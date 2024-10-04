@@ -10,7 +10,5 @@ why not to share it. So enjoy!!
 3. Double click on the KeyTik.exe.
 4. Done
 
-![Screenshot (32)](Data/Screenshot (32).png)
-
 AutoHotkey Web :
 https://www.autohotkey.com/

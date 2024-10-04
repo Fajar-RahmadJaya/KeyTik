@@ -10,7 +10,5 @@ why not to share it. So enjoy!!
 3. Double click on the KeyTik.exe.
 4. Done
 
-<img src="Data/1.png" alt="1" width="600" />
-
 AutoHotkey Web :
 https://www.autohotkey.com/

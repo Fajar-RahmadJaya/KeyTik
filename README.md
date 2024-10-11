@@ -4,6 +4,9 @@ It only have one file as executeable using pyinstaller to make it, so it might a
 star (Maybe i will change it in the future). Anyway i make it for personal use at first, but then 
 why not to share it. So enjoy!!
 
+*Preview
+<img src="Data//picture/Preview.png" alt="Preview" width="600" />
+
 * How To Install :
 1. Download the zip file then extract it.
 2. Download AutoHotkey from : https://www.autohotkey.com/ .

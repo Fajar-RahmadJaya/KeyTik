@@ -6,9 +6,7 @@ why not to share it. So enjoy!!
 
 *Preview
 
-
-
-<img src="Data/Picture/Preview.png" alt="Preview" width="600" />
+<img src="Data/Picture/Preview.png" alt="Preview" width="400" />
 
 * How To Install :
 1. Download the zip file then extract it.

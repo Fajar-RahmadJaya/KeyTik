@@ -5,6 +5,9 @@ star (Maybe i will change it in the future). Anyway i make it for personal use a
 why not to share it. So enjoy!!
 
 *Preview
+
+
+
 <img src="Data/Picture/Preview.png" alt="Preview" width="600" />
 
 * How To Install :

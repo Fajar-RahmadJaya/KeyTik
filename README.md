@@ -4,7 +4,7 @@ It only have one file as executeable using pyinstaller to make it, so it might a
 star (Maybe i will change it in the future). Anyway i make it for personal use at first, but then 
 why not to share it. So enjoy!!
 
-*Preview:
+*Preview :
 
 <img src="Data/Picture/Preview.png" alt="Preview" width="400" />
 

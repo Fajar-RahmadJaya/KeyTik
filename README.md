@@ -34,3 +34,8 @@ SourceForge : https://sourceforge.net/projects/keytik .
 
 AutoHotkey Web :
 https://www.autohotkey.com/
+
+## License
+
+This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
+

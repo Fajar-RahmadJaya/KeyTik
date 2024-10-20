@@ -24,7 +24,7 @@
 4. Edit Remap Profile.
 5. Make Window Always On Top.
 6. Run Profile On Startup.
-7. Show Stored Profile
+7. Show Stored Profile.
 
 ## Case Example On How To Use It :
 1. Multiple profile :

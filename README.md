@@ -37,7 +37,7 @@
 * If you have damaged key on your keyboard and want to remap it permanently (You can still disable it so it's not entirely permanent) without activate it manually every single time you open your computer, you can use "Startup" to make profile run on startup. If you do that, your profile will active every single time you open your computer. You can disable it using "Unstart" or disable it in task manager startup apps.
 5. And more.
 
-## User Safaty (For Those Who Worry About Virus Or Data Safety) :
+## User Safety (For Those Who Worry About Virus Or Data Safety) :
 I don't make this software for that reason and this spftware is open sorce, so you can rest assured. If you still have doubt, you can try virustotal to scan it. Virustotas is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in (https://www.virustotal.com/gui/home/upload). Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
 
 <img src="_internal/Picture/Virus Total Report.png" alt="Virus Total Report" width="500" />

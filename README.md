@@ -8,8 +8,8 @@ why not to share it. So enjoy!!
 
 ## Preview :
 
-<img src="Data/Picture/Preview.png" alt="Preview" width="400" />
-<img src="Data/Picture/Preview_CreateProfile.png" alt="Preview_CreateProfile" width="400" />
+<img src="_internal/Picture/Create Profile Preview.png" alt="Main Preview" width="400" />
+<img src="_internal/Picture/Main Preview.png" alt="/Create Profile Preview" width="400" />
 
 
 ## How To Install :

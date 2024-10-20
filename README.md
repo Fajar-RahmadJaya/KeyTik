@@ -30,9 +30,9 @@
 1. Multiple profile :
 * When you need multiple condition to activate remap like remap keys for different game or you have one key for multiple remap key, you can make different profile as you need and activate or deactivate individually so you don't need to adjust your remap every single time you need it for another condition.
 2. Always on top :
-* When you playing game and that game did't have change input function, you can make KeyTik window to always on top using "Enable Always On Top" button, so you can play the game and know what key need to remap so you don't have to change back and forth beteween window.
+* When you playing game and that game didn't have change input function, you can make KeyTik window to always on top using "Enable Always On Top" button, so you can play the game and know what key need to remap so you don't have to change back and forth between window.
 3. Store Profile :
-* If you don't want to show profile in the main window but you still need it or you just want to store it for future, you can store the profile using "Store" button. If you happen want to run it, you can use "Show Stored Profile" and it will show your stored profile or you want to show it back in main window, you can use "Retrive" button to move it to main window.
+* If you don't want to show profile in the main window but you still need it or you just want to store it for future, you can store the profile using "Store" button. If you happen want to run it, you can use "Show Stored Profile" and it will show your stored profile or you want to show it back in main window, you can use "Retreive" button to move it to main window.
 4. Run On Startup :
 * If you have damaged key on your keyboard and want to remap it permanently (You can still disable it so it's not entirely permanent) without activate it manually every single time you open your computer, you can use "Startup" to make profile run on startup. If you do that, your profile will active every single time you open your computer. You can disable it using "Unstart" or disable it in task manager startup apps.
 5. And more.

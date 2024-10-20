@@ -26,7 +26,7 @@
 6. Run Profile On Startup.
 7. Show Stored Profile.
 
-## Case Example On How To Use It :
+## Case Example On When To Use It :
 1. Multiple profile :
 * When you need multiple condition to activate remap like remap keys for different game or you have one key for multiple remap key, you can make different profile as you need and activate or deactivate individually so you don't need to adjust your remap every single time you need it for another condition.
 2. Always on top :

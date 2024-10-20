@@ -42,7 +42,10 @@ I don't make this software for that reason and this spftware is open sorce, so y
 
 <img src="_internal/Picture/Virus Total Report.png" alt="Virus Total Report" width="500" />
 
-Or you can go to (https://www.virustotal.com/gui/file/f5693aa40c3c5237e853ce1811655ab2b70973f31ed01743d539a872f838fbff/detection) for full scan report. The conclusion is, i dont't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured.
+Or for full scan report you can go to : 
+https://www.virustotal.com/gui/file/f5693aa40c3c5237e853ce1811655ab2b70973f31ed01743d539a872f838fbff/detection
+
+The conclusion is, i dont't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured.
 
 
 ## How To Install :

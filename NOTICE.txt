@@ -1,0 +1,13 @@
+This project includes the following libraries:
+
+1. **Python Standard Library**
+   - Includes modules like `os`, `shutil`, `tkinter`, `messagebox`, `subprocess`, and `sys`.
+   - Licensed under the Python Software Foundation License. The full text of the license can be found at: https://docs.python.org/3/license.html.
+
+2. **pynput**
+   - Copyright (c) 2015-2024 Moses Palmér
+   - Licensed under the MIT License. The full text of the license can be found at: https://github.com/moses-palmer/pynput/blob/master/LICENSE.
+
+3. **AutoHotkey**
+   - Copyright (c) 2017 Hotkeyit, Steve Gray, Chris Mallett, portions (C) AutoIt Team and various others
+   - Licensed under the GPL 2.0 License. The full text of the license can be found at: https://github.com/AutoHotkey/AutoHotkey/blob/alpha/license.txt.

@@ -78,10 +78,3 @@ Subreddit : https://www.reddit.com/r/KeyTik/
 ## License
 
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
-
-
-## Acknowledgements
-- This project uses the following libraries:
-  - **Python Standard Library**: Includes modules like `os`, `shutil`, `tkinter`, `messagebox`, `subprocess`, and `sys`, licensed under the [Python Software Foundation License](https://docs.python.org/3/license.html).
-  - **pynput**: Licensed under the [MIT License](https://github.com/moses-palmer/pynput/blob/master/COPYING.LGPL).
-  - **AutoHotkey**: Licensed under the [GPL 2.0 License](https://github.com/AutoHotkey/AutoHotkey/blob/alpha/license.txt).

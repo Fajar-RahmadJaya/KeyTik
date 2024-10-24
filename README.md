@@ -47,14 +47,14 @@ You can use this when you need to add condition to your remapping like capslock 
 6. And many more.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
-I don't make this software for that reason and this spftware is open sorce, so you can rest assured. If you still have doubt, you can try virustotal to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in (https://www.virustotal.com/gui/home/upload). Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
+I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try virustotal to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in (https://www.virustotal.com/gui/home/upload). Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
 
 <img src="_internal/Picture/Virus Total Report.png" alt="Virus Total Report" width="500" />
 
 Or for full scan report you can go to : 
 https://www.virustotal.com/gui/file/f5693aa40c3c5237e853ce1811655ab2b70973f31ed01743d539a872f838fbff/detection
 
-The conclusion is, i dont't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured.
+The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured.
 
 
 ## How To Install :

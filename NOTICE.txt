@@ -11,3 +11,7 @@ This project includes the following libraries:
 3. **AutoHotkey**
    - Copyright (c) 2017 Hotkeyit, Steve Gray, Chris Mallett, portions (C) AutoIt Team and various others
    - Licensed under the GPL 2.0 License. The full text of the license can be found at: https://github.com/AutoHotkey/AutoHotkey/blob/alpha/license.txt.
+
+4. **Winshell**
+   - Copyright (c) 2012 Tim Golden
+   - Licensed under the MIT License. The full text of the license can be found at: https://github.com/tjguk/winshell/blob/master/LICENSE.txt.

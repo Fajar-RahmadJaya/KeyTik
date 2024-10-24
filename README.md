@@ -52,7 +52,7 @@ I don't make this software for that reason and this software is open source, so 
 <img src="_internal/Picture/Virus Total Report v0.3-beta.1.png" alt="Virus Total Report" width="500" />
 
 Or for full scan report you can go to : 
-https://www.virustotal.com/gui/file/f5693aa40c3c5237e853ce1811655ab2b70973f31ed01743d539a872f838fbff/detection
+https://www.virustotal.com/gui/file/31dca2e0ec231bde3998acd6073d68a68a3c35e817b9bc418c7035d57a1623f5/detection
 
 The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured.
 

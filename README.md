@@ -58,7 +58,7 @@ The conclusion is, i don't intend to add virus or take your personal data intent
 
 
 ## How To Install :
-1. Go to (https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v0.2-beta.1).
+1. Go to (https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v0.3-beta.1).
 2. Download the zip file then extract it.
 3. Download AutoHotkey from (https://www.autohotkey.com/) and install it.
 4. Double click on the KeyTik.exe to run.

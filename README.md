@@ -13,10 +13,14 @@
 
 ## What Make Us Different Then Other Remapper :
 * KeyTik is using AutoHotkey as remapper so basically it has all autohotkey feature as remapper.
-* Various functinality that can help remapping easier.
-* You can activate or deactivate profile individually so you don't need to adjust remap every single time.
-* Run profile on startup so you can activate profile everytime you open the computer without needed to activate manually.
-* Always on top functionality so you can create or edit profile on top of any window.
+* Various functionality that can help remapping easier.
+* Activate Or Seactivate Profile Individually, so you don't need to adjust remap every single time.
+* Run Profile On Startup, so you can activate profile everytime you open the computer without needed to activate manually.
+* Always On Top, so you can create or edit profile on top of any window.
+* Text Mode, so you can use full potential of AutoHotkey.
+* Lightweight, its only 32MB (KeyTik v0.3-beta.1).
+* Simple UI, not using some fancy UI to boost performance and simplicity.
+* Easy To Use, as simple as open software and make profile with add profile name and add remap then just click to use feature and you are good to go.
 * And more.
 
 ## Features :
@@ -37,7 +41,10 @@
 * If you don't want to show profile in the main window but you still need it or you just want to store it for future, you can store the profile using "Store" button. If you happen want to run it, you can use "Show Stored Profile" and it will show your stored profile or you want to show it back in main window, you can use "Retreive" button to move it to main window.
 4. Run On Startup :
 * If you have damaged key on your keyboard and want to remap it permanently (You can still disable it so it's not entirely permanent) without activate it manually every single time you open your computer, you can use "Startup" to make profile run on startup. If you do that, your profile will active every single time you open your computer. You can disable it using "Unstart" or disable it in task manager startup apps.
-5. And more.
+5. Text Mode :
+* Text mode is for more advance remapping. KeyTik using AutoHotkey as remapper and text mode allow you to use AutoHotkey scripting that need more then just remap some key.
+You can use this when you need to add condition to your remapping like capslock need to be active for the script to run or use it for automaton like autoclicking etc. The reason for this feature is so that you can use full potential of AutoHotkey and not limited to just remapping some key.
+6. And many more.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
 I don't make this software for that reason and this spftware is open sorce, so you can rest assured. If you still have doubt, you can try virustotal to scan it. Virustotas is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in (https://www.virustotal.com/gui/home/upload). Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
@@ -74,9 +81,10 @@ If you have any suggestion for KeyTik, we would be very happy to take it. You ca
 
 SourceForge : https://sourceforge.net/projects/keytik .
 
-* Discussion Platform :
+* Announcement And Discussion Platform :
 
-Subreddit : https://www.reddit.com/r/KeyTik/
+Subreddit   : https://www.reddit.com/r/KeyTik/
+Quora Space : https://keytik.quora.com/
 
 
 ## License

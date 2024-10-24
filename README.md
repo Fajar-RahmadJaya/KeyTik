@@ -18,7 +18,7 @@
 * And more.
 
 ## Features :
-1. Create Remap Profile.
+1. Create Remap Profile using default mode or text mode.
 2. Run & Exit Remap Profile.
 3. Delete & Store Remap Profile.
 4. Edit Remap Profile.
@@ -58,7 +58,9 @@ The conclusion is, i dont't intend to add virus or take your personal data inten
 
 ## Feature Plan (Possibly to be Implemented) :
 1. Helper to Know What Remap Key in Profile.
-2. Text Mode In Create and Edit Profile.
+2. Pin Profile.
+3. Assign shortcut on profile.
+4. Create profile or edit only always on top.
 
 
 ## Have Any Suggestion ?

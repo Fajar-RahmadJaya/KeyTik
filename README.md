@@ -1,7 +1,7 @@
 # KeyTik : Keyboard Remapper With Profile
   KeyTik is a keyboard remapper that support profile. It has useful functionality for remapper in a lightweight software. KeyTik use AutoHotkey for remapper so it's flexible and has great potential. KeyTik can made AutoHotkey scripting easier because it basically software to made AutoHotkey attached with another functionality for it. I make it for personal use at first and decided to develop it further. So feel free to try it if you are interested.
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Preview :
 
@@ -31,6 +31,7 @@
 5. Make Window Always On Top.
 6. Run Profile On Startup.
 7. Show Stored Profile.
+8. Import Profile.
 
 ## Example How You Can Use It :
 1. Multiple profile :
@@ -44,7 +45,9 @@
 5. Text Mode :
 * Text mode is for more advance remapping. KeyTik using AutoHotkey as remapper and text mode allow you to use AutoHotkey scripting that need more then just remap some key.
 You can use this when you need to add condition to your remapping like capslock need to be active for the script to run or use it for automaton like auto clicking etc. The reason for this feature is so that you can use full potential of AutoHotkey and not limited to just remapping some key.
-6. And many more.
+6. Import Profile :
+* You can add AutoHotkey script from outside like download it from someone or from some website and use it as profile. It work with adding another command in script so it can use functionality from KeyTik. I also plan to made a repository or another way that can hold AutoHotkey script so you can share your script or download script from someone.
+7. And many more.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
 I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try virustotal to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in (https://www.virustotal.com/gui/home/upload). Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
@@ -58,7 +61,7 @@ The conclusion is, i don't intend to add virus or take your personal data intent
 
 
 ## How To Install :
-1. Go to (https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v0.3-beta.1).
+1. Go to (https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.0).
 2. Download the zip file then extract it.
 3. Download AutoHotkey from (https://www.autohotkey.com/) and install it.
 4. Double click on the KeyTik.exe to run.
@@ -70,6 +73,7 @@ The conclusion is, i don't intend to add virus or take your personal data intent
 2. Pin Profile.
 3. Assign shortcut on profile.
 4. Create profile or edit only always on top.
+5. Repository or another way to made opensource for holding AutoHotkey script to share your script or download script from another person.
 
 
 ## Have Any Suggestion ?

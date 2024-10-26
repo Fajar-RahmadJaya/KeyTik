@@ -53,10 +53,10 @@ You can use this when you need to add condition to your remapping like capslock 
 I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [virustotal](https://www.virustotal.com/gui/home/upload) to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured. Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
 
 * Report Screenshots :
-<img src="_internal/Picture/Virus Total Report v0.3-beta.1.png" alt="Virus Total Report" width="500" />
+<img src="_internal/Picture/Virus Total Report v1.0.png" alt="Virus Total Report" width="500" />
 
 * Full scan report : 
-https://www.virustotal.com/gui/file/31dca2e0ec231bde3998acd6073d68a68a3c35e817b9bc418c7035d57a1623f5/detection
+https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8bf7343eb1b63968a0a59c
 
 
 ## How To Install :

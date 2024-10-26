@@ -77,7 +77,7 @@ https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8b
 
 
 ## Have Any Suggestion ?
-If you have any suggestion for KeyTik, we would be very happy to take it. You can show your suggestion on discussion platform or Issue in github (https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better we can improve KeyTik. So don't be shy to show your suggestion or problem but lets try to be polite and not offend any individual or group. Together, lets make this a wholesome community. We sincerely appreciate your trust and continued support. Thank you.
+If you have any suggestion for KeyTik, we would be very happy to take it. You can show your suggestion on discussion platform or [github issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better we can improve KeyTik. So don't be shy to show your suggestion or problem but lets try to be polite and not offend any individual or group. Together, lets make this a wholesome community. We sincerely appreciate your trust and continued support. Thank you.
 
 
 ## Platform :
@@ -92,12 +92,12 @@ Subreddit   : https://www.reddit.com/r/KeyTik/
 Quora Space : https://keytik.quora.com/
 
 
-## License
+## License :
 
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
 
 
-## Acknowledgements
+## Acknowledgements :
 - This project uses the following libraries:
   - **Python Standard Library**: Includes modules like `os`, `shutil`, `tkinter`, `messagebox`, `subprocess`, and `sys`, licensed under the [Python Software Foundation License](https://docs.python.org/3/license.html).
   - **pynput**: Licensed under the [MIT License](https://github.com/moses-palmer/pynput/blob/master/COPYING.LGPL).

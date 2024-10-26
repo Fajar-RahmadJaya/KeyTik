@@ -1,5 +1,5 @@
-# KeyTik : Keyboard Remapper With Profile
-  KeyTik is a keyboard remapper that support profile. It has useful functionality for remapper in a lightweight software. KeyTik use AutoHotkey for remapper so it's flexible and has great potential. KeyTik can made AutoHotkey scripting easier because it basically software to made AutoHotkey attached with another functionality for it. I make it for personal use at first and decided to develop it further. So feel free to try it if you are interested.
+## KeyTik : Keyboard Remapper With Profile
+  KeyTik is an open-source keyboard remapper that support profile. It has useful functionality for remapper in a lightweight software. KeyTik use AutoHotkey for remapper so it's flexible and has great potential. KeyTik can made AutoHotkey scripting easier because its basically a software to made AutoHotkey script, attached with some functionality. So beside as remapper KeyTik also can also be said as AutoHotkey script manager.I make it for personal use at first and decided to develop it further. So feel free to try it if you are interested.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -50,20 +50,19 @@ You can use this when you need to add condition to your remapping like capslock 
 7. And many more.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
-I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try virustotal to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in (https://www.virustotal.com/gui/home/upload). Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
+I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [virustotal](https://www.virustotal.com/gui/home/upload) to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured. Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
 
+* Report Screenshots :
 <img src="_internal/Picture/Virus Total Report v0.3-beta.1.png" alt="Virus Total Report" width="500" />
 
-Or for full scan report you can go to : 
+* Full scan report : 
 https://www.virustotal.com/gui/file/31dca2e0ec231bde3998acd6073d68a68a3c35e817b9bc418c7035d57a1623f5/detection
-
-The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured.
 
 
 ## How To Install :
-1. Go to (https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.0).
+1. Go to : https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.0.
 2. Download the zip file then extract it.
-3. Download AutoHotkey from (https://www.autohotkey.com/) and install it.
+3. Download and install AutoHotkey from : https://www.autohotkey.com/.
 4. Double click on the KeyTik.exe to run.
 5. Done.
 
@@ -73,11 +72,12 @@ The conclusion is, i don't intend to add virus or take your personal data intent
 2. Pin Profile.
 3. Assign shortcut on profile.
 4. Create profile or edit only always on top.
-5. Repository or another way to made opensource for holding AutoHotkey script to share your script or download script from another person.
+5. Repository or another way for opensource AutoHotkey script sharing and download, so you can share your script and download someone script
+   then import it to keytik.
 
 
 ## Have Any Suggestion ?
-If you have any suggestion for KeyTik, we would be very happy to take it. You can show your suggestion on discussion platform or Issue in github (https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better we can improve KeyTik. So don't shy to show your suggestion or problem but lets try to be polite and not offend any individual or group. Together, lets make this a wholesome community. We sincerely appreciate your trust and continued support. Thank you.
+If you have any suggestion for KeyTik, we would be very happy to take it. You can show your suggestion on discussion platform or Issue in github (https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better we can improve KeyTik. So don't be shy to show your suggestion or problem but lets try to be polite and not offend any individual or group. Together, lets make this a wholesome community. We sincerely appreciate your trust and continued support. Thank you.
 
 
 ## Platform :
@@ -88,6 +88,7 @@ SourceForge : https://sourceforge.net/projects/keytik .
 * Announcement And Discussion Platform :
 
 Subreddit   : https://www.reddit.com/r/KeyTik/
+
 Quora Space : https://keytik.quora.com/
 
 

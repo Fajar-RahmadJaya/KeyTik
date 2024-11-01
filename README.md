@@ -1,4 +1,4 @@
-## KeyTik : Keyboard Remapper With Profile
+## KeyTik : Keyboard Remapper With Profile And AutoHotkey Script Manager
   KeyTik is an open-source keyboard remapper that support profile. It has useful functionality for remapper in a lightweight software. KeyTik use AutoHotkey for remapper so it's flexible and has great potential. KeyTik can made AutoHotkey scripting easier because its basically a software to made AutoHotkey script, attached with some functionality. So beside as remapper KeyTik also can also be said as AutoHotkey script manager. I made it for personal use at first and decided to develop it further. So feel free to try it if you are interested.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------

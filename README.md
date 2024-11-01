@@ -46,7 +46,7 @@
 * Text mode is for more advance remapping. KeyTik using AutoHotkey as remapper and text mode allow you to use AutoHotkey scripting that need more then just remap some key.
 You can use this when you need to add condition to your remapping like capslock need to be active for the script to run or use it for automaton like auto clicking etc. The reason for this feature is so that you can use full potential of AutoHotkey and not limited to just remapping some key.
 6. Import Profile :
-* You can add AutoHotkey script from outside like download it from someone or from some website and use it as profile. It work with adding another command in script so it can use functionality from KeyTik. I also plan to made a repository or another way that can hold AutoHotkey script so you can share your script or download script from someone.
+* You can add AutoHotkey script from outside like download it from someone or from some website and use it as profile. It work with adding another command in script so it can use functionality from KeyTik. We also made a open-source repository for AutoHotkey Script Collection so you can download script and import to KeyTik. Click this "[AutoHotkey Script Collection](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection)" if you are interested.
 7. And many more.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :

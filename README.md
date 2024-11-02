@@ -1,5 +1,5 @@
-## KeyTik : Keyboard Remapper With Profile And AutoHotkey Script Manager
-  KeyTik is an open-source keyboard remapper that support profile. It has useful functionality for remapper in a lightweight software. KeyTik use AutoHotkey for remapper so it's flexible and has great potential. KeyTik can made AutoHotkey scripting easier because its basically a software to made AutoHotkey script, attached with some functionality. So beside as remapper KeyTik also can also be said as AutoHotkey script manager. I made it for personal use at first and decided to develop it further. So feel free to try it if you are interested.
+# KeyTik : Keyboard Remapper With Profile And AutoHotkey Script Manager
+  KeyTik is an open-source keyboard remapper that support profile. It has useful functionality for remapper in a lightweight software. KeyTik use AutoHotkey for remapper so it's flexible and has great potential. KeyTik can made AutoHotkey scripting easier because its basically a software to made AutoHotkey script, attached with some functionality. So beside as remapper KeyTik also can also be said as AutoHotkey script manager. After recent update i realise KeyTik not only can be used as keyboard remapper but also auto clicker, screen clicker and many more. AutoHotkey allow you to made almos automaton and KeyTik is just made it easier to use for beginner or veteran. I made it for personal use at first and decided to develop it further. So feel free to try it if you are interested.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,13 @@
 7. Show Stored Profile.
 8. Import Profile.
 
-## Example How You Can Use It :
+## How To Use KeyTik as Another Automaton : 
+I made another repository to store AutoHotkey script collection. I plan to made it to be as neat and beginner friendly as possible. It also include a script for automaton so you can download it then import it to KeyTik. As it first created, it still didn't has many script but i will try to add more usefull script or you can contribute to it because its open-source. Click this "[AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection)" if you are interested. If you want to use the automaton below, just click on it and you will directed to AutoHotkey collction repository download and guide.
+1. [AutoClicker](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
+2. Screen Clicker (Not Yet Added).
+3. And Many More.
+
+## Example How You Can Use Each Feature :
 1. Multiple profile :
 * When you need multiple condition to activate remap like remap keys for different game or you have one key for multiple remap key, you can make different profile as you need and activate or deactivate individually so you don't need to adjust your remap every single time you need it for another condition.
 2. Always on top :

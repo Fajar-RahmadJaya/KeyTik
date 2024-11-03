@@ -91,12 +91,6 @@ If you have any suggestion for KeyTik, we would be very happy to take it. You ca
 
 SourceForge : https://sourceforge.net/projects/keytik .
 
-* Announcement And Discussion Platform :
-
-Subreddit   : https://www.reddit.com/r/KeyTik/
-
-Quora Space : https://keytik.quora.com/
-
 
 ## License :
 

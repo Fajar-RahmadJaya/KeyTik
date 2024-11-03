@@ -86,7 +86,8 @@ https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8b
 1. Assign Shortcut.
 2. Add Auto Clicker, Screen Clicer, Open Files In The Download.
 3. Add Automatic Key Tracker.
-
+4. Using Python Script To Use Profile.
+Note : I will work on it after i finished adding point 2 in AutoHotkey Script Collection And Template Repository.
 
 ## Have Any Suggestion ?
 If you have any suggestion for KeyTik, we would be very happy to take it. You can show your suggestion on discussion platform or [github issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better we can improve KeyTik. So don't be shy to show your suggestion or problem but lets try to be polite and not offend any individual or group. Together, lets make this a wholesome community. We sincerely appreciate your trust and continued support. Thank you.

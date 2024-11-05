@@ -1,6 +1,6 @@
 # KeyTik: The All-in-One Automation Tool & Keyboard Remapper with Profiles
 ## GUI-Based Keyboard Remapper with Profiles, Auto Clicker, AutoHotkey Manager, and More.
-KeyTik is an open-source automation tool that can do almost all automaton at your will. At first, KeyTik focussing on keyboard remapper with profile to activate or deactivate each remap individually. But because it also use AutoHotkey as scripting lenguage to do the automaton, it allow KeyTik to do all automation available by AutoHotkey such as auto clicker, keyboard remapper, screen clicker and more. With a bit of scripting you can do all of that at ease. If you don't have coding experience, don't wory because i also made a beginner friendly open-source AutoHotkey script collection and template that allow you to use already made script or change it to your preference. I try to make it as easy to understand as possible with guide how to use the template or change the code per script, make sure to visit it at [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). So if you are looking for all-in-one automation with user friendly GUI, then this is what you are looking for. I hope you can enjoy it and it can be useful to you. Sincerely, Fajar Rahmad Jaya.
+KeyTik is an open-source automation tool that can do almost all automaton at your will. At first, KeyTik focused on keyboard remapper with profile to activate or deactivate each remap individually. But because it also use AutoHotkey as scripting language to do the automaton, it allow KeyTik to do all automation available by AutoHotkey such as auto clicker, keyboard remapper, screen clicker and more. With a bit of scripting you can do all of that at ease. If you don't have coding experience, don't worry because i also made a beginner friendly open-source AutoHotkey script collection and template that allow you to use already made script or change it to your preference. I try to make it as easy to understand as possible with guide how to use the template or change the code per script, make sure to visit it at [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). So if you are looking for all-in-one automation with user friendly GUI, then this is what you are looking for. I hope you can enjoy it and it can be useful to you. Sincerely, Fajar Rahmad Jaya.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ KeyTik is an open-source automation tool that can do almost all automaton at you
 <img src="_internal/Picture/Preview Create Text.png" alt="Preview Create Text" width="400" />
 
 ## What Make Us Different Then Other Remapper :
-* KeyTik is using AutoHotkey as remapper so basically it has all autohotkey feature as remapper.
+* KeyTik is using AutoHotkey as remapper so basically it has all AutoHotkey feature as remapper.
 * Various functionality that can help remapping easier.
 * Activate Or Deactivate Profile Individually, so you don't need to adjust remap every single time.
 * Run Profile On Startup, so you can activate profile every time you open the computer without needed to activate manually.

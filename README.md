@@ -1,18 +1,14 @@
-# KeyTik: The All-in-One Automation Tool 
-
+# KeyTik: The All-in-One Automation Tool & Keyboard Remapper with Profiles
 ## GUI-Based Keyboard Remapper with Profiles, Auto Clicker, AutoHotkey Manager, and More.
-
-  KeyTik is an open-source keyboard remapper that support profile. It has useful functionality for remapper in a lightweight software. KeyTik use AutoHotkey for remapper so it's flexible and has great potential. KeyTik can made AutoHotkey scripting easier because its basically a software to made AutoHotkey script, attached with some functionality. So beside as remapper KeyTik also can also be said as AutoHotkey script manager. After recent update i realise KeyTik not only can be used as keyboard remapper but also auto clicker, screen clicker and many more. AutoHotkey allow you to made almos automaton and KeyTik is just made it easier to use for beginner or veteran. I made it for personal use at first and decided to develop it further. So feel free to try it if you are interested.
+KeyTik is an open-source automation tool that can do almost all automaton at your will. At first, KeyTik focussing on keyboard remapper with profile to activate or deactivate each remap individually. But because it also use AutoHotkey as scripting lenguage to do the automaton, it allow KeyTik to do all automation available by AutoHotkey such as auto clicker, keyboard remapper, screen clicker and more. With a bit of scripting you can do all of that at ease. If you don't have coding experience, don't wory because i also made a beginner friendly open-source AutoHotkey script collection and template that allow you to use already made script or change it to your preference. I try to make it as easy to understand as possible with guide how to use the template or change the code per script, so make sure to visit it at [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I hope you can enjoy it and it can be useful to you. Sincerely, Fajar Rahmad Jaya.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Preview :
-
 <img src="_internal/Picture/Preview Main 1.png" alt="Preview Main 1" width="400" />
 <img src="_internal/Picture/Preview Main 2.png" alt="Preview Main 1" width="400" />
 <img src="_internal/Picture/Preview Create Default.png" alt="Preview Create Default" width="400" />
 <img src="_internal/Picture/Preview Create Text.png" alt="Preview Create Text" width="400" />
-
 
 ## What Make Us Different Then Other Remapper :
 * KeyTik is using AutoHotkey as remapper so basically it has all autohotkey feature as remapper.
@@ -24,6 +20,7 @@
 * Lightweight, its only 32MB (KeyTik v0.3-beta.1).
 * Simple UI, not using some fancy UI to boost performance and simplicity.
 * Easy To Use, as simple as open software and make profile with add profile name and add remap then just click to use feature and you are good to go.
+* Multiple Automation Tool Like Auto Clicker, Screen Clicker And More Using AutoHotkey Script.
 * And more.
 
 ## Features :
@@ -56,7 +53,9 @@ I made another repository to store AutoHotkey script collection. I plan to made 
 You can use this when you need to add condition to your remapping like capslock need to be active for the script to run or use it for automaton like auto clicking etc. The reason for this feature is so that you can use full potential of AutoHotkey and not limited to just remapping some key.
 6. Import Profile :
 * You can add AutoHotkey script from outside like download it from someone or from some website and use it as profile. It work with adding another command in script so it can use functionality from KeyTik. We also made a open-source repository for AutoHotkey Script Collection so you can download script and import to KeyTik. Click this "[AutoHotkey Script Collection](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection)" if you are interested.
-7. And many more.
+7. Multiple Automation Tool:
+* With a bit of scripting, you can add many automation tool to your preferences. As for how to do it refer to [How To Use KeyTik as Another Automaton]{https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-another-automaton-), click it or scroll above.
+8. And many more.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
 I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [virustotal](https://www.virustotal.com/gui/home/upload) to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools you can check it in. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission, so you can rest assured. Here is my scan using virustotal (You can also scan for yourself if you want 100% certain) :
@@ -67,15 +66,6 @@ I don't make this software for that reason and this software is open source, so 
 * Full scan report : 
 https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8bf7343eb1b63968a0a59c
 
-
-## How To Install :
-1. Go to : https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.0.
-2. Download the zip file then extract it.
-3. Download and install AutoHotkey from : https://www.autohotkey.com/.
-4. Double click on the KeyTik.exe to run.
-5. Done.
-
-
 ## Feature Plan (Possibly to be Implemented) :
 1. Helper to Know What Remap Key in Profile.
 2. Pin Profile.
@@ -83,7 +73,6 @@ https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8b
 4. Create profile or edit only always on top.
 5. Repository or another way for opensource AutoHotkey script sharing and download, so you can share your script and download someone script
    then import it to keytik.
-
 
 ## Next Release Feature Plan :
 1. Assign Shortcut.
@@ -95,17 +84,12 @@ Note : I will work on it after i finished adding point 2 in AutoHotkey Script Co
 ## Have Any Suggestion ?
 If you have any suggestion for KeyTik, we would be very happy to take it. You can show your suggestion on discussion platform or [github issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better we can improve KeyTik. So don't be shy to show your suggestion or problem but lets try to be polite and not offend any individual or group. Together, lets make this a wholesome community. We sincerely appreciate your trust and continued support. Thank you.
 
-
 ## Platform :
 * Download Platform :
-
 SourceForge : https://sourceforge.net/projects/keytik .
 
-
 ## License :
-
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
-
 
 ## Acknowledgements :
 - This project uses the following libraries:

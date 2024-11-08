@@ -42,7 +42,7 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 * Lightweight: It only 85,5MB!! (KeyTik v1.1).
 * Simple GUI: User friendly and simple GUI to boost functionality and simplicity.
 * Easy To Use: Easy to understand while providing many features.
-* Auto Clicker: Bundled into one with download, you can adjust the auto clicker to your preferences. Refer to [How To Use KeyTik as Another Automaton](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-auto-clicker-).
+* Auto Clicker: Bundled into one with download, you can adjust the auto clicker to your preferences. Refer to [How To Use KeyTik as Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-).
 * Screen Clicker: Still experimenting with it, look forward to it!!
 * Multiple Files Opener Using Shortcut : Still experimenting with it, look forward to it!!
 * Pin Profile : To easily access profile.

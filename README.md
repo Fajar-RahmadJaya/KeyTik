@@ -32,6 +32,11 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 
 ## Platform :
 **SourceForge : https://sourceforge.net/projects/keytik**
+**Reddit :**
+**Quora :**
+**Instagram :**
+**Discord :**
+**X (Formerly Twitter) :**
 
 ## How To Install :
 To install KeyTik you just need to follow these step :

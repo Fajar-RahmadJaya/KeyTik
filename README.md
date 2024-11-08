@@ -14,12 +14,12 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 ## Table Of Content :
 1. [Preview.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview-)
 2. [Platform.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#platform-)
-3. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
-4. [How To Install.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install-)
-5. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
-6. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
-7. [How To Use KeyTik As Auto Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-)
-8. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
+3. [How To Install.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install-)
+4. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
+5. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
+6. [How To Use KeyTik As Auto Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-)
+7. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
+8. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
 9. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
 10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
 11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
@@ -43,19 +43,10 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 
 **X (Formerly Twitter) :**
 
-## User Safety (For Those Who Worry About Virus Or Data Safety) :
-I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [virustotal](https://www.virustotal.com/gui/home/upload) to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. Here is my scan using virustotal if you have doubt (You can also scan for yourself if you want 100% certain) :
-
-* Report Screenshots :
-<img src="_internal/Picture/Virus Total Report v1.0.png" alt="Virus Total Report" width="500" />
-
-* Full scan report : 
-https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8bf7343eb1b63968a0a59c
-
 ## How To Install :
 To install KeyTik you just need to follow these step :
-1. Download AutoHotkey on [AutoHotkey Download](https://www.autohotkey.com/download/)
-2. Download KeyTik zip file at [KeyTik v1.1 Download](https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.1)
+1. Download AutoHotkey on https : //www.autohotkey.com/download/
+2. Download KeyTik zip file at https : //github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.1)
 3. Extract zip file.
 4. Open extracted file and go to KeyTik.exe.
 5. Double click on KeyTik.exe to run.
@@ -126,6 +117,15 @@ Auto clicker come bundled as one whenever you download KeyTik. I take it from [A
 * You can pin your favorite profile or profile that you use the most so it can showed first in the profile list. You just need to click pin icon on the profile to make it work.
   
 **11. And many more.**
+
+## User Safety (For Those Who Worry About Virus Or Data Safety) :
+I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [virustotal](https://www.virustotal.com/gui/home/upload) to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release but maybe it will tak time for me to update it. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. Here is my scan using virustotal if you have doubt (You can also scan for yourself if you want 100% certain) :
+
+* Report Screenshots :
+<img src="_internal/Picture/Virus Total Report v1.0.png" alt="Virus Total Report" width="500" />
+
+* Full scan report : 
+https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8bf7343eb1b63968a0a59c
 
 ## Feature Plan (Possibly to be Implemented) :
 1. Helper to Know What Remap Key in Profile.

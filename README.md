@@ -12,13 +12,24 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 > **Sincerely, thank You.**
 
 ## Table Of Content :
-1. a
+1. [Preview.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview-)
+2. [Platform.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#platform-)
+3. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
+4. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
+5. [How To Use KeyTik As Auto Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-)
+6. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
+7. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
+8. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
+9. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
+10. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
+11. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
+
 ## Preview :
 <img src="Preview/main.png" alt="Preview Main 1" width="400" />
 <img src="Preview/default mode.png" alt="Preview Default Mode" width="400" />
 <img src="Preview/text mode.png" alt="Preview Text Mode" width="400" />
 
-## Link :
+## Platform :
 **SourceForge : https://sourceforge.net/projects/keytik**
 
 ## What Make Us Different Then Other Automation Tool :

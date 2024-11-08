@@ -6,7 +6,9 @@ With a bit of scripting you can do all of that at ease. If you don't have coding
 
 
 > [!NOTE]
-> Don't Forget To Give Star Or Pin If You Are Satisfied With KeyTik. Thank You.
+> Don't Forget To Give Star Or Pin If You Are Satisfied With KeyTik.
+> Also help me fill my github poll to know how much KeyTik user is in [KeyTik User Survey Poll](https://github.com/Fajar-RahmadJaya/KeyTik/discussions/3).
+> Thank You .
 
 ## Preview :
 <img src="_internal/Picture/Preview Main 1.png" alt="Preview Main 1" width="400" />

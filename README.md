@@ -14,15 +14,16 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 ## Table Of Content :
 1. [Preview.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview-)
 2. [Platform.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#platform-)
-3. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
-4. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
-5. [How To Use KeyTik As Auto Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-)
-6. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
-7. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
-8. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
-9. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
-10. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
-11. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
+3. [How To Install.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install-)
+4. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
+5. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
+6. [How To Use KeyTik As Auto Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-)
+7. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
+8. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
+9. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
+10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
+11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
+12. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
 
 ## Preview :
 <img src="Preview/main.png" alt="Preview Main 1" width="400" />
@@ -31,6 +32,15 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 
 ## Platform :
 **SourceForge : https://sourceforge.net/projects/keytik**
+
+## How To Install :
+To install KeyTik you just need to follow these step :
+1. Download AutoHotkey on [AutoHotkey Download](https://www.autohotkey.com/download/)
+2. Download KeyTik zip file at [KeyTik v1.1 Download](https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.1)
+3. Extract zip file.
+4. Open extracted file and go to KeyTik.exe.
+5. Double click on KeyTik.exe to run.
+6. Done.
 
 ## What Make Us Different Then Other Automation Tool :
 * Using AutoHotkey as profile script lenguage allow KeyTik to use all feature and potential of AutoHotkey.

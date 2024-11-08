@@ -32,10 +32,15 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 
 ## Platform :
 **SourceForge : https://sourceforge.net/projects/keytik**
+
 **Reddit :**
-**Quora :**
+
+**Quora : https://www.quora.com/profile/KeyTik**
+
 **Instagram :**
+
 **Discord :**
+
 **X (Formerly Twitter) :**
 
 ## How To Install :

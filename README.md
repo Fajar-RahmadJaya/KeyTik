@@ -62,7 +62,7 @@ KeyTik comes packed with a wide range of features designed to give you ultimate 
 
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
-| 1      | **Run & Exit Remap Profile to Activate/Deactivate Profile Individually** | Activate or deactivate profiles individually, so you don't need to adjust the remap every time. |
+| 1      | **Run & Exit Remap Profile** | Activate or deactivate profiles individually, so you don't need to adjust the remap every time. |
 | 2      | **Run Profile on Startup**                         | Run profiles on startup, so it will automatically activate when you open your device—no need to manually activate it each time. |
 | 3      | **Delete & Store Remap Profile**                   | Delete unnecessary profiles and store profiles for a clean main window without permanently removing them. |
 | 4      | **Pin Profile**                                    | Pin your favorite profiles for quick and easy access. |

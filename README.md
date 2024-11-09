@@ -2,12 +2,14 @@
 ## GUI-Based Keyboard Remapper with Profiles, Auto Clicker, AutoHotkey Manager, and More.
 KeyTik is an open-source automation tool that can do almost all automation at your will. At first, KeyTik focused on keyboard remapper with profile to activate or deactivate each remap individually. But because it also use AutoHotkey as scripting language to do the automation, it allow KeyTik to do all automation available by AutoHotkey such as auto clicker, keyboard remapper, screen clicker and more. 
 
-With a bit of scripting you can do all of that with ease. If you don't have coding experience, don't worry because i also made a beginer friendly open-source AutoHotkey script collection and template that allow you to download already made script or edit it to your preference. I try to make it as easy to understand as possible with guide how to use the template or change the code in each script, make sure to visit it at [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) if you are interested. So if you are looking for lightweight auto clicker, keyboard remapper, screen clicker and more or All-in-One Automation Tool and AutoHotkey script manager with user friendly GUI, then this is what you are looking for. I hope you can enjoy it and it can be useful to you. Sincerely, Fajar Rahmad Jaya.
+With a bit of scripting you can do all of that with ease. If you don't have coding experience, don't worry because i also made a beginner friendly open-source AutoHotkey script collection and template that allow you to download already made script or edit it to your preference. I try to make it as easy to understand as possible with guide how to use the template or change the code in each script, make sure to visit it at [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) if you are interested. 
+
+So if you are looking for lightweight auto clicker, keyboard remapper, screen clicker and more or All-in-One Automation Tool and AutoHotkey script manager with user friendly GUI, then this is what you are looking for. I hope you can enjoy it and it can be useful to you. Sincerely, Fajar Rahmad Jaya.
 
 > [!NOTE]
 > **Don't forget to give us star if you are satisfied with KeyTik and share it so the world can know about KeyTik.**
 > <br/>
-> **Also help me fill my github poll to know how much KeyTik user is in [KeyTik User Survey Poll](https://github.com/Fajar-RahmadJaya/KeyTik/discussions/3).**
+> **Also help me fill my GitHub poll to know how much KeyTik user is in [KeyTik User Survey Poll](https://github.com/Fajar-RahmadJaya/KeyTik/discussions/3).**
 > <br/>
 > **Sincerely, thank You.**
 
@@ -31,7 +33,7 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 <img src="Preview/text mode.png" alt="Preview Text Mode" width="400" />
 
 ## Platform :
-**SourceForge : https://sourceforge.net/projects/keytik**
+**Source Forge : https://sourceforge.net/projects/keytik**
 
 **Reddit :**
 
@@ -45,24 +47,24 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 
 ## How To Install :
 To install KeyTik you just need to follow these step :
-1. Download AutoHotkey on https : //www.autohotkey.com/download/
-2. Download KeyTik zip file at https : //github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.1)
+1. Download AutoHotkey on : https://www.autohotkey.com/download/
+2. Download KeyTik zip file at : https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.1
 3. Extract zip file.
 4. Open extracted file and go to KeyTik.exe.
 5. Double click on KeyTik.exe to run.
 6. Done.
 
 ## What Make Us Different Then Other Automation Tool :
-* Using AutoHotkey as profile script lenguage allow KeyTik to use all feature and potential of AutoHotkey.
+* Using AutoHotkey as profile script language allow KeyTik to use all feature and potential of AutoHotkey.
 * Various functionality that can help remapping and scripting easier.
 * Activate or deactivate profile individually: You don't need to adjust remap every time.
-* Run profile on startup: You can make each profile to always run everytime you open your device so you don't need to activate each profile every single time.
-* Always on top:  Allow you to easily remap keys while opening another window, this feature is useful esecially on gaming.
+* Run profile on startup: You can make each profile to always run every time you open your device so you don't need to activate each profile every single time.
+* Always on top:  Allow you to easily remap keys while opening another window, this feature is useful especially on gaming.
 * Text mode: Allow you to adjust or create your AutoHotkey script easily without opening the editor.
 * Lightweight: It only 85,5MB!! (KeyTik v1.1).
 * Simple GUI: User friendly and simple GUI to boost functionality and simplicity.
 * Easy To Use: Easy to understand while providing many features.
-* Auto Clicker: Bundled togather with the download, you can adjust the auto clicker to your preferences. Refer to [How To Use KeyTik as Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-).
+* Auto Clicker: Bundled together with the download, you can adjust the auto clicker to your preferences. Refer to [How To Use KeyTik as Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-).
 * Screen Clicker: Still experimenting with it, look forward to it!!
 * Multiple Files Opener Using Shortcut : Still experimenting with it, look forward to it!!
 * Pin Profile : To easily access profile.
@@ -83,7 +85,7 @@ To install KeyTik you just need to follow these step :
 12. Pin Profile.
 
 ## How To Use KeyTik As Auto Clicker :
-Auto clicker come bundled as one whenever you download KeyTik. I take it from [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) so the default it use hold 'e' to activate auto clicker. So whenever you hold the 'e' key on you keyboard, it will simulate left click infinitely with 100 milisecond between each left click. You can adjust it like change the 'e' key, change left click, change interval. For more guide on how to change it or download the script, go to [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
+Auto clicker come bundled as one whenever you download KeyTik. I take it from [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) so the default it use hold 'e' to activate auto clicker. So whenever you hold the 'e' key on you keyboard, it will simulate left click infinitely with 100 millisecond between each left click. You can adjust it like change the 'e' key, change left click, change interval. For more guide on how to change it or download the script, go to [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
 
 ## Example How You Can Use Each Feature :
 **1. Multiple profile :**
@@ -99,7 +101,7 @@ Auto clicker come bundled as one whenever you download KeyTik. I take it from [A
 * If you have damaged key on your keyboard and want to remap it permanently (You can still disable it so it's not entirely permanent) without activate it manually every single time you open your computer, you can use "Startup" button to make profile run on startup. If you do that, your profile will active every single time you open your computer. You can disable it using "Unstart" or disable it in task manager startup apps.
   
 **5. Text Mode :**
-* Text mode is for more advance remapping. KeyTik using AutoHotkey as profile automation script lenguage and text mode allow you to edit your script without opening  script editor. You can use this when you need to adjust your script or use it for automation like auto clicking etc. The reason for this feature is, so that you can use full potential of AutoHotkey and not limited to just remapping some key.
+* Text mode is for more advance remapping. KeyTik using AutoHotkey as profile automation script language and text mode allow you to edit your script without opening  script editor. You can use this when you need to adjust your script or use it for automation like auto clicking etc. The reason for this feature is, so that you can use full potential of AutoHotkey and not limited to just remapping some key.
   
 **6. Import Profile :**
 * You can add AutoHotkey script from outside, like download script from someone or from some platform and use it as profile. It work with adding another command in your imported script so it can use functionality from KeyTik. I also made an open-source repository for AutoHotkey Script Collection and template that allow you to download already made AutoHotkey script. AutoHotkey Script Collection and template also give you guide on how to adjust the script to your preferences or using the script as script template. Click this "[AutoHotkey Script Collection](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection)" if you are interested.
@@ -119,7 +121,7 @@ Auto clicker come bundled as one whenever you download KeyTik. I take it from [A
 **11. And many more.**
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
-I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [virustotal](https://www.virustotal.com/gui/home/upload) to scan it. Virustotal is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release but maybe it will tak time for me to update it. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. Here is my scan using virustotal if you have doubt (You can also scan for yourself if you want 100% certain) :
+I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release but maybe it will take time for me to update it. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. Here is my scan using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :
 
 * Report Screenshots :
 <img src="_internal/Picture/Virus Total Report v1.0.png" alt="Virus Total Report" width="500" />
@@ -135,7 +137,7 @@ https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8b
 5. Refine key input.
 
 ## Have Any Suggestion ?
-If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion on [github issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.
+If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion on [GitHub issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.
 
 ## License :
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.

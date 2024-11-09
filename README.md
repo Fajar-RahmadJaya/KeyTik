@@ -39,12 +39,23 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 
 ## How To Install :
 To install KeyTik you just need to follow these step :
-1. Download AutoHotkey on : https://www.autohotkey.com/download/
-2. Download KeyTik zip file at : https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.1
-3. Extract zip file.
-4. Open extracted file and go to KeyTik.exe.
-5. Double click on KeyTik.exe to run.
-6. Done.
+1. **Download And Install AutoHotkey**
+    - AutoHotkey Download Website : https://www.autohotkey.com/download/.
+    - If you encounter any issues with AutoHotkey installation, Visit AutoHotkey install documentation at : https://www.autohotkey.com/docs/v2/howto/Install.htm.
+2. **Download KeyTik from one of the following platforms**
+    - KeyTik v1.1 Github Release : https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.1.
+    - Source Forge : https://sourceforge.net/projects/keytik.
+3. **Extract KeyTik zip file**
+    - Extract the downloaded KeyTik zip file to a location of your choice.
+4. **Open KeyTik folder**
+    - Navigate to the folder where you extracted KeyTik and locate KeyTik.exe.
+5. **Run KeyTik**
+    - Double-click KeyTik.exe to start it.
+6. **You're All Set!**
+    - KeyTik should now be ready to use.
+
+> [!NOTE]
+> **Ensure that AutoHotkey is installed correctly, as it is required for KeyTik to run.**  
 
 ## Features :
 KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:
@@ -96,6 +107,8 @@ Below are my plan and what i have in mind for future KeyTik Development :
 | 5      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as indentifier | Pending |
 | 6      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
 | 7      | **Refine Error Handling**                          | Adding more helpfull error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
+| 8      | **Screen Clicker**                                 | Automation tool to auto click images on screen using interval and condition. | Pending |
+| 9      | **Open Multiple Files Using Shotcut**              | Run multiple program easily using shortcut. | Pending |
 
 
 ## Example How You Can Use Each Feature :

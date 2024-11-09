@@ -20,9 +20,9 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 4. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
 5. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
 6. [How To Use KeyTik As Auto Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-)
-7. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
-8. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
-9. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
+7. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
+8. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
+9. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
 10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
 11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
 12. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
@@ -84,6 +84,16 @@ To install KeyTik you just need to follow these step :
 11. Import Profile.
 12. Pin Profile.
 
+## Feature Plan (Possibly to be Implemented) :
+1. Helper to Know What Remap Key in Profile.
+2. Create profile or edit only always on top.
+3. Refine shortcut.
+4. Automatically take key input.
+5. Refine key input.
+6. Assign script or remap for multiple or different physical keyboard.
+7. Resize and remember window size.
+8. Refine Error Handling.
+
 ## How To Use KeyTik As Auto Clicker :
 Auto clicker come bundled as one whenever you download KeyTik. I take it from [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) so the default it use hold 'e' to activate auto clicker. So whenever you hold the 'e' key on you keyboard, it will simulate left click infinitely with 100 millisecond between each left click. You can adjust it like change the 'e' key, change left click, change interval. For more guide on how to change it or download the script, go to [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
 
@@ -128,15 +138,6 @@ I don't make this software for that reason and this software is open source, so 
 
 * Full scan report : 
 https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8bf7343eb1b63968a0a59c
-
-## Feature Plan (Possibly to be Implemented) :
-1. Helper to Know What Remap Key in Profile.
-2. Create profile or edit only always on top.
-3. Refine shortcut.
-4. Automatically take key input.
-5. Refine key input.
-6. Assign script or remap for multiple or different physical keyboard.
-7. Resize and remember window size.
 
 ## Have Any Suggestion ?
 If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion on [GitHub issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.

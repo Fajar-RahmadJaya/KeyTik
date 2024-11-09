@@ -17,11 +17,11 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 1. [Preview.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview-)
 2. [Platform.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#platform-)
 3. [How To Install.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install-)
-4. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
-5. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
+4. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
+5. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
 6. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
-7. [How To Use KeyTik As Auto Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-)
-8. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
+7. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
+8. [How To Use KeyTik As Auto Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-)
 9. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
 10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
 11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
@@ -35,15 +35,7 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 ## Platform :
 **Source Forge : https://sourceforge.net/projects/keytik**
 
-**Reddit :**
-
 **Quora : https://www.quora.com/profile/KeyTik**
-
-**Instagram :**
-
-**Discord :**
-
-**X (Formerly Twitter) :**
 
 ## How To Install :
 To install KeyTik you just need to follow these step :
@@ -54,48 +46,57 @@ To install KeyTik you just need to follow these step :
 5. Double click on KeyTik.exe to run.
 6. Done.
 
-## What Make Us Different Then Other Automation Tool :
-* Using AutoHotkey as profile script language allow KeyTik to use all feature and potential of AutoHotkey.
-* Various functionality that can help remapping and scripting easier.
-* Activate or deactivate profile individually: You don't need to adjust remap every time.
-* Run profile on startup: You can make each profile to always run every time you open your device so you don't need to activate each profile every single time.
-* Always on top:  Allow you to easily remap keys while opening another window, this feature is useful especially on gaming.
-* Text mode: Allow you to adjust or create your AutoHotkey script easily without opening the editor.
-* Lightweight: It only 85,5MB!! (KeyTik v1.1).
-* Simple GUI: User friendly and simple GUI to boost functionality and simplicity.
-* Easy To Use: Easy to understand while providing many features.
-* Auto Clicker: Bundled together with the download, you can adjust the auto clicker to your preferences. Refer to [How To Use KeyTik as Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-).
-* Screen Clicker: Still experimenting with it, look forward to it!!
-* Multiple Files Opener Using Shortcut : Still experimenting with it, look forward to it!!
-* Pin Profile : To easily access profile.
-* And more.
+## Feature :
+KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:
 
-## Features :
-1. Create Remap Profile.
-2. Edit Remap Profile.
-3. Default Mode In Create Or Edit Profile.
-4. Text Mode In Create Or Edit Profile.
-5. Assign Shortcut On Profile.
-6. Run & Exit Remap Profile To Activate Or Deactivate Profile Individually.
-7. Delete & Store Remap Profile.
-8. Make Window Always On Top.
-9. Run Profile On Startup.
-10. Show Stored Profile.
-11. Import Profile.
-12. Pin Profile.
+| **No** | **Feature**                                         | **Description** |
+|--------|-----------------------------------------------------|-----------------|
+| 1      | **Run & Exit Remap Profile to Activate/Deactivate Profile Individually** | Activate or deactivate profiles individually, so you don't need to adjust the remap every time. |
+| 2      | **Run Profile on Startup**                         | Run profiles on startup, so it will automatically activate when you open your device—no need to manually activate it each time. |
+| 3      | **Delete & Store Remap Profile**                   | Delete unnecessary profiles and store profiles for a clean main window without permanently removing them. |
+| 4      | **Pin Profile**                                    | Pin your favorite profiles for quick and easy access. |
+| 5      | **Edit Remap Profile**                             | Adjust your profile to your preference. |
+| 6      | **Create Multiple Remap Profile**                  | You can create remap not only once but multiple time. |
+| 7      | **Assign Shortcut on Each Profile**                | Enable or Disable your profile using shortcuts. |
+| 8      | **Default Mode in Create or Edit Profile**         | The easiest way to remap your keyboard. |
+| 9      | **Text Mode in Create or Edit Profile**            | Text Mode allows you to adjust or create your AutoHotkey script easily, without needing an external editor.  |
+| 10     | **Make Window Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
+| 11     | **Show Stored Profile**                            | Display your stored profile or restore it to main window. |
+| 12     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
+
+## What Make Us Different Then Other Automation Tool :
+KeyTik have unique capabilities and make it different than other automation tool. Here’s why KeyTik is the best choice for your need:"
+
+- **Various Functionality**:
+  - KeyTik offer various remapping and scripting functionalities that will give you more control over your profiles.
+  - Check out [Feature Section for more]([feature](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-))
+
+- **Flexible with Great Potential**:
+  - Using AutoHotkey as profile script language, allow KeyTik to utilize all feature and potential from AutoHotkey.
+
+- **Lightweight and Easy to Use**:
+  - It’s only 85.5MB!! (KeyTik v1.1)
+  - User friendly and simple GUI to boost functionality and simplicity
+  - Easy to understand while providing plenty of features.
+
+- **All-in-One Automation Tool**:
+  - **Auto Clicker**: Bundled with the download, allow you to adjust the auto clicker to your preferences for more advanced automation. Check out [How To Use KeyTik as Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-).
+
+- **And More.**
 
 ## Feature Plan (Possibly to be Implemented) :
-1. Helper to Know What Remap Key in Profile.
-2. Create profile or edit only always on top.
-3. Refine shortcut.
-4. Automatically take key input.
-5. Refine key input.
-6. Assign script or remap for multiple or different physical keyboard.
-7. Resize and remember window size.
-8. Refine Error Handling.
+Below are my plan and what i have in mind for future KeyTik Development :
 
-## How To Use KeyTik As Auto Clicker :
-Auto clicker come bundled as one whenever you download KeyTik. I take it from [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) so the default it use hold 'e' to activate auto clicker. So whenever you hold the 'e' key on you keyboard, it will simulate left click infinitely with 100 millisecond between each left click. You can adjust it like change the 'e' key, change left click, change interval. For more guide on how to change it or download the script, go to [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
+| **No** | **Feature Plan**                                   | **Description** | **Status** |
+|--------|----------------------------------------------------|-----------------|------------|
+| 1      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
+| 2      | **Create Profile or Edit Only Always on Top**      | Make "Alway on top" only only for create or edit window and not then main window. | Pending |
+| 3      | **Refine Shortcut**                                | Make it more format for entry easier (currently you need to fill with "[key 1] & [Key 2]" format for it to work. | Pending |
+| 4      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |      In progress |
+| 5      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as indentifier | Pending |
+| 6      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
+| 7      | **Refine Error Handling**                          | Adding more helpfull error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
+
 
 ## Example How You Can Use Each Feature :
 **1. Multiple profile :**
@@ -129,6 +130,9 @@ Auto clicker come bundled as one whenever you download KeyTik. I take it from [A
 * You can pin your favorite profile or profile that you use the most so it can showed first in the profile list. You just need to click pin icon on the profile to make it work.
   
 **11. And many more.**
+
+## How To Use KeyTik As Auto Clicker :
+Auto clicker come bundled as one whenever you download KeyTik. I take it from [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) so the default it use hold 'e' to activate auto clicker. So whenever you hold the 'e' key on you keyboard, it will simulate left click infinitely with 100 millisecond between each left click. You can adjust it like change the 'e' key, change left click, change interval. For more guide on how to change it or download the script, go to [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
 I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release but maybe it will take time for me to update it. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. Here is my scan using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :

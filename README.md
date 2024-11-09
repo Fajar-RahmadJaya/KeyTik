@@ -46,7 +46,7 @@ To install KeyTik you just need to follow these step :
 5. Double click on KeyTik.exe to run.
 6. Done.
 
-## Feature :
+## Features :
 KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:
 
 | **No** | **Feature**                                         | **Description** |

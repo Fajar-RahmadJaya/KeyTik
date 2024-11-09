@@ -55,7 +55,7 @@ To install KeyTik you just need to follow these step :
     - KeyTik should now be ready to use.
 
 > [!NOTE]
-> **Ensure that AutoHotkey is installed correctly, as it is required for KeyTik to run.**  
+> **Ensure that AutoHotkey is installed correctly, as it is required for KeyTik to be able to run profile.**  
 
 ## Features :
 KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:

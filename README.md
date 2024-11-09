@@ -136,6 +136,7 @@ https://www.virustotal.com/gui/file/048ed88f32af6f14b36368aa35f1c826d9280a717a8b
 4. Automatically take key input.
 5. Refine key input.
 6. Assign script or remap for multiple or different physical keyboard.
+7. Resize and remember window size.
 
 ## Have Any Suggestion ?
 If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion on [GitHub issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.

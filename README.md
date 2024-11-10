@@ -102,8 +102,8 @@ Below are my plan and what i have in mind for future KeyTik Development :
 |--------|----------------------------------------------------|-----------------|------------|
 | 1      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
 | 2      | **Create Profile or Edit Only Always on Top**      | Make "Alway on top" only only for create or edit window and not then main window. | Pending |
-| 3      | **Refine Shortcut**                                | Make it more format for entry easier (currently you need to fill with "[key 1] & [Key 2]" format for it to work. | Pending |
-| 4      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |      In progress |
+| 3      | **Refine Shortcut**                                | Make it more format for entry easier (currently you need to fill with "[key 1] & [Key 2]" format for it to work. | Completed Waiting For Release |
+| 4      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |      Completed Waiting For Release |
 | 5      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as indentifier | Pending |
 | 6      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
 | 7      | **Refine Error Handling**                          | Adding more helpfull error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |

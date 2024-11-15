@@ -76,8 +76,10 @@ KeyTik comes packed with a wide range of features designed to give you ultimate 
 | 12     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
 | 13      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
 | 14      | **Auto Clickert**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is holded. You can change the 'left click', 'e', interval part to your preference see [How To Use KeyTik As Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-) for more info.                 |
-| 15      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Dont wory because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode.                |
-| 16      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference.               |
+| 15      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Dont wory because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode, see point 16.                |
+| 16      | **Screeen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference.                |
+| 17      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference.               |
+
 ## What Make Us Different Then Other Automation Tool :
 KeyTik have unique capabilities and make it different than other automation tool. Here’s why KeyTik is the best choice for your need:"
 
@@ -103,13 +105,10 @@ Below are my plan and what i have in mind for future KeyTik Development :
 
 | **No** | **Feature Plan**                                   | **Description** | **Status** |
 |--------|----------------------------------------------------|-----------------|------------|
-| 1      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
-| 2      | **Create Profile or Edit Only Always on Top**      | Make "Alway on top" only only for create or edit window and not then main window. | Pending |
-| 3      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as indentifier | Inprogress |
-| 4      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
-| 5      | **Refine Error Handling**                          | Adding more helpfull error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
-| 6      | **Screen Clicker**                                 | Automation tool to auto click images on screen using interval and condition. | Pending |
-| 7      | **Open Multiple Files Using Shotcut**              | Run multiple program easily using shortcut. | Pending |
+| 1      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as indentifier | Inprogress |
+| 2      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
+| 3      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
+| 4      | **Refine Error Handling**                          | Adding more helpfull error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
 
 
 ## Example How You Can Use Each Feature :
@@ -145,8 +144,19 @@ Below are my plan and what i have in mind for future KeyTik Development :
   
 **11. And many more.**
 
-## How To Use KeyTik As Auto Clicker :
-Auto clicker come bundled as one with download. If you don't need auto clicker you can stil delete it whenever you want. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) with default is 'e' as condition to do auto clicker. So whenever you hold the 'e' key on you keyboard, it will simulate left click infinitely with 100 millisecond between each left click and stop when you release 'e' key. You can adjust it as you will  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template releaseon [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
+## How To Use Automation Tool :
+Automation tools come bundled as one with KeyTik download. It count as profile in text mode, so all of it can use KeyTik feature. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I add comment on the script to make it easier to change. So if there are ";" on the line in script that mean after it or ";" right is comment and what you can change is before it or left ";". Example : '''space:: ; This is comment'''. On that example 'space' is what you can change and '; this is comment' is the comment. Comment mean AutoHotkey not detect it as input which mean comment is not affecting script.
+### Auto Clicker:
+Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 milisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template releaseon [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
+
+### Screen Clicker :
+Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Dont wory because KeyTik also comes with tool to find screen coordinate then it will automatically copy.
+
+### Screeen Coordinate Auto Detect And Copy :
+To make screen clicker editing easier. I also include coordinate detector to KeyTik. On dafault, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you prevference.
+
+### Multiple Files Opener :
+You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
 I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. Here is my scan using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :

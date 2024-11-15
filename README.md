@@ -21,7 +21,7 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 5. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
 6. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
 7. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
-8. [How To Use KeyTik Automation Tool.]([https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool-))
+8. [How To Use KeyTik Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool-)
 9. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
 10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
 11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)

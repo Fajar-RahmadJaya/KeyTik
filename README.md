@@ -74,6 +74,7 @@ KeyTik comes packed with a wide range of features designed to give you ultimate 
 | 10     | **Make Window Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
 | 11     | **Show Stored Profile**                            | Display your stored profile or restore it to main window. |
 | 12     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
+| 13      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
 
 ## What Make Us Different Then Other Automation Tool :
 KeyTik have unique capabilities and make it different than other automation tool. Here’s why KeyTik is the best choice for your need:"
@@ -102,13 +103,11 @@ Below are my plan and what i have in mind for future KeyTik Development :
 |--------|----------------------------------------------------|-----------------|------------|
 | 1      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
 | 2      | **Create Profile or Edit Only Always on Top**      | Make "Alway on top" only only for create or edit window and not then main window. | Pending |
-| 3      | **Refine Shortcut**                                | Make it more format for entry easier (currently you need to fill with "[key 1] & [Key 2]" format for it to work. | Completed Waiting For Release |
-| 4      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |      Completed Waiting For Release |
-| 5      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as indentifier | Pending |
-| 6      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
-| 7      | **Refine Error Handling**                          | Adding more helpfull error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
-| 8      | **Screen Clicker**                                 | Automation tool to auto click images on screen using interval and condition. | Pending |
-| 9      | **Open Multiple Files Using Shotcut**              | Run multiple program easily using shortcut. | Pending |
+| 3      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as indentifier | Inprogress |
+| 4      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
+| 5      | **Refine Error Handling**                          | Adding more helpfull error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
+| 6      | **Screen Clicker**                                 | Automation tool to auto click images on screen using interval and condition. | Pending |
+| 7      | **Open Multiple Files Using Shotcut**              | Run multiple program easily using shortcut. | Pending |
 
 
 ## Example How You Can Use Each Feature :

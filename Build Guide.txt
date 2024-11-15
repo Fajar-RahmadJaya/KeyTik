@@ -17,4 +17,4 @@ So if you download KeyTik and not KeyTik Source Code in the release, then you do
   - It should create folder and file like this (Build, KeyTik.spec, Dist)
   - Your KeyTik executeable file should be in the Dist including _internal folder.
   Note : You can discard Build and KeyTik.spec as that is only Pyinstaller build remain. 
-  The actual important part is only in Dist which KeyTik executeable file and _internal (The necessary file to make executeable work). 
+  The actual important part is only in Dist which KeyTik executeable file and _internal (The necessary file to make executeable work).

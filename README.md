@@ -75,7 +75,9 @@ KeyTik comes packed with a wide range of features designed to give you ultimate 
 | 11     | **Show Stored Profile**                            | Display your stored profile or restore it to main window. |
 | 12     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
 | 13      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
-
+| 14      | **Auto Clickert**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is holded. You can change the 'left click', 'e', interval part to your preference see [How To Use KeyTik As Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-) for more info.                 |
+| 15      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Dont wory because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode.                |
+| 16      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference.               |
 ## What Make Us Different Then Other Automation Tool :
 KeyTik have unique capabilities and make it different than other automation tool. Here’s why KeyTik is the best choice for your need:"
 

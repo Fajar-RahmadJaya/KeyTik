@@ -92,7 +92,7 @@ KeyTik have unique capabilities and make it different than other automation tool
   - Using AutoHotkey as profile script language, allow KeyTik to utilize all feature and potential from AutoHotkey.
 
 - **Lightweight and Easy to Use**:
-  - It’s only 85.5MB!! (KeyTik v1.1)
+  - It’s only 85.7MB!! (KeyTik v1.2)
   - User friendly and simple GUI to boost functionality and simplicity
   - Easy to understand while providing plenty of features.
 

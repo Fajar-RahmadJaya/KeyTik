@@ -18,8 +18,8 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 4. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
 5. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
 6. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
-7. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
-8. [How To Use KeyTik Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool-)
+7. [How To Use KeyTik Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool-)
+8. [Example How You Can Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#example-how-you-can-use-each-feature-)
 9. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
 10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
 11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
@@ -41,7 +41,10 @@ To install KeyTik you just need to follow these step :
     - AutoHotkey Download Website : https://www.autohotkey.com/download/.
     - If you encounter any issues with AutoHotkey installation, Visit AutoHotkey install documentation at : https://www.autohotkey.com/docs/v2/howto/Install.htm.
 2. **Download KeyTik from one of the following platforms**
-    - KeyTik v1.1 Github Release : https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.1.
+    - KeyTik Github Release : https://github.com/Fajar-RahmadJaya/KeyTik/releases.
+      - There are 2 option to download, normal version and source code version.
+      - If you want simple version in executeable form, you can download the normal version (In release it's the zip file without 'open source version' name on it, example KeyTik.v1.2.rar). In normal version you can directly double click the exe file to run KeyTik.
+      - If you want the raw code only, you can download source code version (In release it's the zip file with 'open source version' name on it, example KeyTik.v1.2.Source.Code.Download.Version.rar). To make it work, you need to install required python library or build it into executeable yourself. I have added guide to build it into the download or you can see it in [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt).
     - Source Forge : https://sourceforge.net/projects/keytik.
 3. **Extract KeyTik zip file**
     - Extract the downloaded KeyTik zip file to a location of your choice.
@@ -108,6 +111,20 @@ Below are my plan and what i have in mind for future KeyTik Development :
 | 3      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
 | 4      | **Refine Error Handling**                          | Adding more helpful error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
 
+## How To Use KeyTik Automation Tool :
+Automation tools come bundled as one with KeyTik download. It count as profile in text mode, so all of it can use KeyTik feature. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I add comment on the script to make it easier to change. So if there are ";" on the line in script that mean after it or ";" right is comment and what you can change is before it or left ";". Example : '''space:: ; This is comment'''. On that example 'space' is what you can change and '; this is comment' is the comment. Comment mean AutoHotkey not detect it as input which mean comment is not affecting script.
+
+### Auto Clicker:
+Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 millisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
+
+### Screen Clicker :
+Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy.
+
+### Screen Coordinate Auto Detect And Copy :
+To make screen clicker editing easier. I also include coordinate detector to KeyTik. On default, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you preference.
+
+### Multiple Files Opener :
+You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path.
 
 ## Example How You Can Use Each Feature :
 **1. Multiple profile :**
@@ -128,41 +145,18 @@ Below are my plan and what i have in mind for future KeyTik Development :
 **6. Import Profile :**
 * You can add AutoHotkey script from outside, like download script from someone or from some platform and use it as profile. It work with adding another command in your imported script so it can use functionality from KeyTik. I also made an open-source repository for AutoHotkey Script Collection and template that allow you to download already made AutoHotkey script. AutoHotkey Script Collection and template also give you guide on how to adjust the script to your preferences or using the script as script template. Click this "[AutoHotkey Script Collection](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection)" if you are interested.
   
-**7. Auto Clicker :**
-* With a bit of scripting, you can add many automation tool to your preferences such as auto clicker. As for how to do it refer to [How To Use KeyTik as Another Automation](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-auto-clicker-) or scroll above.
-  
-**8. Screen Clicker :**
-* Still at work, look forward to it!!
-  
-**9. Multiple Files Opener Using Shortcut :**
-* Still at work, look forward to it!!
-  
-**10. Pin Profile :**
+**7. Pin Profile :**
 * You can pin your favorite profile or profile that you use the most so it can showed first in the profile list. You just need to click pin icon on the profile to make it work.
-  
-**11. And many more.**
-
-## How To Use KeyTik Automation Tool :
-Automation tools come bundled as one with KeyTik download. It count as profile in text mode, so all of it can use KeyTik feature. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I add comment on the script to make it easier to change. So if there are ";" on the line in script that mean after it or ";" right is comment and what you can change is before it or left ";". Example : '''space:: ; This is comment'''. On that example 'space' is what you can change and '; this is comment' is the comment. Comment mean AutoHotkey not detect it as input which mean comment is not affecting script.
-
-### Auto Clicker:
-Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 millisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
-
-### Screen Clicker :
-Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy.
-
-### Screen Coordinate Auto Detect And Copy :
-To make screen clicker editing easier. I also include coordinate detector to KeyTik. On default, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you preference.
-
-### Multiple Files Opener :
-You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
-I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. 
+I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety in each version. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust with you so you can use KeyTik without worry. 
 
-But if you still have some doubt, i also include non built version on release. With it you can check the source code yourself. You can also build it yourself, i also include buld guide on the download or you can check it [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt). Again, i don't intend to add malware on KeyTik so don't be afraid to download the normal version which i build myself using the same code in source code version.
+But if you still have some doubt, i also include non built version on release. With it you can check the source code yourself. You can also build it yourself, i also include buld guide on the download or you can check it [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt). So there are 2 download version in each release starting from version 1.2. They are normal and source code version. Normal version is download version which i build it myself using the same code as in source code version so you don't have to. I use python library [Pyinstaller](https://github.com/pyinstaller/pyinstaller) to built it. 
+The source code version is download version that not builded, in other word it's the raw code. 
 
-Here is my scan on KeyTik v1.2 using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :
+People usually prefer this version to made sure there isn't anything suspicious because if it's source code they can check it themself. You typically can't do this if it's in executeable format because usually executeable contain binary which make it difficult to check. But at the end at least for KeyTik, what i build and what you build yourself is the same if you use the same technique and command like me using Pyinstaller because i build the normal version using the same code in the source code version. To make it work, you need to install the required python libry or build it yourself into executeable. So if you don't want an extra step then, normal version is what you need. If you want only the source code or have no problem with extra step, then source code version is what you need.
+
+Again, i don't intend to add malware on KeyTik so don't be afraid to download the normal version which i build myself using the same code in source code version. Here is my scan on KeyTik v1.2 using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :
 
 * Report Screenshots :
 <img src="Preview/Virustotal Normal Version v1.2.png" alt="Virus Total Report v1.2 Normal Version" width="500" />
@@ -173,14 +167,17 @@ Here is my scan on KeyTik v1.2 using virus Total if you have doubt (You can also
    - Source Code Download Version : https://www.virustotal.com/gui/file/82f076b8d3f5487c4b46c32707c313b1ba879e561100c33514ebb053926b7bc8?nocache=1
 
 ## Have Any Suggestion ?
-If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion on [GitHub issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.
+If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion or ask anything about KeyTik on [GitHub issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.
 
 ## License :
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
 
 ## Acknowledgements :
 - This project uses the following libraries:
-  - **Python Standard Library**: Includes modules like `os`, `shutil`, `tkinter`, `messagebox`, `subprocess`, and `sys`, licensed under the [Python Software Foundation License](https://docs.python.org/3/license.html).
+  - **Python Standard Library**: Includes modules like `os`, `shutil`, `tkinter`, `subprocess`, `json`, `time` and `sys`, licensed under the [Python Software Foundation License](https://docs.python.org/3/license.html).
   - **pynput**: Licensed under the [MIT License](https://github.com/moses-palmer/pynput/blob/master/COPYING.LGPL).
+  - **win32com.client**: Licensed under the [Python Software Foundation License](https://github.com/mhammond/pywin32).
+  - **PIL**: Licensed under the [MIT License](https://pillow.readthedocs.io/en/stable/releasenotes/7.0.0.html#license).
+  - **keyboard**: Licensed under the [MIT License](https://github.com/boppreh/keyboard/blob/master/LICENSE.txt).
   - **AutoHotkey**: Licensed under the [GPL 2.0 License](https://github.com/AutoHotkey/AutoHotkey/blob/alpha/license.txt).
   - **Winshell**: Licensed under the [MIT License](https://github.com/tjguk/winshell/blob/master/LICENSE.txt).

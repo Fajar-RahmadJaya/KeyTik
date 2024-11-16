@@ -24,12 +24,11 @@ We take security vulnerabilities seriously and follow a responsible disclosure p
 
 ## Supported Versions
 
-We commit to providing security updates and patches for **all versions** of this project, including past releases. This ensures that security vulnerabilities are addressed, regardless of the version you are using.
+We commit to providing security updates and patches for **Latest Version** of this project. This ensures that security vulnerabilities are addressed for current or future version.
 
-- All released versions, including **v1.x.x**, **v2.x.x**, **v3.x.x**, and future releases, will be patched as needed to address security issues.
 - For any major, minor, or patch versions of the project, security updates will be made available to fix reported vulnerabilities.
 
-To receive the latest security fixes, we strongly encourage users to upgrade to the latest stable version of the software. However, we will continue supporting older versions by backporting fixes and patches where possible.
+To receive the latest security fixes, we strongly encourage users to upgrade to the latest stable version of the software.
 
 ## Security Best Practices
 

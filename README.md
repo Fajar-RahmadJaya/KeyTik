@@ -97,7 +97,10 @@ KeyTik have unique capabilities and make it different than other automation tool
   - Easy to understand while providing plenty of features.
 
 - **All-in-One Automation Tool**:
-  - **Auto Clicker**: Bundled with the download, allow you to adjust the auto clicker to your preferences for more advanced automation. Check out [How To Use KeyTik as Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-as-auto-clicker-).
+  - **Auto Clicker**: Bundled with the download, and considered as advance auto clicker where you can adjust the key to click (not just left click), interval between click and condition to activate it such as hold 'e'. Check out [How To Use KeyTik as Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker) for how to do it.
+  - **Screen Clicker**: Bundled with the download, allow you to click on multiple screen coordinate automatically. Same with auto clicker, you can adjust coordinate (you can use Screen Coordinate Auto Detect And Copy below this to easily find screen coordinate), interval between click, condition to activate it. Check out [How To Use KeyTik as screen clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-) for how to do it.
+  - **Screen Coordinate Auto Detect And Copy**: Bundled with the download, allow you to get screen coordinate and automatically copy it. You can adjust condition to activate it to your preference. Check out [How To Use KeyTik as Screen Coordinate Auto Detect And Copy](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy-) for how to do it.
+  - **Multiple Files Opener**: Bundled with the download, allow you to open multiple files or program using shortcut such as 'ctrl+alt'. You can change the shortcut and what files or program to open to your preference. Check out [How To Use KeyTik as Multiple Files Opener](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-).
 
 - **And More.**
 

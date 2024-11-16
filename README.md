@@ -75,9 +75,9 @@ KeyTik comes packed with a wide range of features designed to give you ultimate 
 | 11     | **Show Stored Profile**                            | Display your stored profile or restore it to main window. |
 | 12     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
 | 13      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
-| 14      | **Auto Clickert**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is holded. You can change the 'left click', 'e', interval part to your preference. See [How To Use KeyTik As Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker) for more info.                 |
-| 15      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Dont wory because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode, see point 16. see [Screen Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-) for more info.                |
-| 16      | **Screeen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference. See [Screeen Coordinate Auto Detect And Copy](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screeen-coordinate-auto-detect-and-copy-) for more info.               |
+| 14      | **Auto Clicker**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is holded. You can change the 'left click', 'e', interval part to your preference. See [How To Use KeyTik As Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker) for more info.                 |
+| 15      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode, see point 16. see [Screen Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-) for more info.                |
+| 16      | **Screen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference. See [Screen Coordinate Auto Detect And Copy](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screeen-coordinate-auto-detect-and-copy-) for more info.               |
 | 17      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference. see [Multiple Files Opener](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-) for more info.               |
 
 ## What Make Us Different Then Other Automation Tool :
@@ -105,10 +105,10 @@ Below are my plan and what i have in mind for future KeyTik Development :
 
 | **No** | **Feature Plan**                                   | **Description** | **Status** |
 |--------|----------------------------------------------------|-----------------|------------|
-| 1      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as indentifier | Inprogress |
+| 1      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as identifier | InProgress |
 | 2      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
 | 3      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
-| 4      | **Refine Error Handling**                          | Adding more helpfull error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
+| 4      | **Refine Error Handling**                          | Adding more helpful error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
 
 
 ## Example How You Can Use Each Feature :
@@ -146,26 +146,33 @@ Below are my plan and what i have in mind for future KeyTik Development :
 
 ## How To Use KeyTik Automation Tool :
 Automation tools come bundled as one with KeyTik download. It count as profile in text mode, so all of it can use KeyTik feature. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I add comment on the script to make it easier to change. So if there are ";" on the line in script that mean after it or ";" right is comment and what you can change is before it or left ";". Example : '''space:: ; This is comment'''. On that example 'space' is what you can change and '; this is comment' is the comment. Comment mean AutoHotkey not detect it as input which mean comment is not affecting script.
+
 ### Auto Clicker:
-Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 milisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template releaseon [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
+Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 millisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
 
 ### Screen Clicker :
-Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Dont wory because KeyTik also comes with tool to find screen coordinate then it will automatically copy.
+Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy.
 
-### Screeen Coordinate Auto Detect And Copy :
-To make screen clicker editing easier. I also include coordinate detector to KeyTik. On dafault, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you prevference.
+### Screen Coordinate Auto Detect And Copy :
+To make screen clicker editing easier. I also include coordinate detector to KeyTik. On default, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you preference.
 
 ### Multiple Files Opener :
 You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path.
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
-I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. Here is my scan using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :
+I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust for KeyTik user so they can use KeyTik without worry. 
+
+But if you still have some doubt, i also include non built version on release. With it you can check the source code yourself. You can also build it yourself, i also include buld guide on the download or you can check it [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt). Again, i don't intend to add malware on KeyTik so don't be afraid to download the normal version which i build myself using the same code in source code version.
+
+Here is my scan on KeyTik v1.2 using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :
 
 * Report Screenshots :
-<img src="Preview/Virus Total Report v1.1.png" alt="Virus Total Report" width="500" />
+<img src="Preview/Virustotal Normal Version v1.2.png" alt="Virus Total Report v1.2 Normal Version" width="500" />
+<img src="Preview/Virustotal Source Code Version v1.2.png" alt="Virus Total Report v1.2 Source Code Version" width="500" />
 
 * Full scan report : 
-   - https://www.virustotal.com/gui/file-analysis/YjZjMzEwMmQxNDBhNmY0N2QxNTgzODdiOWYyYmI3NmU6MTczMTE3NDg3OQ==
+   - Normal Download Version : https://www.virustotal.com/gui/file/69acdb1a58e5a22383790f785dbf138eae3cc57da9dac21ca3e61b817d83df84?nocache=1
+   - Source Code Download Version : https://www.virustotal.com/gui/file/82f076b8d3f5487c4b46c32707c313b1ba879e561100c33514ebb053926b7bc8?nocache=1
 
 ## Have Any Suggestion ?
 If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion on [GitHub issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.

@@ -121,13 +121,13 @@ Automation tools come bundled as one with KeyTik download. It count as profile i
 Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 millisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Auto Clicker When Holding Specific Key](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/AutoClickHoldingKey).
 
 ### Screen Clicker :
-Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy.
+Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy. 
 
 ### Screen Coordinate Auto Detect And Copy :
 To make screen clicker editing easier. I also include coordinate detector to KeyTik. On default, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you preference.
 
 ### Multiple Files Opener :
-You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path.
+You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Shortcut To Open Multiple Files](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/ShortcutOpenFiles).
 
 ## Example How You Can Use Each Feature :
 **1. Multiple profile :**

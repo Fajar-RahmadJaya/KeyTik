@@ -9,8 +9,6 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 > [!NOTE]
 > **Don't forget to give us star if you are satisfied with KeyTik and share it so the world can know about KeyTik.**
 > <br/>
-> **Also help me fill my GitHub poll to know how much KeyTik user is in [KeyTik User Survey Poll](https://github.com/Fajar-RahmadJaya/KeyTik/discussions/3).**
-> <br/>
 > **Sincerely, thank You.**
 
 ## Table Of Content :

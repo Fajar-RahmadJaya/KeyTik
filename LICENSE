@@ -173,6 +173,45 @@
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
+      Third-Party Libraries and Their Licenses:
+
+   This project uses the following third-party libraries:
+
+   1. **Python Standard Library**
+   - License: Python Software Foundation License
+         - License Text: https://docs.python.org/3/license.html
+      - Acknowledgment: This project uses modules like `os`, `shutil`, `tkinter`, `subprocess`, `json`, `time`, and `sys`, licensed under the Python Software Foundation    License.
+
+   2. **pynput**
+      - License: MIT License
+      - License Text: https://opensource.org/licenses/MIT
+      - Acknowledgment: This project uses `pynput` under the MIT License.
+   
+   3. **win32com.client**
+      - License: Python Software Foundation License
+      - License Text: https://docs.python.org/3/license.html
+      - Acknowledgment: This project uses `win32com.client` under the Python Software Foundation License.
+
+   4. **PIL (Python Imaging Library)**
+      - License: MIT License
+      - License Text: https://opensource.org/licenses/MIT
+      - Acknowledgment: This project uses `PIL` under the MIT License.
+
+   5. **keyboard**
+      - License: MIT License
+      - License Text: https://opensource.org/licenses/MIT
+      - Acknowledgment: This project uses `keyboard` under the MIT License.
+
+   6. **Winshell**
+      - License: MIT License
+      - License Text: https://opensource.org/licenses/MIT
+      - Acknowledgment: This project uses `Winshell` under the MIT License.
+
+   7. **AutoHotkey Interception**
+      - License: MIT License
+      - License Text: https://opensource.org/licenses/MIT
+      - Acknowledgment: This project uses `AutoHotkey Interception` under the MIT License.
+
    END OF TERMS AND CONDITIONS
 
    Copyright 2024 Fajar Rahmad Jaya

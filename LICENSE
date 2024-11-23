@@ -212,6 +212,12 @@
       - License Text: https://opensource.org/licenses/MIT
       - Acknowledgment: This project uses `AutoHotkey Interception` under the MIT License.
 
+   8. **Interception**
+      - License: LGPL 3.0 License
+      - License Text: https://www.gnu.org/licenses/lgpl-3.0.en.html#license-text
+      - Acknowledgment: This project uses `Interception` under the LGPL 3.0 License.
+      - Source Code: https://github.com/oblitum/Interception
+
    END OF TERMS AND CONDITIONS
 
    Copyright 2024 Fajar Rahmad Jaya

@@ -171,7 +171,7 @@ Again, i don't intend to add malware on KeyTik so don't be afraid to download th
    - https://www.virustotal.com/gui/file/314211b7b27e58fb9beef44467ae3155e42bade9f4b780ef38fcd86a95312598
 
 > [!NOTE]
-> **I don't add the normal download version is because i realize whatever i do pyinstaller build will always detected as malware. But the source code version itself is not detected as malware. If you are curious or still worried, try to download source code version then build it yourself and try to rescan. Even if you build it yourself or i build it, it will still detected as malware if we build using pyinstaller. Don't worry, it's false positive.**
+> **I don't add the normal download version is because i just realize whatever i do pyinstaller build will always detected as malware. But the source code version itself is not detected as malware. If you are curious or still worried, try to download source code version then build it yourself and try to rescan. Even if you build it yourself the result will be the same. It will still detected as malware as long as we build it using pyinstaller. Don't worry, it's false positive.**
 > <br/>
 > **This is completely normal so you don't have to worry.**
 

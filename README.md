@@ -29,34 +29,36 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 <img src="Preview/main.png" alt="Preview Main" width="400" />
 <img src="Preview/default_mode.png" alt="Default Mode" width="400" />
 <img src="Preview/text mode.png" alt="Preview Text Mode" width="400" />
+<img src="Preview/select_device.png" alt="Select Device" width="400" />
 
 ## Platform :
 **Source Forge : https://sourceforge.net/projects/keytik**
 
-**Quora : https://www.quora.com/profile/KeyTik**
-
-## How To Install :
+## How To Install : 
 To install KeyTik you just need to follow these step :
 1. **Download And Install AutoHotkey**
     - AutoHotkey Download Website : https://www.autohotkey.com/download/.
     - If you encounter any issues with AutoHotkey installation, Visit AutoHotkey install documentation at : https://www.autohotkey.com/docs/v2/howto/Install.htm.
-2. **Download KeyTik from one of the following platforms**
-    - KeyTik Github Release : https://github.com/Fajar-RahmadJaya/KeyTik/releases.
-      - There are 2 option to download, normal version and source code version.
-      - If you want simple version in executable form, you can download the normal version (In release it's the zip file without 'open source version' name on it, example KeyTik.v1.2.rar). In normal version you can directly double click the exe file to run KeyTik.
-      - If you want the raw code only, you can download source code version (In release it's the zip file with 'open source version' name on it, example KeyTik.v1.2.Source.Code.Download.Version.rar). To make it work, you need to install required python library or build it into executable yourself. I have added guide to build it into the download or you can see it in [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt).
+2. **(Optional) If You Use Assign Profile On Specific Device Feature, You Need To Download And Install Interception Driver First**
+    - Interception Driver Download : https://github.com/oblitum/Interception/releases
+    - To install, visit [AutoHotkey Interception, Install the Intereception driver](https://github.com/evilC/AutoHotInterception?tab=readme-ov-file#install-the-intereception-driver) for detailed install guide.
+4. **Download KeyTik from one of the following platforms**
+    - KeyTik GitHub Release : https://github.com/Fajar-RahmadJaya/KeyTik/releases.
+     - There are 2 option to download, normal version and source code version.
+     - If you want simple version in executable form, you can download the normal version (In release it's the zip file without 'open source version' name on it, example KeyTik.v1.3.rar). In normal version you can directly double click the exe file to run KeyTik.
+     - If you want the raw code only, you can download source code version (In release it's the zip file with 'open source version' name on it, example KeyTik.v1.3.Source.Code.Download.Version.rar). To make it work, you need to install required python library or build it into executable yourself. I have added guide to build it into the download or you can see it in [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt).
     - Source Forge : https://sourceforge.net/projects/keytik.
-3. **Extract KeyTik zip file**
+5. **Extract KeyTik zip file**
     - Extract the downloaded KeyTik zip file to a location of your choice.
-4. **Open KeyTik folder**
+6. **Open KeyTik folder**
     - Navigate to the folder where you extracted KeyTik and locate KeyTik.exe.
-5. **Run KeyTik**
+7. **Run KeyTik**
     - Double-click KeyTik.exe to start it.
-6. **You're All Set!**
+8. **You're All Set!**
     - KeyTik should now be ready to use.
 
 > [!NOTE]
-> **Ensure that AutoHotkey is installed correctly, as it is required for KeyTik to be able to run profile.**  
+> **Ensure that AutoHotkey is installed correctly, as it is required for KeyTik to be able to run profile. And if you use assign profile on specific device feature, ensure that Interception Driver is installed correctly, as it is required to be able to do that.**
 
 ## Features :
 KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:
@@ -80,6 +82,7 @@ KeyTik comes packed with a wide range of features designed to give you ultimate 
 | 15      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode, see point 16. see [Screen Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-) for more info.                |
 | 16      | **Screen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference. See [Screen Coordinate Auto Detect And Copy](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screeen-coordinate-auto-detect-and-copy-) for more info.               |
 | 17      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference. see [Multiple Files Opener](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-) for more info.               |
+| 18      | **Assign Script or Remap Profile to Specific Keyboard or Mouse Using Device VID and PID or Handle** | Make script or remap profile to only work for specific physical keyboard or mouse using device VID and PID or Handle as identifier. It work using help from [AutoHotkey Interception by evilC(https://github.com/evilC/AutoHotInterception) and [Interception driver by oblitum](https://github.com/oblitum/Interception). |
 
 ## What Make Us Different Then Other Automation Tool :
 KeyTik have unique capabilities and make it different than other automation tool. Here’s why KeyTik is the best choice for your need:"
@@ -92,7 +95,7 @@ KeyTik have unique capabilities and make it different than other automation tool
   - Using AutoHotkey as profile script language, allow KeyTik to utilize all feature and potential from AutoHotkey.
 
 - **Lightweight and Easy to Use**:
-  - It’s only 85.7MB!! (KeyTik v1.2)
+  - It’s only 85.8MB!! (KeyTik v1.3)
   - User friendly and simple GUI to boost functionality and simplicity
   - Easy to understand while providing plenty of features.
 
@@ -109,7 +112,7 @@ Below are my plan and what i have in mind for future KeyTik Development :
 
 | **No** | **Feature Plan**                                   | **Description** | **Status** |
 |--------|----------------------------------------------------|-----------------|------------|
-| 1      | **Assign Script or Remap for Multiple or Different Physical Keyboards** | Make profile only work for some physical keyboard using keyboard ID as identifier | InProgress |
+| 1      | **Improve Documentation** | Make documentation more detailed and Make KeyTik website | InProgress |
 | 2      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
 | 3      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
 | 4      | **Refine Error Handling**                          | Adding more helpful error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
@@ -162,12 +165,15 @@ But at the end at least for KeyTik, what i build and what you build yourself is 
 Again, i don't intend to add malware on KeyTik so don't be afraid to download the normal version which i build myself using the same code in source code version. Here is my scan on KeyTik v1.2 using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :
 
 * Report Screenshots :
-<img src="Preview/Virustotal Normal Version v1.2.png" alt="Virus Total Report v1.2 Normal Version" width="500" />
-<img src="Preview/Virustotal Source Code Version v1.2.png" alt="Virus Total Report v1.2 Source Code Version" width="500" />
+<img src="Preview/Virus Total Report v1.3.png" alt="Virus Total Report v1.3" width="500" />
 
 * Full scan report : 
-   - Normal Download Version : https://www.virustotal.com/gui/file/69acdb1a58e5a22383790f785dbf138eae3cc57da9dac21ca3e61b817d83df84?nocache=1
-   - Source Code Download Version : https://www.virustotal.com/gui/file/82f076b8d3f5487c4b46c32707c313b1ba879e561100c33514ebb053926b7bc8?nocache=1
+   - https://www.virustotal.com/gui/file/314211b7b27e58fb9beef44467ae3155e42bade9f4b780ef38fcd86a95312598
+
+> [!NOTE]
+> **I don't add the normal download version is because i realize whatever i do pyinstaller build will always detected as malware. But the source code version itself is not detected as malware. If you are curious or still worried, try to download source code version then build it yourself and try to rescan. Even if you build it yourself or i build it, it will still detected as malware if we build using pyinstaller. Don't worry, it's false positive.**
+> <br/>
+> **This is completely normal so you don't have to worry.**
 
 ## Have Any Suggestion ?
 If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion or ask anything about KeyTik on [GitHub issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.

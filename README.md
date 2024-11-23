@@ -186,4 +186,4 @@ This project uses the following libraries:
 - **keyboard**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
 - **AutoHotkey Interception**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
 - **Winshell**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
-
+- **Interception**: Licensed under the [LGPL 3.0 License](https://www.gnu.org/licenses/lgpl-3.0.en.html#license-text).

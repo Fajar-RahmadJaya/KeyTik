@@ -15,6 +15,7 @@ from tkinter import TclError
 import keyboard
 import time
 from pynput import mouse
+from tkinter import ttk
 
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 
@@ -34,24 +35,22 @@ if not os.path.exists(store_dir):
 
 SCRIPT_DIR = active_dir
 
-if getattr(sys, 'frozen', False):  
-    icon_path = os.path.join(sys._MEIPASS, '_internal', "Data", "icon.ico")  
-else:
-    icon_path = os.path.join(data_dir, "icon.ico")  
-
-if getattr(sys, 'frozen', False):  
-    pin_path = os.path.join(sys._MEIPASS, '_internal', "Data", "que.ico")  
-else:
-    pin_path = os.path.join(data_dir, "pin.json")  
-
 PINNED_FILE = os.path.join(data_dir, "pinned_profiles.json")
 
-if getattr(sys, 'frozen', False):  
-    icon_unpinned_path = os.path.join(sys._MEIPASS, '_internal', "Data", "icon_a.png")
-    icon_pinned_path = os.path.join(sys._MEIPASS, '_internal', "Data", "icon_b.png")
+if getattr(sys, 'frozen', False):
+    icon_path = os.path.join(sys._MEIPASS,  "Data", "icon.ico")
+    pin_path = os.path.join(sys._MEIPASS, "Data", "que.ico")
+    icon_unpinned_path = os.path.join(sys._MEIPASS, "Data", "icon_a.png")
+    icon_pinned_path = os.path.join(sys._MEIPASS, "Data", "icon_b.png")
+    device_list_path = os.path.join(sys._MEIPASS, "Data", "Active", "AutoHotkey Interception", "shared_device_info.txt")
+    device_finder_path = os.path.join(sys._MEIPASS, 'Data', 'Active', "AutoHotkey Interception", "find_device.ahk")
 else:
-    icon_unpinned_path = os.path.join(data_dir, "icon_a.png")  
-    icon_pinned_path = os.path.join(data_dir, "icon_b.png")  
+    icon_path = os.path.join(data_dir, "icon.ico")
+    pin_path = os.path.join(data_dir, "pin.json")
+    icon_unpinned_path = os.path.join(data_dir, "icon_a.png")
+    icon_pinned_path = os.path.join(data_dir, "icon_b.png")
+    device_list_path = os.path.join(active_dir, "Autohotkey Interception", "shared_device_info.txt")
+    device_finder_path = os.path.join(active_dir, "Autohotkey Interception", "find_device.ahk")
 
 def load_pinned_profiles():
     try:
@@ -108,7 +107,7 @@ class ScriptManagerApp:
         self.shortcut_entry = None
 
         if getattr(sys, 'frozen', False):  
-            self.keylist_path = os.path.join(sys._MEIPASS, '_internal', "Data", "key_list.txt")
+            self.keylist_path = os.path.join(sys._MEIPASS, "Data", "key_list.txt")
         else:
 
             self.keylist_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_internal", "Data", "key_list.txt")
@@ -273,9 +272,8 @@ class ScriptManagerApp:
         save_pinned_profiles(self.pinned_profiles)
         self.list_scripts()
         self.update_script_list()
+
     def import_button(self):
-        from tkinter import Tk, filedialog
-        import shutil  
 
         Tk().withdraw()  
         selected_file = filedialog.askopenfilename(title="Select AHK Script", filetypes=[("AHK Scripts", "*.ahk")])
@@ -304,7 +302,7 @@ class ScriptManagerApp:
         with open(destination_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
-        already_has_exit = any("^!p::" in line or "ExitApp" in line for line in lines)
+        already_has_exit = any("^!p::ExitApp" in line for line in lines)
         already_has_default = any("; default" in line or "; text" in line for line in lines)
 
         if not already_has_exit or not already_has_default:
@@ -315,16 +313,14 @@ class ScriptManagerApp:
 
                 new_lines = [
                     "; default\n",
-                    "^!p::\n",
-                    "ExitApp\n",
+                    "^!p::ExitApp\n",
                     "\n"  
                 ] + [first_line + '\n'] + lines[1:]
             else:
 
                 new_lines = [
                     "; text\n",
-                    "^!p::\n",
-                    "ExitApp\n",
+                    "^!p::ExitApp\n",
                     "\n"  
                 ] + lines
 
@@ -472,9 +468,112 @@ class ScriptManagerApp:
             entry_var.set("    " + current_value.strip())  
         return True
 
+    def parse_device_info(self, file_path):
+        devices = []
+        try:
+            with open(file_path, 'r') as file:
+                lines = file.readlines()
+
+            lines = [line.strip() for line in lines if line.strip()]
+
+            device_info = {}
+            for line in lines:
+                line = line.strip()
+                if line.startswith("Device ID:"):
+
+                    if device_info:
+                        if device_info.get('VID') and device_info.get('PID') and device_info.get('Handle'):
+                            devices.append(device_info)  
+                    device_info = {'Device ID': line.split(":")[1].strip()}
+                elif line.startswith("VID:"):
+                    device_info['VID'] = line.split(":")[1].strip()
+                elif line.startswith("PID:"):
+                    device_info['PID'] = line.split(":")[1].strip()
+                elif line.startswith("Handle:"):
+                    device_info['Handle'] = line.split(":")[1].strip()
+                elif line.startswith("Is Mouse:"):
+                    device_info['Is Mouse'] = line.split(":")[1].strip()
+
+            if device_info.get('VID') and device_info.get('PID') and device_info.get('Handle'):
+                devices.append(device_info)
+
+        except Exception as e:
+            print(f"Error reading device info: {e}")
+
+        return devices
+
+    def refresh_device_list(self, file_path):
+        os.startfile(device_finder_path)  
+        time.sleep(1)  
+        devices = self.parse_device_info(file_path)
+        return devices
+
+    def update_treeview(self, devices, tree):
+        for item in tree.get_children():
+            tree.delete(item)
+
+        for device in devices:
+            if device.get('VID') and device.get('PID') and device.get('Handle'):
+
+                device_type = "Mouse" if device['Is Mouse'] == "Yes" else "Keyboard"
+                tree.insert("", "end", values=(device_type, device['VID'], device['PID'], device['Handle']))
+
+    def select_device(self, tree, entry, window):
+        selected_item = tree.selection()
+        if selected_item:
+            device = tree.item(selected_item[0])['values']
+            device_type = device[0]
+
+            if device[1] == "0x0000" and device[2] == "0x0000":
+                vid_pid = device[3]  
+            else:
+                vid_pid = f"{device[1]}, {device[2]}"  
+
+            entry.delete(0, tk.END)  
+            entry.insert(0, f"{device_type}, {vid_pid}")
+
+            window.destroy()
+
+    def open_device_selection(self):
+        device_selection_window = tk.Toplevel(self.create_profile_window)
+        device_selection_window.geometry("600x300+308+233")
+        device_selection_window.title("Select Keyboard Device")
+        device_selection_window.iconbitmap(icon_path)
+        device_selection_window.transient(self.create_profile_window)
+
+        tree = ttk.Treeview(device_selection_window, columns=("Device Type", "VID", "PID", "Handle"), show="headings")
+        tree.heading("Device Type", text="Device Type")
+        tree.heading("VID", text="VID")
+        tree.heading("PID", text="PID")
+        tree.heading("Handle", text="Handle")
+        tree.pack(padx=10, pady=10)
+
+        tree.column("Device Type", width=150)  
+        tree.column("VID", width=100)
+        tree.column("PID", width=100)
+        tree.column("Handle", width=200)
+
+        devices = self.refresh_device_list(device_list_path)  
+        self.update_treeview(devices, tree)
+
+        button_frame = tk.Frame(device_selection_window)
+        button_frame.pack(pady=5)
+
+        select_button = tk.Button(button_frame, text="Select", width=23,
+                                  command=lambda: self.select_device(tree, self.keyboard_entry,
+                                                                     device_selection_window))
+        select_button.grid(row=0, column=0, padx=5, pady=5)
+
+        monitor_button = tk.Button(button_frame, text="Open AHI Monitor To Test Device", width=29, command=self.run_monitor)
+        monitor_button.grid(row=0, column=2, padx=5, pady=5)
+
+        refresh_button = tk.Button(button_frame, text="Refresh", width=23, command=lambda: self.update_treeview(
+                self.refresh_device_list(device_list_path), tree))
+        refresh_button.grid(row=0, column=1, padx=5, pady=5)
+
     def create_new_profile(self):
         self.create_profile_window = tk.Toplevel(self.root)
-        self.create_profile_window.geometry("600x450+295+111")  
+        self.create_profile_window.geometry("600x450+308+130")  
         self.create_profile_window.title("Create New Profile")
         self.create_profile_window.iconbitmap(icon_path)
 
@@ -482,11 +581,19 @@ class ScriptManagerApp:
 
         script_name_var = tk.StringVar()
 
-        self.script_name_label = tk.Label(self.create_profile_window, text="Profile Name:")
-        self.script_name_label.place(relx=0.2, rely=0.062, height=21, width=104)
+        self.script_name_label = tk.Label(self.create_profile_window, text="Profile Name    :")
+        self.script_name_label.place(relx=0.13, rely=0.026)
         self.script_name_entry = tk.Entry(self.create_profile_window)
-        self.script_name_entry.place(relx=0.383, rely=0.067, height=20, relwidth=0.557)
+        self.script_name_entry.place(relx=0.31, rely=0.03, relwidth=0.557)
         self.script_name_entry.insert(0, "  ")
+
+        self.keyboard_label = tk.Label(self.create_profile_window, text="Device ID           :")
+        self.keyboard_label.place(relx=0.13, rely=0.1)
+        self.keyboard_entry = tk.Entry(self.create_profile_window)
+        self.keyboard_entry.place(relx=0.31, rely=0.104, relwidth=0.38)
+        self.keyboard_entry.insert(0, "  ")
+        self.keyboard_select_button = tk.Button(self.create_profile_window, text="Select Device", command=self.open_device_selection)
+        self.keyboard_select_button.place(relx=0.71, rely=0.094, width=95)
 
         self.is_text_mode = False
 
@@ -524,6 +631,15 @@ class ScriptManagerApp:
 
         self.key_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+    def run_monitor(self):
+
+        script_path = os.path.join(script_dir, "_internal", "Data", "Active", "AutoHotkey Interception", "Monitor.ahk")
+
+        if os.path.exists(script_path):
+            os.startfile(script_path)  
+        else:
+            print(f"Error: The script at {script_path} does not exist.")
 
     def _on_mousewheel(self, event):
         if event.num == 5 or event.delta == -120:
@@ -673,6 +789,7 @@ class ScriptManagerApp:
             self.disable_entry_input(self.key_rows)  
             self.disable_entry_input([(self.script_name_entry, None)])  
             self.disable_entry_input([(self.shortcut_entry, None)])  
+            self.disable_entry_input([(self.keyboard_entry, None)])  
 
             self.ignore_next_click = True  
 
@@ -693,6 +810,7 @@ class ScriptManagerApp:
             self.enable_entry_input(self.key_rows)  
             self.enable_entry_input([(self.script_name_entry, None)])  
             self.enable_entry_input([(self.shortcut_entry, None)])  
+            self.enable_entry_input([(self.keyboard_entry, None)])  
 
             button.config(text="Select Default Key", command=lambda: self.toggle_key_listening(entry_widget, button))
 
@@ -820,6 +938,9 @@ class ScriptManagerApp:
         if hasattr(self, 'text_block') and self.text_block.winfo_exists():
             self.text_block.bind("<Key>", lambda e: "break")  
 
+        if hasattr(self, 'keyboard_entry') and self.keyboard_entry.winfo_exists():
+            self.keyboard_entry.bind("<Key>", lambda e: "break")  
+
     def enable_shortcut_entry_input(self, key_rows):
 
         if self.script_name_entry and self.script_name_entry.winfo_exists():
@@ -837,6 +958,9 @@ class ScriptManagerApp:
 
         if hasattr(self, 'text_block') and self.text_block.winfo_exists():
             self.text_block.unbind("<Key>")  
+
+        if hasattr(self, 'keyboard_entry') and self.keyboard_entry.winfo_exists():
+            self.keyboard_entry.unbind("<Key>")  
 
     def handle_shortcut_key_event(self, event):
         if self.is_listening and self.active_entry is not None:
@@ -939,93 +1063,222 @@ class ScriptManagerApp:
                 else:
                     file.write("; default\n")  
 
-                file.write("^!p::  \nExitApp \n\n")
+                file.write("^!p::ExitApp \n\n")
 
-                if self.is_text_mode:
+                keyboard_entry = self.keyboard_entry.get().strip()  
 
-                    if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                               self.shortcut_rows):  
+                if keyboard_entry:
 
-                        text_content = self.text_block.get("1.0", 'end').strip()  
-                        if text_content:
-                            file.write(text_content + '\n')  
+                    parts = keyboard_entry.split(",", 1)  
+                    device_type = parts[0].strip()  
+                    vid_pid_or_handle = parts[1].strip()  
+
+                    if device_type.lower() == "mouse":
+                        is_mouse = True
+                    elif device_type.lower() == "keyboard":
+                        is_mouse = False
+                    else:
+                        raise ValueError(f"Unknown device type: {device_type}")
+
+                    if vid_pid_or_handle.startswith("0x"):
+
+                        vid_pid = vid_pid_or_handle.split(",")
+                        vid = vid_pid[0].strip()  
+                        pid = vid_pid[1].strip()  
+
+                        file.write(f"""#SingleInstance force
+Persistent
+
+AHI := AutoHotInterception()
+id1 := AHI.GetDeviceId({str(is_mouse).lower()}, {vid}, {pid})
+cm1 := AHI.CreateContextManager(id1)
+
+""")
                     else:
 
-                        file.write("toggle := false\n\n")
+                        file.write(f"""#SingleInstance force
+Persistent
 
-                        for shortcut_row in self.shortcut_rows:
-                            if self.is_widget_valid(shortcut_row):
-                                try:
-                                    shortcut_key = shortcut_row.get().strip()
-                                    if shortcut_key:
+AHI := AutoHotInterception()
+id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, "{vid_pid_or_handle}")
+cm1 := AHI.CreateContextManager(id1)
 
-                                        translated_key = self.translate_key(shortcut_key, key_translations)
-                                        if "&" in translated_key:  
-                                            file.write(f"~{translated_key}::toggle := !toggle \n\n")  
-                                        else:
-                                            file.write(f"~{translated_key}::toggle := !toggle \n\n")
-                                except TclError:
-                                    continue  
+""")
 
-                        file.write("#If toggle\n")
+                    if self.is_text_mode:
 
-                        text_content = self.text_block.get("1.0", 'end').strip()  
-                        if text_content:
-                            for line in text_content.splitlines():
-                                file.write(line + '\n')  
+                        if not any(
+                                self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row
+                                in self.shortcut_rows):  
 
-                        file.write("#If \n\n")
+                            text_content = self.text_block.get("1.0", 'end').strip()  
+                            if text_content:
+                                file.write(text_content + '\n')  
+                        else:
+
+                            file.write("toggle := false\n\n")
+
+                            for shortcut_row in self.shortcut_rows:
+                                if self.is_widget_valid(shortcut_row):
+                                    try:
+                                        shortcut_key = shortcut_row.get().strip()
+                                        if shortcut_key:
+
+                                            translated_key = self.translate_key(shortcut_key, key_translations)
+                                            if "&" in translated_key:  
+                                                file.write(
+                                                    f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")  
+                                            else:
+                                                file.write(
+                                                    f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                    except TclError:
+                                        continue  
+
+                            file.write("#HotIf toggle\n")
+
+                            text_content = self.text_block.get("1.0", 'end').strip()  
+                            if text_content:
+                                for line in text_content.splitlines():
+                                    file.write(line + '\n')  
+
+                            file.write("#HotIf")
+                    else:
+
+                        if not any(
+                                self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
+                                self.shortcut_rows):  
+
+                            for row in self.key_rows:
+                                if len(row) == 2:  
+                                    original_key_entry, remap_key_entry = row
+                                    try:
+                                        original_key = original_key_entry.get().strip()
+                                        remap_key = remap_key_entry.get().strip()
+                                        if original_key and remap_key:
+
+                                            original_key = self.translate_key(original_key, key_translations)
+                                            remap_key = self.translate_key(remap_key, key_translations)
+                                            file.write(f"{original_key}::{remap_key}\n")
+                                    except TclError:
+                                        continue  
+                        else:
+
+                            file.write("toggle := false\n\n")
+
+                            for shortcut_row in self.shortcut_rows:
+                                if self.is_widget_valid(shortcut_row):
+                                    try:
+                                        shortcut_key = shortcut_row.get().strip()
+                                        if shortcut_key:
+
+                                            translated_key = self.translate_key(shortcut_key, key_translations)
+                                            if "&" in translated_key:  
+                                                file.write(
+                                                    f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")  
+                                            else:
+                                                file.write(
+                                                    f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                    except TclError:
+                                        continue  
+
+                            file.write("#HotIf toggle\n")
+                            for row in self.key_rows:
+                                if len(row) == 2:  
+                                    original_key_entry, remap_key_entry = row
+                                    try:
+                                        original_key = original_key_entry.get().strip()
+                                        remap_key = remap_key_entry.get().strip()
+                                        if original_key and remap_key:
+
+                                            original_key = self.translate_key(original_key, key_translations)
+                                            remap_key = self.translate_key(remap_key, key_translations)
+                                            file.write(f"{original_key}::{remap_key}\n")
+                                    except TclError:
+                                        continue  
+                            file.write("#HotIf\n")
+                    file.write("\n#HotIf")
                 else:
 
-                    if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                               self.shortcut_rows):  
+                    if self.is_text_mode:
 
-                        for row in self.key_rows:
-                            if len(row) == 2:  
-                                original_key_entry, remap_key_entry = row
-                                try:
-                                    original_key = original_key_entry.get().strip()
-                                    remap_key = remap_key_entry.get().strip()
-                                    if original_key and remap_key:
+                        if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
+                                   self.shortcut_rows):  
+                            text_content = self.text_block.get("1.0", 'end').strip()  
+                            if text_content:
+                                file.write(text_content + '\n')  
+                        else:
+                            file.write("toggle := false\n\n")
 
-                                        original_key = self.translate_key(original_key, key_translations)
-                                        remap_key = self.translate_key(remap_key, key_translations)
-                                        file.write(f"{original_key}::{remap_key}\n")
-                                except TclError:
-                                    continue  
+                            for shortcut_row in self.shortcut_rows:
+                                if self.is_widget_valid(shortcut_row):
+                                    try:
+                                        shortcut_key = shortcut_row.get().strip()
+                                        if shortcut_key:
+                                            translated_key = self.translate_key(shortcut_key, key_translations)
+                                            if "&" in translated_key:
+                                                file.write(
+                                                    f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                            else:
+                                                file.write(
+                                                    f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                    except TclError:
+                                        continue
+
+                            file.write("#HotIf toggle\n")
+                            text_content = self.text_block.get("1.0", 'end').strip()
+                            if text_content:
+                                for line in text_content.splitlines():
+                                    file.write(line + '\n')
+
+                            file.write("#HotIf")
                     else:
 
-                        file.write("toggle := false\n\n")
+                        if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
+                                   self.shortcut_rows):
+                            for row in self.key_rows:
+                                if len(row) == 2:  
+                                    original_key_entry, remap_key_entry = row
+                                    try:
+                                        original_key = original_key_entry.get().strip()
+                                        remap_key = remap_key_entry.get().strip()
+                                        if original_key and remap_key:
+                                            original_key = self.translate_key(original_key, key_translations)
+                                            remap_key = self.translate_key(remap_key, key_translations)
+                                            file.write(f"{original_key}::{remap_key}\n")
+                                    except TclError:
+                                        continue
+                        else:
+                            file.write("toggle := false\n\n")
 
-                        for shortcut_row in self.shortcut_rows:
-                            if self.is_widget_valid(shortcut_row):
-                                try:
-                                    shortcut_key = shortcut_row.get().strip()
-                                    if shortcut_key:
+                            for shortcut_row in self.shortcut_rows:
+                                if self.is_widget_valid(shortcut_row):
+                                    try:
+                                        shortcut_key = shortcut_row.get().strip()
+                                        if shortcut_key:
+                                            translated_key = self.translate_key(shortcut_key, key_translations)
+                                            if "&" in translated_key:
+                                                file.write(
+                                                    f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                            else:
+                                                file.write(
+                                                    f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                    except TclError:
+                                        continue
 
-                                        translated_key = self.translate_key(shortcut_key, key_translations)
-                                        if "&" in translated_key:  
-                                            file.write(f"~{translated_key}::toggle := !toggle\n\n")  
-                                        else:
-                                            file.write(f"~{translated_key}::toggle := !toggle\n\n")
-                                except TclError:
-                                    continue  
-
-                        file.write("#If toggle\n")
-                        for row in self.key_rows:
-                            if len(row) == 2:  
-                                original_key_entry, remap_key_entry = row
-                                try:
-                                    original_key = original_key_entry.get().strip()
-                                    remap_key = remap_key_entry.get().strip()
-                                    if original_key and remap_key:
-
-                                        original_key = self.translate_key(original_key, key_translations)
-                                        remap_key = self.translate_key(remap_key, key_translations)
-                                        file.write(f"{original_key}::{remap_key}\n")
-                                except TclError:
-                                    continue  
-                        file.write("#If \n\n")
+                            file.write("#HotIf toggle\n")
+                            for row in self.key_rows:
+                                if len(row) == 2:  
+                                    original_key_entry, remap_key_entry = row
+                                    try:
+                                        original_key = original_key_entry.get().strip()
+                                        remap_key = remap_key_entry.get().strip()
+                                        if original_key and remap_key:
+                                            original_key = self.translate_key(original_key, key_translations)
+                                            remap_key = self.translate_key(remap_key, key_translations)
+                                            file.write(f"{original_key}::{remap_key}\n")
+                                    except TclError:
+                                        continue
+                            file.write("#HotIf")
 
                 self.scripts = self.list_scripts()
                 self.update_script_list()
@@ -1061,13 +1314,50 @@ class ScriptManagerApp:
 
             line_count = int(self.text_block.index('end-1c').split('.')[0])
 
-            min_height = 14
+            min_height = 19
             new_height = max(min_height, line_count)  
 
             self.text_block.config(height=new_height)
 
             self.edit_frame.update_idletasks()
             self.edit_canvas.config(scrollregion=self.edit_canvas.bbox("all"))
+
+    def edit_open_device_selection(self):
+        device_selection_window = tk.Toplevel(self.edit_window)
+        device_selection_window.geometry("600x300+308+233")
+        device_selection_window.title("Select Keyboard Device")
+        device_selection_window.iconbitmap(icon_path)
+        device_selection_window.transient(self.edit_window)
+
+        tree = ttk.Treeview(device_selection_window, columns=("Device Type", "VID", "PID", "Handle"), show="headings")
+        tree.heading("Device Type", text="Device Type")
+        tree.heading("VID", text="VID")
+        tree.heading("PID", text="PID")
+        tree.heading("Handle", text="Handle")
+        tree.pack(padx=10, pady=10)
+
+        tree.column("Device Type", width=150)  
+        tree.column("VID", width=100)
+        tree.column("PID", width=100)
+        tree.column("Handle", width=200)
+
+        devices = self.refresh_device_list(device_list_path)  
+        self.update_treeview(devices, tree)
+
+        button_frame = tk.Frame(device_selection_window)
+        button_frame.pack(pady=5)
+
+        select_button = tk.Button(button_frame, text="Select", width=23,
+                                  command=lambda: self.select_device(tree, self.keyboard_entry,
+                                                                     device_selection_window))
+        select_button.grid(row=0, column=0, padx=5, pady=5)
+
+        monitor_button = tk.Button(button_frame, text="Open AHI Monitor To Test Device", width=29, command=self.run_monitor)
+        monitor_button.grid(row=0, column=2, padx=5, pady=5)
+
+        refresh_button = tk.Button(button_frame, text="Refresh", width=23, command=lambda: self.update_treeview(
+                self.refresh_device_list(device_list_path), tree))
+        refresh_button.grid(row=0, column=1, padx=5, pady=5)
 
     def edit_script(self, script_name):
         self.is_text_mode = False  
@@ -1083,22 +1373,56 @@ class ScriptManagerApp:
             mode_line = lines[0].strip() if lines else "; default"  
 
             self.edit_window = tk.Toplevel(self.root)
-            self.edit_window.geometry("600x450+295+111")
+            self.edit_window.geometry("600x450+308+130")
             self.edit_window.title("Edit Profile")
             self.edit_window.iconbitmap(icon_path)
 
             self.edit_window.transient(self.root)
 
-            script_name_label = tk.Label(self.edit_window, text="Profile Name:")
-            script_name_label.place(relx=0.2, rely=0.062, height=21, width=104)
-
+            script_name_label = tk.Label(self.edit_window, text="Profile Name    :")
+            script_name_label.place(relx=0.13, rely=0.026)
             script_name_entry = tk.Entry(self.edit_window)
             script_name_without_extension = script_name.replace('.ahk', '')
             script_name_entry.insert(0, "  ")
             script_name_entry.insert(4, script_name_without_extension)  
             script_name_entry.config(state='readonly')
-            script_name_entry.place(relx=0.383, rely=0.067, height=20, relwidth=0.557)
+            script_name_entry.place(relx=0.31, rely=0.03, relwidth=0.557)
             self.script_name_entry = script_name_entry
+
+            keyboard_label = tk.Label(self.edit_window, text="Device ID           :")
+            keyboard_label.place(relx=0.13, rely=0.1)
+
+            keyboard_entry = tk.Entry(self.edit_window)
+            keyboard_entry.place(relx=0.31, rely=0.104, relwidth=0.38)
+            keyboard_entry.insert(0, "  ")
+            self.keyboard_entry = keyboard_entry
+
+            device_id = None
+            device_type = "Keyboard"  
+
+            for line in lines:
+                if "AHI.GetDeviceId" in line or "AHI.GetDeviceIdFromHandle" in line:
+
+                    start = line.find("(") + 1
+                    end = line.find(")")
+                    params = line[start:end].split(",")
+
+                    if "false" in params[0].strip():
+                        device_type = "Keyboard"
+                    elif "true" in params[0].strip():
+                        device_type = "Mouse"
+
+                    device_id = ", ".join(param.strip().replace('"', '') for param in params)
+
+                    device_id = device_id.replace("false", device_type).replace("true", device_type)
+                    break
+
+            if device_id:
+                keyboard_entry.insert(4, device_id)
+
+            keyboard_select_button = tk.Button(self.edit_window, text="Select Device",
+                                               command=self.edit_open_device_selection)
+            keyboard_select_button.place(relx=0.71, rely=0.094, width=95)
 
             self.edit_canvas = tk.Canvas(self.edit_window)
             self.edit_canvas.place(relx=0.067, rely=0.178, relheight=0.678, relwidth=0.875)
@@ -1125,7 +1449,7 @@ class ScriptManagerApp:
 
                 for line in lines[3:]:  
                     if "::" in line and not (
-                            line.startswith(("^!p::", "ExitApp")) or "toggle" in line):  
+                            line.startswith(("^!p::", "~")) or "toggle" in line):  
                         original_key, remap_key = line.split("::")
 
                         original_key = self.replace_raw_keys(original_key.strip(), key_map)
@@ -1133,7 +1457,7 @@ class ScriptManagerApp:
 
                         remaps.append((original_key, remap_key))
 
-                    elif "toggle := !toggle" in line:  
+                    elif "~" in line:  
                         shortcut = line.split("::")[0].strip()  
                         shortcut = self.replace_raw_keys(shortcut, key_map)
                         shortcut = shortcut.replace("~", "")
@@ -1148,16 +1472,14 @@ class ScriptManagerApp:
                 self.text_block.bind("<KeyRelease>", self.update_edit_text_block_height)
                 self.row_num += 1
 
-                text_content = ''.join(line for line in lines
-                                       if
-                                       not (line.strip().startswith((';', '^!p::', 'ExitApp', 'toggle := false', '#If'))
-                                            or 'toggle' in line))  
+                text_content = self.extract_and_filter_content(lines)  
+
                 self.text_block.insert('1.0', text_content.strip())
                 self.update_edit_text_block_height()
 
                 for line in lines:
                     if "::" in line:
-                        if "toggle := !toggle" in line:
+                        if "~" in line:
                             shortcut = line.split("::")[0].strip()  
                             shortcut = self.replace_raw_keys(shortcut, key_map)
 
@@ -1186,6 +1508,57 @@ class ScriptManagerApp:
             self.update_scroll_region()
         else:
             messagebox.showerror("Error", f"{script_name} does not exist.")
+
+    def extract_and_filter_content(self, lines):
+        toggle_lines = []  
+        cm1_lines = []  
+        inside_hotif_toggle = False
+        inside_hotif_cm1 = False  
+
+        for line in lines:
+            raw_line = line  
+            stripped_line = line.strip()
+
+            if stripped_line.startswith('^!p') or stripped_line.startswith(';'):
+                continue
+
+            if '#HotIf toggle' in stripped_line:
+                inside_hotif_toggle = True
+                continue  
+
+            if inside_hotif_toggle:
+
+                if '#HotIf' in stripped_line:
+                    inside_hotif_toggle = False
+                    continue  
+
+                toggle_lines.append(raw_line)
+
+            if '#HotIf cm1.IsActive' in stripped_line:
+                inside_hotif_cm1 = True
+                continue  
+
+            if inside_hotif_cm1:
+
+                if '#HotIf' in stripped_line:
+                    inside_hotif_cm1 = False
+                    continue  
+
+                cm1_lines.append(raw_line)
+
+        if toggle_lines:
+            print(f"Cleaned toggle lines: {toggle_lines}")
+            result = ''.join(toggle_lines)  
+        elif cm1_lines:
+            print(f"Cleaned cm1 lines: {cm1_lines}")
+            result = ''.join(cm1_lines)  
+        else:
+
+            cleaned_lines = [raw_line for raw_line in lines if
+                             not raw_line.strip().startswith('^!p') and not raw_line.strip().startswith(';')]
+            result = ''.join(cleaned_lines)  
+
+        return result  
 
     def replace_raw_keys(self, key, key_map):
         return key_map.get(key, key)  
@@ -1295,93 +1668,222 @@ class ScriptManagerApp:
             else:
                 file.write("; default\n")  
 
-            file.write("^!p:: \nExitApp \n\n")
+            file.write("^!p::ExitApp \n\n")
 
-            if self.is_text_mode:
+            keyboard_entry = self.keyboard_entry.get().strip()  
 
-                if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                           self.shortcut_rows):  
+            if keyboard_entry:
 
-                    text_content = self.text_block.get("1.0", 'end').strip()  
-                    if text_content:
-                        file.write(text_content + '\n')  
+                parts = keyboard_entry.split(",", 1)  
+                device_type = parts[0].strip()  
+                vid_pid_or_handle = parts[1].strip()  
+
+                if device_type.lower() == "mouse":
+                    is_mouse = True
+                elif device_type.lower() == "keyboard":
+                    is_mouse = False
+                else:
+                    raise ValueError(f"Unknown device type: {device_type}")
+
+                if vid_pid_or_handle.startswith("0x"):
+
+                    vid_pid = vid_pid_or_handle.split(",")
+                    vid = vid_pid[0].strip()  
+                    pid = vid_pid[1].strip()  
+
+                    file.write(f"""#SingleInstance force
+Persistent
+
+AHI := AutoHotInterception()
+id1 := AHI.GetDeviceId({str(is_mouse).lower()}, {vid}, {pid}) ; This is from keyboard_entry
+cm1 := AHI.CreateContextManager(id1)
+
+""")
                 else:
 
-                    file.write("toggle := false\n\n")
+                    file.write(f"""#SingleInstance force
+Persistent
 
-                    for shortcut_row in self.shortcut_rows:
-                        if self.is_widget_valid(shortcut_row):
-                            try:
-                                shortcut_key = shortcut_row.get().strip()
-                                if shortcut_key:
+AHI := AutoHotInterception()
+id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, "{vid_pid_or_handle}")
+cm1 := AHI.CreateContextManager(id1)
 
-                                    translated_key = self.translate_key(shortcut_key, key_translations)
-                                    if "&" in translated_key:  
-                                        file.write(f"~{translated_key}::toggle := !toggle \n\n")  
-                                    else:
-                                        file.write(f"~{translated_key}::toggle := !toggle \n\n")
-                            except TclError:
-                                continue  
+""")
 
-                    file.write("#If toggle\n")
+                if self.is_text_mode:
 
-                    text_content = self.text_block.get("1.0", 'end').strip()  
-                    if text_content:
-                        for line in text_content.splitlines():
-                            file.write(line + '\n')  
+                    if not any(
+                            self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row
+                            in self.shortcut_rows):  
 
-                    file.write("#If \n\n")
+                        text_content = self.text_block.get("1.0", 'end').strip()  
+                        if text_content:
+                            file.write(text_content + '\n')  
+                    else:
+
+                        file.write("toggle := false\n\n")
+
+                        for shortcut_row in self.shortcut_rows:
+                            if self.is_widget_valid(shortcut_row):
+                                try:
+                                    shortcut_key = shortcut_row.get().strip()
+                                    if shortcut_key:
+
+                                        translated_key = self.translate_key(shortcut_key, key_translations)
+                                        if "&" in translated_key:  
+                                            file.write(
+                                                f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")  
+                                        else:
+                                            file.write(
+                                                f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                except TclError:
+                                    continue  
+
+                        file.write("#HotIf toggle\n")
+
+                        text_content = self.text_block.get("1.0", 'end').strip()  
+                        if text_content:
+                            for line in text_content.splitlines():
+                                file.write(line + '\n')  
+
+                        file.write("#HotIf")
+                else:
+
+                    if not any(
+                            self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
+                            self.shortcut_rows):  
+
+                        for row in self.key_rows:
+                            if len(row) == 2:  
+                                original_key_entry, remap_key_entry = row
+                                try:
+                                    original_key = original_key_entry.get().strip()
+                                    remap_key = remap_key_entry.get().strip()
+                                    if original_key and remap_key:
+
+                                        original_key = self.translate_key(original_key, key_translations)
+                                        remap_key = self.translate_key(remap_key, key_translations)
+                                        file.write(f"{original_key}::{remap_key}\n")
+                                except TclError:
+                                    continue  
+                    else:
+
+                        file.write("toggle := false\n\n")
+
+                        for shortcut_row in self.shortcut_rows:
+                            if self.is_widget_valid(shortcut_row):
+                                try:
+                                    shortcut_key = shortcut_row.get().strip()
+                                    if shortcut_key:
+
+                                        translated_key = self.translate_key(shortcut_key, key_translations)
+                                        if "&" in translated_key:  
+                                            file.write(
+                                                f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")  
+                                        else:
+                                            file.write(
+                                                f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                except TclError:
+                                    continue  
+
+                        file.write("#HotIf toggle\n")
+                        for row in self.key_rows:
+                            if len(row) == 2:  
+                                original_key_entry, remap_key_entry = row
+                                try:
+                                    original_key = original_key_entry.get().strip()
+                                    remap_key = remap_key_entry.get().strip()
+                                    if original_key and remap_key:
+
+                                        original_key = self.translate_key(original_key, key_translations)
+                                        remap_key = self.translate_key(remap_key, key_translations)
+                                        file.write(f"{original_key}::{remap_key}\n")
+                                except TclError:
+                                    continue  
+                        file.write("#HotIf\n")
+                file.write("\n#HotIf")
             else:
 
-                if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                           self.shortcut_rows):  
+                if self.is_text_mode:
 
-                    for row in self.key_rows:
-                        if len(row) == 2:  
-                            original_key_entry, remap_key_entry = row
-                            try:
-                                original_key = original_key_entry.get().strip()
-                                remap_key = remap_key_entry.get().strip()
-                                if original_key and remap_key:
+                    if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
+                               self.shortcut_rows):  
+                        text_content = self.text_block.get("1.0", 'end').strip()  
+                        if text_content:
+                            file.write(text_content + '\n')  
+                    else:
+                        file.write("toggle := false\n\n")
 
-                                    original_key = self.translate_key(original_key, key_translations)
-                                    remap_key = self.translate_key(remap_key, key_translations)
-                                    file.write(f"{original_key}::{remap_key}\n")
-                            except TclError:
-                                continue  
+                        for shortcut_row in self.shortcut_rows:
+                            if self.is_widget_valid(shortcut_row):
+                                try:
+                                    shortcut_key = shortcut_row.get().strip()
+                                    if shortcut_key:
+                                        translated_key = self.translate_key(shortcut_key, key_translations)
+                                        if "&" in translated_key:
+                                            file.write(
+                                                f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                        else:
+                                            file.write(
+                                                f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                except TclError:
+                                    continue
+
+                        file.write("#HotIf toggle\n")
+                        text_content = self.text_block.get("1.0", 'end').strip()
+                        if text_content:
+                            for line in text_content.splitlines():
+                                file.write(line + '\n')
+
+                        file.write("#HotIf")
                 else:
 
-                    file.write("toggle := false\n\n")
+                    if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
+                               self.shortcut_rows):
+                        for row in self.key_rows:
+                            if len(row) == 2:  
+                                original_key_entry, remap_key_entry = row
+                                try:
+                                    original_key = original_key_entry.get().strip()
+                                    remap_key = remap_key_entry.get().strip()
+                                    if original_key and remap_key:
+                                        original_key = self.translate_key(original_key, key_translations)
+                                        remap_key = self.translate_key(remap_key, key_translations)
+                                        file.write(f"{original_key}::{remap_key}\n")
+                                except TclError:
+                                    continue
+                    else:
+                        file.write("toggle := false\n\n")
 
-                    for shortcut_row in self.shortcut_rows:
-                        if self.is_widget_valid(shortcut_row):
-                            try:
-                                shortcut_key = shortcut_row.get().strip()
-                                if shortcut_key:
+                        for shortcut_row in self.shortcut_rows:
+                            if self.is_widget_valid(shortcut_row):
+                                try:
+                                    shortcut_key = shortcut_row.get().strip()
+                                    if shortcut_key:
+                                        translated_key = self.translate_key(shortcut_key, key_translations)
+                                        if "&" in translated_key:
+                                            file.write(
+                                                f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                        else:
+                                            file.write(
+                                                f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n")
+                                except TclError:
+                                    continue
 
-                                    translated_key = self.translate_key(shortcut_key, key_translations)
-                                    if "&" in translated_key:  
-                                        file.write(f"~{translated_key}::toggle := !toggle\n\n")  
-                                    else:
-                                        file.write(f"~{translated_key}::toggle := !toggle\n\n")
-                            except TclError:
-                                continue  
-
-                    file.write("#If toggle\n")
-                    for row in self.key_rows:
-                        if len(row) == 2:  
-                            original_key_entry, remap_key_entry = row
-                            try:
-                                original_key = original_key_entry.get().strip()
-                                remap_key = remap_key_entry.get().strip()
-                                if original_key and remap_key:
-
-                                    original_key = self.translate_key(original_key, key_translations)
-                                    remap_key = self.translate_key(remap_key, key_translations)
-                                    file.write(f"{original_key}::{remap_key}\n")
-                            except TclError:
-                                continue  
-                    file.write("#If \n\n")
+                        file.write("#HotIf toggle\n")
+                        for row in self.key_rows:
+                            if len(row) == 2:  
+                                original_key_entry, remap_key_entry = row
+                                try:
+                                    original_key = original_key_entry.get().strip()
+                                    remap_key = remap_key_entry.get().strip()
+                                    if original_key and remap_key:
+                                        original_key = self.translate_key(original_key, key_translations)
+                                        remap_key = self.translate_key(remap_key, key_translations)
+                                        file.write(f"{original_key}::{remap_key}\n")
+                                except TclError:
+                                    continue
+                        file.write("#HotIf")
 
             self.scripts = self.list_scripts()
             self.update_script_list()

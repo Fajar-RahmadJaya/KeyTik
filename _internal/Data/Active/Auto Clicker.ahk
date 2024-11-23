@@ -1,23 +1,23 @@
 ; text
-^!p::
-ExitApp
+^!p::ExitApp
 
-; Set the interval between clicks in milliseconds (e.g., 100 ms for 10 clicks per second)
-ClickInterval := 100
+ClickInterval := 100 ; Change this if you want to change the interval
 
-; Define a flag to check if the E key is held down
-isClicking := false
+global isClicking := false
 
-; Trigger the infinite left-click loop when E is pressed
-$e::
+$e:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+{
+    global isClicking
     isClicking := true
-    while isClicking {
-        Click ; Simulate a left-click
-        Sleep, ClickInterval ; Wait for the specified interval before clicking again
+    while (isClicking)
+    {
+        Click ; Change this if you want to change left click to another key for auto clicker
+        Sleep(ClickInterval)
     }
-return
+}
 
-; Stop the clicking when E is released
-$e up::
+$e up:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+{
+    global isClicking
     isClicking := false
-return
+}

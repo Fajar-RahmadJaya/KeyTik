@@ -1,53 +1,37 @@
 ; text
-^!p::
-ExitApp
+^!p::ExitApp
 
-#Persistent
-SetTimer, CheckImages, 500  ; Set an interval of 500 ms (0.5 seconds)
-return
+toggle := false 
 
-; Define the paths for each image here for easy modification
-imagePath1 := "C:\path\to\your\images.png"
-imagePath2 := "C:\path\to\your\images.png"
-imagePath3 := "C:\path\to\your\images.png"
-imagePath4 := "C:\path\to\your\images.png"
+q & e:: ; Change this to toogle screen clicker on or off
+{ 
+global
+    toggle := !toggle 
 
-CheckImages:
-    ; Look for 1.png and click it if found
-    if (ImageSearchClick(imagePath1))
-    {
-        Sleep, 1000  ; Wait for 1 second (adjust as needed)
-        
-        ; After clicking 1.png, try to find 2.png and click it
-        ImageSearchClick(imagePath2)
-        
-        ; Check if 3.png is present
-        if (ImageSearch(imagePath3))
-        {
-            ; If 3.png is found, click 4.png
-            ImageSearchClick(imagePath4)
-        }
-        ; Otherwise, do nothing and wait for the next interval
+    if (toggle) {
+        SetTimer(ClickLoop,100)
+    } else {
+        SetTimer(ClickLoop,0)
     }
-return
+    return
+} 
 
-; Function to locate and click an image if it exists
-ImageSearchClick(imagePath)
-{
-    CoordMode, Pixel, Screen  ; Search the entire screen
-    ImageSearch, X, Y, 0, 0, A_ScreenWidth, A_ScreenHeight, %imagePath%
-    if !ErrorLevel
+ClickLoop()
+{ 
+global 
+    coordinates := [[500, 300], [600, 400], [700, 500]] ; Change the interval to your preference
+
+    Loop coordinates.Length != 0 ? coordinates.Length : ""
     {
-        Click, %X%, %Y%  ; Click on the found image
-        return true
-    }
-    return false
-}
+        x := coordinates[A_Index][1] 
+        y := coordinates[A_Index][2] 
 
-; Function to only search for an image (without clicking)
-ImageSearch(imagePath)
-{
-    CoordMode, Pixel, Screen
-    ImageSearch, X, Y, 0, 0, A_ScreenWidth, A_ScreenHeight, %imagePath%
-    return !ErrorLevel
-}
+        MouseMove(x, y)
+        Click()
+
+        interval := 500 ; Change the interval to your preference in milisecond
+
+        Sleep(interval)
+    }
+    return
+} 

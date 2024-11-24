@@ -23,7 +23,8 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 9. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
 10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
 11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
-12. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
+12. [Repository Statistic.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#repository-statistic-)
+13. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
 
 ## Preview :
 <img src="Preview/main.png" alt="Preview Main" width="400" />
@@ -57,8 +58,8 @@ To install KeyTik you just need to follow these step :
 8. **You're All Set!**
     - KeyTik should now be ready to use.
 
-> [!NOTE]
-> **Ensure that AutoHotkey is installed correctly, as it is required for KeyTik to be able to run profile. And if you use assign profile on specific device feature, ensure that Interception Driver is installed correctly, as it is required to be able to do that.**
+> [!IMPORTANT]
+> **Ensure that AutoHotkey is installed correctly, as it is required for KeyTik to be able to run profile. And if you use "Assign Profile On Specific Device" feature, ensure that Interception Driver is installed correctly, as it is required to be able to do that.**
 
 ## Features :
 KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:
@@ -170,8 +171,9 @@ Again, i don't intend to add malware on KeyTik so don't be afraid to download th
 * Full scan report : 
    - https://www.virustotal.com/gui/file/314211b7b27e58fb9beef44467ae3155e42bade9f4b780ef38fcd86a95312598
 
-> [!NOTE]
+> [!TIP]
 > **I don't add the normal download version is because i just realize whatever i do pyinstaller build will always detected as malware. But the source code version itself is not detected as malware. If you are curious or still worried, try to download source code version then build it yourself and try to rescan. Even if you build it yourself the result will be the same. It will still detected as malware as long as we build it using pyinstaller. Don't worry, it's false positive.**
+> <br/>
 > <br/>
 > **This is completely normal so you don't have to worry.**
 
@@ -181,7 +183,18 @@ If you have any suggestion for KeyTik, i would be very happy to take it. You can
 ## License :
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
 
-## Acknowledgements
+## Repository Statistic :
+# Star History
+
+<a href="https://star-history.com/#Fajar-RahmadJaya/KeyTik&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date" />
+ </picture>
+</a>
+
+## Acknowledgements :
 
 This project uses the following libraries:
 

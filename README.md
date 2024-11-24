@@ -184,7 +184,7 @@ If you have any suggestion for KeyTik, i would be very happy to take it. You can
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
 
 ## Repository Statistic :
-# Star History
+### Star History
 
 <a href="https://star-history.com/#Fajar-RahmadJaya/KeyTik&Date">
  <picture>

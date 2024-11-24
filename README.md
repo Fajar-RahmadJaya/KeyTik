@@ -23,7 +23,7 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 9. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
 10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
 11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
-12. [Repository Statistic.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#repository-statistic-)
+12. [Star History.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history-)
 13. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
 
 ## Preview :
@@ -186,8 +186,7 @@ If you have any suggestion for KeyTik, i would be very happy to take it. You can
 ## License :
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
 
-## Repository Statistic :
-### Star History
+## Star History :
 
 <a href="https://star-history.com/#Fajar-RahmadJaya/KeyTik&Date">
  <picture>

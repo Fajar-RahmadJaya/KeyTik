@@ -7,9 +7,9 @@ With a bit of scripting you can do all of that with ease. If you don't have codi
 So if you are looking for lightweight auto clicker, keyboard remapper, screen clicker and more or All-in-One Automation Tool and AutoHotkey script manager with user friendly GUI, then this is what you are looking for. I hope you can enjoy it and it can be useful to you. Sincerely, Fajar Rahmad Jaya.
 
 > [!NOTE]
-> **Don't forget to give us star if you are satisfied with KeyTik and share it so the world can know about KeyTik.**
-> <br/>
-> **Sincerely, thank You.**
+> **If you're satisfied with KeyTik, don't forget to give us a star!**
+><br>
+> **Also, don't forget to share it and help the world learn more about us.**
 
 ## Table Of Content :
 1. [Preview.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview-)
@@ -43,6 +43,7 @@ To install KeyTik you just need to follow these step :
 2. **(Optional) If You Use Assign Profile On Specific Device Feature, You Need To Download And Install Interception Driver First**
     - Interception Driver Download : https://github.com/oblitum/Interception/releases
     - To install, visit [AutoHotkey Interception, Install the Intereception driver](https://github.com/evilC/AutoHotInterception?tab=readme-ov-file#install-the-intereception-driver) for detailed install guide.
+    - To know whether the Interception Driver is correctly installed or not, Try using "Open AHI Monitor To Test Device" button. If it's work, then the Interception Driver is installed correctly.
 4. **Download KeyTik from one of the following platforms**
     - KeyTik GitHub Release : https://github.com/Fajar-RahmadJaya/KeyTik/releases.
      - There are 2 option to download, normal version and source code version.
@@ -59,7 +60,7 @@ To install KeyTik you just need to follow these step :
     - KeyTik should now be ready to use.
 
 > [!IMPORTANT]
-> **Ensure that AutoHotkey is installed correctly, as it is required for KeyTik to be able to run profile. And if you use "Assign Profile On Specific Device" feature, ensure that Interception Driver is installed correctly, as it is required to be able to do that.**
+> **Make sure AutoHotkey is installed correctly, as it's required for KeyTik to run profiles. If you're using the "Assign Profile On Specific Device" feature, ensure that the Interception Driver is properly installed, as it is needed for this functionality.**
 
 ## Features :
 KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:
@@ -83,7 +84,7 @@ KeyTik comes packed with a wide range of features designed to give you ultimate 
 | 15      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode, see point 16. see [Screen Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-) for more info.                |
 | 16      | **Screen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference. See [Screen Coordinate Auto Detect And Copy](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screeen-coordinate-auto-detect-and-copy-) for more info.               |
 | 17      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference. see [Multiple Files Opener](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-) for more info.               |
-| 18      | **Assign Script or Remap Profile to Specific Keyboard or Mouse Using Device VID & PID or Device Handle** | Make script or remap profile to only work for specific physical keyboard or mouse using device VID and PID or Handle as identifier. It work using help from [AutoHotkey Interception by evilC](https://github.com/evilC/AutoHotInterception) and [Interception driver by oblitum](https://github.com/oblitum/Interception). |
+| 18      | **Assign Script or Remap Profile to Specific Keyboard or Mouse Using Device VID & PID or Device Handle** | Make script or remap profile to only work for specific physical keyboard or mouse using device VID & PID or device handle as identifier. It work using help from [AutoHotkey Interception by evilC](https://github.com/evilC/AutoHotInterception) and [Interception driver by oblitum](https://github.com/oblitum/Interception). |
 
 ## What Make Us Different Then Other Automation Tool :
 KeyTik have unique capabilities and make it different than other automation tool. Here’s why KeyTik is the best choice for your need:"
@@ -115,8 +116,7 @@ Below are my plan and what i have in mind for future KeyTik Development :
 |--------|----------------------------------------------------|-----------------|------------|
 | 1      | **Improve Documentation** | Make documentation more detailed and Make KeyTik website | InProgress |
 | 2      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
-| 3      | **Helper to Know What Remap Key in Profile**       | hover to question mark icon or another way will show what key or script that profile use. | Pending |
-| 4      | **Refine Error Handling**                          | Adding more helpful error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
+| 3      | **Refine Error Handling**                          | Adding more helpful error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
 
 ## How To Use KeyTik Automation Tool :
 Automation tools come bundled as one with KeyTik download. It count as profile in text mode, so all of it can use KeyTik feature. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I add comment on the script to make it easier to change. So if there are ";" on the line in script that mean after it or ";" right is comment and what you can change is before it or left ";". Example : '''space:: ; This is comment'''. On that example 'space' is what you can change and '; this is comment' is the comment. Comment mean AutoHotkey not detect it as input which mean comment is not affecting script.
@@ -133,7 +133,7 @@ To make screen clicker editing easier. I also include coordinate detector to Key
 ### Multiple Files Opener :
 You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Shortcut To Open Multiple Files](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/ShortcutOpenFiles).
 
-## Example How You Can Use Each Feature :
+## What You Can Do With KeyTik :
 **1. Multiple profile :**
 * When you need multiple condition to activate remap like for different game or you need to remap some key for only one condition and don't need to always activate it, you can make different profile as you need and activate or deactivate individually so you don't need to adjust your remap every single time you need it for another condition.
   
@@ -157,6 +157,9 @@ You can open multiple files only with one key or more. In default, it use alt + 
 
 **8. Assign Script On Specific Device :**
 * You can connect 2 keyboard on your device. You can use first keyboard to typing normally and the other one to do automation tool such as auto clicker, screen clicker, multiple files opener and more, on each key and that would not affect the first keyboard. So you are left with 2 keyboard connected, 1 can do normal keyboard task and the other one can do automation tool. Even more, if you assign the automation to more compact keyboard such as mini keyboard so each key in that keyboard can do different automation tool, that will make it more neat and flexible.
+
+**9. And Many More :**
+* Above is just an example how you can use each feature. It's absolutely possible to use it for different need and case. There are a lot of possibility you can discover with KeyTik. Let us know if you are discovering another use of KeyTik on our [GitHub discussion page](https://github.com/Fajar-RahmadJaya/KeyTik/discussions).
 
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
 I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety in each version. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust with you so you can use KeyTik without worry. 

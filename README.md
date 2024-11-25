@@ -17,7 +17,7 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 3. [How To Install.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install-)
 4. [Features.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-)
 5. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
-6. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#feature-plan-possibly-to-be-implemented-)
+6. [Feature Plan (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#upcoming-update-possibly-to-be-implemented-)
 7. [How To Use KeyTik Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool-)
 8. [What You Can Do With KeyTik.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-you-can-do-with-keytik-)
 9. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
@@ -109,7 +109,7 @@ KeyTik have unique capabilities and make it different than other automation tool
 
 - **And More.**
 
-## Feature Plan (Possibly to be Implemented) :
+## Upcoming Update (Possibly to be Implemented) :
 Below are my plan and what i have in mind for future KeyTik Development :
 
 | **No** | **Feature Plan**                                   | **Description** | **Status** |

@@ -18,15 +18,22 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 4. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
 5. [Upcoming Feature (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#upcoming-update-possibly-to-be-implemented-)
 6. [How To Use KeyTik Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool-)
-7. [What You Can Do With KeyTik.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-you-can-do-with-keytik-)
-8. [How Is This Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-this-work-)
-9. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
-10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
-11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
-12. [Star History.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history-)
-13. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
+   * [Auto Clicker/](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker)
+   * [Screen Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-)
+   * [Screen Coordinate Auto Detect And Copy.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy-)
+   * [Multiple Files Opener.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-)
+8. [What You Can Do With KeyTik.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-you-can-do-with-keytik-)
+9. [How Is This Work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-this-work-)
+   * [How is Remapper And Automation Tool work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work-)
+   * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work-)
+11. [User Safety (For Those Who Worry About Virus Or Data Safety).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#user-safety-for-those-who-worry-about-virus-or-data-safety-)
+12. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
+13. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
+14. [Star History.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history-)
+15. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
 
 ## Preview :
+### KeyTik Feature Preview :
 <img src="Preview/main.png" alt="Preview Main" width="400" />
 <img src="Preview/default mode.png" alt="Default Mode" width="400" />
 <img src="Preview/text mode.png" alt="Preview Text Mode" width="400" />
@@ -204,6 +211,7 @@ a::Left
 s::Down
 #HotIf
 ```
+
 ### How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work :
 This feature work similar to [Remapper And Automation Tool] section with taking input from user then create AutoHotkey script from it. The difference is, KeyTik use help from AutoHotkey wrapper named [AutoHotkey Interception by evilC(https://github.com/evilC/AutoHotInterception) to be able to assign script ot profile on specific device. AutoHotkey Interception work using [Interception driver by oblitum](https://github.com/oblitum/Interception) so to be able to make it work you need to install Interception driver first. For how to do it, visit [AutoHotkey Interception, Install the Intereception driver](https://github.com/evilC/AutoHotInterception?tab=readme-ov-file#install-the-intereception-driver). 
 

@@ -126,16 +126,113 @@ Below are my plan and what i have in mind for future KeyTik Development :
 Automation tools come bundled as one with KeyTik download. It count as profile in text mode, so all of it can use KeyTik feature. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I add comment on the script to make it easier to change. So if there are ";" on the line in script that mean after it or ";" right is comment and what you can change is before it or left ";". Example : '''space:: ; This is comment'''. On that example 'space' is what you can change and '; this is comment' is the comment. Comment mean AutoHotkey not detect it as input which mean comment is not affecting script.
 
 ### Auto Clicker:
-Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 millisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Auto Clicker Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.2).
+Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 millisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Auto Clicker Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.2). 
+- **Full 'Auto Clicker' Script on KeyTik Bundled Download:**
+```
+ClickInterval := 100 ; Change this if you want to change the interval
+
+global isClicking := false
+
+$e:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+{
+    global isClicking
+    isClicking := true
+    while (isClicking)
+    {
+        Click ; Change this if you want to change left click to another key for auto clicker
+        Sleep(ClickInterval)
+    }
+}
+
+$e up:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+{
+    global isClicking
+    isClicking := false
+}
+```
 
 ### Screen Clicker :
 Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Screen Clicker Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.3).
+- **Full 'Screen Clicker' Script on KeyTik Bundled Download:**
+```
+toggle := false 
+
+q & e:: ; Change this to toggle screen clicker on or off
+{ 
+global
+    toggle := !toggle 
+
+    if (toggle) {
+        SetTimer(ClickLoop,100)
+    } else {
+        SetTimer(ClickLoop,0)
+    }
+    return
+} 
+
+ClickLoop()
+{ 
+global 
+    coordinates := [[500, 300], [600, 400], [700, 500]] ; Change the interval to your preference
+
+    Loop coordinates.Length != 0 ? coordinates.Length : ""
+    {
+        x := coordinates[A_Index][1] 
+        y := coordinates[A_Index][2] 
+
+        MouseMove(x, y)
+        Click()
+
+        interval := 500 ; Change the interval to your preference in milisecond
+
+        Sleep(interval)
+    }
+    return
+} 
+```
 
 ### Screen Coordinate Auto Detect And Copy :
 To make screen clicker editing easier. I also include coordinate detector to KeyTik. On default, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you preference.
+- **Full 'Screen Coordinate Auto Detect And Copy' Script on KeyTik Bundled Download:**
+```
+Persistent
+SetTitleMatchMode(2)
+
+Space:: ; Change this for script to take coordinate 
+{
+    MouseGetPos(&mouseX, &mouseY)
+
+    coordFormat := "[" mouseX "," mouseY "]"
+
+    A_Clipboard := coordFormat
+
+    ToolTip("The coordinate has been copied:`n" coordFormat)
+
+    SetTimer(RemoveToolTip,-2000)
+
+    return
+}
+
+RemoveToolTip()
+{ 
+global 
+    ToolTip()
+    return
+} 
+```
 
 ### Multiple Files Opener :
 You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Multiple Files Opener Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.1).
+- **Full 'Multiple Files Opener' Script on KeyTik Bundled Download:**
+```
+Alt & Left::
+{
+    Run("C:\\path\\to\\your\\file1.txt") ; Made sure to change this with your file path
+    Run("C:\\path\\to\\your\\file2.txt") ; You can also copy and paste this line for more file like this
+    Run("C:\\path\\to\\your\\file3.txt")
+}
+return
+```
 
 ## What You Can Do With KeyTik :
 **1. Multiple profile :**

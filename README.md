@@ -22,7 +22,7 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
    * [Screen Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-)
    * [Screen Coordinate Auto Detect And Copy.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy-)
    * [Multiple Files Opener.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-)
-8. [What You Can Do With KeyTik.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-you-can-do-with-keytik-)
+8. [Guide and Tips to Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#guide-and-tips-to-use-each-feature-)
 9. [How Is This Work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-this-work-)
    * [How is Remapper And Automation Tool work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work-)
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work-)
@@ -119,14 +119,12 @@ Below are my plan and what i have in mind for future KeyTik Development :
 | **No** | **Feature Plan**                                   | **Description** | **Status** |
 |--------|----------------------------------------------------|-----------------|------------|
 | 1      | **Improve Documentation** | Make documentation more detailed and Make KeyTik website | InProgress |
-| 2      | **Resize and Remember Window Size**                |  Resize KeyTik window for more comfortable use and remember it so next time you open KeyTik, it will retain previous window size | Pending |
-| 3      | **Refine Error Handling**                          | Adding more helpful error handling like "you don't have AutoHotkey installed on your device. Download it first on https://www.autohotkey.com/download/ to make KeyTik work. | Pending |
 
 ## How To Use KeyTik Automation Tool :
 Automation tools come bundled as one with KeyTik download. It count as profile in text mode, so all of it can use KeyTik feature. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I add comment on the script to make it easier to change. So if there are ";" on the line in script that mean after it or ";" right is comment and what you can change is before it or left ";". Example : '''space:: ; This is comment'''. On that example 'space' is what you can change and '; this is comment' is the comment. Comment mean AutoHotkey not detect it as input which mean comment is not affecting script.
 
 ### Auto Clicker:
-Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 millisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Auto Clicker Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.2). 
+Auto Clicker default is to simulate 'left click' when holding 'e' key with 100 millisecond interval. You can adjust it to your preference  like change the 'e' key, change left click and change interval. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [AutoHotkey Script Collection and Template, Auto Clicker Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.2). 
 - **Full 'Auto Clicker' Script on KeyTik Bundled Download:**
 ```
 ClickInterval := 100 ; Change this if you want to change the interval
@@ -152,7 +150,7 @@ $e up:: ; Change this if you want to change hold 'e' for condition to do autocli
 ```
 
 ### Screen Clicker :
-Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Screen Clicker Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.3).
+Screen clicker work with It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [AutoHotkey Script Collection and Template, Screen Clicker Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.3).
 - **Full 'Screen Clicker' Script on KeyTik Bundled Download:**
 ```
 toggle := false 
@@ -222,7 +220,7 @@ global
 ```
 
 ### Multiple Files Opener :
-You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [Multiple Files Opener Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.1).
+You can open multiple files only with one key or more. In default, it use alt + left to open some files or program. You can change files path with your files or programs path to your preference. Make sure you change files path to yours because in default it only give you path example not the actual path. For more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [AutoHotkey Script Collection and Template, Multiple Files Opener Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.1).
 - **Full 'Multiple Files Opener' Script on KeyTik Bundled Download:**
 ```
 Alt & Left::
@@ -234,7 +232,10 @@ Alt & Left::
 return
 ```
 
-## What You Can Do With KeyTik :
+> [!NOTE]
+> **All KeyTik AutoHotkey Script Including Automation Tool is Using AutoHotkey V2.**
+
+## Guide and Tips to Use Each Feature:
 **1. Multiple profile :**
 * When you need multiple condition to activate remap like for different game or you need to remap some key for only one condition and don't need to always activate it, you can make different profile as you need and activate or deactivate individually so you don't need to adjust your remap every single time you need it for another condition.
   
@@ -257,7 +258,8 @@ return
 * You can pin your favorite profile or profile that you use the most so it can showed first in the profile list. You just need to click pin icon on the profile to make it work.
 
 **8. Assign Script On Specific Device :**
-* You can connect 2 keyboard on your device. You can use first keyboard to typing normally and the other one to do automation tool such as auto clicker, screen clicker, multiple files opener and more, on each key and that would not affect the first keyboard. So you are left with 2 keyboard connected, 1 can do normal keyboard task and the other one can do automation tool. Even more, if you assign the automation to more compact keyboard such as mini keyboard so each key in that keyboard can do different automation tool, that will make it more neat and flexible.
+* You can connect 2 keyboard on your device. You can use first keyboard to typing normally and the other one to do automation tool such as auto clicker, screen clicker, multiple files opener and more, on each key and that would not affect the first keyboard. So you are left with 2 keyboard connected, 1 can do normal keyboard task and the other one can do automation tool. Even more, you can assign the automation tool to more compact keyboard such as mini keyboard, so each key in that keyboard can do different automation tool. This will make your desktop and keyboard more neat and flexible.
+* To do this, you just need to click on 'Select Device' button when you create or edit profile. When you do this, KeyTik will show list of device conected to your device. If you want to refresh the list, you just need to press 'Refresh' button. And if you not sure where is your device or where to select, you can use AutoHotkey Interception built in monitor to test your device. To do that, you can just check the checkbox on the Device ID and try to press keys on your device. If the Device ID is correct, the monitor will show the keys you press. After knowing your device ID, then you just need to select the ID from the 'Select Device Window'.
 
 **9. And Many More :**
 * Above is just an example how you can use each feature. It's absolutely possible to use it for different need and case. There are a lot of possibility you can discover with KeyTik. Let us know if you are discovering another use of KeyTik on our [GitHub discussion page](https://github.com/Fajar-RahmadJaya/KeyTik/discussions).

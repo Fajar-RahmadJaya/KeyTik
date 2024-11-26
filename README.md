@@ -84,7 +84,7 @@ KeyTik comes packed with a wide range of features designed to give you ultimate 
 | 11     | **Show Stored Profile**                            | Display your stored profile or restore it to main window. |
 | 12     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
 | 13      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
-| 14      | **Auto Clicker**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is holded. You can change the 'left click', 'e', interval part to your preference. See [How To Use KeyTik As Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker) for more info.                 |
+| 14      | **Auto Clicker**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is held. You can change the 'left click', 'e', interval part to your preference. See [How To Use KeyTik As Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker) for more info.                 |
 | 15      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode, see point 16. see [How To Use KeyTik as Screen Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-) for more info.                |
 | 16      | **Screen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference. See [How To Use KeyTik as Screen Coordinate Auto Detect And Copy](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy-) for more info.               |
 | 17      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference. see [How To Use KeyTik as Multiple Files Opener](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-) for more info.               |
@@ -131,7 +131,7 @@ ClickInterval := 100 ; Change this if you want to change the interval
 
 global isClicking := false
 
-$e:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+$e:: ; Change this if you want to change hold 'e' for condition to do auto clicker
 {
     global isClicking
     isClicking := true
@@ -142,7 +142,7 @@ $e:: ; Change this if you want to change hold 'e' for condition to do autoclicke
     }
 }
 
-$e up:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+$e up:: ; Change this if you want to change hold 'e' for condition to do auto clicker
 {
     global isClicking
     isClicking := false
@@ -181,7 +181,7 @@ global
         MouseMove(x, y)
         Click()
 
-        interval := 500 ; Change the interval to your preference in milisecond
+        interval := 500 ; Change the interval to your preference in millisecond
 
         Sleep(interval)
     }
@@ -259,7 +259,7 @@ return
 
 **8. Assign Script On Specific Device :**
 * You can connect 2 keyboard on your device. You can use first keyboard to typing normally and the other one to do automation tool such as auto clicker, screen clicker, multiple files opener and more, on each key and that would not affect the first keyboard. So you are left with 2 keyboard connected, 1 can do normal keyboard task and the other one can do automation tool. Even more, you can assign the automation tool to more compact keyboard such as mini keyboard, so each key in that keyboard can do different automation tool. This will make your desktop and keyboard more neat and flexible.
-* To do this, you just need to click on 'Select Device' button when you create or edit profile. When you do this, KeyTik will show list of device conected to your device. If you want to refresh the list, you just need to press 'Refresh' button. And if you not sure where is your device or where to select, you can use AutoHotkey Interception built in monitor to test your device. To do that, you can just check the checkbox on the Device ID and try to press keys on your device. If the Device ID is correct, the monitor will show the keys you press. After knowing your device ID, then you just need to select the ID from the 'Select Device Window'.
+* To do this, you just need to click on 'Select Device' button when you create or edit profile. When you do this, KeyTik will show list of device connected to your device. If you want to refresh the list, you just need to press 'Refresh' button. And if you not sure where is your device or where to select, you can use AutoHotkey Interception built in monitor to test your device. To do that, you can just check the checkbox on the Device ID and try to press keys on your device. If the Device ID is correct, the monitor will show the keys you press. After knowing your device ID, then you just need to select the ID from the 'Select Device Window'.
 
 **9. And Many More :**
 * Above is just an example how you can use each feature. It's absolutely possible to use it for different need and case. There are a lot of possibility you can discover with KeyTik. Let us know if you are discovering another use of KeyTik on our [GitHub discussion page](https://github.com/Fajar-RahmadJaya/KeyTik/discussions).
@@ -267,7 +267,7 @@ return
 ## How Is This Work :
 If you are curious how KeyTik work you can check this section : 
 ### How is Remapper And Automation Tool work :
-For the automation tool executor, KeyTik use AutoHotkey. AutoHotkey is a powerful scripting lenguage to do this task. Using AutoHotkey, allow keytik to do almost all automation task while still make it lightweight. For example, one AutoHotkey script size usually below 1MB and if i make the automation tool without AutoHotkey such as using python library then the size could be more than that. Another reason i use AutoHotkey is because how it work. Because it work in a single file and have different file for each script, allow KeyTik to assign feature to it such as run on startup or multiple profile.
+For the automation tool executor, KeyTik use AutoHotkey. AutoHotkey is a powerful scripting language to do this task. Using AutoHotkey, allow keytik to do almost all automation task while still make it lightweight. For example, one AutoHotkey script size usually below 1MB and if i make the automation tool without AutoHotkey such as using python library then the size could be more than that. Another reason i use AutoHotkey is because how it work. Because it work in a single file and have different file for each script, allow KeyTik to assign feature to it such as run on startup or multiple profile.
 To be more simple, I use python for the functionality (create, edit, GUI, run, exit, store, delete, run on startup and more) and use AutoHotkey as executor for each profile. So it's basically an app to create AutoHotkey script based on user input and assign functionality to it. You can see the created script on (KeyTik\_internal\data\active). For example, suppose your input is like this :
 
 Example 1 (Without Shortcut) :
@@ -318,7 +318,7 @@ To use this feature, you just need to select your device then click on "Select" 
 
 For more simple explanation, to assign your remap or script to specific device, you just need to select your device in the "Select Device" button. 
 
-Here is the the example, suppose your input is like this :
+Here is the example, suppose your input is like this :
 <p align="center">
   <img src="Preview/Example 3.png" alt="Input Example 3" width="300" />
 </p>
@@ -357,8 +357,8 @@ s::Down
 ## User Safety (For Those Who Worry About Virus Or Data Safety) :
 I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety in each version. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust with you so you can use KeyTik without worry. 
 
-But if you still have some doubt, i also include non built version on release. With it you can check the source code yourself. You can also build it yourself, i also include buld guide on the download or you can check it [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt). So there are 2 download version in each release starting from version 1.2. They are normal and source code version. Normal version is download version which i build it myself using the same code as in source code version so you don't have to. I use python library [Pyinstaller](https://github.com/pyinstaller/pyinstaller) to built it. 
-The source code version is download version that not builded, in other word it's the raw code. People usually prefer this version to made sure there isn't anything suspicious because if it's source code they can check it themself. You typically can't do this if it's in executable format because usually executable contain binary which make it difficult to check. 
+But if you still have some doubt, i also include non built version on release. With it you can check the source code yourself. You can also build it yourself, i also include build guide on the download or you can check it [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt). So there are 2 download version in each release starting from version 1.2. They are normal and source code version. Normal version is download version which i build it myself using the same code as in source code version so you don't have to. I use python library [Pyinstaller](https://github.com/pyinstaller/pyinstaller) to built it. 
+The source code version is download version that not built, in other word it's the raw code. People usually prefer this version to made sure there isn't anything suspicious because if it's source code they can check it themself. You typically can't do this if it's in executable format because usually executable contain binary which make it difficult to check. 
 
 But at the end at least for KeyTik, what i build and what you build yourself is the same if you use the same technique and command like me using Pyinstaller because i build the normal version using the same code in the source code version. To make it work, you need to install the required python library or build it yourself into executable. So if you don't want an extra step then, normal version is what you need. If you want only the source code or have no problem with extra step, then source code version is what you need.
 

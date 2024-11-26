@@ -18,7 +18,7 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 4. [What Make Us Different Then Other Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool-)
 5. [Upcoming Feature (Possibly to be Implemented).](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#upcoming-update-possibly-to-be-implemented-)
 6. [How To Use KeyTik Automation Tool.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool-)
-   * [Auto Clicker/](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker)
+   * [Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker)
    * [Screen Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-)
    * [Screen Coordinate Auto Detect And Copy.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy-)
    * [Multiple Files Opener.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-)

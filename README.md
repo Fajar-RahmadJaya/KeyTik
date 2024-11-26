@@ -116,7 +116,7 @@ KeyTik have unique capabilities and make it different than other automation tool
 ## Upcoming Update (Possibly to be Implemented) :
 Below are my plan and what i have in mind for future KeyTik Development :
 
-| **No** | **Feature Plan**                                   | **Description** | **Status** |
+| **No** | **Upcoming Update**                                   | **Description** | **Status** |
 |--------|----------------------------------------------------|-----------------|------------|
 | 1      | **Improve Documentation** | Make documentation more detailed and Make KeyTik website | InProgress |
 
@@ -190,7 +190,7 @@ global
 ```
 
 ### Screen Coordinate Auto Detect And Copy :
-To make screen clicker editing easier. I also include coordinate detector to KeyTik. On default, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you preference.
+To make screen clicker editing easier. I also include coordinate detector to KeyTik. On default, you just need to move your cursor to desired position then press 'space'. After that, it will show coordinate and automatically copy it. You can then just paste whenever you want. You can also change 'space' part to you preference. or more guide on how to adjust or download the script, go to AutoHotkey Script Collection And Template release on [AutoHotkey Script Collection and Template, Screen Coordinate Auto Detect And Copy Guide](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection/releases/tag/v2.4).
 - **Full 'Screen Coordinate Auto Detect And Copy' Script on KeyTik Bundled Download:**
 ```
 Persistent

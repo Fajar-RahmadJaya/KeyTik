@@ -22,7 +22,7 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
    * [Screen Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-)
    * [Screen Coordinate Auto Detect And Copy.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy-)
    * [Multiple Files Opener.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-)
-8. [Guide and Tips to Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#guide-and-tips-to-use-each-feature-)
+8. [Guide and Tips to Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#guide-and-tips-to-use-each-feature)
 9. [How Is This Work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-this-work-)
    * [How is Remapper And Automation Tool work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work-)
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work-)

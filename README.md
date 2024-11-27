@@ -3,7 +3,7 @@
   <br><br>
   
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=github&label=Total%20Download&color=white&link=https%3A%2F%2Ftooomm.github.io%2Fgithub-release-stats%2F%3Fusername%3DFajar-RahmadJaya%26repository%3DKeyTik)
-![SourceForge Downloads](https://img.shields.io/sourceforge/dt/KeyTik?style=plastic&logo=sourceforge&label=Total%20Download&color=orange&link=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fkeytik%2F)
+![SourceForge Downloads](https://img.shields.io/sourceforge/dt/KeyTik?style=plastic&logo=sourceforge&label=Total%20Download&color=orange&link=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fkeytik%2Ffiles%2Fstats%2Ftimeline)
 
 # KeyTik: The All-in-One Automation Tool
 

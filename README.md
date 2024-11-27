@@ -352,15 +352,17 @@ s::Down
 #HotIf
 ```
 
-## User Safety (For Those Who Worry About Virus Or Data Safety) :
-I don't make this software for that reason and this software is open source, so you can rest assured. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety in each version. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust with you so you can use KeyTik without worry. 
+## Does KeyTik Safe to Use ? :
+Yes, because i didn't add any malicious thing or code on KeyTik. Also KeyTik is open-source meaning you can check the code yourself. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety in each version. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust with you so you can use KeyTik without worry. 
 
-But if you still have some doubt, i also include non built version on release. With it you can check the source code yourself. You can also build it yourself, i also include build guide on the download or you can check it [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt). So there are 2 download version in each release starting from version 1.2. They are normal and source code version. Normal version is download version which i build it myself using the same code as in source code version so you don't have to. I use python library [Pyinstaller](https://github.com/pyinstaller/pyinstaller) to built it. 
-The source code version is download version that not built, in other word it's the raw code. People usually prefer this version to made sure there isn't anything suspicious because if it's source code they can check it themself. You typically can't do this if it's in executable format because usually executable contain binary which make it difficult to check. 
+For download in release, i include non built version or source code version on release. The source code version is download version that contain pure code that not compiled. You can check the code yourself to make sure there is nothing malicious in it. After that you can build it or compile it yourself. I also include build guide on the download to make you easier to compile it. You can check the guide [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt) or in the source code download. The downside of source code download version is you need to compile or build it yourself or install the required python library to run it.
 
-But at the end at least for KeyTik, what i build and what you build yourself is the same if you use the same technique and command like me using Pyinstaller because i build the normal version using the same code in the source code version. To make it work, you need to install the required python library or build it yourself into executable. So if you don't want an extra step then, normal version is what you need. If you want only the source code or have no problem with extra step, then source code version is what you need.
+So there are 2 download version in each release starting from version 1.2. They are normal and source code version. Normal version is download version which i built it myself using the same code as in source code version so you don't have to. I use python library [Pyinstaller](https://github.com/pyinstaller/pyinstaller) to built it. 
+The source code version is download version that not built, in other word it's the raw code. People usually prefer this version if they want to made sure there isn't anything suspicious in it. This is because, they can check the code themself if it's a source code. You typically can't do this if it's in executable format because executable usually contain binary that make it difficult to check. 
 
-Again, i don't intend to add malware on KeyTik so don't be afraid to download the normal version which i build myself using the same code in source code version. Here is my scan on KeyTik v1.2 using virus Total if you have doubt (You can also scan for yourself if you want 100% certain) :
+But at the end at least for KeyTik, what i build and what you build yourself is the same if you use the same technique and command like myself, using Pyinstaller . This is because, i build the normal version using the same code in the source code version. So if you don't want an extra step then, normal version is what you need. If you want only the source code or have no problem with extra step, then source code version is what you need. Because on the source code version, you need to install the required python library or build it yourself into executable to make it work.
+
+Again, i don't intend to add malware on KeyTik so don't be afraid to download the normal version because i build myself using the same code in source code version. Here is my scan on KeyTik v1.3 source code version using virus Total :
 
 * Report Screenshots :
 <img src="Preview/Virus Total Report v1.3.png" alt="Virus Total Report v1.3" width="500" />
@@ -369,7 +371,10 @@ Again, i don't intend to add malware on KeyTik so don't be afraid to download th
    - https://www.virustotal.com/gui/file/314211b7b27e58fb9beef44467ae3155e42bade9f4b780ef38fcd86a95312598
 
 > [!TIP]
-> **I don't add the normal download version is because i just realize whatever i do pyinstaller build will always detected as malware. But the source code version itself is not detected as malware. If you are curious or still worried, try to download source code version then build it yourself and try to rescan. Even if you build it yourself the result will be the same. It will still detected as malware as long as we build it using pyinstaller. Don't worry, it's false positive.**
+> **I don't add the normal download version is because i just realize whatever i do pyinstaller build will always detected as malware.
+> But the source code version itself is not detected as malware.
+> If you are curious or still worried, try to download source code version then build it yourself and try to rescan.
+> Even if you build it yourself the result will be the same. It will still detected as malware as long as we build it using pyinstaller. Don't worry, it's false positive.**
 > <br/>
 > <br/>
 > **This is completely normal so you don't have to worry.**

@@ -1,15 +1,31 @@
-# KeyTik: The All-in-One Automation Tool & Keyboard Remapper with Profiles
-## GUI-Based Keyboard Remapper with Profiles, AutoHotkey Script Manager, Auto Clicker, Screen Clicker, and More.
-KeyTik is an open-source automation tool that can do almost all automation at your will. At first, KeyTik focused on keyboard remapper with profile to activate or deactivate each remap individually. But because it also use AutoHotkey as scripting language to do the automation, it allow KeyTik to do all automation available by AutoHotkey such as auto clicker, keyboard remapper, screen clicker and more. 
+<div align="center">
+  <img src="Preview/KeyTik Icon.png" alt="KeyTik Icon" width="150">
+  <br><br>
+  
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=github&label=Total%20Download&color=white&link=https%3A%2F%2Ftooomm.github.io%2Fgithub-release-stats%2F%3Fusername%3DFajar-RahmadJaya%26repository%3DKeyTik)
+![SourceForge Downloads](https://img.shields.io/sourceforge/dt/KeyTik?style=plastic&logo=sourceforge&label=Total%20Download&color=orange&link=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fkeytik%2F)
 
-With a bit of scripting you can do all of that with ease. If you don't have coding experience, don't worry because i also made a beginner friendly open-source AutoHotkey script collection and template that allow you to download already made script or edit it to your preference. I try to make it as easy to understand as possible with guide how to use the template or change the code in each script, make sure to visit it at [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) if you are interested. 
+# KeyTik: The All-in-One Automation Tool
 
-So if you are looking for lightweight auto clicker, keyboard remapper, screen clicker and more or All-in-One Automation Tool and AutoHotkey script manager with user friendly GUI, then this is what you are looking for. I hope you can enjoy it and it can be useful to you. Sincerely, Fajar Rahmad Jaya.
+## GUI-Based Keyboard Remapper with Profiles, Auto Clicker, Screen Clicker, Multiple Files Opener, AutoHotkey Script Manager and More.
+
+</div>
+
+## What is KeyTik?
+
+KeyTik is an open-source, all-in-one automation tool that lets you automate nearly anything at your will. Initially, KeyTik focused on being a keyboard remapper with profiles, allowing you to activate or deactivate each remap individually. However, since KeyTik uses AutoHotkey as the scripting language, it can handle all types of automation available in AutoHotkey, such as auto-clicking, keyboard remapping, screen clicking, opening multiple files, and more. Additionally, the use of AutoHotkey has made KeyTik an AutoHotkey script manager. This means you can easily run, exit, run on startup, edit, store, delete, and more on your AutoHotkey scripts.
+
+With a bit of scripting, you can do almost all automation tasks with ease. If you don't have coding experience, don't worry! I’ve created a beginner-friendly open-source [AutoHotkey script collection and template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) that allows you to download pre-made scripts or edit them to your preference. I’ve tried to make it as easy to understand as possible, with guides on how to use the templates or customize the scripts.
+
+So, if you're looking for a lightweight auto-clicker, keyboard remapper, screen clicker, multiple files opener, and AutoHotkey script manager with a user-friendly GUI in a single software, then this is exactly what you need! I hope you enjoy using KeyTik and find it useful.
+
+Sincerely,  
+**Fajar Rahmad Jaya**
 
 > [!NOTE]
-> **If you're satisfied with KeyTik, don't forget to give us a star!**
-><br>
-> **Also, don't forget to share it and help the world learn more about us.**
+> **If you're satisfied with KeyTik, don't forget to give us a star!**  
+> **Also, share it and help the world learn more about us.**
+
 
 ## Table Of Content :
 1. [Preview.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview-)

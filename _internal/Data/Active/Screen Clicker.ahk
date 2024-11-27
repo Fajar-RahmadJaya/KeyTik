@@ -3,7 +3,7 @@
 
 toggle := false 
 
-q & e:: ; Change this to toogle screen clicker on or off
+q & e:: ; Change this to toggle screen clicker on or off
 { 
 global
     toggle := !toggle 
@@ -29,9 +29,10 @@ global
         MouseMove(x, y)
         Click()
 
-        interval := 500 ; Change the interval to your preference in milisecond
+        interval := 500 ; Change the interval to your preference in millisecond
 
         Sleep(interval)
     }
     return
 } 
+

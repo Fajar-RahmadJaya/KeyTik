@@ -8,3 +8,4 @@ Alt & Left::
     Run("C:\\path\\to\\your\\file3.txt")
 }
 return
+

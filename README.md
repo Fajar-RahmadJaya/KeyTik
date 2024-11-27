@@ -47,11 +47,12 @@ Sincerely,
 7. [How Is This Work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-this-work-)
    * [How is Remapper And Automation Tool work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work-)
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work-)
-8. [Does KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik/tree/main?tab=readme-ov-file#does-keytik-safe-to-use--)
-9. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
-10. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
-11. [Star History.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history-)
-12. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
+8. [Supported Key List.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#supported-key-list-)
+9. [Does KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik/tree/main?tab=readme-ov-file#does-keytik-safe-to-use--)
+10. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
+11. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
+12. [Star History.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history-)
+13. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
 
 ## Preview :
 <img src="Preview/main.png" alt="Preview Main" width="400" />

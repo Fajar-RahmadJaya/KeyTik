@@ -374,6 +374,16 @@ s::Down
 #HotIf
 ```
 
+## Supported Key List :
+
+KeyTik uses AutoHotkey, which means that if AutoHotkey supports a particular key, then KeyTik can support it as well. However, sometimes the keys need to be represented with syntax or symbols rather than the actual key name. For example, the "CTRL" key is represented as `^` in AutoHotkey syntax.
+
+The good news is that KeyTik can automatically translate the key names into their corresponding syntax. This way, you don’t need to manually input the syntax when assigning keys—just use the key names, and KeyTik will handle the translation for you.
+
+A complete list of supported keys and their corresponding AutoHotkey syntax can be found in the `key_list.txt` file located in the `KeyTik_internal\data` folder in the download package. Alternatively, you can view the same list directly on the repository via this [Key List link](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/_internal/Data/key_list.txt).
+
+The content of the `key_list.txt` file reflects the exact keys supported by KeyTik. This means that the list of supported keys is stored in the `key_list.txt` file.
+
 ## Does KeyTik Safe to Use ? :
 Yes, because i didn't add any malicious thing or code on KeyTik. Also KeyTik is open-source meaning you can check the code yourself. If you still have doubt, you can try [Virus Total](https://www.virustotal.com/gui/home/upload) to scan it. Virus Total is known for it being a free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. The scan is done each version release to ensure safety in each version. The conclusion is, i don't intend to add virus or take your personal data intentionally or without your permission. I want to build trust with you so you can use KeyTik without worry. 
 

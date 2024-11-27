@@ -25,7 +25,7 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 7. [How Is This Work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-this-work-)
    * [How is Remapper And Automation Tool work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work-)
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work-)
-8. [Does KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/README.md#does-keytik-safe-to-use--)
+8. [Does KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik/tree/main?tab=readme-ov-file#does-keytik-safe-to-use--)
 9. [Have Any Suggestion ?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion-)
 10. [License.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license-)
 11. [Star History.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history-)

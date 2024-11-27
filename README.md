@@ -2,8 +2,9 @@
   <img src="Preview/KeyTik Icon.png" alt="KeyTik Icon" width="150">
   <br><br>
   
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=github&label=Total%20Download&color=white&link=https%3A%2F%2Ftooomm.github.io%2Fgithub-release-stats%2F%3Fusername%3DFajar-RahmadJaya%26repository%3DKeyTik)
-![SourceForge Downloads](https://img.shields.io/sourceforge/dt/KeyTik?style=plastic&logo=sourceforge&label=Total%20Download&color=orange&link=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fkeytik%2Ffiles%2Fstats%2Ftimeline)
+[![GitHub Downloads](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=github&label=Total%20Downloads&color=white)](https://tooomm.github.io/github-release-stats/?username=Fajar-RahmadJaya&repository=KeyTik)
+[![SourceForge Downloads](https://img.shields.io/sourceforge/dt/KeyTik?style=plastic&logo=sourceforge&label=Downloads&color=orange)](https://sourceforge.net/projects/keytik/)
+
 
 # KeyTik: The All-in-One Automation Tool
 

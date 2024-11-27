@@ -44,7 +44,7 @@ Sincerely,
    * [Screen Coordinate Auto Detect And Copy.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy-)
    * [Multiple Files Opener.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-)
 6. [Guide and Tips to Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#guide-and-tips-to-use-each-feature)
-7. [How Is This Work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-this-work-)
+7. [How Is KeyTik Work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-keytik-work-)
    * [How is Remapper And Automation Tool work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work-)
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work-)
 8. [Supported Key List.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#supported-key-list-)
@@ -285,7 +285,7 @@ return
 **9. And Many More :**
 * Above is just an example how you can use each feature. It's absolutely possible to use it for different need and case. There are a lot of possibility you can discover with KeyTik. Let us know if you are discovering another use of KeyTik on our [GitHub discussion page](https://github.com/Fajar-RahmadJaya/KeyTik/discussions).
 
-## How Is This Work :
+## How Is KeyTik Work :
 If you are curious how KeyTik work you can check this section : 
 ### How is Remapper And Automation Tool work :
 For the automation tool executor, KeyTik use AutoHotkey. AutoHotkey is a powerful scripting language to do this task. Using AutoHotkey, allow keytik to do almost all automation task while still make it lightweight. For example, one AutoHotkey script size usually below 1MB and if i make the automation tool without AutoHotkey such as using python library then the size could be more than that. Another reason i use AutoHotkey is because how it work. Because it work in a single file and have different file for each script, allow KeyTik to assign feature to it such as run on startup or multiple profile.

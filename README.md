@@ -32,7 +32,6 @@ So if you are looking for lightweight auto clicker, keyboard remapper, screen cl
 12. [Acknowledgements.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements-)
 
 ## Preview :
-### KeyTik Feature Preview :
 <img src="Preview/main.png" alt="Preview Main" width="400" />
 <img src="Preview/default mode.png" alt="Default Mode" width="400" />
 <img src="Preview/text mode.png" alt="Preview Text Mode" width="400" />

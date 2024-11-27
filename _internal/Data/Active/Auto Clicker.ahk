@@ -5,7 +5,7 @@ ClickInterval := 100 ; Change this if you want to change the interval
 
 global isClicking := false
 
-$e:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+$e:: ; Change this if you want to change hold 'e' for condition to do auto clicker
 {
     global isClicking
     isClicking := true
@@ -16,7 +16,7 @@ $e:: ; Change this if you want to change hold 'e' for condition to do autoclicke
     }
 }
 
-$e up:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+$e up:: ; Change this if you want to change hold 'e' for condition to do auto clicker
 {
     global isClicking
     isClicking := false

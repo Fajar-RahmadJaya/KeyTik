@@ -62,27 +62,72 @@ Sincerely,
 
 ## How To Install : 
 To install KeyTik you just need to follow these step :
-1. **Download And Install AutoHotkey**
-    - AutoHotkey Download Website : https://www.autohotkey.com/download/.
-    - If you encounter any issues with AutoHotkey installation, Visit AutoHotkey install documentation at : https://www.autohotkey.com/docs/v2/howto/Install.htm.
-2. **(Optional) If You Use Assign Profile On Specific Device Feature, You Need To Download And Install Interception Driver First**
-    - Interception Driver Download : https://github.com/oblitum/Interception/releases
-    - To install, visit [AutoHotkey Interception, Install the Intereception driver](https://github.com/evilC/AutoHotInterception?tab=readme-ov-file#install-the-intereception-driver) for detailed install guide.
-    - To know whether the Interception Driver is correctly installed or not, Try using "Open AHI Monitor To Test Device" button. If it's work, then the Interception Driver is installed correctly.
-4. **Download KeyTik from one of the following platforms**
+1. **Download And Install AutoHotkey, Interception Driver (Optional If You Use Assign Profile On Specific Device Feature)**
+    - You can install AutoHotkey and Interception driver manually or use command line to make it easier. Refer to
+    - **AutoHotkey :**
+      - AutoHotkey Download Website : https://www.autohotkey.com/download/.
+      - If you encounter any issues with AutoHotkey installation, Visit AutoHotkey install documentation at : https://www.autohotkey.com/docs/v2/howto/Install.htm.
+    - **Interception Driver**
+      - Interception Driver Download : https://github.com/oblitum/Interception/releases
+      - To install, visit [AutoHotkey Interception, Install the Intereception driver](https://github.com/evilC/AutoHotInterception?tab=readme-ov-file#install-the-intereception-driver) for detailed install guide.
+      - To know whether the Interception Driver is correctly installed or not, Try using "Open AHI Monitor To Test Device" button. If it's work, then the Interception Driver is installed correctly.
+2. **Download KeyTik from one of the following platforms**
     - KeyTik GitHub Release : https://github.com/Fajar-RahmadJaya/KeyTik/releases.
      - There are 2 option to download, normal version and source code version.
      - If you want simple version in executable form, you can download the normal version (In release it's the zip file without 'open source version' name on it, example KeyTik.v1.3.rar). In normal version you can directly double click the exe file to run KeyTik.
      - If you want the raw code only, you can download source code version (In release it's the zip file with 'open source version' name on it, example KeyTik.v1.3.Source.Code.Download.Version.rar). To make it work, you need to install required python library or build it into executable yourself. I have added guide to build it into the download or you can see it in [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt).
     - Source Forge : https://sourceforge.net/projects/keytik.
-5. **Extract KeyTik zip file**
+3. **Extract KeyTik zip file**
     - Extract the downloaded KeyTik zip file to a location of your choice.
-6. **Open KeyTik folder**
+4. **Open KeyTik folder**
     - Navigate to the folder where you extracted KeyTik and locate KeyTik.exe.
-7. **Run KeyTik**
+5. **Run KeyTik**
     - Double-click KeyTik.exe to start it.
-8. **You're All Set!**
+6. **You're All Set!**
     - KeyTik should now be ready to use.
+
+### How To Install AutoHotkey and Interception Driver Using Command Line
+Installing AutoHotkey and Interception driver can be a lot of work especially Interception driver. So i made this command line to make AutoHotkey and Interception driver installation easier. Here is how to do it :
+1. Open command prompt as administrator (This is required to install Interception driver).
+2. Copy the command below and paste it (Left click) to command prompt.
+3. Follow installation step in AutoHotkey installation window
+4. Check installation using "Open AHI Monitor To Test Device" button. If it's work, then the installation is complete.
+
+**AutoHotkey and Interception driver installation command :**
+```
+:: This Is Comment.
+:: Make sure to run your Command Prompt as administrator for Interception Installation
+
+:: Go To Download Directory.
+cd %USERPROFILE%\Downloads
+
+:: Create Installation Folder.
+mkdir "AutoHotkey & Interception Installation"
+
+:: Go To Installation Folder.
+cd "%USERPROFILE%\Downloads\AutoHotkey & Interception Installation"
+
+:: Check If AutoHotkey Installed, If Not, Then Download AutoHotkey Setup From GitHub Release And Run It.
+IF NOT EXIST "C:\Program Files\AutoHotkey" (curl -L https://github.com/AutoHotkey/AutoHotkey/releases/download/v2.0.18/AutoHotkey_2.0.18_setup.exe -o "%USERPROFILE%\Downloads\AutoHotkey & Interception Installation\AutoHotkey_2.0.18_setup.exe" && "%USERPROFILE%\Downloads\AutoHotkey & Interception Installation\AutoHotkey_2.0.18_setup.exe") ELSE echo AutoHotkey is already installed.
+
+:: Download Interception.zip From GitHub Release.
+curl -L https://github.com/oblitum/Interception/releases/download/v1.0.1/Interception.zip -o "%USERPROFILE%\Downloads\AutoHotkey & Interception Installation\Interception.zip"
+
+:: Extract Interception.zip.
+powershell -Command "Expand-Archive -Path '%USERPROFILE%\Downloads\AutoHotkey & Interception Installation\Interception.zip' -DestinationPath '%USERPROFILE%\Downloads\AutoHotkey & Interception Installation\Interception'"
+
+:: Go To Interception Install Directory.
+cd "%USERPROFILE%\Downloads\AutoHotkey & Interception Installation\Interception\Interception\command line installer"
+
+:: Run Interception Installer.
+install-interception.exe
+
+:: Command To Install Interception.
+install-interception.exe /install
+
+:: AutoHotkey And Interception Installation Done!
+
+```
 
 > [!IMPORTANT]
 > **Make sure AutoHotkey is installed correctly, as it's required for KeyTik to run profiles. If you're using the "Assign Profile On Specific Device" feature, ensure that the Interception Driver is properly installed, as it is needed for this functionality.**

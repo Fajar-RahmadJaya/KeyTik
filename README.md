@@ -63,7 +63,7 @@ Sincerely,
 ## How To Install : 
 To install KeyTik you just need to follow these step :
 1. **Download And Install AutoHotkey, Interception Driver (Optional If You Use Assign Profile On Specific Device Feature)**
-    - You can install AutoHotkey and Interception driver manually or use command line to make it easier. Refer to
+    - You can install AutoHotkey and Interception driver manually or use command line to make it easier. Refer to [How To Install AutoHotkey and Interception Driver Using Command Line](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/README.md#how-to-install-autohotkey-and-interception-driver-using-command-line).
     - **AutoHotkey :**
       - AutoHotkey Download Website : https://www.autohotkey.com/download/.
       - If you encounter any issues with AutoHotkey installation, Visit AutoHotkey install documentation at : https://www.autohotkey.com/docs/v2/howto/Install.htm.
@@ -86,7 +86,7 @@ To install KeyTik you just need to follow these step :
 6. **You're All Set!**
     - KeyTik should now be ready to use.
 
-### How To Install AutoHotkey and Interception Driver Using Command Line
+### How To Install AutoHotkey and Interception Driver Using Command Line :
 Installing AutoHotkey and Interception driver can be a lot of work especially Interception driver. So i made this command line to make AutoHotkey and Interception driver installation easier. Here is how to do it :
 1. Open command prompt as administrator (This is required to install Interception driver).
 2. Copy the command below and paste it (Left click) to command prompt.

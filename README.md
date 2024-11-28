@@ -67,7 +67,7 @@ To install KeyTik you just need to follow these step :
     - **AutoHotkey :**
       - AutoHotkey Download Website : https://www.autohotkey.com/download/.
       - If you encounter any issues with AutoHotkey installation, Visit AutoHotkey install documentation at : https://www.autohotkey.com/docs/v2/howto/Install.htm.
-    - **Interception Driver**
+    - **Interception Driver :**
       - Interception Driver Download : https://github.com/oblitum/Interception/releases
       - To install, visit [AutoHotkey Interception, Install the Intereception driver](https://github.com/evilC/AutoHotInterception?tab=readme-ov-file#install-the-intereception-driver) for detailed install guide.
       - To know whether the Interception Driver is correctly installed or not, Try using "Open AHI Monitor To Test Device" button. If it's work, then the Interception Driver is installed correctly.

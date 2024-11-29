@@ -43,7 +43,7 @@ Sincerely,
    * [Screen Clicker.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker-)
    * [Screen Coordinate Auto Detect And Copy.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy-)
    * [Multiple Files Opener.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener-)
-6. [Guide and Tips to Use Each Feature.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#guide-and-tips-to-use-each-feature)
+6. [What can You do With KeyTik.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-can-you-do-with-keytik-)
 7. [How Is KeyTik Work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-keytik-work-)
    * [How is Remapper And Automation Tool work.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work-)
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work-)
@@ -301,7 +301,7 @@ return
 > [!NOTE]
 > **All KeyTik AutoHotkey Script Including Automation Tool is Using AutoHotkey V2.**
 
-## Guide and Tips to Use Each Feature:
+## What can You do With KeyTik :
 **1. Multiple profile :**
 * When you need multiple condition to activate remap like for different game or you need to remap some key for only one condition and don't need to always activate it, you can make different profile as you need and activate or deactivate individually so you don't need to adjust your remap every single time you need it for another condition.
   

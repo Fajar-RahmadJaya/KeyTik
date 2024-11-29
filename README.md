@@ -37,6 +37,7 @@ KeyTik is available at the following platforms:
 - [GitHub](https://github.com/Fajar-RahmadJaya/KeyTik)
 - [SourceForge](https://sourceforge.net/projects/keytik/)
 - [PitchHut](https://www.pitchhut.com/project/keytik)
+- [YouTube (@Fajar-RahmadJaya)](https://www.youtube.com/@Fajar-RahmadJaya)
 
 ## Table Of Content
 1. [Preview](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview)

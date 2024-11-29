@@ -56,7 +56,7 @@ KeyTik is available at the following platforms:
    * [How is Remapper And Automation Tool work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work)
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work)
 8. [Supported Key List](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#supported-key-list)
-9. [Is KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#does-keytik-safe-to-use)
+9. [Is KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#is-keytik-safe-to-use)
     - [Download Options](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#download-options)
     - [Why the Normal Version May Be Flagged as Malware](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#why-the-normal-version-may-be-flagged-as-malware)
     - [Scan Results](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#scan-results)

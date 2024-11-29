@@ -474,8 +474,18 @@ Again, i don't intend to add malware on KeyTik so don't be afraid to download th
 > <br/>
 > **This is completely normal so you don't have to worry.**
 
-## Have Any Suggestion?
-If you have any suggestion for KeyTik, i would be very happy to take it. You can show your suggestion or ask anything about KeyTik on [GitHub issue](https://github.com/Fajar-RahmadJaya/KeyTik/issues). The more you give suggestion, the better i can improve KeyTik. So don't be shy to show your suggestion or problem. Try to be polite and don't offend any individual or group. Together, lets make this a wholesome community. I sincerely appreciate your trust and continued support. Thank you. Sincerely, Fajar Rahmad Jaya.
+## Have a Suggestion or Question?
+We’d love to hear from you! Your feedback is essential for the continued improvement of KeyTik. If you have any suggestions or have encountered an issue, please submit it on the [KeyTik Issues page](https://github.com/Fajar-RahmadJaya/KeyTik/issues).
+
+To make it easier for you to submit feedback, we’ve provided several issue templates. Please select the one that best matches your feedback:
+- **[Automation Tool Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Automation+Tool+Suggestion%2C+Supported+Key+Suggestion&projects=&template=automation-tool-suggestion.md&title=Automation+Tool+Suggestion)**: Suggest additions to KeyTik’s built-in automation tools.
+- **[Bug Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=bug&projects=&template=bug-report.md&title=Bug+Report)**: Report any bugs or issues you’ve encountered to help us improve.
+- **[Feature Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Feature+Suggestion&projects=&template=feature_suggestion.md&title=Feature+Suggestion)**: Suggest an idea for a new feature or improvement for the project.
+- **[Supported Key Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Supported+Key+Suggestion&projects=&template=supported-key-suggestion.md&title=Supported+Key+Suggestion)**: Suggest a key to include in the list if you find some keys aren’t working.
+- **[Windows Warning Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Windows+Warning+Report&projects=&template=windows-warning-report.md&title=Windows+Warning+Report)**: Report any Windows warnings, such as untrusted author notifications or false positives.
+Simply choose the most relevant template and provide as much detail as possible. Your input will help us improve KeyTik for everyone!
+
+Thank you for your support — we truly appreciate it!
 
 ## License
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.

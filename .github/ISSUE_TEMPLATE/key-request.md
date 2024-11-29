@@ -2,7 +2,7 @@
 name: Key Request
 about: Request Key To Include In Key List If You Find Not Working Key.
 title: Request Key Implementation
-labels: Request Key Implementation
+labels: ''
 assignees: ''
 
 ---

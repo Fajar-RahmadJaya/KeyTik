@@ -93,14 +93,22 @@ To install KeyTik you just need to follow these step:
     - Double-click KeyTik.exe to start it.
 6. **You're All Set!**
     - KeyTik should now be ready to use.
+  
+### System Requirements  
+KeyTik requires AutoHotkey to run, so it shares the same system requirements as AutoHotkey:  
+- **Operating System**: Windows only.
 
 ### How To Install AutoHotkey and Interception Driver Using Command Line
 Installing AutoHotkey and Interception driver can be a lot of work especially Interception driver. So i made this command line to make AutoHotkey and Interception driver installation easier. Here is how to do it:
-1. Open command prompt as administrator (This is required to install Interception driver).
-2. Copy the command below and paste it (Left click) to command prompt.
-3. Follow installation step in AutoHotkey installation window
-4. Check installation using "Open AHI Monitor To Test Device" button. If it's work, then the installation is complete.
-
+1. **Open Command Prompt as Administrator**  
+   - This step is required to install the Interception Driver.
+2. **Run the Command Below**  
+   - Copy the command below and paste it into your command prompt (right-click to paste).
+3. **Follow the Installation Steps for AutoHotkey**  
+   - After running the command, follow the prompts to install **AutoHotkey**.
+4. **Test Installation**  
+   - After installation, use the "Open AHI Monitor to Test Device" button to ensure everything is set up properly.
+   
 **AutoHotkey and Interception driver installation command**:
 ```
 :: This Is Comment.

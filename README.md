@@ -32,6 +32,10 @@ Sincerely,
 > **If you're satisfied with KeyTik, don't forget to give us a star!**  
 > **Also, share it and help the world learn more about us.**
 
+## Platform :
+KeyTik is available at the following platforms :
+- [SourceForge](https://sourceforge.net/projects/keytik/)
+- [PtchHub](https://www.pitchhut.com/project/keytik)
 
 ## Table Of Content :
 1. [Preview.](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview-)

@@ -57,7 +57,7 @@ KeyTik is available at the following platforms:
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work)
 9. [Supported Key List](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#supported-key-list)
 10. [Does KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#does-keytik-safe-to-use)
-11. [Have Any Suggestion?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-any-suggestion)
+11. [Have a Suggestion or Question?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-a-suggestion-or-question)
 12. [License](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license)
 13. [Contributing](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#contributing)
 14. [Star History](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history)

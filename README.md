@@ -454,7 +454,7 @@ The content of the `key_list.txt` file reflects the exact keys supported by KeyT
 ## Is KeyTik Safe to Use?
 Yes, KeyTik is safe to use. I have not added any malicious code, and since KeyTik is open-source, you can check the code yourself. If you still have doubts, I encourage you to scan it using [VirusTotal](https://www.virustotal.com/gui/home/upload). VirusTotal is a well-known free online service that analyzes files and URLs for viruses, malware, and other malicious content by scanning them with a wide range of antivirus engines and security tools. I scan every new version before release to ensure its safety.
 
-To put it simply: I do not intend to add any malware or collect your personal data without your permission. My goal is to build trust with you, so you can use KeyTik with confidence.
+To put it simply, I do not intend to add any malware or collect your personal data without your permission. My goal is to build trust with you, so you can use KeyTik with confidence. If you encounter any Windows warning such as untrusted author or false positives, don't hesitate to tell us so we can request warning removal to Windows. You can do this with submitting report on [KeyTik Issues page](https://github.com/Fajar-RahmadJaya/KeyTik/issues) or using issue template [Windows Warning Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Windows+Warning+Report&projects=&template=windows-warning-report.md&title=Windows+Warning+Report). Thank you, we really appreciate your support!
 
 ### Download Options
 In each release (starting from version 1.2), I provide two download versions:

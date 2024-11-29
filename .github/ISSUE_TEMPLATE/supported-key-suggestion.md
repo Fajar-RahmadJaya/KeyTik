@@ -1,6 +1,6 @@
 ---
 name: Supported Key Suggestion
-about: Request key to include in key list if you find some key not working
+about: Suggest a key to include in the list if you find some keys aren’t working
 title: Supported Key Suggestion
 labels: Supported Key Suggestion
 assignees: ''

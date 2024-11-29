@@ -1,6 +1,6 @@
 ---
 name: Feature Suggestion
-about: Suggest an idea for this project
+about: Suggest an idea for a new feature or improvement for the project
 title: Feature Suggestion
 labels: Feature Suggestion
 assignees: ''

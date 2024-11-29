@@ -1,6 +1,7 @@
 ---
 name: Windows Warning Report
-about: Report windows warning such as untrusted author or false positive
+about: Report any Windows warnings, such as untrusted author notifications or false
+  positives
 title: Windows Warning Report
 labels: Windows Warning Report
 assignees: ''

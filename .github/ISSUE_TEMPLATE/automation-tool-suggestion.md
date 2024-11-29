@@ -1,6 +1,6 @@
 ---
 name: Automation Tool Suggestion
-about: Suggest KeyTik built in automation tool addition
+about: " Suggest additions to KeyTik’s built-in automation tools"
 title: Automation Tool Suggestion
 labels: Automation Tool Suggestion, Supported Key Suggestion
 assignees: ''

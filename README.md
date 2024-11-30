@@ -58,7 +58,6 @@ KeyTik is available at the following platforms:
 8. [Supported Key List](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#supported-key-list)
 9. [Is KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#is-keytik-safe-to-use)
     - [Download Options](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#download-options)
-    - [Why the Normal Version May Be Flagged as Malware](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#why-the-normal-version-may-be-flagged-as-malware)
     - [Scan Results](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#scan-results)
     - [Summary](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#summary)
 10. [Have a Suggestion or Question?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-a-suggestion-or-question)

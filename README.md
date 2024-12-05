@@ -476,7 +476,7 @@ Here’s the VirusTotal scan for KeyTik v1.4 (source code version):
   ![Virus Total Report v1.4](Preview/Virus%20Total%20Report%20v1.4.png)
 
 * **Full scan report**:  
-  - [View full scan report on VirusTotal](https://www.virustotal.com/gui/file/314211b7b27e58fb9beef44467ae3155e42bade9f4b780ef38fcd86a95312598)
+  - [View full scan report on VirusTotal](https://www.virustotal.com/gui/file/0a94bae55421cab450d8b6510ad4ae95ce1826233108c910d0362ea06aec7a1e)
 
 > [!IMPORTANT]  
 > **The normal version may be flagged as malware, but it is a false positive. This is due to how PyInstaller packages the code into an executable. If you are still unsure, feel free to download the source code, build it yourself, and perform a scan — the result should be the same.**

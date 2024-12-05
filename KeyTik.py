@@ -16,6 +16,7 @@ import keyboard
 import time
 from pynput import mouse
 from tkinter import ttk
+import psutil
 
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 
@@ -75,6 +76,7 @@ def save_pinned_profiles(pinned_profiles):
 
 class ScriptManagerApp:
     def __init__(self, root):
+        self.first_load = True
         self.root = root
         self.root.geometry("650x500+284+97")  
         self.root.title("KeyTik")
@@ -189,6 +191,18 @@ class ScriptManagerApp:
         self.scripts = pinned + unpinned
         return self.scripts  
 
+    def is_script_running(self, script_name):
+        for process in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                if process.info['name'] and 'autohotkey' in process.info['name'].lower():
+                    if process.info['cmdline']:
+                        for arg in process.info['cmdline']:
+                            if arg.endswith(script_name):  
+                                return True
+            except (psutil.AccessDenied, psutil.NoSuchProcess):
+                pass
+        return False
+
     def update_script_list(self):
 
         for widget in self.script_frame.winfo_children():
@@ -211,7 +225,8 @@ class ScriptManagerApp:
             icon_label.image = icon  
             icon_label.place(relx=1.0, rely=0, anchor="ne", x=9, y=-18)
 
-            icon_label.bind("<Button-1>", lambda event, script=script, icon_label=icon_label: self.toggle_pin(script, icon_label))
+            icon_label.bind("<Button-1>",
+                            lambda event, script=script, icon_label=icon_label: self.toggle_pin(script, icon_label))
 
             run_button = tk.Button(frame, text="Run", width=10, height=1)
             run_button.grid(row=0, column=0, padx=2, pady=5)
@@ -219,10 +234,23 @@ class ScriptManagerApp:
             exit_button = tk.Button(frame, text="Exit", state="disabled", width=10, height=1)
             exit_button.grid(row=0, column=1, padx=5, pady=5)
 
+            if self.first_load:
+                if self.is_script_running(script):
+                    run_button.config(state='disabled')
+                    exit_button.config(state='normal')
+                else:
+                    run_button.config(state='normal')
+                    exit_button.config(state='disabled')
+            else:
+
+                run_button.config(state='normal')
+                exit_button.config(state='disabled')
+
             run_button.config(command=lambda s=script, rb=run_button, eb=exit_button: self.activate_script(s, rb, eb))
             exit_button.config(command=lambda s=script, rb=run_button, eb=exit_button: self.exit_script(s, rb, eb))
 
-            delete_button = tk.Button(frame, text="Delete", command=lambda s=script: self.delete_script(s), width=10, height=1)
+            delete_button = tk.Button(frame, text="Delete", command=lambda s=script: self.delete_script(s), width=10,
+                                      height=1)
             delete_button.grid(row=0, column=2, padx=8, pady=5)
 
             store_button = tk.Button(frame, text="Store" if self.SCRIPT_DIR == active_dir else "Restore",
@@ -258,6 +286,8 @@ class ScriptManagerApp:
             self.script_frame.grid_rowconfigure(i, weight=1)
         for i in range(2):
             self.script_frame.grid_columnconfigure(i, weight=1)
+
+        self.first_load = False
 
     def toggle_pin(self, script, icon_label):
         if script in self.pinned_profiles:
@@ -401,13 +431,23 @@ class ScriptManagerApp:
 
     def activate_script(self, script_name, run_button, exit_button):
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
-        os.startfile(script_path)
-        run_button.config(state='disabled')
-        exit_button.config(state='normal')
+
+        if os.path.isfile(script_path):
+
+            os.startfile(script_path)
+
+            if self.is_script_running(script_name):
+                run_button.config(state='disabled')
+                exit_button.config(state='normal')
+            else:
+                run_button.config(state='normal')
+                exit_button.config(state='disabled')
+        else:
+            messagebox.showerror("Error", f"{script_name} does not exist.")
 
     def exit_script(self, script_name, run_button, exit_button):
-
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
+
         if os.path.isfile(script_path):
 
             keyboard = Controller()
@@ -419,11 +459,14 @@ class ScriptManagerApp:
             keyboard.release(Key.alt)
             keyboard.release(Key.ctrl)
 
+            if not self.is_script_running(script_name):
+                run_button.config(state='normal')
+                exit_button.config(state='disabled')
+            else:
+                run_button.config(state='disabled')
+                exit_button.config(state='normal')
         else:
             messagebox.showerror("Error", f"{script_name} does not exist.")
-
-        exit_button.config(state='disabled')
-        run_button.config(state='normal')
 
     def delete_script(self, script_name):
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
@@ -577,6 +620,8 @@ class ScriptManagerApp:
         self.create_profile_window.title("Create New Profile")
         self.create_profile_window.iconbitmap(icon_path)
 
+        self.create_profile_window.protocol("WM_DELETE_WINDOW", self.cleanup_listeners)
+
         self.create_profile_window.transient(self.root)
 
         script_name_var = tk.StringVar()
@@ -631,6 +676,23 @@ class ScriptManagerApp:
 
         self.key_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+    def cleanup_listeners(self):
+        if self.is_listening:
+
+            if self.hook_registered:
+                keyboard.unhook_all()
+                self.hook_registered = False
+
+            if self.mouse_listener is not None:
+                self.mouse_listener.stop()
+                self.mouse_listener = None
+
+            self.is_listening = False
+            self.active_entry = None
+
+        if self.create_profile_window:
+            self.create_profile_window.destroy()
 
     def run_monitor(self):
 
@@ -702,31 +764,25 @@ class ScriptManagerApp:
 
     def add_shortcut_mapping_row(self):
 
-        if self.is_text_mode and (not hasattr(self, 'text_block') or not self.text_block.winfo_exists()):
-
-            self.text_block = tk.Text(self.key_frame, wrap='word', height=14, width=70, font=("Consolas", 10))
-            self.text_block.grid(column=0, columnspan=4, padx=10, pady=10, row=self.row_num)
-            self.row_num += 1  
-
-        if self.is_text_mode and hasattr(self, 'text_block'):
-            self.text_block.grid_forget()  
-            self.row_num -= 1  
-
         shortcut_label = tk.Label(self.key_frame, text="Shortcut Key:", justify='center')
         shortcut_label.grid(row=self.row_num, rowspan=2, column=0, columnspan=2, padx=20, pady=6, sticky="w")
 
-        shortcut_key_select = tk.Button(self.key_frame, text="Select Shortcut Key", justify='center', width=38,
-                                        command=lambda: self.toggle_shortcut_key_listening(shortcut_entry,
-                                                                                           shortcut_key_select))
+        def shortcut_key_command():
+            self.toggle_shortcut_key_listening(shortcut_entry, shortcut_key_select)
+
+        shortcut_key_select = tk.Button(self.key_frame, text="Select Shortcut Key", justify='center', width=38)
+        shortcut_key_select.config(command=shortcut_key_command)
         shortcut_key_select.grid(row=self.row_num, column=1, columnspan=3, padx=20, pady=5, sticky="w")
+
+        if self.is_listening:
+            shortcut_key_select.config(state=tk.DISABLED)
 
         self.row_num += 1
 
         shortcut_entry = tk.Entry(self.key_frame, width=45, justify='center')
         shortcut_entry.grid(row=self.row_num, column=1, columnspan=3, padx=20, pady=6, sticky="w")
-        self.shortcut_entry = shortcut_entry
 
-        self.shortcut_rows.append(shortcut_entry)
+        self.shortcut_rows.append((shortcut_entry, shortcut_key_select))
 
         self.row_num += 1
 
@@ -734,10 +790,6 @@ class ScriptManagerApp:
         separator.grid(row=self.row_num, column=0, columnspan=4, sticky="we", padx=2, pady=3)
 
         self.row_num += 1
-
-        if self.is_text_mode and hasattr(self, 'text_block'):
-            self.text_block.grid(column=0, columnspan=4, padx=10, pady=10, row=self.row_num)
-            self.row_num += 1  
 
         self.key_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
@@ -750,25 +802,35 @@ class ScriptManagerApp:
         select_remap_key_label = tk.Label(self.key_frame, text="Remap Key:")
         select_remap_key_label.grid(row=self.row_num, rowspan=2, column=2, padx=20, pady=6)
 
+        def default_key_command():
+            self.toggle_key_listening(original_key_entry, original_key_select)
+
+        def remap_key_command():
+            self.toggle_key_listening(remap_key_entry, remap_key_select)
+
         original_key_select = tk.Button(self.key_frame, text="Select Default Key", justify='center', width=16,
-            command=lambda: self.toggle_key_listening(original_key_entry, original_key_select))
+                                        command=default_key_command)
         original_key_select.grid(row=self.row_num, column=1, columnspan=2, sticky='w', padx=13, pady=5)
 
         remap_key_select = tk.Button(self.key_frame, text="Select Remap Key", width=16, justify='center',
-            command=lambda: self.toggle_key_listening(remap_key_entry, remap_key_select))
+                                     command=remap_key_command)
         remap_key_select.grid(row=self.row_num, column=3, columnspan=2, sticky='w', padx=13, pady=5)
+
+        if self.is_listening:
+            original_key_select.config(state=tk.DISABLED)
+            remap_key_select.config(state=tk.DISABLED)
 
         self.row_num += 1
 
         original_key_entry = tk.Entry(self.key_frame, width=20, justify='center')
-        original_key_entry.grid(row=self.row_num, column=1, sticky='w',padx=13, pady=6)
+        original_key_entry.grid(row=self.row_num, column=1, sticky='w', padx=13, pady=6)
         self.original_key_entry = original_key_entry  
 
         remap_key_entry = tk.Entry(self.key_frame, width=20, justify='center')
+        remap_key_entry.grid(row=self.row_num, column=3, sticky='w', padx=13, pady=6)
         self.remap_key_entry = remap_key_entry  
-        remap_key_entry.grid(row=self.row_num, column=3, sticky='w',padx=13, pady=6)
 
-        self.key_rows.append((original_key_entry, remap_key_entry))
+        self.key_rows.append((original_key_entry, remap_key_entry, original_key_select, remap_key_select))
 
         self.row_num += 1
 
@@ -781,6 +843,19 @@ class ScriptManagerApp:
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def toggle_key_listening(self, entry_widget, button):
+
+        def toggle_other_buttons(state):
+
+            for _, _, orig_button, remap_button in self.key_rows:
+                if orig_button != button and orig_button.winfo_exists():  
+                    orig_button.config(state=state)
+                if remap_button != button and remap_button.winfo_exists():  
+                    remap_button.config(state=state)
+
+            for _, shortcut_button in self.shortcut_rows:
+                if shortcut_button.winfo_exists():  
+                    shortcut_button.config(state=state)
+
         if not self.is_listening:
 
             self.is_listening = True
@@ -793,6 +868,8 @@ class ScriptManagerApp:
 
             self.ignore_next_click = True  
 
+            toggle_other_buttons(tk.DISABLED)
+
             button.config(text="Save Selected Key", command=lambda: self.toggle_key_listening(entry_widget, button))
 
             if not self.hook_registered:
@@ -804,6 +881,7 @@ class ScriptManagerApp:
                 self.mouse_listener.start()
 
         else:
+
             self.is_listening = False
             self.active_entry = None
 
@@ -811,6 +889,8 @@ class ScriptManagerApp:
             self.enable_entry_input([(self.script_name_entry, None)])  
             self.enable_entry_input([(self.shortcut_entry, None)])  
             self.enable_entry_input([(self.keyboard_entry, None)])  
+
+            toggle_other_buttons(tk.NORMAL)
 
             button.config(text="Select Default Key", command=lambda: self.toggle_key_listening(entry_widget, button))
 
@@ -823,6 +903,72 @@ class ScriptManagerApp:
                 self.mouse_listener = None
 
             print("Key and Mouse listening stopped.")
+
+    def toggle_shortcut_key_listening(self, entry_widget, button):
+
+        def toggle_other_buttons(state):
+
+            for key_row in self.key_rows:
+
+                orig_entry, remap_entry, orig_button, remap_button = key_row
+                if orig_button != button and orig_button.winfo_exists():  
+                    orig_button.config(state=state)
+                if remap_button != button and remap_button.winfo_exists():  
+                    remap_button.config(state=state)
+
+            for shortcut_entry, shortcut_button in self.shortcut_rows:
+                if shortcut_button != button and shortcut_button.winfo_exists():  
+                    shortcut_button.config(state=state)
+
+        if not self.is_listening:
+
+            self.is_listening = True
+            self.active_entry = entry_widget
+
+            self.disable_entry_input(self.key_rows)  
+            self.disable_entry_input([(self.script_name_entry, None)])  
+            self.disable_entry_input([(self.shortcut_entry, None)])  
+            self.disable_entry_input([(self.keyboard_entry, None)])  
+
+            self.ignore_next_click = True  
+
+            toggle_other_buttons(tk.DISABLED)
+
+            button.config(text="Save Selected Key",
+                          command=lambda: self.toggle_shortcut_key_listening(entry_widget, button))
+
+            if not self.hook_registered:
+                keyboard.hook(self.on_shortcut_key_event)
+                self.hook_registered = True
+
+            if self.mouse_listener is None:
+                self.mouse_listener = mouse.Listener(on_click=self.on_shortcut_mouse_event)
+                self.mouse_listener.start()
+
+        else:
+
+            self.is_listening = False
+            self.active_entry = None
+
+            self.enable_entry_input(self.key_rows)  
+            self.enable_entry_input([(self.script_name_entry, None)])  
+            self.enable_entry_input([(self.shortcut_entry, None)])  
+            self.enable_entry_input([(self.keyboard_entry, None)])  
+
+            toggle_other_buttons(tk.NORMAL)
+
+            button.config(text="Select Shortcut Key",
+                          command=lambda: self.toggle_shortcut_key_listening(entry_widget, button))
+
+            if self.hook_registered:
+                keyboard.unhook_all()  
+                self.hook_registered = False
+
+            if self.mouse_listener is not None:
+                self.mouse_listener.stop()
+                self.mouse_listener = None
+
+            print("Shortcut key and mouse listening stopped.")
 
     def disable_entry_input(self, key_rows):
 
@@ -880,87 +1026,6 @@ class ScriptManagerApp:
 
                 self.active_entry.delete(0, tk.END)  
                 self.active_entry.insert(0, mouse_button)  
-
-    def toggle_shortcut_key_listening(self, entry_widget, button):
-        if not self.is_listening:
-
-            self.is_listening = True
-            self.active_entry = entry_widget
-
-            button.config(text="Save Selected Key",
-                          command=lambda: self.toggle_shortcut_key_listening(entry_widget, button))
-
-            self.disable_shortcut_entry_input(self.shortcut_rows)
-
-            if not self.hook_registered:
-                keyboard.hook(self.on_shortcut_key_event)
-                self.hook_registered = True
-
-            if self.mouse_listener is None:
-                self.mouse_listener = mouse.Listener(on_click=self.on_shortcut_mouse_event)
-                self.mouse_listener.start()
-
-        else:
-
-            self.ignore_next_click = True
-
-            self.is_listening = False
-            self.active_entry = None
-            button.config(text="Select Shortcut Key",
-                          command=lambda: self.toggle_shortcut_key_listening(entry_widget, button))
-
-            self.enable_shortcut_entry_input(self.shortcut_rows)
-
-            if self.hook_registered:
-                keyboard.unhook_all()  
-                self.hook_registered = False
-
-            if self.mouse_listener is not None:
-                self.mouse_listener.stop()
-                self.mouse_listener = None
-
-            print("Shortcut key and mouse listening stopped.")
-
-    def disable_shortcut_entry_input(self, key_rows):
-        if hasattr(self, 'script_name_entry') and self.script_name_entry:
-            self.script_name_entry.bind("<Key>", lambda e: "break")  
-
-        if hasattr(self, 'original_key_entry') and self.original_key_entry and self.original_key_entry.winfo_exists():
-            self.original_key_entry.bind("<Key>", lambda e: "break")  
-
-        if hasattr(self, 'remap_key_entry') and self.remap_key_entry and self.remap_key_entry.winfo_exists():
-            self.remap_key_entry.bind("<Key>", lambda e: "break")  
-
-        for shortcut_entry in key_rows:
-            if shortcut_entry is not None and shortcut_entry.winfo_exists():
-                shortcut_entry.bind("<Key>", lambda e: "break")  
-
-        if hasattr(self, 'text_block') and self.text_block.winfo_exists():
-            self.text_block.bind("<Key>", lambda e: "break")  
-
-        if hasattr(self, 'keyboard_entry') and self.keyboard_entry.winfo_exists():
-            self.keyboard_entry.bind("<Key>", lambda e: "break")  
-
-    def enable_shortcut_entry_input(self, key_rows):
-
-        if self.script_name_entry and self.script_name_entry.winfo_exists():
-            self.script_name_entry.unbind("<Key>")  
-
-        if self.original_key_entry and self.original_key_entry.winfo_exists():
-            self.original_key_entry.unbind("<Key>")  
-
-        if self.remap_key_entry and self.remap_key_entry.winfo_exists():
-            self.remap_key_entry.unbind("<Key>")  
-
-        for shortcut_entry in key_rows:
-            if shortcut_entry and shortcut_entry.winfo_exists():
-                shortcut_entry.unbind("<Key>")  
-
-        if hasattr(self, 'text_block') and self.text_block.winfo_exists():
-            self.text_block.unbind("<Key>")  
-
-        if hasattr(self, 'keyboard_entry') and self.keyboard_entry.winfo_exists():
-            self.keyboard_entry.unbind("<Key>")  
 
     def handle_shortcut_key_event(self, event):
         if self.is_listening and self.active_entry is not None:
@@ -1108,8 +1173,8 @@ cm1 := AHI.CreateContextManager(id1)
                     if self.is_text_mode:
 
                         if not any(
-                                self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row
-                                in self.shortcut_rows):  
+                                self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in
+                                self.shortcut_rows):
 
                             text_content = self.text_block.get("1.0", 'end').strip()  
                             if text_content:
@@ -1121,9 +1186,9 @@ cm1 := AHI.CreateContextManager(id1)
                             for shortcut_row in self.shortcut_rows:
                                 if self.is_widget_valid(shortcut_row):
                                     try:
-                                        shortcut_key = shortcut_row.get().strip()
+                                        shortcut_entry, _ = shortcut_row  
+                                        shortcut_key = shortcut_entry.get().strip()  
                                         if shortcut_key:
-
                                             translated_key = self.translate_key(shortcut_key, key_translations)
                                             if "&" in translated_key:  
                                                 file.write(
@@ -1145,17 +1210,16 @@ cm1 := AHI.CreateContextManager(id1)
                     else:
 
                         if not any(
-                                self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                                self.shortcut_rows):  
+                                self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in
+                                self.shortcut_rows):
 
                             for row in self.key_rows:
-                                if len(row) == 2:  
-                                    original_key_entry, remap_key_entry = row
+                                if len(row) == 4:  
+                                    original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
                                     try:
-                                        original_key = original_key_entry.get().strip()
-                                        remap_key = remap_key_entry.get().strip()
+                                        original_key = original_key_entry.get().strip()  
+                                        remap_key = remap_key_entry.get().strip()  
                                         if original_key and remap_key:
-
                                             original_key = self.translate_key(original_key, key_translations)
                                             remap_key = self.translate_key(remap_key, key_translations)
                                             file.write(f"{original_key}::{remap_key}\n")
@@ -1168,9 +1232,9 @@ cm1 := AHI.CreateContextManager(id1)
                             for shortcut_row in self.shortcut_rows:
                                 if self.is_widget_valid(shortcut_row):
                                     try:
-                                        shortcut_key = shortcut_row.get().strip()
+                                        shortcut_entry, _ = shortcut_row  
+                                        shortcut_key = shortcut_entry.get().strip()  
                                         if shortcut_key:
-
                                             translated_key = self.translate_key(shortcut_key, key_translations)
                                             if "&" in translated_key:  
                                                 file.write(
@@ -1183,13 +1247,12 @@ cm1 := AHI.CreateContextManager(id1)
 
                             file.write("#HotIf toggle\n")
                             for row in self.key_rows:
-                                if len(row) == 2:  
-                                    original_key_entry, remap_key_entry = row
+                                if len(row) == 4:  
+                                    original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
                                     try:
-                                        original_key = original_key_entry.get().strip()
-                                        remap_key = remap_key_entry.get().strip()
+                                        original_key = original_key_entry.get().strip()  
+                                        remap_key = remap_key_entry.get().strip()  
                                         if original_key and remap_key:
-
                                             original_key = self.translate_key(original_key, key_translations)
                                             remap_key = self.translate_key(remap_key, key_translations)
                                             file.write(f"{original_key}::{remap_key}\n")
@@ -1201,8 +1264,9 @@ cm1 := AHI.CreateContextManager(id1)
 
                     if self.is_text_mode:
 
-                        if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                                   self.shortcut_rows):  
+                        if not any(
+                                self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in
+                                self.shortcut_rows):
                             text_content = self.text_block.get("1.0", 'end').strip()  
                             if text_content:
                                 file.write(text_content + '\n')  
@@ -1212,7 +1276,8 @@ cm1 := AHI.CreateContextManager(id1)
                             for shortcut_row in self.shortcut_rows:
                                 if self.is_widget_valid(shortcut_row):
                                     try:
-                                        shortcut_key = shortcut_row.get().strip()
+                                        shortcut_entry, _ = shortcut_row  
+                                        shortcut_key = shortcut_entry.get().strip()  
                                         if shortcut_key:
                                             translated_key = self.translate_key(shortcut_key, key_translations)
                                             if "&" in translated_key:
@@ -1233,27 +1298,30 @@ cm1 := AHI.CreateContextManager(id1)
                             file.write("#HotIf")
                     else:
 
-                        if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                                   self.shortcut_rows):
+                        if not any(
+                                self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in
+                                self.shortcut_rows):
+
                             for row in self.key_rows:
-                                if len(row) == 2:  
-                                    original_key_entry, remap_key_entry = row
+                                if len(row) == 4:  
+                                    original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
                                     try:
-                                        original_key = original_key_entry.get().strip()
-                                        remap_key = remap_key_entry.get().strip()
+                                        original_key = original_key_entry.get().strip()  
+                                        remap_key = remap_key_entry.get().strip()  
                                         if original_key and remap_key:
                                             original_key = self.translate_key(original_key, key_translations)
                                             remap_key = self.translate_key(remap_key, key_translations)
                                             file.write(f"{original_key}::{remap_key}\n")
                                     except TclError:
-                                        continue
+                                        continue  
                         else:
                             file.write("toggle := false\n\n")
 
                             for shortcut_row in self.shortcut_rows:
                                 if self.is_widget_valid(shortcut_row):
                                     try:
-                                        shortcut_key = shortcut_row.get().strip()
+                                        shortcut_entry, _ = shortcut_row  
+                                        shortcut_key = shortcut_entry.get().strip()  
                                         if shortcut_key:
                                             translated_key = self.translate_key(shortcut_key, key_translations)
                                             if "&" in translated_key:
@@ -1267,17 +1335,18 @@ cm1 := AHI.CreateContextManager(id1)
 
                             file.write("#HotIf toggle\n")
                             for row in self.key_rows:
-                                if len(row) == 2:  
-                                    original_key_entry, remap_key_entry = row
+                                if len(row) == 4:  
+                                    original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
                                     try:
-                                        original_key = original_key_entry.get().strip()
-                                        remap_key = remap_key_entry.get().strip()
+                                        original_key = original_key_entry.get().strip()  
+                                        remap_key = remap_key_entry.get().strip()  
                                         if original_key and remap_key:
                                             original_key = self.translate_key(original_key, key_translations)
                                             remap_key = self.translate_key(remap_key, key_translations)
                                             file.write(f"{original_key}::{remap_key}\n")
                                     except TclError:
-                                        continue
+                                        continue  
+
                             file.write("#HotIf")
 
                 self.scripts = self.list_scripts()
@@ -1287,10 +1356,11 @@ cm1 := AHI.CreateContextManager(id1)
         except Exception as e:
             print(f"Error writing script: {e}")
 
-    def is_widget_valid(self, widget):
+    def is_widget_valid(self, widget_tuple):
         try:
 
-            return widget.winfo_exists()
+            entry_widget, button_widget = widget_tuple
+            return entry_widget.winfo_exists() and button_widget.winfo_exists()
         except TclError:
 
             return False
@@ -1376,6 +1446,8 @@ cm1 := AHI.CreateContextManager(id1)
             self.edit_window.geometry("600x450+308+130")
             self.edit_window.title("Edit Profile")
             self.edit_window.iconbitmap(icon_path)
+
+            self.edit_window.protocol("WM_DELETE_WINDOW", self.edit_cleanup_listeners)
 
             self.edit_window.transient(self.root)
 
@@ -1509,6 +1581,23 @@ cm1 := AHI.CreateContextManager(id1)
         else:
             messagebox.showerror("Error", f"{script_name} does not exist.")
 
+    def edit_cleanup_listeners(self):
+        if self.is_listening:
+
+            if self.hook_registered:
+                keyboard.unhook_all()
+                self.hook_registered = False
+
+            if self.mouse_listener is not None:
+                self.mouse_listener.stop()
+                self.mouse_listener = None
+
+            self.is_listening = False
+            self.active_entry = None
+
+        if self.edit_window:
+            self.edit_window.destroy()
+
     def extract_and_filter_content(self, lines):
         toggle_lines = []  
         cm1_lines = []  
@@ -1577,6 +1666,12 @@ cm1 := AHI.CreateContextManager(id1)
         select_remap_key_label = tk.Label(self.edit_frame, text="Remap Key:")
         select_remap_key_label.grid(row=self.row_num, rowspan=2, column=2, padx=20, pady=6)
 
+        def default_key_command():
+            self.toggle_key_listening(original_key_entry, original_key_select)
+
+        def remap_key_command():
+            self.toggle_key_listening(remap_key_entry, remap_key_select)
+
         original_key_select = tk.Button(self.edit_frame, text="Select Default Key", justify='center', width=16,
             command=lambda: self.toggle_key_listening(original_key_entry, original_key_select))
         original_key_select.grid(row=self.row_num, column=1, columnspan=2, sticky='w', padx=13, pady=5)
@@ -1584,6 +1679,10 @@ cm1 := AHI.CreateContextManager(id1)
         remap_key_select = tk.Button(self.edit_frame, text="Select Remap Key", width=16, justify='center',
             command=lambda: self.toggle_key_listening(remap_key_entry, remap_key_select))
         remap_key_select.grid(row=self.row_num, column=3, columnspan=2, sticky='w', padx=13, pady=5)
+
+        if self.is_listening:
+            original_key_select.config(state=tk.DISABLED)
+            remap_key_select.config(state=tk.DISABLED)
 
         self.row_num += 1
 
@@ -1597,7 +1696,7 @@ cm1 := AHI.CreateContextManager(id1)
         remap_key_entry.grid(row=self.row_num, column=3, sticky='w',padx=13, pady=6)
         remap_key_entry.insert(0, remap_key)
 
-        self.key_rows.append((original_key_entry, remap_key_entry))
+        self.key_rows.append((original_key_entry, remap_key_entry, original_key_select, remap_key_select))
 
         self.row_num += 1
 
@@ -1624,10 +1723,16 @@ cm1 := AHI.CreateContextManager(id1)
         shortcut_label = tk.Label(self.edit_frame, text="Shortcut Key:", justify='center')
         shortcut_label.grid(row=self.row_num, rowspan=2, column=0, columnspan=2, padx=20, pady=6, sticky="w")
 
+        def shortcut_key_command():
+            self.toggle_shortcut_key_listening(shortcut_entry, shortcut_key_select)
+
         shortcut_key_select = tk.Button(self.edit_frame, text="Select Shortcut Key", justify='center', width=38,
                                         command=lambda: self.toggle_shortcut_key_listening(shortcut_entry,
                                                                                            shortcut_key_select))
         shortcut_key_select.grid(row=self.row_num, column=1, columnspan=3, padx=20, pady=5, sticky="w")
+
+        if self.is_listening:
+            shortcut_key_select.config(state=tk.DISABLED)
 
         self.row_num += 1
 
@@ -1636,7 +1741,7 @@ cm1 := AHI.CreateContextManager(id1)
         shortcut_entry.insert(0, shortcut)
         self.shortcut_entry = shortcut_entry
 
-        self.shortcut_rows.append(shortcut_entry)
+        self.shortcut_rows.append((shortcut_entry, shortcut_key_select))
 
         self.row_num += 1
 
@@ -1713,8 +1818,8 @@ cm1 := AHI.CreateContextManager(id1)
                 if self.is_text_mode:
 
                     if not any(
-                            self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row
-                            in self.shortcut_rows):  
+                            self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in
+                            self.shortcut_rows):
 
                         text_content = self.text_block.get("1.0", 'end').strip()  
                         if text_content:
@@ -1726,9 +1831,9 @@ cm1 := AHI.CreateContextManager(id1)
                         for shortcut_row in self.shortcut_rows:
                             if self.is_widget_valid(shortcut_row):
                                 try:
-                                    shortcut_key = shortcut_row.get().strip()
+                                    shortcut_entry, _ = shortcut_row  
+                                    shortcut_key = shortcut_entry.get().strip()  
                                     if shortcut_key:
-
                                         translated_key = self.translate_key(shortcut_key, key_translations)
                                         if "&" in translated_key:  
                                             file.write(
@@ -1750,22 +1855,22 @@ cm1 := AHI.CreateContextManager(id1)
                 else:
 
                     if not any(
-                            self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                            self.shortcut_rows):  
+                            self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in
+                            self.shortcut_rows):
 
                         for row in self.key_rows:
-                            if len(row) == 2:  
-                                original_key_entry, remap_key_entry = row
+                            if len(row) == 4:  
+                                original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
                                 try:
-                                    original_key = original_key_entry.get().strip()
-                                    remap_key = remap_key_entry.get().strip()
+                                    original_key = original_key_entry.get().strip()  
+                                    remap_key = remap_key_entry.get().strip()  
                                     if original_key and remap_key:
-
                                         original_key = self.translate_key(original_key, key_translations)
                                         remap_key = self.translate_key(remap_key, key_translations)
                                         file.write(f"{original_key}::{remap_key}\n")
                                 except TclError:
                                     continue  
+
                     else:
 
                         file.write("toggle := false\n\n")
@@ -1773,9 +1878,9 @@ cm1 := AHI.CreateContextManager(id1)
                         for shortcut_row in self.shortcut_rows:
                             if self.is_widget_valid(shortcut_row):
                                 try:
-                                    shortcut_key = shortcut_row.get().strip()
+                                    shortcut_entry, _ = shortcut_row  
+                                    shortcut_key = shortcut_entry.get().strip()  
                                     if shortcut_key:
-
                                         translated_key = self.translate_key(shortcut_key, key_translations)
                                         if "&" in translated_key:  
                                             file.write(
@@ -1788,26 +1893,27 @@ cm1 := AHI.CreateContextManager(id1)
 
                         file.write("#HotIf toggle\n")
                         for row in self.key_rows:
-                            if len(row) == 2:  
-                                original_key_entry, remap_key_entry = row
+                            if len(row) == 4:  
+                                original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
                                 try:
-                                    original_key = original_key_entry.get().strip()
-                                    remap_key = remap_key_entry.get().strip()
+                                    original_key = original_key_entry.get().strip()  
+                                    remap_key = remap_key_entry.get().strip()  
                                     if original_key and remap_key:
-
                                         original_key = self.translate_key(original_key, key_translations)
                                         remap_key = self.translate_key(remap_key, key_translations)
                                         file.write(f"{original_key}::{remap_key}\n")
                                 except TclError:
                                     continue  
+
                         file.write("#HotIf\n")
                 file.write("\n#HotIf")
             else:
 
                 if self.is_text_mode:
 
-                    if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                               self.shortcut_rows):  
+                    if not any(
+                            self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in
+                            self.shortcut_rows):
                         text_content = self.text_block.get("1.0", 'end').strip()  
                         if text_content:
                             file.write(text_content + '\n')  
@@ -1817,7 +1923,8 @@ cm1 := AHI.CreateContextManager(id1)
                         for shortcut_row in self.shortcut_rows:
                             if self.is_widget_valid(shortcut_row):
                                 try:
-                                    shortcut_key = shortcut_row.get().strip()
+                                    shortcut_entry, _ = shortcut_row  
+                                    shortcut_key = shortcut_entry.get().strip()  
                                     if shortcut_key:
                                         translated_key = self.translate_key(shortcut_key, key_translations)
                                         if "&" in translated_key:
@@ -1838,27 +1945,30 @@ cm1 := AHI.CreateContextManager(id1)
                         file.write("#HotIf")
                 else:
 
-                    if not any(self.is_widget_valid(shortcut_row) and shortcut_row.get().strip() for shortcut_row in
-                               self.shortcut_rows):
+                    if not any(
+                            self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in
+                            self.shortcut_rows):
                         for row in self.key_rows:
-                            if len(row) == 2:  
-                                original_key_entry, remap_key_entry = row
+                            if len(row) == 4:  
+                                original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
                                 try:
-                                    original_key = original_key_entry.get().strip()
-                                    remap_key = remap_key_entry.get().strip()
+                                    original_key = original_key_entry.get().strip()  
+                                    remap_key = remap_key_entry.get().strip()  
                                     if original_key and remap_key:
                                         original_key = self.translate_key(original_key, key_translations)
                                         remap_key = self.translate_key(remap_key, key_translations)
                                         file.write(f"{original_key}::{remap_key}\n")
                                 except TclError:
-                                    continue
+                                    continue  
+
                     else:
                         file.write("toggle := false\n\n")
 
                         for shortcut_row in self.shortcut_rows:
                             if self.is_widget_valid(shortcut_row):
                                 try:
-                                    shortcut_key = shortcut_row.get().strip()
+                                    shortcut_entry, _ = shortcut_row  
+                                    shortcut_key = shortcut_entry.get().strip()  
                                     if shortcut_key:
                                         translated_key = self.translate_key(shortcut_key, key_translations)
                                         if "&" in translated_key:
@@ -1872,17 +1982,18 @@ cm1 := AHI.CreateContextManager(id1)
 
                         file.write("#HotIf toggle\n")
                         for row in self.key_rows:
-                            if len(row) == 2:  
-                                original_key_entry, remap_key_entry = row
+                            if len(row) == 4:  
+                                original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
                                 try:
-                                    original_key = original_key_entry.get().strip()
-                                    remap_key = remap_key_entry.get().strip()
+                                    original_key = original_key_entry.get().strip()  
+                                    remap_key = remap_key_entry.get().strip()  
                                     if original_key and remap_key:
                                         original_key = self.translate_key(original_key, key_translations)
                                         remap_key = self.translate_key(remap_key, key_translations)
                                         file.write(f"{original_key}::{remap_key}\n")
                                 except TclError:
-                                    continue
+                                    continue  
+
                         file.write("#HotIf")
 
             self.scripts = self.list_scripts()

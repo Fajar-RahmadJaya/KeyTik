@@ -5,6 +5,8 @@
 [![GitHub Downloads](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=github&label=Total%20Downloads&color=white)](https://tooomm.github.io/github-release-stats/?username=Fajar-RahmadJaya&repository=KeyTik)
 [![SourceForge Downloads](https://img.shields.io/sourceforge/dt/KeyTik?style=plastic&logo=sourceforge&label=Total%20Downloads&color=orange)](https://sourceforge.net/projects/keytik/files/stats/timeline)
 
+[![GitHub Release](https://img.shields.io/github/v/release/Fajar-RahmadJaya/KeyTik?style=plastic&logo=github&label=Latest%20Update&labelColor=black&color=white)](https://github.com/Fajar-RahmadJaya/KeyTik/releases/tag/v1.4)
+
 
 # KeyTik: The All-in-One Automation Tool
 

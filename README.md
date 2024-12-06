@@ -42,37 +42,41 @@ KeyTik is available at the following platforms:
 
 ## Table Of Content
 1. [Preview](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview)
-2. [How To Install](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install)
+2. [Video Guide]()
+3. [How To Install](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install)
    - [System Requirements](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#system-requirements)
    - [How To Install AutoHotkey and Interception Driver Using Command Line](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install-autohotkey-and-interception-driver-using-command-line)
      - [AutoHotkey and Interception Driver Installation Command](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#autohotkey-and-interception-driver-installation-command)
-3. [Features](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features)
-4. [What Make Us Different Then Other Automation Tool](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool)
-5. [How To Use KeyTik Automation Tool](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool)
+4. [Features](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features)
+5. [What Make Us Different Then Other Automation Tool](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool)
+6. [How To Use KeyTik Automation Tool](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool)
    * [Auto Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#auto-clicker)
    * [Screen Clicker](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-clicker)
    * [Screen Coordinate Auto Detect And Copy](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screen-coordinate-auto-detect-and-copy)
    * [Multiple Files Opener](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#multiple-files-opener)
-6. [What can You do With KeyTik](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-can-you-do-with-keytik)
-7. [How Is KeyTik Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-keytik-work)
+7. [What can You do With KeyTik](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-can-you-do-with-keytik)
+8. [How Is KeyTik Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-keytik-work)
    * [How is Remapper And Automation Tool work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-remapper-and-automation-tool-work)
    * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-is-assign-keyboard-or-mouse-on-specific-device-vid--pid-or-device-handle-work)
-8. [Supported Key List](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#supported-key-list)
-9. [Is KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#is-keytik-safe-to-use)
+9. [Supported Key List](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#supported-key-list)
+10. [Is KeyTik Safe to Use?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#is-keytik-safe-to-use)
     - [Download Options](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#download-options)
     - [Scan Results](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#scan-results)
     - [Summary](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#summary)
-10. [Have a Suggestion or Question?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-a-suggestion-or-question)
-11. [License](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license)
-12. [Contributing](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#contributing)
-13. [Star History](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history)
-14. [Acknowledgements](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements)
+11. [Have a Suggestion or Question?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-a-suggestion-or-question)
+12. [License](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#license)
+13. [Contributing](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#contributing)
+14. [Star History](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history)
+15. [Acknowledgements](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements)
 
 ## Preview
 <img src="Preview/main.png" alt="Preview Main" width="400" />
 <img src="Preview/default mode.png" alt="Default Mode" width="400" />
 <img src="Preview/text mode.png" alt="Preview Text Mode" width="400" />
 <img src="Preview/select_device.png" alt="Select Device" width="400" />
+
+## Video Guide
+- [AutoHotkey and Interception Driver Command Line Installation Guide](https://youtu.be/-qKC3TkfDEo?si=U5lfavG5VDaBbZWm)
 
 ## How To Install
 To install KeyTik you just need to follow these step:
@@ -105,7 +109,7 @@ KeyTik requires AutoHotkey to run, so it shares the same system requirements as 
 - **Operating System**: Windows only.
 
 ### How To Install AutoHotkey and Interception Driver Using Command Line
-Installing AutoHotkey and Interception driver can be a lot of work especially Interception driver. So i made this command line to make AutoHotkey and Interception driver installation easier. Here is how to do it:
+Installing AutoHotkey and Interception driver can be a lot of work especially Interception driver. So i made this command line to make AutoHotkey and Interception driver installation easier. I also made video guide to do this, Check out [AutoHotkey and Interception Driver Command Line Installation Guide](https://youtu.be/-qKC3TkfDEo?si=mOG2LH9JQUBZoSMB). Here is step-by-step how to install AutoHotkey and Interception driver using command line:
 1. **Open Command Prompt as Administrator**  
    - This step is required to install the Interception Driver.
 2. **Run the Command Below**  

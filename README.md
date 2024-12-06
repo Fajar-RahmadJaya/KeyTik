@@ -45,6 +45,7 @@ KeyTik is available at the following platforms:
 2. [How To Install](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install)
    - [System Requirements](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#system-requirements)
    - [How To Install AutoHotkey and Interception Driver Using Command Line](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install-autohotkey-and-interception-driver-using-command-line)
+     - [AutoHotkey and Interception Driver Installation Command](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#autohotkey-and-interception-driver-installation-command)
 3. [Features](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features)
 4. [What Make Us Different Then Other Automation Tool](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#what-make-us-different-then-other-automation-tool)
 5. [How To Use KeyTik Automation Tool](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-use-keytik-automation-tool)
@@ -114,7 +115,7 @@ Installing AutoHotkey and Interception driver can be a lot of work especially In
 4. **Test Installation**  
    - After installation, use the "Open AHI Monitor to Test Device" button to ensure everything is set up properly.
    
-#### AutoHotkey and Interception driver installation command:
+#### AutoHotkey and Interception Driver Installation Command:
 ```
 :: This Is Comment.
 :: Make sure to run your Command Prompt as administrator for Interception Installation

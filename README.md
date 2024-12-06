@@ -114,7 +114,7 @@ Installing AutoHotkey and Interception driver can be a lot of work especially In
 4. **Test Installation**  
    - After installation, use the "Open AHI Monitor to Test Device" button to ensure everything is set up properly.
    
-**AutoHotkey and Interception driver installation command**:
+#### AutoHotkey and Interception driver installation command:
 ```
 :: This Is Comment.
 :: Make sure to run your Command Prompt as administrator for Interception Installation

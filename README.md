@@ -42,7 +42,7 @@ KeyTik is available at the following platforms:
 
 ## Table Of Content
 1. [Preview](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview)
-2. [Video Guide]()
+2. [Video Guide](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#video-guide)
 3. [How To Install](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install)
    - [System Requirements](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#system-requirements)
    - [How To Install AutoHotkey and Interception Driver Using Command Line](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#how-to-install-autohotkey-and-interception-driver-using-command-line)

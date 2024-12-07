@@ -545,3 +545,6 @@ This project uses the following libraries:
 - **Winshell**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
 - **Interception**: Licensed under the [LGPL 3.0 License](https://www.gnu.org/licenses/lgpl-3.0.en.html#license-text).
   - Source Code: https://github.com/oblitum/Interception 
+
+## Thank You to the Sponsors
+Be the first sponsor [here](https://github.com/sponsors/Fajar-RahmadJaya).

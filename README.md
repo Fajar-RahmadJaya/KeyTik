@@ -550,5 +550,4 @@ This project uses the following libraries:
 ## Thank You to the Sponsors
 Be the first sponsor [here](https://github.com/sponsors/Fajar-RahmadJaya).
 
-<!-- sponsors -->
-<!-- sponsors -->
+<!-- sponsors --><!-- sponsors -->

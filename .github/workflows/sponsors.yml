@@ -17,6 +17,7 @@ jobs:
         with:
           token: ${{ secrets.TOK }}
           file: 'README.md'
+          template: '* [{{ name }}]({{ url }}) - {{ avatarUrl }}}'
 
       # ⚠️ Note: You can use any deployment step here to automatically push the README
       # changes back to your branch.

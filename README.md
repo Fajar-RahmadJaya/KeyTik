@@ -71,6 +71,7 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 13. [Contributing](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#contributing)
 14. [Star History](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history)
 15. [Acknowledgements](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements)
+16. [Thank You to the Sponsors](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#thank-you-to-the-sponsors)
 
 ## Preview
 <img src="Preview/main.png" alt="Preview Main" width="400" />

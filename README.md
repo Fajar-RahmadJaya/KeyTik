@@ -40,6 +40,9 @@ KeyTik is available at the following platforms:
 - [PitchHut](https://www.pitchhut.com/project/keytik)
 - [YouTube (@Fajar-RahmadJaya)](https://www.youtube.com/@Fajar-RahmadJaya)
 
+## Sponsor
+Sponsorships are now supported! Your support will motivate me to continue working on this project. You can sponsor me by clicking the "Sponsor" button above or by visiting my [GitHub Sponsor Page](https://github.com/sponsors/Fajar-RahmadJaya). There is only one tier, with a $1 contribution, which includes a mention in this project's README as a reward.
+
 ## Table Of Content
 1. [Preview](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview)
 2. [Video Guide](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#video-guide)

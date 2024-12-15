@@ -98,8 +98,8 @@ To install KeyTik you just need to follow these step:
 2. **Download KeyTik from one of the following platforms**
     - KeyTik GitHub Release: https://github.com/Fajar-RahmadJaya/KeyTik/releases.
      - There are 2 option to download, normal version and source code version.
-     - If you want simple version in executable form, you can download the normal version (In release it's the zip file without 'open source version' name on it, example KeyTik.v1.5.rar). In normal version you can directly double click the exe file to run KeyTik.
-     - If you want the raw code only, you can download source code version (In release it's the zip file with 'open source version' name on it, example KeyTik.v1.5.Source.Code.Download.Version.rar). To make it work, you need to install required python library or build it into executable yourself. I have added guide to build it into the download or you can see it in [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt).
+     - If you want simple version in executable form, you can download the normal version (In release it's the zip file without 'open source version' name on it, example KeyTik.v1.5.0.rar). In normal version you can directly double click the exe file to run KeyTik.
+     - If you want the raw code only, you can download source code version (In release it's the zip file with 'open source version' name on it, example KeyTik.v1.5.0.Source.Code.Download.Version.rar). To make it work, you need to install required python library or build it into executable yourself. I have added guide to build it into the download or you can see it in [here](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/Build%20Guide.txt).
     - Source Forge: https://sourceforge.net/projects/keytik.
 3. **Extract KeyTik zip file**
     - Extract the downloaded KeyTik zip file to a location of your choice.
@@ -199,7 +199,7 @@ KeyTik have unique capabilities and make it different than other automation tool
   - Using AutoHotkey as profile script language, allow KeyTik to utilize all feature and potential from AutoHotkey.
 
 - **Lightweight and Easy to Use**:
-  - It’s only 85.9MB!! (KeyTik v1.5)
+  - It’s only 85.9MB!! (KeyTik v1.5.0)
   - User friendly and simple GUI to boost functionality and simplicity
   - Easy to understand while providing plenty of features.
 
@@ -477,15 +477,15 @@ The advantage of the Source Code Version is that you can review the entire code 
 ### Why the Normal Version May Be Flagged as Malware
 Some antivirus programs may flag the normal compiled version as malware. This is because of how PyInstaller packages the code into an executable. Even though the code is clean and free from malware, PyInstaller's packaging process can trigger false positives in certain antivirus engines.
 
-For example, when I scan KeyTik v1.5 (source code version) using VirusTotal, it passes without any issues. However, the normal compiled version can be flagged as malware due to the way PyInstaller works.
+For example, when I scan KeyTik v1.5.0 (source code version) using VirusTotal, it passes without any issues. However, the normal compiled version can be flagged as malware due to the way PyInstaller works.
 
 > [!TIP]
 > **If you're still concerned, you can download the source code version, build it yourself, and scan it again with VirusTotal. You'll likely see the same result — the executable built with PyInstaller will be flagged as malware, but it’s a false positive.**
 
 ### Scan Results
-Here’s the VirusTotal scan for KeyTik v1.5 (source code version):
+Here’s the VirusTotal scan for KeyTik v1.5.0 (source code version):
 * **Report Screenshot**:
-  ![Virus Total Report v1.5](.github/Picture/Virus%20Total%20Report%20v1.5.png)
+  ![Virus Total Report v1.5.0](.github/Picture/Virus%20Total%20Report%20v1.5.0.png)
 
 * **Full scan report**:  
   - [View full scan report on VirusTotal](https://www.virustotal.com/gui/file/0a94bae55421cab450d8b6510ad4ae95ce1826233108c910d0362ea06aec7a1e)

@@ -1,13 +1,16 @@
-alt, !
+ , 
+alt, alt
 right alt, RAlt
 left alt, LAlt
-ctrl, ^
+ctrl, ctrl
 right ctrl, RCtrl
 left ctrl, LCtrl
-shift, +
+shift, shift
 right shift, RShift
 left shift, LShift
 win, #
+left windows, LWin
+left windows, right windows
 Left Click, LButton
 Right Click, RButton
 Middle Click, MButton
@@ -148,7 +151,7 @@ $, $
 (, (
 ), )
 _, _
-+, +
++, {+}
 {, {
 }, }
 |, |
@@ -157,5 +160,5 @@ _, _
 <, <
 >, >
 ?, ?
-AppsKey, AppsKey ; Context Menu Key
-PrintScreen, PrintScreen ; Print Screen
+AppsKey, AppsKey
+PrintScreen, PrintScreen

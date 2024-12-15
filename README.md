@@ -76,6 +76,7 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 ## Preview
 <img src=".github/Picture/main.png" alt="Preview Main" width="400" />
 <img src=".github/Picture/default mode.png" alt="Default Mode" width="400" />
+<img src=".github/Picture/dropdown.png" alt="Dropdown" width="400" />
 <img src=".github/Picture/text mode.png" alt="Preview Text Mode" width="400" />
 <img src=".github/Picture/select_device.png" alt="Select Device" width="400" />
 

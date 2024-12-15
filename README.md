@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="Preview/KeyTik Icon.png" alt="KeyTik Icon" width="150">
+  <img src=".github/Picture/KeyTik Icon.png" alt="KeyTik Icon" width="150">
   <br><br>
 
 [![GitHub Downloads](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=github&label=Total%20Downloads&color=white)](https://tooomm.github.io/github-release-stats/?username=Fajar-RahmadJaya&repository=KeyTik)
@@ -74,10 +74,10 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 16. [Thank You to the Sponsors](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#thank-you-to-the-sponsors)
 
 ## Preview
-<img src="Preview/main.png" alt="Preview Main" width="400" />
-<img src="Preview/default mode.png" alt="Default Mode" width="400" />
-<img src="Preview/text mode.png" alt="Preview Text Mode" width="400" />
-<img src="Preview/select_device.png" alt="Select Device" width="400" />
+<img src=".github/Picture/main.png" alt="Preview Main" width="400" />
+<img src=".github/Picture/default mode.png" alt="Default Mode" width="400" />
+<img src=".github/Picture/text mode.png" alt="Preview Text Mode" width="400" />
+<img src=".github/Picture/select_device.png" alt="Select Device" width="400" />
 
 ## Video Guide
 - [AutoHotkey and Interception Driver Command Line Installation Guide](https://youtu.be/-qKC3TkfDEo?si=U5lfavG5VDaBbZWm)
@@ -368,7 +368,7 @@ To be more simple, I use python for the functionality (create, edit, GUI, run, e
 
 Example 1 (Without Shortcut):
 <p align="center">
-  <img src="Preview/Example 1.png" alt="Input Example 1" width="300" />
+  <img src=".github/Picture/Example 1.png" alt="Input Example 1" width="300" />
 </p>
 
 Then the created script result would look like this:
@@ -384,7 +384,7 @@ d::Right
 
 Example 2 (With Shortcut):
 <p align="center">
-  <img src="Preview/Example 2.png" alt="Input Example 2" width="300" />
+  <img src=".github/Picture/Example 2.png" alt="Input Example 2" width="300" />
 </p>
 
 Then the created script result would look like this:
@@ -416,7 +416,7 @@ For more simple explanation, to assign your remap or script to specific device, 
 
 Here is the example, suppose your input is like this:
 <p align="center">
-  <img src="Preview/Example 3.png" alt="Input Example 3" width="300" />
+  <img src=".github/Picture/Example 3.png" alt="Input Example 3" width="300" />
 </p>
 
 Then the created script result would look like this:
@@ -483,7 +483,7 @@ For example, when I scan KeyTik v1.4 (source code version) using VirusTotal, it 
 ### Scan Results
 Here’s the VirusTotal scan for KeyTik v1.4 (source code version):
 * **Report Screenshot**:
-  ![Virus Total Report v1.4](Preview/Virus%20Total%20Report%20v1.4.png)
+  ![Virus Total Report v1.4](.github/Picture/Virus%20Total%20Report%20v1.4.png)
 
 * **Full scan report**:  
   - [View full scan report on VirusTotal](https://www.virustotal.com/gui/file/0a94bae55421cab450d8b6510ad4ae95ce1826233108c910d0362ea06aec7a1e)

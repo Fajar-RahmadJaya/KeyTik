@@ -211,13 +211,6 @@ KeyTik have unique capabilities and make it different than other automation tool
 
 - **And More**.
 
-## Upcoming Update (Possibly to be Implemented)
-Below are my plan and what i have in mind for future KeyTik Development:
-
-| **No** | **Upcoming Update**                                   | **Description** | **Status** |
-|--------|----------------------------------------------------|-----------------|------------|
-| 1      | **Improve Documentation** | Make documentation more detailed and Make KeyTik website | InProgress |
-
 ## How To Use KeyTik Automation Tool
 Automation tools come bundled as one with KeyTik download. It count as profile in text mode, so all of it can use KeyTik feature. I take it from my side project on [AutoHotkey Script Collection And Template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection). I add comment on the script to make it easier to change. So if there are ";" on the line in script that mean after it or ";" right is comment and what you can change is before it or left ";". Example: '''space:: ; This is comment'''. On that example 'space' is what you can change and '; this is comment' is the comment. Comment mean AutoHotkey not detect it as input which mean comment is not affecting script.
 

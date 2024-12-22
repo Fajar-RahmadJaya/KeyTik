@@ -20,15 +20,16 @@
 
 <div align="center">
   
-# Overview
+## Overview
 
-</div>
 
 KeyTik is an open-source, all-in-one automation tool that lets you automate nearly anything at your will. Initially, KeyTik focused on being a keyboard remapper with profiles, allowing you to activate or deactivate each remap individually. However, since KeyTik uses AutoHotkey as the scripting language, it can handle all types of automation available in AutoHotkey, such as auto-clicking, keyboard remapping, screen clicking, opening multiple files, and more. Additionally, the use of AutoHotkey has made KeyTik an AutoHotkey script manager. This means you can easily run, exit, run on startup, edit, store, delete, and more on your AutoHotkey scripts.
 
 With a bit of scripting, you can do almost all automation tasks with ease. If you don't have coding experience, don't worry! I’ve created a beginner-friendly open-source [AutoHotkey script collection and template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) that allows you to download pre-made scripts or edit them to your preference. I’ve tried to make it as easy to understand as possible, with guides on how to use the templates or customize the scripts.
 
 So, if you're looking for a lightweight auto-clicker, keyboard remapper, screen clicker, multiple files opener, and AutoHotkey script manager with a user-friendly GUI in a single software, then this is exactly what you need! I hope you enjoy using KeyTik and find it useful.
+
+</div>
 
 Sincerely,  
 **Fajar Rahmad Jaya**
@@ -41,7 +42,7 @@ Sincerely,
 
 <div align="center">
 
-# Platform
+## Platform
 
 </div>
 
@@ -55,17 +56,16 @@ KeyTik is available at the following platforms:
 
 <div align="center">
   
-# Sponsor
+## Sponsor
+Sponsorships are now supported! Your support will motivate me to continue working on this project. You can sponsor me by clicking the "Sponsor" button above or by visiting my [GitHub Sponsor Page](https://github.com/sponsors/Fajar-RahmadJaya). There is only one tier, with a minimal $1 sponsorship, which includes a mention in this project's README as a reward.
 
 </div>
-
-Sponsorships are now supported! Your support will motivate me to continue working on this project. You can sponsor me by clicking the "Sponsor" button above or by visiting my [GitHub Sponsor Page](https://github.com/sponsors/Fajar-RahmadJaya). There is only one tier, with a minimal $1 sponsorship, which includes a mention in this project's README as a reward.
 
 <br>
 
 <div align="center">
   
-# Table Of Content
+## Table Of Content
 
 </div>
 
@@ -104,37 +104,37 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 
 <div align="center">
   
-# Screenshots Preview
+## Screenshots Preview
 
 </div>
 
 <div align="center">
-<img src=".github/Picture/main.png" alt="Preview Main" width="600" />
+<img src=".github/Picture/main.png" alt="Preview Main" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/default mode.png" alt="Default Mode" width="600" />
+<img src=".github/Picture/default mode.png" alt="Default Mode" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/dropdown.png" alt="Dropdown" width="600" />
+<img src=".github/Picture/dropdown.png" alt="Dropdown" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/text mode.png" alt="Preview Text Mode" width="600" />
+<img src=".github/Picture/text mode.png" alt="Preview Text Mode" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/select_device.png" alt="Select Device" width="600" />
+<img src=".github/Picture/select_device.png" alt="Select Device" width="400" />
 </div>
 
 <br>
 
 <div align="center">
   
-# Features
+## Features
 
 </div>
 
 KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:
 
-## Key Features
+### Key Features
 Below is KeyTik key features that make KeyTik different than another automation tool:
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
@@ -145,7 +145,7 @@ Below is KeyTik key features that make KeyTik different than another automation 
 | 5      | **Screen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference.|
 | 6      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference.|
 
-## Additional Feature
+### Additional Feature
 Below is another KeyTik feature to increase user experience and give ultimate control over each profiles:
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
@@ -166,7 +166,7 @@ Below is another KeyTik feature to increase user experience and give ultimate co
 
 <div align="center">
   
-# What Make KeyTik Different Then Other Automation Tool
+## What Make KeyTik Different Then Other Automation Tool
 
 </div>
 
@@ -196,7 +196,7 @@ KeyTik have unique capabilities and make it different than other automation tool
 
 <div align="center">
   
-# Have a Suggestion or Question?
+## Have a Suggestion or Question?
 
 </div>
 
@@ -217,29 +217,27 @@ Thank you for your support — we truly appreciate it!
 
 <div align="center">
   
-# License
+## License
+This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
 
 </div>
-
-This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
 
 <br>
 
 <div align="center">
   
-# Contributing
-
-</div>
-
+## Contributing
 Contributions are welcome! You can contribute by submitting a **pull request** for improvements, such as bug fixes, new features, or automation tool additions. Please follow the [Contribution Guidelines](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/CONTRIBUTING.md) when making contributions.
 
 Thank you for helping improve this project!
 
+</div>
+
 <br>
 
 <div align="center">
   
-# Star History
+## Star History
 
 </div>
 
@@ -255,7 +253,7 @@ Thank you for helping improve this project!
 
 <div align="center">
   
-# Acknowledgements
+## Acknowledgements
 
 </div>
 
@@ -275,7 +273,7 @@ This project uses the following libraries:
 
 <div align="center">
   
-# Thank You to the Sponsors
+## Thank You to the Sponsors
 
 </div>
 

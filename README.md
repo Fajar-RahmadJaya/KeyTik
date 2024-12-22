@@ -70,7 +70,8 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 </div>
 
 > [!NOTE]  
-> **Some of documentation moved to KeyTik official website to increase visual, readability and monetization (Through Ads from AdSense on the website if approved). You can still access it through this table of content. Thank you for your understanding!**
+> Some of documentation moved to KeyTik official website to increase visual, readability and monetization (Through Ads from AdSense on the website if approved).
+> You can still access it through this table of content. You can visit KeyTik official website on https://keytik.netlify.app/ .This is still in experiment. Thank you for your understanding!
 
 1. [Preview](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#preview)
 2. [Video Guide](https://www.youtube.com/@Fajar-RahmadJaya)
@@ -103,7 +104,7 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 
 <div align="center">
   
-# Preview
+# Screenshots Preview
 
 </div>
 

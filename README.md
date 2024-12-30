@@ -79,7 +79,7 @@ Sponsorships are now supported! Your support will motivate me to continue workin
    - [How To Install AutoHotkey and Interception Driver Using Command Line](https://keytik.com/getting-started/installation/#command-line-installation)
 4. [Features](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features)
 5. [What Make Us Different Then Other Automation Tool](https://keytik.com/introduction/overview/#what-make-us-different-then-other-automation-tool)
-6. [How To Use KeyTik Automation Tool]()
+6. [How To Use KeyTik Automation Tool](https://keytik.com/additional-information/automation-tool-customization/)
    * [Auto Clicker](https://keytik.com/additional-information/automation-tool-customization/#auto-clicker)
    * [Screen Clicker](https://keytik.com/additional-information/automation-tool-customization/#screen-clicker)
    * [Screen Coordinate Auto Detect And Copy](https://keytik.com/additional-information/automation-tool-customization/#screen-coordinate-auto-detect-and-copy)

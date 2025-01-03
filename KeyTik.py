@@ -179,7 +179,6 @@ class ScriptManagerApp:
             self.always_top.config(text="Enable Always on Top")
 
     def list_scripts(self):
-
         all_scripts = [f for f in os.listdir(self.SCRIPT_DIR) if f.endswith('.ahk') or f.endswith('.py')]
 
         pinned = [script for script in all_scripts if script in self.pinned_profiles]
@@ -201,7 +200,6 @@ class ScriptManagerApp:
         return False
 
     def update_script_list(self):
-
         for widget in self.script_frame.winfo_children():
             widget.destroy()
 
@@ -301,7 +299,6 @@ class ScriptManagerApp:
         self.update_script_list()
 
     def import_button(self):
-
         Tk().withdraw()  
         selected_file = filedialog.askopenfilename(title="Select AHK Script", filetypes=[("AHK Scripts", "*.ahk")])
 
@@ -569,7 +566,7 @@ class ScriptManagerApp:
     def open_device_selection(self):
         device_selection_window = tk.Toplevel(self.create_profile_window)
         device_selection_window.geometry("600x300+308+233")
-        device_selection_window.title("Select Keyboard Device")
+        device_selection_window.title("Select Device")
         device_selection_window.iconbitmap(icon_path)
         device_selection_window.transient(self.create_profile_window)
 
@@ -761,6 +758,8 @@ class ScriptManagerApp:
         select_window = tk.Toplevel(self.root)
         select_window.title("Select Programs")
         select_window.geometry("600x300+308+217")  
+        select_window.iconbitmap(icon_path)
+        select_window.transient(self.create_profile_window)
 
         treeview_frame = tk.Frame(select_window)
         treeview_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
@@ -915,6 +914,7 @@ class ScriptManagerApp:
             self.create_profile_window.destroy()
 
     def run_monitor(self):
+
         script_path = os.path.join(script_dir, "_internal", "Data", "Active", "AutoHotkey Interception", "Monitor.ahk")
 
         if os.path.exists(script_path):
@@ -1546,7 +1546,7 @@ cm1 := AHI.CreateContextManager(id1)
     def edit_open_device_selection(self):
         device_selection_window = tk.Toplevel(self.edit_window)
         device_selection_window.geometry("600x300+308+233")
-        device_selection_window.title("Select Keyboard Device")
+        device_selection_window.title("Select Device")
         device_selection_window.iconbitmap(icon_path)
         device_selection_window.transient(self.edit_window)
 
@@ -1635,7 +1635,7 @@ cm1 := AHI.CreateContextManager(id1)
             program_entry.place(relx=0.31, rely=0.07, relwidth=0.38)
             program_entry.insert(0, "  ")
             program_select_button = tk.Button(self.edit_window, text="Select Program",
-                                              command=lambda: self.open_select_program_window(self.program_entry))
+                                              command=lambda: self.edit_open_select_program_window(self.program_entry))
             program_select_button.place(relx=0.71, rely=0.06, width=95)
             self.program_entry = program_entry
 
@@ -1805,6 +1805,124 @@ cm1 := AHI.CreateContextManager(id1)
             self.update_scroll_region()
         else:
             messagebox.showerror("Error", f"{script_name} does not exist.")
+
+    def edit_open_select_program_window(self, entry_widget):
+        select_window = tk.Toplevel(self.root)
+        select_window.title("Select Programs")
+        select_window.geometry("600x300+308+217")  
+        select_window.iconbitmap(icon_path)
+        select_window.transient(self.edit_window)
+
+        treeview_frame = tk.Frame(select_window)
+        treeview_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+        treeview = ttk.Treeview(treeview_frame, columns=("Name", "Class", "Process", "Type"), show="headings",
+                                selectmode="extended")
+        treeview.heading("Name", text="Window Title ↑", command=lambda: self.sort_treeview(treeview, 0))
+        treeview.heading("Class", text="Class", command=lambda: self.sort_treeview(treeview, 1))
+        treeview.heading("Process", text="Process", command=lambda: self.sort_treeview(treeview, 2))
+        treeview.heading("Type", text="Type", command=lambda: self.sort_treeview(treeview, 3))
+
+        treeview.column("Name", width=135)
+        treeview.column("Class", width=135)
+        treeview.column("Process", width=130)
+        treeview.column("Type", width=50)
+
+        scrollbar = tk.Scrollbar(treeview_frame, orient=tk.VERTICAL, command=treeview.yview)
+        treeview.config(yscrollcommand=scrollbar.set)
+
+        treeview.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        treeview_frame.columnconfigure(0, weight=1)
+        treeview_frame.rowconfigure(0, weight=1)
+
+        show_all = False  
+
+        def update_treeview(show_all_processes):
+            treeview.delete(*treeview.get_children())
+            processes = self.get_running_processes()
+            for window_title, class_name, proc_name, p_type in processes:  
+                if show_all_processes or p_type == "Application":
+
+                    treeview.insert('', 'end', values=(window_title, class_name, proc_name, p_type))
+
+        update_treeview(show_all)
+
+        selected_programs = []
+
+        def save_selected_programs():
+            selected_programs.clear()
+            for item in treeview.get_children():
+                name, class_name, proc_name, _ = treeview.item(item, "values")
+                if "✔" in name:
+                    selected_programs.append(f"Name - {name.strip(' ✔')}")
+                if "✔" in class_name:
+                    selected_programs.append(f"Class - {class_name.strip(' ✔')}")
+                if "✔" in proc_name:
+                    selected_programs.append(f"Process - {proc_name.strip(' ✔')}")
+            entry_widget.delete(0, tk.END)
+            entry_widget.insert(0, ", ".join(selected_programs))
+            select_window.destroy()
+
+        def search_programs():
+            search_query = search_entry.get().lower()
+            treeview.delete(*treeview.get_children())
+            processes = self.get_running_processes()
+            for class_name, proc_name, p_type in processes:
+                if search_query in class_name.lower() or search_query in proc_name.lower():
+                    if show_all or p_type == "Application":
+                        treeview.insert('', 'end', values=(proc_name, class_name, proc_name, p_type))
+
+        def toggle_show_all_processes():
+            nonlocal show_all
+            show_all = not show_all
+            update_treeview(show_all)
+            toggle_button_text = "Show App Only" if show_all else "Show All Processes"
+            show_all_button.config(text=toggle_button_text)
+
+        button_frame = tk.Frame(select_window)
+        button_frame.pack(pady=5)
+
+        save_button = tk.Button(button_frame, text="Select", command=save_selected_programs, width=12)
+        save_button.grid(row=0, column=0, padx=1, pady=5)
+
+        search_label = tk.Label(button_frame, text="Search:", anchor="w")
+        search_label.grid(row=0, column=1, padx=19, pady=5)
+
+        search_entry = tk.Entry(button_frame, width=30)
+        search_entry.grid(row=0, column=2, padx=5, pady=5)
+
+        search_button = tk.Button(button_frame, text="Search", command=search_programs, width=9)
+        search_button.grid(row=0, column=3, padx=5, pady=5)
+
+        toggle_button_text = "Show All Processes" if not show_all else "Show Applications Only"
+        show_all_button = tk.Button(button_frame, text=toggle_button_text, command=toggle_show_all_processes, width=15)
+        show_all_button.grid(row=0, column=4, padx=5, pady=5)
+
+        def toggle_checkmark(event):
+            item = treeview.identify('item', event.x, event.y)
+            if item:
+                current_values = treeview.item(item, 'values')
+                name, class_name, proc_name, p_type = current_values
+                if event.x < treeview.bbox(item, 'Name')[0] + treeview.bbox(item, 'Name')[2] / 2:
+                    if "✔" in name:
+                        name = name.replace(" ✔", "")
+                    else:
+                        name += " ✔"
+                elif event.x < treeview.bbox(item, 'Class')[0] + treeview.bbox(item, 'Class')[2] / 2:
+                    if "✔" in class_name:
+                        class_name = class_name.replace(" ✔", "")
+                    else:
+                        class_name += " ✔"
+                else:
+                    if "✔" in proc_name:
+                        proc_name = proc_name.replace(" ✔", "")
+                    else:
+                        proc_name += " ✔"
+                treeview.item(item, values=(name, class_name, proc_name, p_type))
+
+        treeview.bind('<Button-1>', toggle_checkmark)
 
     def edit_cleanup_listeners(self):
         if self.is_listening:

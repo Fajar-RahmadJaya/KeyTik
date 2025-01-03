@@ -109,19 +109,28 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 </div>
 
 <div align="center">
-<img src=".github/Picture/main.png" alt="Preview Main" width="400" />
+<img src=".github/Picture/Profile Manager.png" alt="Main Profile Manager" width="400" />
 </div>
 <div align="center">
 <img src=".github/Picture/default mode.png" alt="Default Mode" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/dropdown.png" alt="Dropdown" width="400" />
+<img src=".github/Picture/text mode.png" alt="Text Mode" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/text mode.png" alt="Preview Text Mode" width="400" />
+<img src=".github/Picture/Programs and Devices Example.png" alt="Programs and Devices Example" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/select_device.png" alt="Select Device" width="400" />
+<img src=".github/Picture/Select Device.png" alt="Select Device" width="400" />
+</div>
+<div align="center">
+<img src=".github/Picture/Select Programs.png" alt="Select Programs.png" width="400" />
+</div>
+<div align="center">
+<img src=".github/Picture/Key Format Example.png" alt="Key Format Example" width="400" />
+</div>
+<div align="center">
+<img src=".github/Picture/Drop Down.png" alt="Drop Down" width="400" />
 </div>
 
 <br>
@@ -139,7 +148,9 @@ Below is KeyTik key features that make KeyTik different than another automation 
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
 | 1      | **Multiple Keyboard Remap Profile**                  | Not like most of keyboard remapper, KeyTik can handle multiple keyboard remap. You don't have to set remap again when you need to use another remap then set it back again after done. Just create multiple remap and activate or deactivate it whenever you want. |
+| 1      | **Advance Keyboard Remap**                  | Keyboard remap not only able to remap single key but also key combination and text or typing (Example: Clicking 's' will type 'Select"). |
 | 2      | **Assign Script or Remap Profile to Specific Keyboard or Mouse Using Device VID & PID or Device Handle** | Make script or remap profile to only work for specific physical keyboard or mouse using device VID & PID or device handle as identifier.|
+| 3      | **Assign Script or Remap Profile to Specific Programs Using Class or Process** | Make script or remap profile to only work for specific programs class, like specific Chrome tab or entire program.|
 | 3      | **Auto Clicker**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is held. You can change the 'left click', 'e', interval part to your preference.|
 | 4      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode, see point 16.|
 | 5      | **Screen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference.|

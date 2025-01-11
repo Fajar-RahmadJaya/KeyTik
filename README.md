@@ -161,18 +161,16 @@ Below is KeyTik key features that make KeyTik different than another automation 
 Below is another KeyTik feature to increase user experience and give ultimate control over each profiles:
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
-| 1      | **Run & Exit Remap Profile** | Activate or deactivate profiles individually, so you don't need to adjust the remap every time. |
+| 1      | **Manage Profiles** | **Run**, **Exit**, **Delete**, **Store**, **Edit**, **Pin** each profiles for better control over profiles.|
 | 2      | **Run Profile on Startup**                         | Run profiles on startup, so it will automatically activate when you open your device—no need to manually activate it each time. |
-| 3      | **Delete & Store Remap Profile**                   | Delete unnecessary profiles and store profiles for a clean main window without permanently removing them. |
-| 4      | **Pin Profile**                                    | Pin your favorite profiles for quick and easy access. |
-| 5      | **Edit Remap Profile**                             | Adjust your profile to your preference. |
-| 6      | **Assign Shortcut on Each Profile**                | Enable or Disable your profile using shortcuts. |
-| 7      | **Default Mode in Create or Edit Profile**         | The easiest way to remap your keyboard. |
-| 8      | **Text Mode in Create or Edit Profile**            | Text Mode allows you to adjust or create your AutoHotkey script easily, without needing an external editor.|
-| 9     | **Make Window Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
-| 10     | **Show Stored Profile**                            | Display your stored profile or restore it to main window. |
-| 11     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
-| 12      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
+| 3      | **Assign Shortcut on Each Profile**                | Enable or Disable your profile using shortcuts. |
+| 4      | **Default Mode in Create or Edit Profile**         | The easiest way to remap your keyboard. |
+| 5      | **Text Mode in Create or Edit Profile**            | Text Mode allows you to adjust or create your AutoHotkey script easily, without needing an external editor.|
+| 6     | **Make Window Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
+| 7| **Show Stored Profile** | Display your stored profile or restore it to main window. |
+| 8     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
+| 9      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
+
 
 <br>
 

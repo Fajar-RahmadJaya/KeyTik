@@ -113,7 +113,7 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 <img src=".github/Picture/Profile Manager.png" alt="Main Profile Manager" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/default mode.png" alt="Default Mode" width="400" />
+<img src=".github/Picture/Default Mode.png" alt="Default Mode" width="400" />
 </div>
 <div align="center">
 <img src=".github/Picture/text mode.png" alt="Text Mode" width="400" />

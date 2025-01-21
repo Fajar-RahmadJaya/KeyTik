@@ -48,8 +48,6 @@ Sincerely,
 
 KeyTik is available at the following platforms:
 - [KeyTik Official Website](https://keytik.com)
-- [GitHub](https://github.com/Fajar-RahmadJaya/KeyTik)
-- [KeyTik Official Website](keytik.netlify.app/)
 - [SourceForge](https://sourceforge.net/projects/keytik/)
 - [PitchHut](https://www.pitchhut.com/project/keytik)
 

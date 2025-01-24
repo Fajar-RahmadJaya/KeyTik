@@ -65,8 +65,8 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 <div align="center">
   
 ## Table Of Content
-
 </div>
+
 1. [Screenshots Preview](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screenshots-preview)
 2. [Video Guide](https://www.youtube.com/@Fajar-RahmadJaya)
 3. [Installation]()

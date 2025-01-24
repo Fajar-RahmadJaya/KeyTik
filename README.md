@@ -47,8 +47,8 @@ Sincerely,
 </div>
 
 KeyTik is available at the following platforms:
-- [KeyTik Official Website](https://keytik.com)
-- [SourceForge](https://sourceforge.net/projects/keytik/)
+- [KeyTik Website](https://keytik.com)
+- [Source Forge](https://sourceforge.net/projects/keytik/)
 - [PitchHut](https://www.pitchhut.com/project/keytik)
 
 <br>
@@ -67,29 +67,32 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 ## Table Of Content
 
 </div>
-
-> [!NOTE]  
-> Some of documentation moved to KeyTik official website to increase visual, readability and monetization (Through Ads from AdSense on the website if approved).
-> You can still access it through this table of content. You can visit KeyTik official website on https://keytik.netlify.app/ .This is still in experiment. Thank you for your understanding!
-
 1. [Screenshots Preview](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#screenshots-preview)
 2. [Video Guide](https://www.youtube.com/@Fajar-RahmadJaya)
-3. [How To Install](https://keytik.com/getting-started/installation/)
-   - [How To Install AutoHotkey and Interception Driver Using Command Line](https://keytik.com/getting-started/installation/#command-line-installation)
+3. [Installation]()
+   - [How To Install](https://keytik.com/getting-started/installation/#how-to-install)
+   - [User Agreement](https://keytik.com/getting-started/installation/#user-agreement)
+   - [System Requirements](https://keytik.com/getting-started/installation/#system-requirements)
+   - [Command Line Installation](https://keytik.com/getting-started/installation/#command-line-installation)
 4. [Features](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features)
+4. [Use Case Example](https://keytik.com/introduction/use-case-example/)
 5. [What Make Us Different Then Other Automation Tool](https://keytik.com/introduction/overview/#what-make-us-different-then-other-automation-tool)
-6. [How To Use KeyTik Automation Tool](https://keytik.com/additional-information/automation-tool-customization/)
-   * [Auto Clicker](https://keytik.com/additional-information/automation-tool-customization/#auto-clicker)
-   * [Screen Clicker](https://keytik.com/additional-information/automation-tool-customization/#screen-clicker)
-   * [Screen Coordinate Auto Detect And Copy](https://keytik.com/additional-information/automation-tool-customization/#screen-coordinate-auto-detect-and-copy)
-   * [Multiple Files Opener](https://keytik.com/additional-information/automation-tool-customization/#multiple-files-opener)
-7. [What can You do With KeyTik](https://keytik.com/tips-and-guide/utilize-features/)
-8. [How Is KeyTik Work](https://keytik.com/additional-information/keytik-mechanism/)
-   * [How is Remapper And Automation Tool work](https://keytik.com/additional-information/keytik-mechanism/#overall-mechanism)
-   * [How is Assign Keyboard or Mouse on Specific Device VID & PID or Device Handle Work](https://keytik.com/additional-information/keytik-mechanism/#assign-profile-on-specific-device)
+6. [Automation Tool Customization](https://keytik.com/additional-information/automation-tool-customization/)
+   - [Auto Clicker](https://keytik.com/additional-information/automation-tool-customization/#auto-clicker)
+   - [Screen Clicker](https://keytik.com/additional-information/automation-tool-customization/#screen-clicker)
+   - [Screen Coordinate Auto Detect And Copy](https://keytik.com/additional-information/automation-tool-customization/#screen-coordinate-auto-detect-and-copy)
+   - [Multiple Files Opener](https://keytik.com/additional-information/automation-tool-customization/#multiple-files-opener)
+8. [KeyTik Mechanism](https://keytik.com/additional-information/keytik-mechanism/)
+   - [Overall Mechanism](https://keytik.com/additional-information/keytik-mechanism/#overall-mechanism)
+   - [Assign Profile on Specific Device](https://keytik.com/additional-information/keytik-mechanism/#assign-profile-on-specific-device)
+8. [Tips & Guide](https://keytik.com/additional-information/keytik-mechanism/)
+    - [Create Automation Tool](https://keytik.com/tips-and-guide/create-automation-tool/)
+    - [Profile Backup](https://keytik.com/tips-and-guide/profile-backup/)
 9. [Supported Key List](https://keytik.com/additional-information/supported-key-list/)
-10. [Is KeyTik Safe to Use?](https://keytik.com/introduction/safety/#is-keytik-safe-to-use%3F)
+10. [Safety](https://keytik.com/introduction/safety/)
+    - [Is KeyTik Safe to Use?](https://keytik.com/introduction/safety/#is-keytik-safe-to-use%3F)
     - [Download Options](https://keytik.com/introduction/safety/#download-options)
+    - [Why are We Include Source Code Version?](https://keytik.com/introduction/safety/#why-are-we-include-source-code-version%3F)
     - [Scan Results](https://keytik.com/introduction/safety/#scan-results)
     - [Summary](https://keytik.com/introduction/safety/#summary)
 11. [Have a Suggestion or Question?](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#have-a-suggestion-or-question)

@@ -9,7 +9,6 @@ import winshell
 from win32com.client import Dispatch
 from PIL import Image, ImageTk
 from tkinter import LabelFrame
-import json
 from tkinter import TclError
 import keyboard
 import time
@@ -18,21 +17,58 @@ from tkinter import ttk
 import psutil
 import win32gui
 import win32process
+import webbrowser
+from markdown import markdown
+from tkhtmlview import HTMLLabel
+import requests
+import json
+import tkinter.simpledialog
+import threading
 
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 
 data_dir = os.path.join(script_dir, '_internal', 'Data')
 
-active_dir = os.path.join(data_dir, 'Active')
+current_version = "v1.7.0"
 
-store_dir = os.path.join(data_dir, 'Store')
+if getattr(sys, 'frozen', False):
+    condition_path = os.path.join(sys._MEIPASS, "Data", "condition.json")
+    dont_show_path = os.path.join(sys._MEIPASS, "Data", "dont_show.json")
+else:
+    condition_path = os.path.join(data_dir, "condition.json")
+    dont_show_path = os.path.join(data_dir, "dont_show.json")
+
+def load_condition():
+    try:
+        if os.path.exists(condition_path):
+            with open(condition_path, "r") as f:
+                content = f.read().strip()  
+                if content:
+                    data = json.loads(content)
+                    if isinstance(data, dict) and "path" in data:
+                        return data["path"]
+                else:
+                    print("Condition file is empty. Returning None.")
+    except json.JSONDecodeError:
+        print("Error: Condition file is not in valid JSON format. Resetting condition.")
+    except Exception as e:
+        print(f"An error occurred while loading condition: {e}")
+    return None  
+
+path_from_condition = load_condition()
+
+if path_from_condition:
+    active_dir = os.path.join(path_from_condition, 'Active')
+    store_dir = os.path.join(path_from_condition, 'Store')
+else:
+
+    active_dir = os.path.join(data_dir, 'Active')
+    store_dir = os.path.join(data_dir, 'Store')
 
 if not os.path.exists(active_dir):
-
     os.makedirs(active_dir)
 
 if not os.path.exists(store_dir):
-
     os.makedirs(store_dir)
 
 SCRIPT_DIR = active_dir
@@ -47,6 +83,8 @@ if getattr(sys, 'frozen', False):
     device_list_path = os.path.join(sys._MEIPASS, "Data", "Active", "AutoHotkey Interception", "shared_device_info.txt")
     device_finder_path = os.path.join(sys._MEIPASS, 'Data', 'Active', "AutoHotkey Interception", "find_device.ahk")
     keylist_path = os.path.join(sys._MEIPASS, "Data", "key_list.txt")
+    welcome_path = os.path.join(sys._MEIPASS, "Data", "welcome.md")
+    changelog_path = os.path.join(sys._MEIPASS, "Data", "changelog.md")
 else:
     icon_path = os.path.join(data_dir, "icon.ico")
     pin_path = os.path.join(data_dir, "pin.json")
@@ -55,6 +93,8 @@ else:
     device_list_path = os.path.join(active_dir, "Autohotkey Interception", "shared_device_info.txt")
     device_finder_path = os.path.join(active_dir, "Autohotkey Interception", "find_device.ahk")
     keylist_path = os.path.join(data_dir, "key_list.txt")
+    welcome_path = os.path.join(data_dir, "welcome.md")
+    changelog_path = os.path.join(data_dir, "changelog.md")
 
 def load_pinned_profiles():
     try:
@@ -81,6 +121,10 @@ class ScriptManagerApp:
     def __init__(self, root):
         self.first_load = True
         self.root = root
+        self.running_scripts_cache = {}  
+        self.cache_lock = threading.Lock()  
+        self.cache_refresh_interval = 5  
+        self.refresh_script_cache()  
         self.root.geometry("650x500+284+97")  
         self.root.title("KeyTik")
         self.current_page = 0
@@ -111,6 +155,113 @@ class ScriptManagerApp:
         self.ignore_next_click = False  
         self.shortcut_entry = None
         self.sort_order = [True, True, True]
+        self.previous_button_text = None  
+        self.welcome_condition = self.load_welcome_condition()
+        self.check_welcome()
+
+    def load_welcome_condition(self):
+        try:
+            if os.path.exists(dont_show_path):
+                with open(dont_show_path, "r") as f:
+                    config = json.load(f)
+                    return config.get("welcome_condition", True)  
+        except Exception as e:
+            print(f"Error loading condition file: {e}")
+        return True  
+
+    def save_welcome_condition(self):
+        try:
+            with open(dont_show_path, "w") as f:
+                json.dump({"welcome_condition": self.welcome_condition}, f)
+        except Exception as e:
+            print(f"Error saving condition file: {e}")
+
+    def check_welcome(self):
+        if self.welcome_condition:
+            self.show_welcome_window()
+
+    def show_welcome_window(self):
+        try:
+
+            with open(welcome_path, "r") as f:
+                md_content = f.read()
+
+                html_content = markdown(md_content)
+
+                html_content = html_content.replace(
+                    "<p>", "<p style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px;'>"
+                ).replace(
+                    "<h1>", "<h1 style='font-family: Open Sans; font-size: 18px; font-weight: 600; margin: 10px;'>"
+                ).replace(
+                    "<h2>", "<h2 style='font-family: Open Sans; font-size: 11px; font-weight: 500; margin: 10px;'>"
+                )
+        except FileNotFoundError:
+            html_content = """
+            <p style='font-family: Open Sans; font-size: 10px; font-weight: 300;'>Welcome file not found!</p>
+            """
+
+        welcome_window = tk.Toplevel(self.root)
+        welcome_window.title("KeyTik v1.7.0")
+        welcome_window.geometry("525x290+350+220")
+        welcome_window.resizable(False, False)
+        welcome_window.iconbitmap(icon_path)
+        welcome_window.transient(self.root)
+
+        html_frame = tk.Frame(
+            welcome_window, width=500, height=230, relief=tk.RIDGE, borderwidth=2
+        )
+        html_frame.pack(pady=10)
+        html_frame.pack_propagate(False)  
+
+        html_label = HTMLLabel(
+            html_frame,
+            html=html_content,
+            background="white",
+            padx=11,
+            pady=11,
+            relief=tk.FLAT,
+        )
+        html_label.pack(fill=tk.BOTH, expand=True)
+
+        button_frame = tk.Frame(welcome_window)
+        button_frame.pack(pady=0)
+
+        def on_next():
+            try:
+
+                with open(changelog_path, "r") as f:
+                    md_content = f.read()
+                    html_content = markdown(md_content)
+                    html_content = html_content.replace(
+                        "<p>", "<p style='font-family: Open Sans; font-size: 10px; font-weight: 300; margin: 10px;'>"
+                    ).replace(
+                        "<h1>", "<h1 style='font-family: Open Sans; font-size: 18px; font-weight: 600; margin: 10px;'>"
+                    ).replace(
+                        "<h2>", "<h2 style='font-family: Open Sans; font-size: 12px; font-weight: 500; margin: 10px;'>"
+                    )
+
+                    html_label.set_html(html_content)
+
+                next_button.grid_forget()  
+                dont_show_button.grid(row=0, column=0, padx=50, pady=3)  
+                close_button.grid(row=0, column=1, padx=50, pady=3)  
+            except FileNotFoundError:
+                html_label.set_html(
+                    "<p style='font-family: Open Sans; font-size: 10px; font-weight: 300;'>Changelog file not found!</p>")
+
+        def on_dont_show_again():
+            self.welcome_condition = False
+            self.save_welcome_condition()
+            welcome_window.destroy()
+
+        def on_close():
+            welcome_window.destroy()
+
+        next_button = tk.Button(button_frame, text="Next", command=on_next, width=20)
+        next_button.grid(row=0, column=0, padx=50, pady=3)
+
+        dont_show_button = tk.Button(button_frame, text="Don't Show Again", command=on_dont_show_again, width=20)
+        close_button = tk.Button(button_frame, text="Close", command=on_close, width=20)
 
     def create_ui(self):
         self.frame = tk.Frame(self.root)
@@ -148,8 +299,114 @@ class ScriptManagerApp:
         self.import_button = tk.Button(action_container, text="Import Profile", width=20, height=1, command=self.import_button)
         self.import_button.grid(row=0, column=1, padx=15, pady=3)
 
+        self.setting_button = tk.Button(self.frame, text="Setting", width=8, command=self.open_settings_window)
+        self.setting_button.place(relx=0.85, rely=0.907)  
+
         action_container.grid_columnconfigure(0, weight=1)  
         action_container.grid_columnconfigure(1, weight=1)
+
+    def open_settings_window(self):
+        settings_window = tk.Toplevel(self.root)
+        settings_window.title("Settings")
+        settings_window.geometry("400x300+400+225")  
+        settings_window.resizable(False, False)
+        settings_window.configure(padx=10, pady=10)  
+        settings_window.iconbitmap(icon_path)
+        settings_window.transient(self.root)
+
+        frame = tk.LabelFrame(settings_window)
+        frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)  
+
+        change_path_button = tk.Button(frame, text="Change Profile Location", command=self.change_data_location, height=2, width=20)
+        change_path_button.grid(row=0, column=0, padx=5, pady=5)
+
+        check_update_button = tk.Button(frame, text="Check For Update", command=lambda: self.check_for_update(), height=2, width=20)
+        check_update_button.grid(row=0, column=1, padx=5, pady=5)
+
+        on_boarding_button = tk.Button(frame, text="On Boarding", command=self.show_welcome_window, height=2, width=20)
+        on_boarding_button.grid(row=1, column=0, padx=5, pady=5)
+
+        credit_button = tk.Button(frame, text="Credit", command=lambda: print("Button 4 clicked"), height=2, width=20)
+        credit_button.grid(row=1, column=1, padx=5, pady=5)
+        credit_button.config(state="disabled")
+
+        sponsor_button = tk.Button(frame, text="Sponsor Me", command=lambda: webbrowser.open("https://github.com/sponsors/Fajar-RahmadJaya"), height=2, width=20)
+        sponsor_button.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
+        frame.grid_rowconfigure(0, weight=1)
+        frame.grid_rowconfigure(1, weight=1)
+        frame.grid_rowconfigure(2, weight=1)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid_columnconfigure(1, weight=1)
+
+    def check_for_update(self):
+        try:
+
+            response = requests.get("https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest")
+            if response.status_code == 200:
+                release_data = response.json()
+                latest_version = release_data["tag_name"]  
+
+                if current_version == latest_version:
+
+                    messagebox.showinfo("Check For Update", "You are using the latest version of KeyTik.")
+                else:
+
+                    messagebox.showinfo("Check For Update", f"New update available: KeyTik {latest_version}")
+            else:
+                messagebox.showerror("Error", "Failed to check for updates. Please try again later.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
+    def change_data_location(self):
+        global active_dir, store_dir
+
+        new_path = filedialog.askdirectory(title="Select a New Path for Active and Store Folders")
+
+        if not new_path:
+            print("No directory selected. Operation canceled.")
+            return
+
+        try:
+
+            if not os.path.exists(new_path):
+                print(f"The selected path does not exist: {new_path}")
+                return
+
+            new_active_dir = os.path.join(new_path, 'Active')
+            new_store_dir = os.path.join(new_path, 'Store')
+
+            if os.path.exists(active_dir):
+                shutil.move(active_dir, new_active_dir)
+                print(f"Moved Active folder to {new_active_dir}")
+            else:
+                print(f"Active folder does not exist at {active_dir}")
+
+            if os.path.exists(store_dir):
+                shutil.move(store_dir, new_store_dir)
+                print(f"Moved Store folder to {new_store_dir}")
+            else:
+                print(f"Store folder does not exist at {store_dir}")
+
+            new_condition_data = {"path": new_path}
+            with open(condition_path, 'w') as f:
+                json.dump(new_condition_data, f)
+            print(f"Updated condition.json with the new path: {new_path}")
+
+            active_dir = new_active_dir
+            store_dir = new_store_dir
+            print(f"Global active_dir updated to: {active_dir}")
+            print(f"Global store_dir updated to: {store_dir}")
+
+            self.SCRIPT_DIR = active_dir
+            self.scripts = self.list_scripts()
+            self.update_script_list()  
+
+            messagebox.showinfo("Change Profile Location", "Profile location changed successfully!")
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            messagebox.showerror("Error", f"An error occurred: {e}")
 
     def toggle_on_top(self):
         self.is_on_top = not self.is_on_top
@@ -187,17 +444,28 @@ class ScriptManagerApp:
         self.scripts = pinned + unpinned
         return self.scripts  
 
+    def refresh_script_cache(self):
+        def update_cache():
+            new_cache = {}
+            for process in psutil.process_iter(['name', 'cmdline']):
+                try:
+                    if process.info['name'] and 'autohotkey' in process.info['name'].lower():
+                        if process.info['cmdline']:
+                            for arg in process.info['cmdline']:
+                                script_name = os.path.basename(arg)
+                                new_cache[script_name] = True
+                except (psutil.AccessDenied, psutil.NoSuchProcess):
+                    continue
+            with self.cache_lock:
+                self.running_scripts_cache = new_cache
+
+        threading.Thread(target=update_cache, daemon=True).start()
+
+        self.root.after(self.cache_refresh_interval * 1000, self.refresh_script_cache)
+
     def is_script_running(self, script_name):
-        for process in psutil.process_iter(['pid', 'name', 'cmdline']):
-            try:
-                if process.info['name'] and 'autohotkey' in process.info['name'].lower():
-                    if process.info['cmdline']:
-                        for arg in process.info['cmdline']:
-                            if arg.endswith(script_name):  
-                                return True
-            except (psutil.AccessDenied, psutil.NoSuchProcess):
-                pass
-        return False
+        with self.cache_lock:
+            return self.running_scripts_cache.get(script_name, False)
 
     def update_script_list(self):
         for widget in self.script_frame.winfo_children():
@@ -223,59 +491,45 @@ class ScriptManagerApp:
             icon_label.bind("<Button-1>",
                             lambda event, script=script, icon_label=icon_label: self.toggle_pin(script, icon_label))
 
-            run_button = tk.Button(frame, text="Run", width=10, height=1)
-            run_button.grid(row=0, column=0, padx=2, pady=5)
+            is_running = self.is_script_running(script)
+            button_text = "Exit" if is_running else "Run"
 
-            exit_button = tk.Button(frame, text="Exit", state="disabled", width=10, height=1)
-            exit_button.grid(row=0, column=1, padx=5, pady=5)
+            combined_button = tk.Button(frame, text=button_text, width=10, height=1)
+            combined_button.grid(row=0, column=0, padx=2, pady=5)
 
-            if self.first_load:
-                if self.is_script_running(script):
-                    run_button.config(state='disabled')
-                    exit_button.config(state='normal')
-                else:
-                    run_button.config(state='normal')
-                    exit_button.config(state='disabled')
-            else:
+            combined_button.config(command=lambda s=script, b=combined_button: self.toggle_run_exit(s, b))
 
-                run_button.config(state='normal')
-                exit_button.config(state='disabled')
-
-            run_button.config(command=lambda s=script, rb=run_button, eb=exit_button: self.activate_script(s, rb, eb))
-            exit_button.config(command=lambda s=script, rb=run_button, eb=exit_button: self.exit_script(s, rb, eb))
+            copy_button = tk.Button(frame, text="Copy", command=lambda s=script: self.copy_script(s), width=10,
+                                      height=1)
+            copy_button.grid(row=1, column=0, padx=8, pady=5)
 
             delete_button = tk.Button(frame, text="Delete", command=lambda s=script: self.delete_script(s), width=10,
                                       height=1)
-            delete_button.grid(row=0, column=2, padx=8, pady=5)
+            delete_button.grid(row=1, column=2, padx=8, pady=5)
 
             store_button = tk.Button(frame, text="Store" if self.SCRIPT_DIR == active_dir else "Restore",
                                      command=lambda s=script: self.store_script(s), width=10, height=1)
-            store_button.grid(row=1, column=0, padx=2, pady=5)
+            store_button.grid(row=1, column=1, padx=2, pady=5)
 
             edit_button = tk.Button(frame, text="Edit",
-                                    command=lambda s=script, rb=run_button, eb=exit_button: (
-                                        self.exit_script(s, rb, eb),  
-                                        self.edit_script(s)  
-                                    ),
+                                    command=lambda s=script: self.edit_script(s),
                                     width=10, height=1)
-            edit_button.grid(row=1, column=1, padx=5, pady=5)
+            edit_button.grid(row=0, column=1, padx=5, pady=5)
 
             shortcut_name = os.path.splitext(script)[0] + ".lnk"  
             startup_folder = winshell.startup()
             shortcut_path = os.path.join(startup_folder, shortcut_name)
 
             if os.path.exists(shortcut_path):
-
                 startup_button = tk.Button(frame, text="Unstart",
                                            command=lambda s=script: self.remove_ahk_from_startup(s),
                                            width=10, height=1)
             else:
-
                 startup_button = tk.Button(frame, text="Startup",
                                            command=lambda s=script: self.add_ahk_to_startup(s),
                                            width=10, height=1)
 
-            startup_button.grid(row=1, column=2, padx=8, pady=5)
+            startup_button.grid(row=0, column=2, padx=8, pady=5)
 
         for i in range(3):
             self.script_frame.grid_rowconfigure(i, weight=1)
@@ -283,6 +537,72 @@ class ScriptManagerApp:
             self.script_frame.grid_columnconfigure(i, weight=1)
 
         self.first_load = False
+
+    def copy_script(self, script):
+        self.root.iconbitmap(icon_path)  
+
+        prompt = "Enter the new script name:".ljust(50)  
+
+        new_name = tkinter.simpledialog.askstring("Copy Script", prompt)
+
+        if not new_name:
+            return  
+
+        if not new_name.lower().endswith('.ahk'):
+            new_name += '.ahk'
+
+        source_path = os.path.join(self.SCRIPT_DIR, script)
+        destination_path = os.path.join(self.SCRIPT_DIR, new_name)
+
+        try:
+
+            shutil.copy(source_path, destination_path)
+            print(f"Script copied to {destination_path}")
+
+            self.update_script_list()
+        except Exception as e:
+            print(f"Error copying script: {e}")
+
+    def toggle_run_exit(self, script_name, button):
+        if button["text"] == "Run":
+
+            self.activate_script(script_name, button)
+
+            button.config(text="Exit", command=lambda: self.toggle_run_exit(script_name, button))
+        else:
+
+            self.exit_script(script_name, button)
+
+            button.config(text="Run", command=lambda: self.toggle_run_exit(script_name, button))
+
+    def activate_script(self, script_name, button):
+        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+
+        if os.path.isfile(script_path):
+
+            os.startfile(script_path)
+
+            button.config(text="Exit", command=lambda: self.toggle_run_exit(script_name, button))
+        else:
+            messagebox.showerror("Error", f"{script_name} does not exist.")
+
+    def exit_script(self, script_name, button):
+        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+
+        if os.path.isfile(script_path):
+
+            keyboard = Controller()
+
+            keyboard.press(Key.ctrl)
+            keyboard.press(Key.alt)
+            keyboard.press('p')
+            keyboard.release('p')
+            keyboard.release(Key.alt)
+            keyboard.release(Key.ctrl)
+
+            button.config(text="Run", command=lambda: self.toggle_run_exit(script_name, button))
+        else:
+            messagebox.showerror("Error", f"{script_name} does not exist.")
 
     def toggle_pin(self, script, icon_label):
         if script in self.pinned_profiles:
@@ -419,45 +739,6 @@ class ScriptManagerApp:
 
         self.list_scripts()
         self.update_script_list()
-
-    def activate_script(self, script_name, run_button, exit_button):
-        script_path = os.path.join(self.SCRIPT_DIR, script_name)
-
-        if os.path.isfile(script_path):
-
-            os.startfile(script_path)
-
-            if self.is_script_running(script_name):
-                run_button.config(state='disabled')
-                exit_button.config(state='normal')
-            else:
-                run_button.config(state='normal')
-                exit_button.config(state='disabled')
-        else:
-            messagebox.showerror("Error", f"{script_name} does not exist.")
-
-    def exit_script(self, script_name, run_button, exit_button):
-        script_path = os.path.join(self.SCRIPT_DIR, script_name)
-
-        if os.path.isfile(script_path):
-
-            keyboard = Controller()
-
-            keyboard.press(Key.ctrl)
-            keyboard.press(Key.alt)
-            keyboard.press('p')
-            keyboard.release('p')
-            keyboard.release(Key.alt)
-            keyboard.release(Key.ctrl)
-
-            if not self.is_script_running(script_name):
-                run_button.config(state='normal')
-                exit_button.config(state='disabled')
-            else:
-                run_button.config(state='disabled')
-                exit_button.config(state='normal')
-        else:
-            messagebox.showerror("Error", f"{script_name} does not exist.")
 
     def delete_script(self, script_name):
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
@@ -633,23 +914,6 @@ class ScriptManagerApp:
         self.keyboard_entry.insert(0, "  ")
         self.keyboard_select_button = tk.Button(self.create_profile_window, text="Select Device", command=self.open_device_selection)
         self.keyboard_select_button.place(relx=0.71, rely=0.12, width=95)
-
-        help_button = tk.Button(self.create_profile_window, text="Tips!", font=("Arial", 8),
-                                relief="flat", borderwidth=0, padx=1, pady=5)
-        help_button.place(relx=0.02, rely=0.00)  
-
-        tooltip_text = ('Key Format:\n '
-                        '1. Normal Key - Work for Both Remap Key or Default Key (a, b, ctrl etc).\n'
-                        '   - Example: Default Key = w, Remap Key = up (When w clicked, it will click up arrow instead).\n'
-                        '2. Key Combination - Work for Both Remap Key or Default Key (ctrl + b etc).\n'
-                        '   - Example: Default Key = c, Remap Key = ctrl + c (When c clicked, it will simulate ctrl + c).\n'
-                        '3. "Text" - Only for Remap Key ("Select").\n'
-                        '   - Example: Default Key = f, Remap Key = "For" (When f clicked, it will type "For").\n\n'
-                        'Select Program Tips: You can select multiple process or program.\n'
-                        '- Class is process specific like specific Chrome tab, You')
-
-        help_button.bind("<Enter>", lambda event: self.show_tooltip(event, tooltip_text))
-        help_button.bind("<Leave>", self.hide_tooltip)
 
         self.is_text_mode = False
 
@@ -914,7 +1178,6 @@ class ScriptManagerApp:
             self.create_profile_window.destroy()
 
     def run_monitor(self):
-
         script_path = os.path.join(script_dir, "_internal", "Data", "Active", "AutoHotkey Interception", "Monitor.ahk")
 
         if os.path.exists(script_path):
@@ -1121,6 +1384,7 @@ class ScriptManagerApp:
 
             self.is_listening = True
             self.active_entry = entry_widget
+            self.previous_button_text = button.cget("text")
 
             self.disable_entry_input(self.key_rows)  
             self.disable_entry_input([(self.script_name_entry, None)])  
@@ -1156,7 +1420,7 @@ class ScriptManagerApp:
 
             toggle_other_buttons(tk.NORMAL)
 
-            button.config(text="Select Shortcut Key",
+            button.config(text=self.previous_button_text,
                           command=lambda: self.toggle_shortcut_key_listening(entry_widget, button))
 
             if self.hook_registered:
@@ -1477,7 +1741,6 @@ class ScriptManagerApp:
                 file.write(self.generate_device_code_from_handle(is_mouse, vid_pid_or_handle))
 
     def generate_device_code(self, is_mouse, vid, pid):
-        """Generate the device code for vid/pid format."""
         return f"""#SingleInstance force
 Persistent
 
@@ -1488,7 +1751,6 @@ cm1 := AHI.CreateContextManager(id1)
 """
 
     def generate_device_code_from_handle(self, is_mouse, handle):
-        """Generate the device code for handle format."""
         return f"""#SingleInstance force
 Persistent
 
@@ -1648,21 +1910,6 @@ cm1 := AHI.CreateContextManager(id1)
                                                command=self.edit_open_device_selection)
             keyboard_select_button.place(relx=0.71, rely=0.12, width=95)
             self.keyboard_entry = keyboard_entry
-
-            help_button = tk.Button(self.edit_window, text="Tips!", font=("Arial", 8),
-                                    relief="flat", borderwidth=0, padx=1, pady=5)
-            help_button.place(relx=0.02, rely=0.00)  
-
-            tooltip_text = ('Key Format:\n '
-                            '1. Normal Key - Work for Both Remap Key or Default Key (a, b, ctrl etc).\n'
-                            '   - Example: Default Key = w, Remap Key = up (When w clicked, it will click up arrow instead).\n'
-                            '2. Key Combination - Work for Both Remap Key or Default Key (ctrl + b etc).\n'
-                            '   - Example: Default Key = c, Remap Key = ctrl + c (When c clicked, it will simulate ctrl + c).\n'
-                            '3. "Text" - Only for Remap Key ("Select").\n'
-                            '   - Example: Default Key = f, Remap Key = "For" (When f clicked, it will type "For").')
-
-            help_button.bind("<Enter>", lambda event: self.show_tooltip(event, tooltip_text))
-            help_button.bind("<Leave>", self.hide_tooltip)
 
             device_id = None
             device_type = "Keyboard"  

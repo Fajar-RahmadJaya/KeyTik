@@ -29,6 +29,8 @@ With a bit of scripting, you can do almost all automation tasks with ease. If yo
 
 So, if you're looking for a lightweight auto-clicker, keyboard remapper, screen clicker, multiple files opener, and AutoHotkey script manager with a user-friendly GUI in a single software, then this is exactly what you need! I hope you enjoy using KeyTik and find it useful.
 
+**Note: KeyTik is only available for Windows only following AutoHotkey supported operating system.**
+
 </div>
 
 Sincerely,  

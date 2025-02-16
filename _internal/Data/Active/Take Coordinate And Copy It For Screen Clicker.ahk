@@ -1,6 +1,7 @@
 ; text
 ^!p::ExitApp
 
+#SingleInstance Force
 Persistent
 SetTitleMatchMode(2)
 

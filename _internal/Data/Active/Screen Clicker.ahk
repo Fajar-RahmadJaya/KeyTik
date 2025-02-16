@@ -1,6 +1,7 @@
 ; text
 ^!p::ExitApp
 
+#SingleInstance Force
 toggle := false 
 
 q & e:: ; Change this to toogle screen clicker on or off

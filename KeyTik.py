@@ -136,6 +136,8 @@ class ScriptManagerApp:
         self.icon_unpinned = ImageTk.PhotoImage(Image.open(icon_unpinned_path).resize((14, 14)))
         self.icon_pinned = ImageTk.PhotoImage(Image.open(icon_pinned_path).resize((14, 14)))
         self.scripts = self.list_scripts()
+        self.device_selection_window = None  # ✅ Initialize as None
+        self.select_program_window = None   # ✅ Initialize as None
         self.frames = []
         self.root.iconbitmap(icon_path)
         self.root.resizable(False, False)
@@ -208,11 +210,12 @@ class ScriptManagerApp:
             """
 
         welcome_window = tk.Toplevel(self.root)
-        welcome_window.title("Readme !")
+        welcome_window.title("Readme!")
         welcome_window.geometry("525x290+350+220")
         welcome_window.resizable(False, False)
         welcome_window.iconbitmap(icon_path)
         welcome_window.transient(self.root)
+        welcome_window.resizable(False, False)
 
         # Frame to contain the HTMLLabel with a border
         html_frame = tk.Frame(
@@ -334,6 +337,7 @@ class ScriptManagerApp:
         settings_window.configure(padx=10, pady=10)  # Padding around the window
         settings_window.iconbitmap(icon_path)
         settings_window.transient(self.root)
+        settings_window.resizable(False, False)
 
         # Create a LabelFrame inside the settings window
         frame = tk.LabelFrame(settings_window)
@@ -440,34 +444,46 @@ class ScriptManagerApp:
             messagebox.showerror("Error", f"An error occurred: {e}")
 
     def toggle_on_top(self):
-        """Toggle the always-on-top feature."""
+        """Toggle the always-on-top feature for the main window and ensure child windows stay on top."""
         self.is_on_top = not self.is_on_top
-        self.root.attributes("-topmost", self.is_on_top)  # Ensure to toggle 'topmost' on the root window
+        try:
+            self.root.attributes("-topmost", self.is_on_top)
+        except TclError:
+            print("Error: Unable to set always-on-top for root window.")
 
-        if self.create_profile_window is not None:
-            self.create_profile_window.attributes("-topmost", self.is_on_top)
-            if self.is_on_top:
-                self.create_profile_window.title("Create New Profile (Always on Top)")
-            else:
-                self.create_profile_window.title("Create New Profile")
+        def set_window_on_top(window, title, parent=None):
+            """Helper function to set a window on top of the specified parent and reapply the icon."""
+            if window is not None and window.winfo_exists():
+                try:
+                    if parent:
+                        window.transient(parent)  # Keep window on top of its parent
+                    else:
+                        window.transient(self.root)
 
-        # Check if the edit_window exists and is still valid
-        if self.edit_window is not None and self.edit_window.winfo_exists():
-            self.edit_window.attributes("-topmost", self.is_on_top)
-            if self.is_on_top:
-                self.edit_window.title("Edit Profile (Always on Top)")
-            else:
-                self.edit_window.title("Edit Profile")
-        else:
-            self.edit_window = None  # Reset the reference if it doesn't exist
+                    window.attributes("-topmost", self.is_on_top)
+                    title_suffix = " (Always on Top)" if self.is_on_top else ""
+                    window.title(f"{title}{title_suffix}")
 
-        if self.is_on_top:
-            self.root.title("KEES (Always on Top)")
-            self.always_top.config(text="Disable Always on Top")
-        else:
-            self.root.title("KEES")
-            self.always_top.config(text="Enable Always on Top")
+                    # ✅ Fix disappearing icon by reapplying it here
+                    window.iconbitmap(icon_path)
 
+                except TclError:
+                    print(f"Error: Unable to set always-on-top for {title} window.")
+
+        # Apply Always on Top & Icon Fix to all relevant windows
+        parent_window = self.create_profile_window or self.edit_window
+        set_window_on_top(self.create_profile_window, "Create New Profile", self.root)
+        set_window_on_top(self.edit_window, "Edit Profile", self.root)
+        set_window_on_top(self.device_selection_window, "Select Device", parent_window)
+        set_window_on_top(self.select_program_window, "Select Program", parent_window)
+
+        # Update main window title and button text
+        try:
+            self.root.title(f"KeyTik{' (Always on Top)' if self.is_on_top else ''}")
+            self.always_top.config(text="Disable Always on Top" if self.is_on_top else "Enable Always on Top")
+        except TclError:
+            print("Error: Unable to update main window title or button text.")
+            
     def list_scripts(self):
         """List all .ahk and .py files in the active directory and return the script list."""
         # Create a list of all .ahk and .py files
@@ -919,14 +935,23 @@ class ScriptManagerApp:
             window.destroy()
 
     def open_device_selection(self):
-        """Open a new window to select a device and update the Keyboard_entry field."""
-        device_selection_window = tk.Toplevel(self.create_profile_window)
-        device_selection_window.geometry("600x300+308+233")
-        device_selection_window.title("Select Device")
-        device_selection_window.iconbitmap(icon_path)
-        device_selection_window.transient(self.create_profile_window)
+        """Open the Select Device window, ensuring only one instance is open."""
+        if self.device_selection_window and self.device_selection_window.winfo_exists():
+            self.device_selection_window.lift()
+            return
 
-        tree = ttk.Treeview(device_selection_window, columns=("Device Type", "VID", "PID", "Handle"), show="headings")
+        self.device_selection_window = tk.Toplevel(self.create_profile_window or self.edit_window)
+        self.device_selection_window.geometry("600x300+308+233")
+        self.device_selection_window.title("Select Device")
+        self.device_selection_window.iconbitmap(icon_path)
+        self.device_selection_window.resizable(False, False)
+        self.device_selection_window.transient(self.create_profile_window or self.edit_window)  # Keep on top
+        self.device_selection_window.attributes("-topmost", self.is_on_top)  # Respect Always on Top setting
+
+        # Cleanup reference when closed
+        self.device_selection_window.protocol("WM_DELETE_WINDOW", self.cleanup_device_selection_window)
+
+        tree = ttk.Treeview(self.device_selection_window, columns=("Device Type", "VID", "PID", "Handle"), show="headings")
         tree.heading("Device Type", text="Device Type")
         tree.heading("VID", text="VID")
         tree.heading("PID", text="PID")
@@ -942,13 +967,13 @@ class ScriptManagerApp:
         self.update_treeview(devices, tree)
 
         # Button Frame
-        button_frame = tk.Frame(device_selection_window)
+        button_frame = tk.Frame(self.device_selection_window)
         button_frame.pack(pady=5)
 
         # Select button
         select_button = tk.Button(button_frame, text="Select", width=23,
                                   command=lambda: self.select_device(tree, self.keyboard_entry,
-                                                                     device_selection_window))
+                                                                     self.device_selection_window))
         select_button.grid(row=0, column=0, padx=5, pady=5)
 
         monitor_button = tk.Button(button_frame, text="Open AHI Monitor To Test Device", width=29, command=self.run_monitor)
@@ -958,12 +983,18 @@ class ScriptManagerApp:
                 self.refresh_device_list(device_list_path), tree))
         refresh_button.grid(row=0, column=1, padx=5, pady=5)
 
+    def cleanup_device_selection_window(self):
+        """Reset reference when Select Device window is closed."""
+        self.device_selection_window.destroy()
+        self.device_selection_window = None
+
     def create_new_profile(self):
         """Create a new AutoHotkey script based on user input."""
         self.create_profile_window = tk.Toplevel(self.root)
         self.create_profile_window.geometry("600x450+308+130")  # Set initial size (width x height)
         self.create_profile_window.title("Create New Profile")
         self.create_profile_window.iconbitmap(icon_path)
+        self.create_profile_window.resizable(False, False)
 
         # Bind cleanup method to window close event
         self.create_profile_window.protocol("WM_DELETE_WINDOW", self.cleanup_listeners)
@@ -1112,14 +1143,24 @@ class ScriptManagerApp:
         return processes
 
     def open_select_program_window(self, entry_widget):
-        select_window = tk.Toplevel(self.root)
-        select_window.title("Select Programs")
-        select_window.geometry("600x300+308+217")  # Set initial size (width x height)
-        select_window.iconbitmap(icon_path)
-        select_window.transient(self.create_profile_window)
+        """Open the Select Program window, ensuring only one instance is open."""
+        if self.select_program_window and self.select_program_window.winfo_exists():
+            self.select_program_window.lift()
+            return
+
+        self.select_program_window = tk.Toplevel(self.create_profile_window or self.edit_window)
+        self.select_program_window.title("Select Programs")
+        self.select_program_window.geometry("600x300+308+217")
+        self.select_program_window.iconbitmap(icon_path)
+        self.select_program_window.resizable(False, False)
+        self.select_program_window.transient(self.create_profile_window or self.edit_window)  # Keep on top
+        self.select_program_window.attributes("-topmost", self.is_on_top)  # Respect Always on Top setting
+
+        # Cleanup reference when closed
+        self.select_program_window.protocol("WM_DELETE_WINDOW", self.cleanup_select_program_window)
 
         # Frame to hold Treeview and scrollbar
-        treeview_frame = tk.Frame(select_window)
+        treeview_frame = tk.Frame(self.select_program_window)
         treeview_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
         # Treeview for displaying programs
@@ -1175,7 +1216,7 @@ class ScriptManagerApp:
                     selected_programs.append(f"Process - {proc_name.strip(' ✔')}")
             entry_widget.delete(0, tk.END)
             entry_widget.insert(0, ", ".join(selected_programs))
-            select_window.destroy()
+            self.select_program_window.destroy()
 
         def search_programs():
             search_query = search_entry.get().lower()
@@ -1194,7 +1235,7 @@ class ScriptManagerApp:
             show_all_button.config(text=toggle_button_text)
 
         # Button Frame
-        button_frame = tk.Frame(select_window)
+        button_frame = tk.Frame(self.select_program_window)
         button_frame.pack(pady=5)
 
         # Save button
@@ -1241,6 +1282,11 @@ class ScriptManagerApp:
                 treeview.item(item, values=(name, class_name, proc_name, p_type))
 
         treeview.bind('<Button-1>', toggle_checkmark)
+
+    def cleanup_select_program_window(self):
+        """Reset reference when Select Program window is closed."""
+        self.select_program_window.destroy()
+        self.select_program_window = None
 
     def sort_treeview(self, treeview, col_index):
         self.sort_order[col_index] = not self.sort_order[col_index]
@@ -2026,13 +2072,23 @@ cm1 := AHI.CreateContextManager(id1)
 
     def edit_open_device_selection(self):
         """Open a new window to select a device and update the Keyboard_entry field."""
-        device_selection_window = tk.Toplevel(self.edit_window)
-        device_selection_window.geometry("600x300+308+233")
-        device_selection_window.title("Select Device")
-        device_selection_window.iconbitmap(icon_path)
-        device_selection_window.transient(self.edit_window)
+        if self.device_selection_window and self.device_selection_window.winfo_exists():
+            self.device_selection_window.lift()
+            return
 
-        tree = ttk.Treeview(device_selection_window, columns=("Device Type", "VID", "PID", "Handle"), show="headings")
+        self.device_selection_window = tk.Toplevel(self.create_profile_window or self.edit_window)
+        self.device_selection_window.geometry("600x300+308+233")
+        self.device_selection_window.title("Select Device")
+        self.device_selection_window.iconbitmap(icon_path)
+        self.device_selection_window.resizable(False, False)
+        self.device_selection_window.transient(self.create_profile_window or self.edit_window)  # Keep on top
+        self.device_selection_window.attributes("-topmost", self.is_on_top)  # Respect Always on Top setting
+
+        # Cleanup reference when closed
+        self.device_selection_window.protocol("WM_DELETE_WINDOW", self.cleanup_device_selection_window)
+
+
+        tree = ttk.Treeview(self.device_selection_window, columns=("Device Type", "VID", "PID", "Handle"), show="headings")
         tree.heading("Device Type", text="Device Type")
         tree.heading("VID", text="VID")
         tree.heading("PID", text="PID")
@@ -2048,13 +2104,13 @@ cm1 := AHI.CreateContextManager(id1)
         self.update_treeview(devices, tree)
 
         # Button Frame
-        button_frame = tk.Frame(device_selection_window)
+        button_frame = tk.Frame(self.device_selection_window)
         button_frame.pack(pady=5)
 
         # Select button
         select_button = tk.Button(button_frame, text="Select", width=23,
                                   command=lambda: self.select_device(tree, self.keyboard_entry,
-                                                                     device_selection_window))
+                                                                     self.device_selection_window))
         select_button.grid(row=0, column=0, padx=5, pady=5)
 
         monitor_button = tk.Button(button_frame, text="Open AHI Monitor To Test Device", width=29, command=self.run_monitor)
@@ -2104,6 +2160,7 @@ cm1 := AHI.CreateContextManager(id1)
             self.edit_window.geometry("600x450+308+130")
             self.edit_window.title("Edit Profile")
             self.edit_window.iconbitmap(icon_path)
+            self.edit_window.resizable(False, False)
 
             # Bind cleanup method to window close event
             self.edit_window.protocol("WM_DELETE_WINDOW", self.edit_cleanup_listeners)
@@ -2307,14 +2364,24 @@ cm1 := AHI.CreateContextManager(id1)
             messagebox.showerror("Error", f"{script_name} does not exist.")
 
     def edit_open_select_program_window(self, entry_widget):
-        select_window = tk.Toplevel(self.root)
-        select_window.title("Select Programs")
-        select_window.geometry("600x300+308+217")  # Set initial size (width x height)
-        select_window.iconbitmap(icon_path)
-        select_window.transient(self.edit_window)
+        """Open the Select Program window, ensuring only one instance is open."""
+        if self.select_program_window and self.select_program_window.winfo_exists():
+            self.select_program_window.lift()
+            return
+
+        self.select_program_window = tk.Toplevel(self.create_profile_window or self.edit_window)
+        self.select_program_window.title("Select Programs")
+        self.select_program_window.geometry("600x300+308+217")
+        self.select_program_window.iconbitmap(icon_path)
+        self.select_program_window.resizable(False, False)
+        self.select_program_window.transient(self.create_profile_window or self.edit_window)  # Keep on top
+        self.select_program_window.attributes("-topmost", self.is_on_top)  # Respect Always on Top setting
+
+        # Cleanup reference when closed
+        self.select_program_window.protocol("WM_DELETE_WINDOW", self.cleanup_select_program_window)
 
         # Frame to hold Treeview and scrollbar
-        treeview_frame = tk.Frame(select_window)
+        treeview_frame = tk.Frame(self.select_program_window)
         treeview_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
         # Treeview for displaying programs
@@ -2370,7 +2437,7 @@ cm1 := AHI.CreateContextManager(id1)
                     selected_programs.append(f"Process - {proc_name.strip(' ✔')}")
             entry_widget.delete(0, tk.END)
             entry_widget.insert(0, ", ".join(selected_programs))
-            select_window.destroy()
+            self.select_program_window.destroy()
 
         def search_programs():
             search_query = search_entry.get().lower()
@@ -2389,7 +2456,7 @@ cm1 := AHI.CreateContextManager(id1)
             show_all_button.config(text=toggle_button_text)
 
         # Button Frame
-        button_frame = tk.Frame(select_window)
+        button_frame = tk.Frame(self.select_program_window)
         button_frame.pack(pady=5)
 
         # Save button

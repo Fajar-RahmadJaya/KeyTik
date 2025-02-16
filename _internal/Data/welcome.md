@@ -1,5 +1,5 @@
 Thank you for downloading KeyTik. <br> Before you start, make sure you have AutoHotkey installed, optionally Interception Driver if you want to use assign profile on specific device feature. You can check installation guide at [KeyTik Website Installation Guide](https://keytik.com/getting-started/installation/). You could always open this again at the setting. <br>
-Check out our website at [keytik.com](https://keytik.com) for more information about KeyTik.
+**If you find any problem or confusion, feel free to visit our website at [keytik.com](https://keytik.com). We monetize KeyTik from that website using Ads, so support us with visiting it!**
 
 **Key Format**:
 <br>

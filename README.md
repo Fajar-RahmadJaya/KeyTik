@@ -2,7 +2,7 @@
   <img src=".github/Picture/KeyTik Icon.png" alt="KeyTik Icon" width="150">
   <br><br>
 
-[![GitHub Downloads](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=github&label=Total%20Downloads&color=white)](https://tooomm.github.io/github-release-stats/?username=Fajar-RahmadJaya&repository=KeyTik)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=Github&logoColor=white&label=Total%20Downloads&color=white&link=https%3A%2F%2Ftooomm.github.io%2Fgithub-release-stats%2F%3Fusername%3DFajar-RahmadJaya%26repository%3DKeyTik)
 [![SourceForge Downloads](https://img.shields.io/sourceforge/dt/KeyTik?style=plastic&logo=sourceforge&label=Total%20Downloads&color=orange)](https://sourceforge.net/projects/keytik/files/stats/timeline)
 
 

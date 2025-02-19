@@ -1,0 +1,18 @@
+1. pynput
+2. winshell
+3. pywin32 (for win32com.client and win32gui, win32process)
+4. pillow (for PIL)
+5. keyboard
+6. psutil
+7. markdown
+8. tkhtmlview
+9. requests
+10. os (Python Standard Library)
+11. shutil (Python Standard Library)
+12. tkinter (Python Standard Library)
+13. sys (Python Standard Library)
+14. time (Python Standard Library)
+15. webbrowser (Python Standard Library)
+16. json (Python Standard Library)
+17. tkinter.simpledialog (Python Standard Library)
+

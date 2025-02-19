@@ -1,7 +1,7 @@
 ; text
 ^!p::ExitApp
 
-#SingleInstance Force
+#SingleInstance force
 Alt & Left::
 {
     Run("C:\\path\\to\\your\\file1.txt") ; Made sure to change this with your file path

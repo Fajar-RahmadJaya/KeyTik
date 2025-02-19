@@ -4,7 +4,7 @@ PID: 0x0000
 Handle: ACPI\VEN_HPQ&DEV_8001
 Is Mouse: No
 
-Device ID: 5
+Device ID: 7
 VID: 0x1BCF
 PID: 0x08A0
 Handle: HID\VID_1BCF&PID_08A0&REV_0104&Col02
@@ -16,7 +16,7 @@ PID: 0x0000
 Handle: HID\VEN_SYNA&DEV_3296&Col01
 Is Mouse: Yes
 
-Device ID: 15
+Device ID: 17
 VID: 0x1BCF
 PID: 0x08A0
 Handle: HID\VID_1BCF&PID_08A0&REV_0104&Col01

@@ -177,89 +177,114 @@ class ScriptManagerApp:
             self.show_welcome_window()
 
     def show_welcome_window(self):
-        """Display the welcome window with the content of welcome.md."""
+        """Display the welcome window with multiple markdown files in order."""
         try:
 
-            with open(welcome_path, "r") as f:
-                md_content = f.read()
+            md_files = [f for f in os.listdir(data_dir) if f.endswith(".md") and f[:-3].isdigit()]
+            md_files.sort(key=lambda x: int(x[:-3]))  
 
-                html_content = markdown(md_content)
+            if not md_files:
+                md_files = ["welcome.md"]  
 
-                html_content = html_content.replace(
-                    "<p>", "<p style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px;'>"
-                ).replace(
-                    "<h1>", "<h1 style='font-family: Open Sans; font-size: 18px; font-weight: 600; margin: 10px;'>"
-                ).replace(
-                    "<h2>", "<h2 style='font-family: Open Sans; font-size: 11px; font-weight: 500; margin: 10px;'>"
-                )
-        except FileNotFoundError:
-            html_content = """
-            <p style='font-family: Open Sans; font-size: 10px; font-weight: 300;'>Welcome file not found!</p>
-            """
+            self.current_welcome_index = 0
+            self.welcome_files = [os.path.join(data_dir, f) for f in md_files]
 
-        welcome_window = tk.Toplevel(self.root)
-        welcome_window.title("Readme!")
-        welcome_window.geometry("525x290+350+220")
-        welcome_window.resizable(False, False)
-        welcome_window.iconbitmap(icon_path)
-        welcome_window.transient(self.root)
-        welcome_window.resizable(False, False)
+            def load_content(index):
+                """Load and display markdown content with styling, keeping lists formatted like paragraphs."""
+                try:
+                    with open(self.welcome_files[index], "r", encoding="utf-8") as f:
+                        md_content = f.read()
+                        html_content = markdown(md_content)
 
-        html_frame = tk.Frame(
-            welcome_window, width=500, height=230, relief=tk.RIDGE, borderwidth=2
-        )
-        html_frame.pack(pady=10)
-        html_frame.pack_propagate(False)  
+                        html_content = html_content.replace(
+                            "<p>", "<p style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px;'>"
+                        ).replace(
+                            "<h1>",
+                            "<h1 style='font-family: Open Sans; font-size: 18px; font-weight: 600; margin: 10px;'>"
+                        ).replace(
+                            "<h2>",
+                            "<h2 style='font-family: Open Sans; font-size: 11px; font-weight: 500; margin: 10px;'>"
+                        ).replace(
+                            "<ul>",
+                            "<ul style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px;'>"
+                        ).replace(
+                            "<ol>",
+                            "<ol style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px;'>"
+                        ).replace(
+                            "<li>",
+                            "<li style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px;'>"
+                        )
 
-        html_label = HTMLLabel(
-            html_frame,
-            html=html_content,
-            background="white",
-            padx=11,
-            pady=11,
-            relief=tk.FLAT,
-        )
-        html_label.pack(fill=tk.BOTH, expand=True)
-
-        button_frame = tk.Frame(welcome_window)
-        button_frame.pack(pady=0)
-
-        def on_next():
-            try:
-
-                with open(changelog_path, "r") as f:
-                    md_content = f.read()
-                    html_content = markdown(md_content)
-                    html_content = html_content.replace(
-                        "<p>", "<p style='font-family: Open Sans; font-size: 10px; font-weight: 300; margin: 10px;'>"
-                    ).replace(
-                        "<h1>", "<h1 style='font-family: Open Sans; font-size: 18px; font-weight: 600; margin: 10px;'>"
-                    ).replace(
-                        "<h2>", "<h2 style='font-family: Open Sans; font-size: 12px; font-weight: 500; margin: 10px;'>"
+                        html_label.set_html(html_content)
+                except FileNotFoundError:
+                    html_label.set_html(
+                        "<p style='font-family: Open Sans; font-size: 10px; font-weight: 300;'>File not found!</p>"
                     )
 
-                    html_label.set_html(html_content)
+            welcome_window = tk.Toplevel(self.root)
+            welcome_window.title("Readme!")
+            welcome_window.geometry("525x290+350+220")
+            welcome_window.resizable(False, False)
+            welcome_window.iconbitmap(icon_path)
+            welcome_window.transient(self.root)
 
-                next_button.grid_forget()  
-                dont_show_button.grid(row=0, column=0, padx=50, pady=3)  
-                close_button.grid(row=0, column=1, padx=50, pady=3)  
-            except FileNotFoundError:
-                html_label.set_html(
-                    "<p style='font-family: Open Sans; font-size: 10px; font-weight: 300;'>Changelog file not found!</p>")
+            html_frame = tk.Frame(welcome_window, width=500, height=230, relief=tk.RIDGE, borderwidth=2)
+            html_frame.pack(pady=10)
+            html_frame.pack_propagate(False)
 
-        def on_dont_show_again():
-            self.welcome_condition = False
-            self.save_welcome_condition()
-            welcome_window.destroy()
+            html_label = HTMLLabel(
+                html_frame,
+                html="",
+                background="white",
+                padx=11,
+                pady=11,
+                relief=tk.FLAT,
+            )
+            html_label.pack(fill=tk.BOTH, expand=True)
 
-        def on_close():
-            welcome_window.destroy()
+            load_content(self.current_welcome_index)
 
-        next_button = tk.Button(button_frame, text="Next", command=on_next, width=20)
-        next_button.grid(row=0, column=0, padx=50, pady=3)
+            def next_page():
+                if self.current_welcome_index < len(self.welcome_files) - 1:
+                    self.current_welcome_index += 1
+                    load_content(self.current_welcome_index)
+                    update_buttons()
 
-        dont_show_button = tk.Button(button_frame, text="Don't Show Again", command=on_dont_show_again, width=20)
-        close_button = tk.Button(button_frame, text="Close", command=on_close, width=20)
+            def prev_page():
+                if self.current_welcome_index > 0:
+                    self.current_welcome_index -= 1
+                    load_content(self.current_welcome_index)
+                    update_buttons()
+
+            def update_buttons():
+                """Enable or disable buttons based on the current page index."""
+                prev_button.config(state=tk.NORMAL if self.current_welcome_index > 0 else tk.DISABLED)
+                next_button.config(
+                    state=tk.NORMAL if self.current_welcome_index < len(self.welcome_files) - 1 else tk.DISABLED)
+
+            def toggle_dont_show():
+                """Update the condition based on the checkbox state."""
+                self.welcome_condition = not dont_show_var.get()
+                self.save_welcome_condition()
+
+            button_frame = tk.Frame(welcome_window)
+            button_frame.pack(pady=0)
+
+            dont_show_var = tk.BooleanVar(value=not self.welcome_condition)
+            dont_show_checkbox = tk.Checkbutton(button_frame, text="Don't show again", variable=dont_show_var,
+                                                command=toggle_dont_show)
+            dont_show_checkbox.grid(row=0, column=2, pady=2)
+
+            prev_button = tk.Button(button_frame, text="Previous", command=prev_page, width=15)
+            next_button = tk.Button(button_frame, text="Next", command=next_page, width=15)
+
+            prev_button.grid(row=0, column=0, padx=37, pady=2)
+            next_button.grid(row=0, column=1, padx=37, pady=2)
+
+            update_buttons()  
+
+        except Exception as e:
+            print(f"Error displaying welcome window: {e}")
 
     def create_ui(self):
         """Create the main UI components."""

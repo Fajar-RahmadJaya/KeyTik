@@ -21,17 +21,13 @@ import requests
 import json
 
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-
 data_dir = os.path.join(script_dir, '_internal', 'Data')
+appdata_dir = os.path.join(os.getenv('APPDATA'), 'KeyTik')
 
 current_version = "v1.7.0"
 
-if getattr(sys, 'frozen', False):
-    condition_path = os.path.join(sys._MEIPASS, "Data", "condition.json")
-    dont_show_path = os.path.join(sys._MEIPASS, "Data", "dont_show.json")
-else:
-    condition_path = os.path.join(data_dir, "condition.json")
-    dont_show_path = os.path.join(data_dir, "dont_show.json")
+condition_path = os.path.join(appdata_dir, "path.json")
+dont_show_path = os.path.join(data_dir, "dont_show.json")
 
 def load_condition():
     try:
@@ -68,33 +64,20 @@ if not os.path.exists(store_dir):
 
 SCRIPT_DIR = active_dir
 
-PINNED_FILE = os.path.join(data_dir, "pinned_profiles.json")
-
-if getattr(sys, 'frozen', False):
-    icon_path = os.path.join(sys._MEIPASS,  "Data", "icon.ico")
-    pin_path = os.path.join(sys._MEIPASS, "Data", "que.ico")
-    icon_unpinned_path = os.path.join(sys._MEIPASS, "Data", "icon_a.png")
-    icon_pinned_path = os.path.join(sys._MEIPASS, "Data", "icon_b.png")
-    device_list_path = os.path.join(sys._MEIPASS, "Data", "Active", "AutoHotkey Interception", "shared_device_info.txt")
-    device_finder_path = os.path.join(sys._MEIPASS, 'Data', 'Active', "AutoHotkey Interception", "find_device.ahk")
-    keylist_path = os.path.join(sys._MEIPASS, "Data", "key_list.txt")
-    welcome_path = os.path.join(sys._MEIPASS, "Data", "welcome.md")
-    changelog_path = os.path.join(sys._MEIPASS, "Data", "changelog.md")
-else:
-    icon_path = os.path.join(data_dir, "icon.ico")
-    pin_path = os.path.join(data_dir, "pin.json")
-    icon_unpinned_path = os.path.join(data_dir, "icon_a.png")
-    icon_pinned_path = os.path.join(data_dir, "icon_b.png")
-    device_list_path = os.path.join(active_dir, "Autohotkey Interception", "shared_device_info.txt")
-    device_finder_path = os.path.join(active_dir, "Autohotkey Interception", "find_device.ahk")
-    keylist_path = os.path.join(data_dir, "key_list.txt")
-    welcome_path = os.path.join(data_dir, "welcome.md")
-    changelog_path = os.path.join(data_dir, "changelog.md")
+pinned_file = os.path.join(appdata_dir, "pinned_profiles.json")
+icon_path = os.path.join(data_dir, "icon.ico")
+icon_unpinned_path = os.path.join(data_dir, "icon_a.png")
+icon_pinned_path = os.path.join(data_dir, "icon_b.png")
+device_list_path = os.path.join(active_dir, "Autohotkey Interception", "shared_device_info.txt")
+device_finder_path = os.path.join(active_dir, "Autohotkey Interception", "find_device.ahk")
+keylist_path = os.path.join(data_dir, "key_list.txt")
+welcome_path = os.path.join(data_dir, "welcome.md")
+changelog_path = os.path.join(data_dir, "changelog.md")
 
 def load_pinned_profiles():
     try:
-        if os.path.exists(PINNED_FILE):
-            with open(PINNED_FILE, "r") as f:
+        if os.path.exists(pinned_file):
+            with open(pinned_file, "r") as f:
                 content = f.read().strip()  
                 if content:  
                     data = json.loads(content)  
@@ -109,8 +92,24 @@ def load_pinned_profiles():
     return []  
 
 def save_pinned_profiles(pinned_profiles):
-    with open(PINNED_FILE, "w") as f:
+    with open(pinned_file, "w") as f:
         json.dump(pinned_profiles, f)
+
+if not os.path.exists(appdata_dir):
+    os.makedirs(appdata_dir)
+
+if not os.path.exists(condition_path):
+    with open(condition_path, "w") as f:
+        json.dump({"path": ""}, f)
+
+if not os.path.exists(pinned_file):
+    with open(pinned_file, "w") as f:
+        json.dump([
+            "Multiple Files Opener.ahk",
+            "Take Coordinate And Copy It For Screen Clicker.ahk",
+            "Screen Clicker.ahk",
+            "Auto Clicker.ahk"
+        ], f)
 
 class ScriptManagerApp:
     def __init__(self, root):

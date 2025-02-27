@@ -152,7 +152,6 @@ class ScriptManagerApp:
         self.check_welcome()
 
     def load_welcome_condition(self):
-        """Load welcomeCondition from the condition.json file."""
         try:
             if os.path.exists(dont_show_path):
                 with open(dont_show_path, "r") as f:
@@ -163,7 +162,6 @@ class ScriptManagerApp:
         return True  
 
     def save_welcome_condition(self):
-        """Save welcomeCondition to the condition.json file."""
         try:
             with open(dont_show_path, "w") as f:
                 json.dump({"welcome_condition": self.welcome_condition}, f)
@@ -171,12 +169,10 @@ class ScriptManagerApp:
             print(f"Error saving condition file: {e}")
 
     def check_welcome(self):
-        """Check if the welcome window should be shown on startup."""
         if self.welcome_condition:
             self.show_welcome_window()
 
     def show_welcome_window(self):
-        """Display the welcome window with multiple markdown files in order."""
         try:
 
             md_files = [f for f in os.listdir(data_dir) if f.endswith(".md") and f[:-3].isdigit()]
@@ -189,7 +185,6 @@ class ScriptManagerApp:
             self.welcome_files = [os.path.join(data_dir, f) for f in md_files]
 
             def load_content(index):
-                """Load and display markdown content with styling, keeping lists formatted like paragraphs."""
                 try:
                     with open(self.welcome_files[index], "r", encoding="utf-8") as f:
                         md_content = f.read()
@@ -256,13 +251,11 @@ class ScriptManagerApp:
                     update_buttons()
 
             def update_buttons():
-                """Enable or disable buttons based on the current page index."""
                 prev_button.config(state=tk.NORMAL if self.current_welcome_index > 0 else tk.DISABLED)
                 next_button.config(
                     state=tk.NORMAL if self.current_welcome_index < len(self.welcome_files) - 1 else tk.DISABLED)
 
             def toggle_dont_show():
-                """Update the condition based on the checkbox state."""
                 self.welcome_condition = not dont_show_var.get()
                 self.save_welcome_condition()
 
@@ -286,7 +279,6 @@ class ScriptManagerApp:
             print(f"Error displaying welcome window: {e}")
 
     def create_ui(self):
-        """Create the main UI components."""
         self.frame = tk.Frame(self.root)
         self.frame.pack(fill=tk.BOTH, expand=True)  
 
@@ -297,7 +289,6 @@ class ScriptManagerApp:
         self.create_action_buttons()
 
     def create_navigation_buttons(self):
-        """Create navigation buttons for paging through scripts."""
         nav_frame = tk.Frame(self.frame)
         nav_frame.pack(side=tk.TOP, fill=tk.X)  
 
@@ -308,7 +299,6 @@ class ScriptManagerApp:
         self.next_button.pack(side=tk.RIGHT, padx=30)
 
     def create_action_buttons(self):
-        """Create the action buttons for creating new profiles."""
 
         action_container = tk.Frame(self.frame)
         action_container.pack(pady=5, side=tk.BOTTOM)  
@@ -332,7 +322,6 @@ class ScriptManagerApp:
         action_container.grid_columnconfigure(1, weight=1)
 
     def open_settings_window(self):
-        """Open a settings window with a frame containing 5 buttons arranged in a grid."""
 
         settings_window = tk.Toplevel(self.root)
         settings_window.title("Settings")
@@ -369,7 +358,6 @@ class ScriptManagerApp:
         frame.grid_columnconfigure(1, weight=1)
 
     def check_for_update(self):
-        """Check for updates by comparing the current version with the latest release on GitHub."""
         try:
 
             response = requests.get("https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest")
@@ -439,7 +427,6 @@ class ScriptManagerApp:
             messagebox.showerror("Error", f"An error occurred: {e}")
 
     def toggle_on_top(self):
-        """Toggle the always-on-top feature for the main window and ensure child windows stay on top."""
         self.is_on_top = not self.is_on_top
         try:
             self.root.attributes("-topmost", self.is_on_top)
@@ -447,7 +434,6 @@ class ScriptManagerApp:
             print("Error: Unable to set always-on-top for root window.")
 
         def set_window_on_top(window, title, parent=None):
-            """Helper function to set a window on top of the specified parent and reapply the icon."""
             if window is not None and window.winfo_exists():
                 try:
                     if parent:
@@ -477,7 +463,6 @@ class ScriptManagerApp:
             print("Error: Unable to update main window title or button text.")
 
     def list_scripts(self):
-        """List all .ahk and .py files in the active directory and return the script list."""
 
         all_scripts = [f for f in os.listdir(self.SCRIPT_DIR) if f.endswith('.ahk') or f.endswith('.py')]
 
@@ -488,7 +473,6 @@ class ScriptManagerApp:
         return self.scripts  
 
     def update_script_list(self):
-        """Update the script list based on the current page."""
 
         for widget in self.script_frame.winfo_children():
             widget.destroy()
@@ -556,7 +540,6 @@ class ScriptManagerApp:
         self.first_load = False
 
     def copy_script(self, script):
-        """Prompts the user for a new name and copies the script to the active directory."""
 
         self.root.iconbitmap(icon_path)  
 
@@ -583,7 +566,6 @@ class ScriptManagerApp:
             print(f"Error copying script: {e}")
 
     def toggle_run_exit(self, script_name, button):
-        """Toggle between running and exiting the script."""
         if button["text"] == "Run":
 
             self.activate_script(script_name, button)
@@ -596,7 +578,6 @@ class ScriptManagerApp:
             button.config(text="Run", command=lambda: self.toggle_run_exit(script_name, button))
 
     def activate_script(self, script_name, button):
-        """Activate the given .ahk script."""
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
 
         if os.path.isfile(script_path):
@@ -608,7 +589,6 @@ class ScriptManagerApp:
             messagebox.showerror("Error", f"{script_name} does not exist.")
 
     def exit_script(self, script_name, button):
-        """Exit the given .ahk script."""
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
 
         if os.path.isfile(script_path):
@@ -627,7 +607,6 @@ class ScriptManagerApp:
             messagebox.showerror("Error", f"{script_name} does not exist.")
 
     def toggle_pin(self, script, icon_label):
-        """Toggle the pin state for a script and update the icon."""
         if script in self.pinned_profiles:
 
             self.pinned_profiles.remove(script)
@@ -703,19 +682,16 @@ class ScriptManagerApp:
         self.update_script_list()  
 
     def prev_page(self):
-        """Go to the previous page of scripts."""
         if self.current_page > 0:
             self.current_page -= 1
             self.update_script_list()
 
     def next_page(self):
-        """Go to the next page of scripts."""
         if (self.current_page + 1) * 6 < len(self.scripts):
             self.current_page += 1
             self.update_script_list()
 
     def add_ahk_to_startup(self, script_name):
-        """Create a shortcut to the AHK script in the startup folder."""
 
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
 
@@ -738,7 +714,6 @@ class ScriptManagerApp:
         return shortcut_path
 
     def remove_ahk_from_startup(self, script_name):
-        """Remove the shortcut to the AHK script from the startup folder."""
 
         shortcut_name = os.path.splitext(script_name)[0]  
 
@@ -760,7 +735,6 @@ class ScriptManagerApp:
             print(f"Error removing {shortcut_path}: {e}")
 
     def toggle_script_dir(self):
-        """Toggle between active_dir and store_dir, update the button text, and refresh the script list."""
 
         if self.SCRIPT_DIR == active_dir:
             self.SCRIPT_DIR = store_dir
@@ -773,7 +747,6 @@ class ScriptManagerApp:
         self.update_script_list()
 
     def delete_script(self, script_name):
-        """Delete the given .ahk script file."""
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
 
         if os.path.isfile(script_path):
@@ -788,7 +761,6 @@ class ScriptManagerApp:
             messagebox.showerror("Error", f"{script_name} does not exist.")
 
     def store_script(self, script_name):
-        """Move the given .ahk script file between Active and Store directories."""
         script_path = os.path.join(self.SCRIPT_DIR, script_name)  
 
         if self.SCRIPT_DIR == active_dir:
@@ -880,7 +852,6 @@ class ScriptManagerApp:
             window.destroy()
 
     def open_device_selection(self):
-        """Open the Select Device window, ensuring only one instance is open."""
         if self.device_selection_window and self.device_selection_window.winfo_exists():
             self.device_selection_window.lift()
             return
@@ -926,12 +897,10 @@ class ScriptManagerApp:
         refresh_button.grid(row=0, column=1, padx=5, pady=5)
 
     def cleanup_device_selection_window(self):
-        """Reset reference when Select Device window is closed."""
         self.device_selection_window.destroy()
         self.device_selection_window = None
 
     def create_new_profile(self):
-        """Create a new AutoHotkey script based on user input."""
         self.create_profile_window = tk.Toplevel(self.root)
         self.create_profile_window.geometry("600x450+308+130")  
         self.create_profile_window.title("Create New Profile")
@@ -1002,7 +971,6 @@ class ScriptManagerApp:
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def show_tooltip(self, event, tooltip_text):
-        """Show a tooltip near the cursor."""
         self.tooltip = tk.Toplevel()
         self.tooltip.wm_overrideredirect(True)  
         self.tooltip.geometry(f"+{event.x_root + 10}+{event.y_root + 10}")  
@@ -1012,7 +980,6 @@ class ScriptManagerApp:
         label.pack()
 
     def hide_tooltip(self, event):
-        """Hide the tooltip."""
         if hasattr(self, 'tooltip') and self.tooltip:
             self.tooltip.destroy()
             self.tooltip = None
@@ -1072,7 +1039,6 @@ class ScriptManagerApp:
         return processes
 
     def open_select_program_window(self, entry_widget):
-        """Open the Select Program window, ensuring only one instance is open."""
         if self.select_program_window and self.select_program_window.winfo_exists():
             self.select_program_window.lift()
             return
@@ -1199,7 +1165,6 @@ class ScriptManagerApp:
         treeview.bind('<Button-1>', toggle_checkmark)
 
     def cleanup_select_program_window(self):
-        """Reset reference when Select Program window is closed."""
         self.select_program_window.destroy()
         self.select_program_window = None
 
@@ -1228,7 +1193,6 @@ class ScriptManagerApp:
                 treeview.heading(col, text=header_text)
 
     def cleanup_listeners(self):
-        """Stop all listeners and close the create profile window."""
         if self.is_listening:
 
             if self.hook_registered:
@@ -1255,7 +1219,6 @@ class ScriptManagerApp:
             print(f"Error: The script at {script_path} does not exist.")
 
     def _on_mousewheel(self, event):
-        """Scroll the canvas with the mouse wheel, but stop scrolling at the top/bottom."""
 
         can_scroll_down = self.canvas.yview()[1] < 1  
         can_scroll_up = self.canvas.yview()[0] > 0  
@@ -1268,7 +1231,6 @@ class ScriptManagerApp:
                 self.canvas.yview_scroll(-1, "units")
 
     def toggle_mode(self):
-        """Toggle between Remap Mode and Text Mode."""
         if not self.is_text_mode:
 
             self.is_text_mode = True
@@ -1309,7 +1271,6 @@ class ScriptManagerApp:
             self.continue_button.config(state='normal')
 
     def update_text_block_height(self, event=None):
-        """Adjust the height of the text block based on the number of lines."""
         if hasattr(self, 'text_block'):
 
             line_count = int(self.text_block.index('end-1c').split('.')[0])
@@ -1323,8 +1284,6 @@ class ScriptManagerApp:
             self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def add_shortcut_mapping_row(self):
-        """Add a new row for shortcut mapping input."""
-        """Add a new row for shortcut mapping input."""
 
         if self.is_text_mode and (not hasattr(self, 'text_block') or not self.text_block.winfo_exists()):
 
@@ -1376,7 +1335,6 @@ class ScriptManagerApp:
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def load_key_values(self):
-        """Load key values from key_list.txt, only taking the first part before the comma."""
         key_values = []
         try:
             with open(keylist_path, 'r') as file:
@@ -1392,8 +1350,6 @@ class ScriptManagerApp:
         return key_values
 
     def add_key_mapping_row(self):
-        """Add a new row with buttons and entry fields for key mapping."""
-
         select_default_key_label = tk.Label(self.key_frame, text="Default Key:")
         select_default_key_label.grid(row=self.row_num, rowspan=2, column=0, padx=10, pady=6)
 
@@ -1436,6 +1392,35 @@ class ScriptManagerApp:
 
         self.row_num += 1
 
+        format_label = tk.Label(self.key_frame, text="Remap Format:")
+        format_label.grid(row=self.row_num, column=0, columnspan=2, padx=10, pady=6, sticky="w")
+
+        text_format_checkbox = tk.Checkbutton(self.key_frame, text="Text Format")
+        text_format_checkbox.grid(row=self.row_num, column=1, columnspan=3, padx=30, pady=6, sticky="w")
+
+        hold_format_checkbox = tk.Checkbutton(self.key_frame, text="Hold Format")
+        hold_format_checkbox.grid(row=self.row_num, column=1, columnspan=3, padx=140, pady=6, sticky="w")
+
+        def on_focus_in(event):
+            if event.widget.get() == "Hold Interval":
+                event.widget.delete(0, "end")
+                event.widget.config(fg="black")  
+
+        def on_focus_out(event):
+            if event.widget.get() == "":
+                event.widget.insert(0, "Hold Interval")
+                event.widget.config(fg="light gray")  
+
+        hold_interval_entry = tk.Entry(self.key_frame, width=17, justify='center', fg="light gray")
+        hold_interval_entry.insert(0, "Hold Interval")
+
+        hold_interval_entry.bind("<FocusIn>", on_focus_in)
+        hold_interval_entry.bind("<FocusOut>", on_focus_out)
+
+        hold_interval_entry.grid(row=self.row_num, column=2, columnspan=3, padx=75, pady=6, sticky="w")
+
+        self.row_num += 1
+
         separator = tk.Frame(self.key_frame, height=1, bg="gray")
         separator.grid(row=self.row_num, column=0, columnspan=4, sticky="we", padx=0, pady=3)
 
@@ -1445,8 +1430,6 @@ class ScriptManagerApp:
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def toggle_shortcut_key_listening(self, entry_widget, button):
-        """Toggle the shortcut key and mouse listener on and off."""
-
         def toggle_other_buttons(state):
 
             for key_row in self.key_rows:
@@ -1515,8 +1498,6 @@ class ScriptManagerApp:
             print("Shortcut key and mouse listening stopped.")
 
     def disable_entry_input(self, key_rows):
-        """Disable user input for all entries without changing the background color."""
-
         if self.script_name_entry and self.script_name_entry.winfo_exists():
             self.script_name_entry.bind("<Key>", lambda e: "break")  
 
@@ -1533,8 +1514,6 @@ class ScriptManagerApp:
                     entry.bind("<Key>", lambda e: "break")  
 
     def enable_entry_input(self, key_rows):
-        """Re-enable user input for all entries."""
-
         if self.script_name_entry and self.script_name_entry.winfo_exists():
             self.script_name_entry.unbind("<Key>")  
 
@@ -1550,14 +1529,12 @@ class ScriptManagerApp:
                     entry.unbind("<Key>")  
 
     def on_key_event(self, event):
-        """Handle key press and insert key into the active entry."""
         if self.is_listening and self.active_entry and event.event_type == 'down':
             key_pressed = event.name
             self.active_entry.delete(0, tk.END)  
             self.active_entry.insert(0, key_pressed)  
 
     def on_mouse_event(self, x, y, button, pressed):
-        """Handle mouse click events and insert the mouse button pressed into the active entry."""
         if self.is_listening and self.active_entry:
 
             if self.ignore_next_click and button == mouse.Button.left and pressed:
@@ -1576,7 +1553,6 @@ class ScriptManagerApp:
                 self.active_entry.insert(0, mouse_button)  
 
     def handle_shortcut_key_event(self, event):
-        """Handle the key event from the listener."""
         if self.is_listening and self.active_entry is not None:
 
             self.active_entry.config(state='normal')  
@@ -1586,7 +1562,6 @@ class ScriptManagerApp:
             self.active_entry.config(state='normal')  
 
     def on_shortcut_key_event(self, event):
-        """Handle keyboard shortcut key press and insert into the active entry."""
         if self.is_listening and self.active_entry:
             current_time = time.time()
             key = event.name
@@ -1603,7 +1578,6 @@ class ScriptManagerApp:
                 self.last_key_time = current_time
 
     def on_shortcut_mouse_event(self, x, y, button, pressed):
-        """Handle mouse click event as part of the shortcut sequence."""
         if self.is_listening and self.active_entry and pressed:  
 
             if self.ignore_next_click and button == mouse.Button.left:
@@ -1631,14 +1605,12 @@ class ScriptManagerApp:
             self.last_key_time = current_time
 
     def update_entry(self):
-        """Update the entry field with the current combination of keys and mouse buttons."""
         shortcut_combination = '+'.join(self.pressed_keys)  
         self.active_entry.config(state='normal')  
         self.active_entry.delete(0, tk.END)  
         self.active_entry.insert(0, shortcut_combination)  
 
     def load_key_translations(self):
-        """Load key translations from the key_list.txt file."""
         key_translations = {}
         try:
 
@@ -1652,7 +1624,6 @@ class ScriptManagerApp:
         return key_translations
 
     def translate_key(self, key, key_translations):
-        """Translate the key using the key translation dictionary, handling multiple keys."""
         keys = key.split('+')  
         translated_keys = []
 
@@ -1663,7 +1634,6 @@ class ScriptManagerApp:
         return " & ".join(translated_keys)
 
     def finish_profile(self):
-        """Create the .ahk script file based on user input."""
         script_name = self.get_script_name()
         if not script_name:
             return  
@@ -1699,7 +1669,6 @@ class ScriptManagerApp:
             print(f"Error writing script: {e}")
 
     def get_program_condition(self):
-        """Generate the program condition for the #HotIf line."""
         program_entry = self.program_entry.get().strip()
         program_condition = ""
 
@@ -1721,7 +1690,6 @@ class ScriptManagerApp:
         return program_condition
 
     def get_device_condition(self):
-        """Generate the device condition for the #HotIf line."""
         device_condition = ""
         device_name = self.keyboard_entry.get().strip()  
         if device_name:
@@ -1729,7 +1697,6 @@ class ScriptManagerApp:
         return device_condition
 
     def handle_text_mode(self, file, key_translations, program_condition, shortcuts_present, device_condition):
-        """Handle the text mode logic."""
         if not shortcuts_present:
 
             if program_condition:
@@ -1760,7 +1727,6 @@ class ScriptManagerApp:
             file.write("#HotIf\n")
 
     def handle_default_mode(self, file, key_translations, program_condition, shortcuts_present, device_condition):
-        """Handle the default mode logic (key remapping)."""
         if not shortcuts_present:
 
             if program_condition:
@@ -1786,7 +1752,6 @@ class ScriptManagerApp:
             file.write("#HotIf\n")
 
     def process_shortcuts(self, file, key_translations):
-        """Process and write the shortcut toggle functionality."""
         for shortcut_row in self.shortcut_rows:
             if self.is_widget_valid(shortcut_row):
                 try:
@@ -1802,7 +1767,6 @@ class ScriptManagerApp:
                     continue
 
     def get_script_name(self):
-        """Process the script name and ensure it has the correct file extension."""
         script_name = self.script_name_entry.get().strip()
         if not script_name:
             messagebox.showwarning("Input Error", "Please enter a Profile name.")
@@ -1814,7 +1778,6 @@ class ScriptManagerApp:
         return script_name
 
     def write_first_line(self, file):
-        """Write the first line based on the mode (Text or Default)."""
         if self.is_text_mode:
             file.write("; text\n")
         else:
@@ -1822,7 +1785,6 @@ class ScriptManagerApp:
         file.write("^!p::ExitApp \n\n#SingleInstance Force\n")
 
     def handle_device(self, file):
-        """Handle the device type (mouse or keyboard) and its identifier."""
         keyboard_entry = self.keyboard_entry.get().strip()
         if keyboard_entry:
             parts = keyboard_entry.split(",", 1)
@@ -1843,7 +1805,6 @@ class ScriptManagerApp:
                 file.write(self.generate_device_code_from_handle(is_mouse, vid_pid_or_handle))
 
     def generate_device_code(self, is_mouse, vid, pid):
-        """Generate the device code for vid/pid format."""
         return f"""#SingleInstance force
 Persistent
 
@@ -1854,7 +1815,6 @@ cm1 := AHI.CreateContextManager(id1)
 """
 
     def generate_device_code_from_handle(self, is_mouse, handle):
-        """Generate the device code for handle format."""
         return f"""#SingleInstance force
 Persistent
 
@@ -1865,7 +1825,6 @@ cm1 := AHI.CreateContextManager(id1)
 """
 
     def process_key_remaps(self, file, key_translations):
-        """Process and write the key remaps."""
         for row in self.key_rows:
             if len(row) == 4:
                 original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
@@ -1898,7 +1857,6 @@ cm1 := AHI.CreateContextManager(id1)
             return False
 
     def update_edit_text_block_height(self, event=None):
-        """Adjust the height of the text block based on the number of lines."""
         if hasattr(self, 'text_block'):
 
             line_count = int(self.text_block.index('end-1c').split('.')[0])
@@ -1912,7 +1870,6 @@ cm1 := AHI.CreateContextManager(id1)
             self.edit_canvas.config(scrollregion=self.edit_canvas.bbox("all"))
 
     def edit_open_device_selection(self):
-        """Open a new window to select a device and update the Keyboard_entry field."""
         if self.device_selection_window and self.device_selection_window.winfo_exists():
             self.device_selection_window.lift()
             return
@@ -1958,11 +1915,9 @@ cm1 := AHI.CreateContextManager(id1)
         refresh_button.grid(row=0, column=1, padx=5, pady=5)
 
     def replace_raw_keys(self, key, key_map):
-        """Replace raw key with readable key from the key map."""
         return key_map.get(key, key)  
 
     def load_key_list(self):
-        """Load key list from file into a dictionary."""
         key_map = {}
         try:
             with open(keylist_path, 'r') as f:
@@ -1977,7 +1932,6 @@ cm1 := AHI.CreateContextManager(id1)
         return key_map
 
     def edit_script(self, script_name):
-        """Open the given .ahk script in an editable UI for modifying key mappings."""
         self.is_text_mode = False  
 
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
@@ -2173,7 +2127,6 @@ cm1 := AHI.CreateContextManager(id1)
             messagebox.showerror("Error", f"{script_name} does not exist.")
 
     def edit_open_select_program_window(self, entry_widget):
-        """Open the Select Program window, ensuring only one instance is open."""
         if self.select_program_window and self.select_program_window.winfo_exists():
             self.select_program_window.lift()
             return
@@ -2300,7 +2253,6 @@ cm1 := AHI.CreateContextManager(id1)
         treeview.bind('<Button-1>', toggle_checkmark)
 
     def edit_cleanup_listeners(self):
-        """Stop all listeners and close the create profile window."""
         if self.is_listening:
 
             if self.hook_registered:
@@ -2318,7 +2270,6 @@ cm1 := AHI.CreateContextManager(id1)
             self.edit_window.destroy()
 
     def extract_and_filter_content(self, lines):
-        """Extract lines based on #HotIf toggle and #HotIf cm1.IsActive."""
         toggle_lines = []  
         cm1_lines = []  
         inside_hotif_toggle = False
@@ -2370,7 +2321,6 @@ cm1 := AHI.CreateContextManager(id1)
         return result  
 
     def edit_on_mousewheel(self, event):
-        """Scroll the canvas with the mouse wheel, but stop scrolling at the top/bottom."""
 
         can_scroll_down = self.edit_canvas.yview()[1] < 1  
         can_scroll_up = self.edit_canvas.yview()[0] > 0  
@@ -2383,7 +2333,6 @@ cm1 := AHI.CreateContextManager(id1)
                 self.edit_canvas.yview_scroll(-1, "units")
 
     def add_edit_mapping_row(self, original_key='', remap_key=''):
-        """Add a new row with buttons and entry fields for key mapping."""
 
         select_default_key_label = tk.Label(self.edit_frame, text="Default Key:")
         select_default_key_label.grid(row=self.row_num, rowspan=2, column=0, padx=10, pady=6)
@@ -2423,6 +2372,35 @@ cm1 := AHI.CreateContextManager(id1)
 
         self.row_num += 1
 
+        format_label = tk.Label(self.edit_frame, text="Remap Format:")
+        format_label.grid(row=self.row_num, column=0, columnspan=2, padx=10, pady=6, sticky="w")
+
+        text_format_checkbox = tk.Checkbutton(self.edit_frame, text="Text Format")
+        text_format_checkbox.grid(row=self.row_num, column=1, columnspan=3, padx=30, pady=6, sticky="w")
+
+        hold_format_checkbox = tk.Checkbutton(self.edit_frame, text="Hold Format")
+        hold_format_checkbox.grid(row=self.row_num, column=1, columnspan=3, padx=140, pady=6, sticky="w")
+
+        def on_focus_in(event):
+            if event.widget.get() == "Hold Interval":
+                event.widget.delete(0, "end")
+                event.widget.config(fg="black")  
+
+        def on_focus_out(event):
+            if event.widget.get() == "":
+                event.widget.insert(0, "Hold Interval")
+                event.widget.config(fg="light gray")  
+
+        hold_interval_entry = tk.Entry(self.edit_frame, width=17, justify='center', fg="light gray")
+        hold_interval_entry.insert(0, "Hold Interval")
+
+        hold_interval_entry.bind("<FocusIn>", on_focus_in)
+        hold_interval_entry.bind("<FocusOut>", on_focus_out)
+
+        hold_interval_entry.grid(row=self.row_num, column=2, columnspan=3, padx=75, pady=6, sticky="w")
+
+        self.row_num += 1
+
         separator = tk.Frame(self.edit_frame, height=1, bg="gray")
         separator.grid(row=self.row_num, column=0, columnspan=4, sticky="we", padx=0, pady=3)
 
@@ -2432,7 +2410,6 @@ cm1 := AHI.CreateContextManager(id1)
         self.edit_canvas.config(scrollregion=self.edit_canvas.bbox("all"))
 
     def add_edit_shortcut_mapping_row(self, shortcut=''):
-        """Add a new row for shortcut mapping input."""
 
         if self.is_text_mode and (not hasattr(self, 'text_block') or not self.text_block.winfo_exists()):
 
@@ -2485,12 +2462,10 @@ cm1 := AHI.CreateContextManager(id1)
         self.edit_canvas.config(scrollregion=self.edit_canvas.bbox("all"))
 
     def update_scroll_region(self):
-        """Update the scroll region of the canvas to encompass all content."""
         self.edit_frame.update_idletasks()  
         self.edit_canvas.config(scrollregion=self.edit_canvas.bbox("all"))  
 
     def save_changes(self, script_name):
-        """Create the .ahk script file based on user input."""
         script_name = self.get_script_name()
         if not script_name:
             return  

@@ -19,12 +19,13 @@ from markdown import markdown
 from tkhtmlview import HTMLLabel
 import requests
 import json
+import re
 
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 data_dir = os.path.join(script_dir, '_internal', 'Data')
 appdata_dir = os.path.join(os.getenv('APPDATA'), 'KeyTik')
 
-current_version = "v1.7.0"
+current_version = "v1.8.0"
 
 condition_path = os.path.join(appdata_dir, "path.json")
 dont_show_path = os.path.join(data_dir, "dont_show.json")
@@ -561,7 +562,8 @@ class ScriptManagerApp:
             shutil.copy(source_path, destination_path)
             print(f"Script copied to {destination_path}")
 
-            self.update_script_list()
+            self.scripts = self.list_scripts()  
+            self.update_script_list()  
         except Exception as e:
             print(f"Error copying script: {e}")
 
@@ -1043,12 +1045,19 @@ class ScriptManagerApp:
             self.select_program_window.lift()
             return
 
-        self.select_program_window = tk.Toplevel(self.create_profile_window or self.edit_window)
+        if hasattr(self, 'create_profile_window') and self.create_profile_window and self.create_profile_window.winfo_exists():
+            parent_window = self.create_profile_window
+        elif hasattr(self, 'edit_window') and self.edit_window and self.edit_window.winfo_exists():
+            parent_window = self.edit_window
+        else:
+            parent_window = self.root
+
+        self.select_program_window = tk.Toplevel(parent_window)
         self.select_program_window.title("Select Programs")
         self.select_program_window.geometry("600x300+308+217")
         self.select_program_window.iconbitmap(icon_path)
         self.select_program_window.resizable(False, False)
-        self.select_program_window.transient(self.create_profile_window or self.edit_window)  
+        self.select_program_window.transient(parent_window)  
         self.select_program_window.attributes("-topmost", self.is_on_top)  
 
         self.select_program_window.protocol("WM_DELETE_WINDOW", self.cleanup_select_program_window)
@@ -1349,25 +1358,26 @@ class ScriptManagerApp:
             print(f"Error reading key_list.txt: {e}")
         return key_values
 
-    def add_key_mapping_row(self):
+    def handle_combobox_scroll(self, event):
+
+        return "break"
+
+    def add_key_mapping_row(self, original_key='', remap_key=''):  
         select_default_key_label = tk.Label(self.key_frame, text="Default Key:")
         select_default_key_label.grid(row=self.row_num, rowspan=2, column=0, padx=10, pady=6)
 
         select_remap_key_label = tk.Label(self.key_frame, text="Remap Key:")
         select_remap_key_label.grid(row=self.row_num, rowspan=2, column=2, padx=10, pady=6)
 
-        def default_key_command():
-            self.toggle_shortcut_key_listening(original_key_entry, original_key_select)
-
-        def remap_key_command():
-            self.toggle_shortcut_key_listening(remap_key_entry, remap_key_select)
+        text_format_var = tk.BooleanVar()
+        hold_format_var = tk.BooleanVar()
 
         original_key_select = tk.Button(self.key_frame, text="Select Default Key", justify='center', width=16,
-                                        command=default_key_command)
+                                     command=lambda: self.toggle_shortcut_key_listening(original_key_entry, original_key_select))
         original_key_select.grid(row=self.row_num, column=1, columnspan=2, sticky='w', padx=13, pady=5)
 
         remap_key_select = tk.Button(self.key_frame, text="Select Remap Key", width=16, justify='center',
-                                     command=remap_key_command)
+                                  command=lambda: self.toggle_shortcut_key_listening(remap_key_entry, remap_key_select))
         remap_key_select.grid(row=self.row_num, column=3, columnspan=2, sticky='w', padx=13, pady=5)
 
         if self.is_listening:
@@ -1382,23 +1392,31 @@ class ScriptManagerApp:
         original_key_entry.grid(row=self.row_num, column=1, sticky='w', padx=13, pady=6)
         self.original_key_entry = original_key_entry  
         original_key_entry['values'] = key_values  
+        if original_key:  
+            original_key_entry.set(original_key)
+
+        original_key_entry.bind('<MouseWheel>', self.handle_combobox_scroll)
 
         remap_key_entry = ttk.Combobox(self.key_frame, width=20, justify='center')
         remap_key_entry.grid(row=self.row_num, column=3, sticky='w', padx=13, pady=6)
         self.remap_key_entry = remap_key_entry  
         remap_key_entry['values'] = key_values  
+        if remap_key:  
+            remap_key_entry.set(remap_key)
 
-        self.key_rows.append((original_key_entry, remap_key_entry, original_key_select, remap_key_select))
+        remap_key_entry.bind('<MouseWheel>', self.handle_combobox_scroll)
+
+        self.key_rows.append((original_key_entry, remap_key_entry, original_key_select, remap_key_select, text_format_var, hold_format_var))
 
         self.row_num += 1
 
         format_label = tk.Label(self.key_frame, text="Remap Format:")
         format_label.grid(row=self.row_num, column=0, columnspan=2, padx=10, pady=6, sticky="w")
 
-        text_format_checkbox = tk.Checkbutton(self.key_frame, text="Text Format")
+        text_format_checkbox = tk.Checkbutton(self.key_frame, text="Text Format", variable=text_format_var)
         text_format_checkbox.grid(row=self.row_num, column=1, columnspan=3, padx=30, pady=6, sticky="w")
 
-        hold_format_checkbox = tk.Checkbutton(self.key_frame, text="Hold Format")
+        hold_format_checkbox = tk.Checkbutton(self.key_frame, text="Hold Format", variable=hold_format_var)
         hold_format_checkbox.grid(row=self.row_num, column=1, columnspan=3, padx=140, pady=6, sticky="w")
 
         def on_focus_in(event):
@@ -1419,6 +1437,8 @@ class ScriptManagerApp:
 
         hold_interval_entry.grid(row=self.row_num, column=2, columnspan=3, padx=75, pady=6, sticky="w")
 
+        self.key_rows[-1] = self.key_rows[-1] + (hold_interval_entry,)
+
         self.row_num += 1
 
         separator = tk.Frame(self.key_frame, height=1, bg="gray")
@@ -1434,7 +1454,7 @@ class ScriptManagerApp:
 
             for key_row in self.key_rows:
 
-                orig_entry, remap_entry, orig_button, remap_button = key_row
+                orig_entry, remap_entry, orig_button, remap_button, text_format_var, hold_format_var, hold_interval_entry = key_row
                 if orig_button != button and orig_button.winfo_exists():  
                     orig_button.config(state=state)
                 if remap_button != button and remap_button.winfo_exists():  
@@ -1509,7 +1529,7 @@ class ScriptManagerApp:
 
         for shortcut_entry in key_rows:
 
-            for entry in shortcut_entry:
+            for entry in shortcut_entry[:4]:  
                 if entry and entry.winfo_exists():
                     entry.bind("<Key>", lambda e: "break")  
 
@@ -1524,7 +1544,8 @@ class ScriptManagerApp:
             self.remap_key_entry.unbind("<Key>")  
 
         for shortcut_entry in key_rows:
-            for entry in shortcut_entry:
+
+            for entry in shortcut_entry[:4]:  
                 if entry and entry.winfo_exists():
                     entry.unbind("<Key>")  
 
@@ -1826,16 +1847,23 @@ cm1 := AHI.CreateContextManager(id1)
 
     def process_key_remaps(self, file, key_translations):
         for row in self.key_rows:
-            if len(row) == 4:
-                original_key_entry, remap_key_entry, original_key_select, remap_key_select = row
+            if len(row) >= 7:  
+                original_key_entry, remap_key_entry, original_key_select, remap_key_select, text_format_var, hold_format_var, hold_interval_entry = row
                 try:
                     original_key = original_key_entry.get().strip()
                     remap_key = remap_key_entry.get().strip()
 
                     if original_key and remap_key:
                         original_key = self.translate_key(original_key, key_translations)
-                        if remap_key.startswith('"') and remap_key.endswith('"'):
-                            file.write(f'{original_key}::SendText({remap_key})\n')
+                        if text_format_var.get():  
+                            file.write(f'{original_key}::SendText("{remap_key}")\n')
+                        elif hold_format_var.get():  
+
+                            hold_interval = hold_interval_entry.get().strip() if hold_interval_entry.get().strip() != "Hold Interval" else "5"
+
+                            hold_interval_ms = str(int(float(hold_interval) * 1000))
+                            remap_key = self.translate_key(remap_key, key_translations)
+                            file.write(f'*{original_key}:: Send("{{{remap_key} Down}}"), SetTimer(Send.Bind("{{{remap_key} Up}}"), -{hold_interval_ms})\n')
                         elif "+" in remap_key:
                             keys = [key.strip() for key in remap_key.split("+")]
                             key_down = "".join([f"{{{key} down}}" for key in keys])
@@ -1874,12 +1902,17 @@ cm1 := AHI.CreateContextManager(id1)
             self.device_selection_window.lift()
             return
 
-        self.device_selection_window = tk.Toplevel(self.create_profile_window or self.edit_window)
+        parent_window = self.create_profile_window if self.create_profile_window and self.create_profile_window.winfo_exists() else self.edit_window
+        if not parent_window or not parent_window.winfo_exists():
+            messagebox.showerror("Error", "Parent window no longer exists.")
+            return
+
+        self.device_selection_window = tk.Toplevel(parent_window)
         self.device_selection_window.geometry("600x300+308+233")
         self.device_selection_window.title("Select Device")
         self.device_selection_window.iconbitmap(icon_path)
         self.device_selection_window.resizable(False, False)
-        self.device_selection_window.transient(self.create_profile_window or self.edit_window)  
+        self.device_selection_window.transient(parent_window)  
         self.device_selection_window.attributes("-topmost", self.is_on_top)  
 
         self.device_selection_window.protocol("WM_DELETE_WINDOW", self.cleanup_device_selection_window)
@@ -2063,14 +2096,30 @@ cm1 := AHI.CreateContextManager(id1)
                         original_key = parts[0].strip()
                         remap_or_action = parts[1].strip() if len(parts) > 1 else ""
 
-                        original_key = self.replace_raw_keys(original_key, key_map).replace("~", "").replace(" & ", "+")
+                        original_key = self.replace_raw_keys(original_key, key_map).replace("~", "").replace(" & ", "+").replace("*", "")
 
                         if remap_or_action:  
+                            is_text_format = False
+                            is_hold_format = False
+                            remap_key = ""
+                            hold_interval = "5"  
                             if remap_or_action.startswith('SendText'):
 
                                 text = remap_or_action[len("SendText("):-1]  
-                                remap_key = f'{text}'  
+                                text = text.strip('"')  
+                                remap_key = text  
+                                is_text_format = True
+                            elif 'SetTimer' in remap_or_action:
 
+                                key_match = re.search(r'Send\("{(.*?) Down}"\)', remap_or_action)
+                                if key_match:
+                                    remap_key = key_match.group(1)  
+
+                                interval_match = re.search(r'SetTimer\(Send\.Bind\("{.*? Up}"\), -(\d+)\)', remap_or_action)
+                                if interval_match:
+                                    hold_interval = str(int(interval_match.group(1)) / 1000)  
+
+                                is_hold_format = True
                             elif remap_or_action.startswith('Send'):
 
                                 key_sequence = remap_or_action[len("Send("):-1]  
@@ -2083,12 +2132,13 @@ cm1 := AHI.CreateContextManager(id1)
                                     keys = list(set(match[0] for match in matches))  
                                     remap_key = " + ".join(keys)  
                                 else:
-                                    remap_key = remap_or_action  
+
+                                    remap_key = key_sequence.strip('{}')  
 
                             else:
                                 remap_key = remap_or_action  
 
-                            remaps.append((original_key, remap_key))
+                            remaps.append((original_key, remap_key, is_text_format, is_hold_format, hold_interval))
 
                         else:  
                             shortcuts.append(original_key)
@@ -2104,8 +2154,20 @@ cm1 := AHI.CreateContextManager(id1)
                 self.text_block.insert('1.0', text_content.strip())
                 self.update_edit_text_block_height()
 
-            for original_key, remap_key in remaps:
+            for original_key, remap_key, is_text_format, is_hold_format, hold_interval in remaps:
                 self.add_edit_mapping_row(original_key, remap_key)
+
+                if self.key_rows and len(self.key_rows[-1]) == 7:  
+                    _, _, _, _, text_format_var, hold_format_var, hold_interval_entry = self.key_rows[-1]
+                    text_format_var.set(is_text_format)
+                    hold_format_var.set(is_hold_format)
+                    if is_hold_format and hold_interval:
+                        hold_interval_entry.delete(0, "end")
+
+                        hold_interval_float = float(hold_interval)
+                        hold_interval_str = str(int(hold_interval_float)) if hold_interval_float.is_integer() else str(hold_interval_float)
+                        hold_interval_entry.insert(0, hold_interval_str)
+                        hold_interval_entry.config(fg="black")
 
             for shortcut in shortcuts:
                 self.add_edit_shortcut_mapping_row(shortcut)
@@ -2131,12 +2193,17 @@ cm1 := AHI.CreateContextManager(id1)
             self.select_program_window.lift()
             return
 
-        self.select_program_window = tk.Toplevel(self.create_profile_window or self.edit_window)
+        if hasattr(self, 'edit_window') and self.edit_window and self.edit_window.winfo_exists():
+            parent_window = self.edit_window
+        else:
+            parent_window = self.root
+
+        self.select_program_window = tk.Toplevel(parent_window)
         self.select_program_window.title("Select Programs")
         self.select_program_window.geometry("600x300+308+217")
         self.select_program_window.iconbitmap(icon_path)
         self.select_program_window.resizable(False, False)
-        self.select_program_window.transient(self.create_profile_window or self.edit_window)  
+        self.select_program_window.transient(parent_window)  
         self.select_program_window.attributes("-topmost", self.is_on_top)  
 
         self.select_program_window.protocol("WM_DELETE_WINDOW", self.cleanup_select_program_window)
@@ -2266,8 +2333,13 @@ cm1 := AHI.CreateContextManager(id1)
             self.is_listening = False
             self.active_entry = None
 
-        if self.edit_window:
+        if hasattr(self, 'device_selection_window') and self.device_selection_window and self.device_selection_window.winfo_exists():
+            self.device_selection_window.destroy()
+            self.device_selection_window = None
+
+        if hasattr(self, 'edit_window'):
             self.edit_window.destroy()
+            self.edit_window = None
 
     def extract_and_filter_content(self, lines):
         toggle_lines = []  
@@ -2333,12 +2405,14 @@ cm1 := AHI.CreateContextManager(id1)
                 self.edit_canvas.yview_scroll(-1, "units")
 
     def add_edit_mapping_row(self, original_key='', remap_key=''):
-
         select_default_key_label = tk.Label(self.edit_frame, text="Default Key:")
         select_default_key_label.grid(row=self.row_num, rowspan=2, column=0, padx=10, pady=6)
 
         select_remap_key_label = tk.Label(self.edit_frame, text="Remap Key:")
         select_remap_key_label.grid(row=self.row_num, rowspan=2, column=2, padx=10, pady=6)
+
+        text_format_var = tk.BooleanVar()
+        hold_format_var = tk.BooleanVar()
 
         original_key_select = tk.Button(self.edit_frame, text="Select Default Key", justify='center', width=16,
             command=lambda: self.toggle_shortcut_key_listening(original_key_entry, original_key_select))
@@ -2360,25 +2434,31 @@ cm1 := AHI.CreateContextManager(id1)
         original_key_entry.grid(row=self.row_num, column=1, sticky='w', padx=13, pady=6)
         self.original_key_entry = original_key_entry  
         original_key_entry['values'] = key_values  
-        original_key_entry.insert(0, original_key)
+        if original_key:  
+            original_key_entry.set(original_key)
+
+        original_key_entry.bind('<MouseWheel>', self.handle_combobox_scroll)
 
         remap_key_entry = ttk.Combobox(self.edit_frame, width=20, justify='center')
         remap_key_entry.grid(row=self.row_num, column=3, sticky='w', padx=13, pady=6)
         self.remap_key_entry = remap_key_entry  
         remap_key_entry['values'] = key_values  
-        remap_key_entry.insert(0, remap_key)
+        if remap_key:  
+            remap_key_entry.set(remap_key)
 
-        self.key_rows.append((original_key_entry, remap_key_entry, original_key_select, remap_key_select))
+        remap_key_entry.bind('<MouseWheel>', self.handle_combobox_scroll)
+
+        self.key_rows.append((original_key_entry, remap_key_entry, original_key_select, remap_key_select, text_format_var, hold_format_var))
 
         self.row_num += 1
 
         format_label = tk.Label(self.edit_frame, text="Remap Format:")
         format_label.grid(row=self.row_num, column=0, columnspan=2, padx=10, pady=6, sticky="w")
 
-        text_format_checkbox = tk.Checkbutton(self.edit_frame, text="Text Format")
+        text_format_checkbox = tk.Checkbutton(self.edit_frame, text="Text Format", variable=text_format_var)
         text_format_checkbox.grid(row=self.row_num, column=1, columnspan=3, padx=30, pady=6, sticky="w")
 
-        hold_format_checkbox = tk.Checkbutton(self.edit_frame, text="Hold Format")
+        hold_format_checkbox = tk.Checkbutton(self.edit_frame, text="Hold Format", variable=hold_format_var)
         hold_format_checkbox.grid(row=self.row_num, column=1, columnspan=3, padx=140, pady=6, sticky="w")
 
         def on_focus_in(event):
@@ -2398,6 +2478,8 @@ cm1 := AHI.CreateContextManager(id1)
         hold_interval_entry.bind("<FocusOut>", on_focus_out)
 
         hold_interval_entry.grid(row=self.row_num, column=2, columnspan=3, padx=75, pady=6, sticky="w")
+
+        self.key_rows[-1] = self.key_rows[-1] + (hold_interval_entry,)
 
         self.row_num += 1
 

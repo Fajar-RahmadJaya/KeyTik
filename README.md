@@ -52,6 +52,7 @@ KeyTik is available at the following platforms:
 - [KeyTik Website](https://keytik.com)
 - [Source Forge](https://sourceforge.net/projects/keytik/)
 - [PitchHut](https://www.pitchhut.com/project/keytik)
+- [Itch.io](https://fajar-rahmadjaya.itch.io/keytik)
 
 <br>
 
@@ -154,7 +155,7 @@ Below is KeyTik key features that make KeyTik different than another automation 
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
 | 1      | **Multiple Keyboard Remap Profile**                  | Not like most of keyboard remapper, KeyTik can handle multiple keyboard remap. You don't have to set remap again when you need to use another remap then set it back again after done. Just create multiple remap and activate or deactivate it whenever you want. |
-| 2      | **Advance Keyboard Remap**                  | Keyboard remap not only able to remap single key but also key combination and text or typing (Example: Clicking 's' will type 'Select"). |
+| 2      | **Advance Keyboard Remap**                  | Various remap format you can use such as simulate typing or remap key to text, simulate key hold, shortcut remap and more. |
 | 3      | **Assign Script or Remap Profile to Specific Keyboard or Mouse Using Device VID & PID or Device Handle** | Make script or remap profile to only work for specific physical keyboard or mouse using device VID & PID or device handle as identifier.|
 | 4      | **Assign Script or Remap Profile to Specific Programs Using Class or Process** | Make script or remap profile to only work for specific programs class, like specific Chrome tab or entire program.|
 | 5      | **Auto Clicker**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is held. You can change the 'left click', 'e', interval part to your preference.|
@@ -166,7 +167,7 @@ Below is KeyTik key features that make KeyTik different than another automation 
 Below is another KeyTik feature to increase user experience and give ultimate control over each profiles:
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
-| 1      | **Manage Profiles** | **Run**, **Exit**, **Delete**, **Store**, **Edit**, **Pin** each profiles for better control over profiles.|
+| 1      | **Manage Profiles** | Run, Exit, Delete, Store, Edit, Pin each profiles for better control over profiles.|
 | 2      | **Run Profile on Startup**                         | Run profiles on startup, so it will automatically activate when you open your device—no need to manually activate it each time. |
 | 3      | **Assign Shortcut on Each Profile**                | Enable or Disable your profile using shortcuts. |
 | 4      | **Default Mode in Create or Edit Profile**         | The easiest way to remap your keyboard. |

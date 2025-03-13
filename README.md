@@ -44,6 +44,27 @@ Sincerely,
 
 <div align="center">
 
+## Pro Version
+
+</div>
+
+KeyTik Pro version is available at Gumroad at $20 for lifetime purchase. Check out KeyTik Pro at: 
+- KeyTik Pro: https://fajarrahmadjaya.gumroad.com/l/keytik-pro
+
+First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l/keytik-pro/KeyTikPro) to get the discount.
+
+### Pro Version Feature
+- Additional UI for auto clicker, screen clicker, files opener.
+- Possibly AI integration.
+
+### Why You Choose Pro Version
+- Support the developer.
+- More feature than the regular version.
+
+<br>
+
+<div align="center">
+
 ## Platform
 
 </div>

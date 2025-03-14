@@ -1,4 +1,4 @@
-; text
+; Screen Clicker
 ^!p::ExitApp
 
 #SingleInstance Force

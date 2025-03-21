@@ -5,20 +5,20 @@ Persistent
 ; Initialize AutoHotInterception library
 AHI := AutoHotInterception()
 
+; Define the file path (no folder, same directory as the script)
+filePath := A_ScriptDir "\shared_device_info.txt"
+
+; Clear the contents of the file before writing new data (if it exists)
+if FileExist(filePath)
+    FileDelete(filePath)
+
 ; Get the list of devices
 DeviceList := AHI.GetDeviceList()
 
-; File path where the device info will be saved
-filePath := "shared_device_info.txt"
-
-; Clear the contents of the file before writing new data
-FileDelete(filePath)
-
 ; Loop through each device in the DeviceList
-For index, device in DeviceList {
+for index, device in DeviceList {
     ; Check if the device is a keyboard or a mouse
-    If (device.isMouse || !device.isMouse)  ; You can modify this condition if you need specific filtering
-    {
+    if (device.isMouse || !device.isMouse) {  ; Modify this condition if you need specific filtering
         ; Prepare the device information string
         devInfo := "Device ID: " device.Id "`n"
         devInfo .= "VID: 0x" Format("{:04X}", device.Vid) "`n"

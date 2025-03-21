@@ -1,4 +1,4 @@
-; Auto Clicker
+; text
 ^!p::ExitApp
 
 #SingleInstance Force

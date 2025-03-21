@@ -25,7 +25,7 @@ script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 data_dir = os.path.join(script_dir, '_internal', 'Data')
 appdata_dir = os.path.join(os.getenv('APPDATA'), 'KeyTik')
 
-current_version = "v1.8.0"
+current_version = "v1.9.0"
 
 condition_path = os.path.join(appdata_dir, "path.json")
 dont_show_path = os.path.join(data_dir, "dont_show.json")
@@ -1323,7 +1323,9 @@ class ScriptManagerApp:
 
         shortcut_entry = ttk.Combobox(self.key_frame, width=45, justify='center')
         shortcut_entry.grid(row=self.row_num, column=1, columnspan=3, padx=20, pady=6, sticky="w")
-        shortcut_entry['values'] = key_values  
+        shortcut_entry['values'] = key_values  # Populate combobox with the values
+        # Add this line to prevent scroll selection
+        shortcut_entry.bind('<MouseWheel>', self.handle_combobox_scroll)
 
         self.row_num += 1
 
@@ -1358,9 +1360,14 @@ class ScriptManagerApp:
             print(f"Error reading key_list.txt: {e}")
         return key_values
 
-    def handle_combobox_scroll(self, event):
 
-        return "break"
+
+    def handle_combobox_scroll(self, event):
+        # Instead of blocking the event completely, let it propagate to the canvas
+        # but prevent the combobox from changing value
+        current_value = event.widget.get()  # Store current value
+        self.root.after(1, lambda: event.widget.set(current_value))  # Restore value after event
+        return  # Let the event continue to propagate
 
     def add_key_mapping_row(self, original_key='', remap_key=''):  
         select_default_key_label = tk.Label(self.key_frame, text="Default Key:")
@@ -2096,7 +2103,7 @@ cm1 := AHI.CreateContextManager(id1)
                         original_key = parts[0].strip()
                         remap_or_action = parts[1].strip() if len(parts) > 1 else ""
 
-                        original_key = self.replace_raw_keys(original_key, key_map).replace("~", "").replace(" & ", "+").replace("*", "")
+                        original_key = self.replace_raw_keys(original_key, key_map).replace("~", "").replace(" & ", " + ").replace("*", "")
 
                         if remap_or_action:  
                             is_text_format = False
@@ -2120,20 +2127,27 @@ cm1 := AHI.CreateContextManager(id1)
                                     hold_interval = str(int(interval_match.group(1)) / 1000)  
 
                                 is_hold_format = True
+                            
+                            # In the edit_script method, modify the part that handles Send commands:
                             elif remap_or_action.startswith('Send'):
-
-                                key_sequence = remap_or_action[len("Send("):-1]  
+                                # Extract the keys from Send command
+                                key_sequence = remap_or_action[len("Send("):-1]  # Remove the 'Send(' and ')'
                                 keys = []
 
-                                import re
+                                # Find the individual keys and maintain their order
                                 matches = re.findall(r'{(.*?)( down| up)}', key_sequence)
                                 if matches:
-
-                                    keys = list(set(match[0] for match in matches))  
-                                    remap_key = " + ".join(keys)  
+                                    # Process keys in pairs (down/up) to maintain order
+                                    seen_keys = set()  # To track keys we've already processed
+                                    for match in matches:
+                                        key = match[0]  # Get the key name
+                                        if key not in seen_keys:
+                                            seen_keys.add(key)
+                                            keys.append(key)  # Add key in order of appearance
+                                    remap_key = " + ".join(keys)  # Join the keys with ' + '
                                 else:
-
-                                    remap_key = key_sequence.strip('{}')  
+                                    # If no matches, it's a simple key press
+                                    remap_key = key_sequence.strip('{}')  # Remove curly braces if present
 
                             else:
                                 remap_key = remap_or_action  
@@ -2521,11 +2535,14 @@ cm1 := AHI.CreateContextManager(id1)
 
         key_values = self.load_key_values()
 
+        # Similarly in add_edit_shortcut_mapping_row method
         shortcut_entry = ttk.Combobox(self.edit_frame, width=45, justify='center')
         shortcut_entry.grid(row=self.row_num, column=1, columnspan=3, padx=20, pady=6, sticky="w")
-        shortcut_entry['values'] = key_values  
+        shortcut_entry['values'] = key_values  # Populate combobox with the values
         shortcut_entry.insert(0, shortcut)
         self.shortcut_entry = shortcut_entry
+        # Add this line to prevent scroll selection
+        shortcut_entry.bind('<MouseWheel>', self.handle_combobox_scroll)
 
         self.shortcut_rows.append((shortcut_entry, shortcut_key_select))
 

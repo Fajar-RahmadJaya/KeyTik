@@ -1323,8 +1323,8 @@ class ScriptManagerApp:
 
         shortcut_entry = ttk.Combobox(self.key_frame, width=45, justify='center')
         shortcut_entry.grid(row=self.row_num, column=1, columnspan=3, padx=20, pady=6, sticky="w")
-        shortcut_entry['values'] = key_values  # Populate combobox with the values
-        # Add this line to prevent scroll selection
+        shortcut_entry['values'] = key_values  
+
         shortcut_entry.bind('<MouseWheel>', self.handle_combobox_scroll)
 
         self.row_num += 1
@@ -1360,14 +1360,11 @@ class ScriptManagerApp:
             print(f"Error reading key_list.txt: {e}")
         return key_values
 
-
-
     def handle_combobox_scroll(self, event):
-        # Instead of blocking the event completely, let it propagate to the canvas
-        # but prevent the combobox from changing value
-        current_value = event.widget.get()  # Store current value
-        self.root.after(1, lambda: event.widget.set(current_value))  # Restore value after event
-        return  # Let the event continue to propagate
+
+        current_value = event.widget.get()  
+        self.root.after(1, lambda: event.widget.set(current_value))  
+        return  
 
     def add_key_mapping_row(self, original_key='', remap_key=''):  
         select_default_key_label = tk.Label(self.key_frame, text="Default Key:")
@@ -2127,27 +2124,25 @@ cm1 := AHI.CreateContextManager(id1)
                                     hold_interval = str(int(interval_match.group(1)) / 1000)  
 
                                 is_hold_format = True
-                            
-                            # In the edit_script method, modify the part that handles Send commands:
+
                             elif remap_or_action.startswith('Send'):
-                                # Extract the keys from Send command
-                                key_sequence = remap_or_action[len("Send("):-1]  # Remove the 'Send(' and ')'
+
+                                key_sequence = remap_or_action[len("Send("):-1]  
                                 keys = []
 
-                                # Find the individual keys and maintain their order
                                 matches = re.findall(r'{(.*?)( down| up)}', key_sequence)
                                 if matches:
-                                    # Process keys in pairs (down/up) to maintain order
-                                    seen_keys = set()  # To track keys we've already processed
+
+                                    seen_keys = set()  
                                     for match in matches:
-                                        key = match[0]  # Get the key name
+                                        key = match[0]  
                                         if key not in seen_keys:
                                             seen_keys.add(key)
-                                            keys.append(key)  # Add key in order of appearance
-                                    remap_key = " + ".join(keys)  # Join the keys with ' + '
+                                            keys.append(key)  
+                                    remap_key = " + ".join(keys)  
                                 else:
-                                    # If no matches, it's a simple key press
-                                    remap_key = key_sequence.strip('{}')  # Remove curly braces if present
+
+                                    remap_key = key_sequence.strip('{}')  
 
                             else:
                                 remap_key = remap_or_action  
@@ -2535,13 +2530,12 @@ cm1 := AHI.CreateContextManager(id1)
 
         key_values = self.load_key_values()
 
-        # Similarly in add_edit_shortcut_mapping_row method
         shortcut_entry = ttk.Combobox(self.edit_frame, width=45, justify='center')
         shortcut_entry.grid(row=self.row_num, column=1, columnspan=3, padx=20, pady=6, sticky="w")
-        shortcut_entry['values'] = key_values  # Populate combobox with the values
+        shortcut_entry['values'] = key_values  
         shortcut_entry.insert(0, shortcut)
         self.shortcut_entry = shortcut_entry
-        # Add this line to prevent scroll selection
+
         shortcut_entry.bind('<MouseWheel>', self.handle_combobox_scroll)
 
         self.shortcut_rows.append((shortcut_entry, shortcut_key_select))

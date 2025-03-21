@@ -146,16 +146,22 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 </div>
 
 <div align="center">
-<img src=".github/Picture/Profile Manager 1.7.0.png" alt="Main Profile Manager" width="400" />
+<img src=".github/Picture/Main Window.png" alt="Main Window" width="400" />
 </div>
 <div align="center">
 <img src=".github/Picture/Default Mode.png" alt="Default Mode" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/text mode.png" alt="Text Mode" width="400" />
+<img src=".github/Picture/Example 1.png" alt="Example 1" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/Programs and Devices Example.png" alt="Programs and Devices Example" width="400" />
+<img src=".github/Picture/Example 2.png" alt="Example 2" width="400" />
+</div>
+<div align="center">
+<img src=".github/Picture/Example 3.png" alt="Example 3" width="400" />
+</div>
+<div align="center">
+<img src=".github/Picture/Drop Down.png" alt="Drop Down" width="400" />
 </div>
 <div align="center">
 <img src=".github/Picture/Select Device.png" alt="Select Device" width="400" />
@@ -163,12 +169,15 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 <div align="center">
 <img src=".github/Picture/Select Programs.png" alt="Select Programs.png" width="400" />
 </div>
-<div align="center">
-<img src=".github/Picture/Key Format Example.png" alt="Key Format Example" width="400" />
+<img src=".github/Picture/Programs and Devices Example.png" alt="Programs and Devices Example" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/Drop Down.png" alt="Drop Down" width="400" />
+<img src=".github/Picture/text mode.png" alt="Text Mode" width="400" />
 </div>
+<div align="center">
+
+
+
 
 <br>
 

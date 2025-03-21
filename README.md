@@ -169,6 +169,7 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 <div align="center">
 <img src=".github/Picture/Select Programs.png" alt="Select Programs.png" width="400" />
 </div>
+<div align="center">
 <img src=".github/Picture/Programs and Devices Example.png" alt="Programs and Devices Example" width="400" />
 </div>
 <div align="center">

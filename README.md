@@ -48,12 +48,11 @@ Sincerely,
 
 </div>
 
-KeyTik Pro version is available at Gumroad at $20 for lifetime purchase. Check out KeyTik Pro at: 
-- KeyTik Pro: https://fajarrahmadjaya.gumroad.com/l/keytik-pro
+KeyTik Pro version is available at Gumroad at $20 for lifetime purchase. Check out KeyTik Pro at [https://fajarrahmadjaya.gumroad.com/l/keytik-pro](https://fajarrahmadjaya.gumroad.com/l/keytik-pro)
 
 First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l/keytik-pro/KeyTikPro) to get the discount. Get the discount before its gone!
 
-### My Plan for the Pro Version
+## My Plan for the Pro Version
 - Additional UI for file openers.
 - Additional UI for auto clicker.
 - Additional UI for screen clicker.
@@ -65,7 +64,7 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
    - New automation tool, OCR translator. Much like snipping tool but it will translate the chosen screen.
    - Macro recording. Record any input and simulate it.
 
-### Why You Choose Pro Version
+## Why You Choose Pro Version
 - Support the developer.
 - More feature than the regular version.
 - Get early access for the upcoming KeyTik update.

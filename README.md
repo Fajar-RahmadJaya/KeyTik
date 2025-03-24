@@ -69,6 +69,10 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - More feature than the regular version.
 - Get early access for the upcoming KeyTik update.
 
+## Pro Version Preview
+<img src=".github/Picture/Pro Preview 1.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Pro Preview 2.png" alt="Pro Version Preview 2" width="400" />
+
 <br>
 
 <div align="center">

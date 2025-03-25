@@ -178,7 +178,6 @@ Sponsorships are now supported! Your support will motivate me to continue workin
 <div align="center">
 <img src=".github/Picture/text mode.png" alt="Text Mode" width="400" />
 </div>
-<div align="center">
 
 
 

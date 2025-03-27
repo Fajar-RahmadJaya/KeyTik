@@ -58,11 +58,11 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - Additional UI for screen clicker.
 - Full macro. Combining auto clicker, screen clicker, keyboard remap, files opener, in a single profile.
 - Possibly AI integration.
+- New automation tool, make specific program window always on top.
+- New automation tool, OCR translator. Much like snipping tool but it will translate the chosen screen.
+- Macro recording. Record any input and simulate it.
 - Upcoming KeyTik update will be implemented on KeyTik Pro first. Including:
    - Instead of "Add Another Row" or "Add Shortcut Row" button to add key mapping or shortcuts, use + instead on separator between mapping.
-   - New automation tool, make specific program window always on top.
-   - New automation tool, OCR translator. Much like snipping tool but it will translate the chosen screen.
-   - Macro recording. Record any input and simulate it.
 
 ## Why You Choose Pro Version
 - Support the developer.

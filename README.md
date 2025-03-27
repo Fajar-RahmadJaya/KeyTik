@@ -92,15 +92,6 @@ KeyTik is available at the following platforms:
 
 <div align="center">
   
-## Sponsor
-Sponsorships are now supported! Your support will motivate me to continue working on this project. You can sponsor me by clicking the "Sponsor" button above or by visiting my [GitHub Sponsor Page](https://github.com/sponsors/Fajar-RahmadJaya). There is only one tier, with a minimal $1 sponsorship, which includes a mention in this project's README as a reward.
-
-</div>
-
-<br>
-
-<div align="center">
-  
 ## Table Of Content
 </div>
 

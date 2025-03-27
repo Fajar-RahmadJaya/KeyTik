@@ -68,6 +68,7 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - Support the developer.
 - More feature than the regular version.
 - Get early access for the upcoming KeyTik update.
+- Expect an evolving software. My goal for KeyTik Pro is software that covers or combines many tools at once.
 
 ## Pro Version Preview
 <img src=".github/Picture/Pro Preview 1.png" alt="Pro Version Preview 1" width="400" />

@@ -60,6 +60,8 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - Possibly AI integration.
 - New automation tool, make specific program window always on top.
 - New automation tool, OCR translator. Much like snipping tool but it will translate the chosen screen.
+- New automation tool, easy window always on top. Make window in the cursor to always on top with one click or shortcut.
+- New automation tool, window size changer. Change window size to full size, half screen vertical, half screen horizontal, quarter screen, with a single click or shortcut.
 - Macro recording. Record any input and simulate it.
 - Upcoming KeyTik update will be implemented on KeyTik Pro first. Including:
    - Instead of "Add Another Row" or "Add Shortcut Row" button to add key mapping or shortcuts, use + instead on separator between mapping.

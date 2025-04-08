@@ -73,8 +73,21 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - Expect an evolving software. My goal for KeyTik Pro is software that covers or combines many tools at once.
 
 ## Pro Version Preview
-<img src=".github/Picture/Pro Preview 1.png" alt="Pro Version Preview 1" width="400" />
-<img src=".github/Picture/Pro Preview 2.png" alt="Pro Version Preview 2" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 221108.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 220847.png" alt="Pro Version Preview 2" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 220856.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 220906.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Select Device.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Select Programs.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 220919.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 220927.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 220944.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 221000.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 221021.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 221036.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 221045.png" alt="Pro Version Preview 1" width="400" />
+<img src=".github/Picture/Screenshot 2025-04-07 221058.png" alt="Pro Version Preview 1" width="400" />
+
 
 <br>
 

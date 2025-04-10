@@ -1,5 +1,5 @@
 ; text
-^!p::ExitApp
+^!x::ExitApp
 
 #SingleInstance Force
 Persistent

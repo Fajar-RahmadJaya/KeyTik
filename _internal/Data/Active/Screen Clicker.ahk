@@ -1,5 +1,5 @@
 ; text
-^!p::ExitApp
+^!q::ExitApp
 
 #SingleInstance Force
 toggle := false 

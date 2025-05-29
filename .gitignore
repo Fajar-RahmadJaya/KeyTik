@@ -1,0 +1,30 @@
+# Python related
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+.env/
+.venv/
+build/
+dist/
+eggs/
+*.egg-info/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.vs/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Files
+exit_keys.json
+dont_show.json
+
+

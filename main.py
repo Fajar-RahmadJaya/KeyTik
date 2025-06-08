@@ -6,39 +6,48 @@ from PySide6.QtWidgets import (
     QInputDialog, QSizePolicy
 )
 from PySide6.QtGui import QPixmap, QIcon
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread, Signal  # add QThread, Signal
 from pynput.keyboard import Controller, Key
 import sys
 import winshell
 import json
+import shutil
 from src.utility.constant import (icon_unpinned_path, icon_pinned_path, 
                                   icon_path, exit_keys_file)
 from src.utility.utils import (load_pinned_profiles, active_dir, store_dir,
-                               save_pinned_profiles)
-from src.logic.logic import logic
-from src.ui.edit_frame_row import edit_frame_row
-from src.ui.edit_script import EditScript
-from src.ui.edit_script_logic import EditScriptLogic
-from src.ui.edit_script_save import EditScriptSave
+                               save_pinned_profiles, read_running_scripts_temp,
+                               add_script_to_temp, remove_script_from_temp)
+from src.logic.logic import Logic
+from src.ui.setting import Setting
+from src.ui.welcome import Welcome
+from src.ui.edit_script.edit_script_main import EditScriptMain
+from src.ui.edit_script.select_program import SelectProgram
+from src.ui.edit_script.select_device import SelectDevice
+from src.ui.edit_script.edit_frame_row import EditFrameRow
+from src.ui.edit_script.edit_script_logic import EditScriptLogic
+from src.ui.edit_script.edit_script_save import EditScriptSave
 
-from src.ui.setting_window import setting_window
-from src.ui.welcome_window import welcome_window
+class StartupWorker(QThread):
+    finished = Signal()
 
-class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
-           setting_window, welcome_window, 
+    def __init__(self, main_window):
+        super().__init__()
+        self.main_window = main_window
+
+    def run(self):
+        # Run the startup checks
+        self.main_window.initialize_exit_keys()
+        self.main_window.check_ahk_installation(show_installed_message=False)
+        self.main_window.check_for_update(show_no_update_message=False)
+        self.finished.emit()
+
+class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
+           Setting, Welcome, SelectProgram, SelectDevice,
            EditScriptLogic, EditScriptSave):
     def __init__(self):
         super().__init__()
+        # Global variables
         self.first_load = True
-        self.welcome_condition = self.load_welcome_condition()
-        self.setWindowTitle("KeyTik Pro")
-        self.setGeometry(284, 97, 650, 492)
-        self.current_page = 0
-        self.SCRIPT_DIR = active_dir
-        self.pinned_profiles = load_pinned_profiles()
-        self.icon_unpinned = QPixmap(icon_unpinned_path).scaled(14, 14)
-        self.icon_pinned = QPixmap(icon_pinned_path).scaled(14, 14)
-        self.scripts = self.list_scripts()
         self.device_selection_window = None
         self.select_program_window = None
         self.is_on_top = False
@@ -59,17 +68,23 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
         self.shortcut_entry = None
         self.sort_order = [True, True, True]
         self.previous_button_text = None
-        self.setWindowIcon(QIcon(icon_path))
+
+        # UI initialization
         self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
         self.main_layout = QVBoxLayout(self.central_widget)
-        self.check_for_update(show_no_update_message=False)
-        self.initialize_exit_keys()
-        self.welcome_condition = self.load_welcome_condition()
-        self.check_ahk_installation(show_installed_message=False)
-        # self.check_welcome()  # Moved to main()
+        self.current_page = 0
+        self.SCRIPT_DIR = active_dir
+        self.pinned_profiles = load_pinned_profiles()
+        self.icon_unpinned = QPixmap(icon_unpinned_path).scaled(14, 14)
+        self.icon_pinned = QPixmap(icon_pinned_path).scaled(14, 14)
+        self.scripts = self.list_scripts()
         self.create_ui()
         self.update_script_list()
+        self.setWindowTitle("KeyTik")
+        self.setGeometry(284, 97, 650, 492)
+        self.setWindowIcon(QIcon(icon_path))
+        self.setCentralWidget(self.central_widget)
+        self.welcome_condition = self.load_welcome_condition()
 
     def create_ui(self):
         # Main vertical layout
@@ -134,6 +149,8 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
         end_index = start_index + 6
         scripts_to_display = self.scripts[start_index:end_index]
 
+        running_scripts = read_running_scripts_temp()
+
         for index, script in enumerate(scripts_to_display):
             row = index // 2
             column = index % 2
@@ -142,15 +159,26 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
             group_box = QGroupBox(os.path.splitext(script)[0])
             group_layout = QGridLayout(group_box)
 
-            icon_label = QLabel(group_box)  # set the group_box as parent for absolute positioning
+            icon_label = QLabel(group_box)
             icon_label.setPixmap(icon)
             icon_label.setFixedSize(18, 18)
             icon_label.setCursor(Qt.CursorShape.PointingHandCursor)
             icon_label.mousePressEvent = lambda event, s=script, l=icon_label: self.toggle_pin(s, l)
-            icon_label.move(281, 2)  # adjust x, y to fit visually
+            icon_label.move(281, 2)
 
-            run_button = QPushButton("Run")
+            run_button = QPushButton()
             run_button.setFixedWidth(80)
+
+            shortcut_name = os.path.splitext(script)[0] + ".lnk"
+            startup_folder = winshell.startup()
+            shortcut_path = os.path.join(startup_folder, shortcut_name)
+            is_startup = os.path.exists(shortcut_path)
+
+            # If script is in startup, always show Exit
+            if is_startup or script in running_scripts:
+                run_button.setText("Exit")
+            else:
+                run_button.setText("Run")
             run_button.clicked.connect(lambda checked, s=script, b=run_button: self.toggle_run_exit(s, b))
             group_layout.addWidget(run_button, 0, 0)
 
@@ -175,10 +203,7 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
             group_layout.addWidget(store_button, 1, 1)
 
             # Startup/Unstart button
-            shortcut_name = os.path.splitext(script)[0] + ".lnk"
-            startup_folder = winshell.startup()
-            shortcut_path = os.path.join(startup_folder, shortcut_name)
-            if os.path.exists(shortcut_path):
+            if is_startup:
                 startup_button = QPushButton("Unstart")
                 startup_button.clicked.connect(lambda checked, s=script: self.remove_ahk_from_startup(s))
             else:
@@ -198,6 +223,10 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
             spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             self.script_grid.addWidget(spacer, row, column)
 
+        # Ensure both columns have equal width
+        self.script_grid.setColumnStretch(0, 1)
+        self.script_grid.setColumnStretch(1, 1)
+
     # --- Dialog and file picker replacements ---
     def import_button_clicked(self):
         file_dialog = QFileDialog(self)
@@ -216,55 +245,47 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
                 except Exception as e:
                     QMessageBox.warning(self, "Error", f"Failed to move file: {e}")
                     return
-                # Now modify the file contents in its new location
                 try:
-                    # Generate new unique exit key first
                     exit_key = self.generate_exit_key(file_name)
-
                     with open(destination_path, 'r', encoding='utf-8') as file:
                         lines = file.readlines()
-
-                    # Check if the script already has the required lines
-                    already_has_exit = any("::ExitApp" in line for line in lines)
-                    already_has_default = any("; default" in line or "; text" in line for line in lines)
-
-                    if not already_has_exit or not already_has_default:
-                        # Check the format of the first line
-                        first_line = lines[0].strip() if lines else ''
-
-                        # Handle the case for `; text` or `; default`
+                    # 1. Remove any line with ::ExitApp
+                    lines = [line for line in lines if "::ExitApp" not in line]
+                    # 2. Check first line for ; text or ; default
+                    first_line = lines[0].strip() if lines else ""
+                    has_text_or_default = first_line.startswith("; text") or first_line.startswith("; default")
+                    new_lines = []
+                    if not has_text_or_default:
+                        # 3. Add ; default or ; text as needed
                         if first_line and '::' in first_line:
-                            # If the first line is script-like, add `; default`
                             new_lines = [
                                 "; default\n",
                                 f"{exit_key}::ExitApp\n",
-                                "\n"  # Add a new line for better formatting
+                                "\n"
                             ] + [first_line + '\n'] + lines[1:]
                         else:
-                            # If the first line is plain text, add `; text`
                             new_lines = [
                                 "; text\n",
                                 f"{exit_key}::ExitApp\n",
-                                "\n"  # Add a new line for better formatting
+                                "\n"
                             ] + lines
                     else:
-                        # If script already has exit key, replace it with the new one
-                        new_lines = []
-                        for line in lines:
-                            if "::ExitApp" in line:
-                                new_lines.append(f"{exit_key}::ExitApp\n")
-                            else:
-                                new_lines.append(line)
-
-                    # Write the modified contents back to the file
+                        # 4. Insert exit key on second line, keep first line
+                        new_lines = [lines[0] + f"{exit_key}::ExitApp\n", "\n"] + lines[1:]
+                    # 5. Insert ; Text mode start at third line, and ; Text mode end at end
+                    # Remove any previous ; Text mode start/end if present
+                    content = ''.join(new_lines)
+                    content_lines = content.splitlines()
+                    content_lines = [line for line in content_lines if line.strip() not in ["; Text mode start", "; Text mode end"]]
+                    # Insert ; Text mode start after header (which is 3 lines)
+                    header = content_lines[:3]
+                    body = content_lines[3:]
+                    result_lines = header + ["; Text mode start"] + body + ["; Text mode end"]
+                    # Write back
                     with open(destination_path, 'w', encoding='utf-8') as file:
-                        file.writelines(new_lines)
-
-                    print(f"Modified script saved at: {destination_path}")
-
+                        file.write('\n'.join(result_lines) + '\n')
                 except Exception as e:
                     print(f"Error modifying script: {e}")
-                    # If there's an error, try to remove the exit key from JSON
                     try:
                         if os.path.exists(exit_keys_file):
                             with open(exit_keys_file, 'r') as f:
@@ -276,10 +297,8 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
                     except:
                         pass
                     return
-
-                # Append the newly added script to self.scripts
                 self.scripts.append(file_name)
-                self.update_script_list()  # Refresh the UI
+                self.update_script_list()
 
     def copy_script(self, script):
         new_name, ok = QInputDialog.getText(self, "Copy Script", "Enter the new script name:")
@@ -423,6 +442,7 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
         if button.text() == "Run":
             # Start the script
             self.activate_script(script_name, button)
+            add_script_to_temp(script_name)
             # Change button to Exit after script is running
             button.setText("Exit")
             button.clicked.disconnect()
@@ -430,6 +450,7 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
         else:
             # Exit the script
             self.exit_script(script_name, button)
+            remove_script_from_temp(script_name)
             # Change button to Run after script has exited
             button.setText("Run")
             button.clicked.disconnect()
@@ -467,11 +488,39 @@ class MainApp(QMainWindow, logic, edit_frame_row, EditScript,
         # Just call the method to show the welcome dialog
         # Do not assign to self.device_selection_window or call setAttribute/show on welcome_window
         try:
-            welcome_window.show_welcome_window(self)
+            Welcome.show_welcome_window(self)
         except Exception as e:
             print(f"Error displaying welcome window: {e}")
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        # Only start the worker once, on first show
+        if getattr(self, "_startup_worker_started", False):
+            return
+        self._startup_worker_started = True
+        self.startup_worker = StartupWorker(self)
+        self.startup_worker.start()
+
+def get_theme_from_themefile():
+    from src.utility.constant import theme_path
+    try:
+        if os.path.exists(theme_path):
+            with open(theme_path, 'r') as f:
+                theme = f.read().strip().lower()
+            if theme in ("dark", "light"):
+                return theme
+        return "system"
+    except Exception:
+        return "system"
+
 def main():
+    theme = get_theme_from_themefile()
+    # Set darkmode=1 for light, darkmode=2 for dark, or use system default if "system"
+    if theme == "dark":
+        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
+    elif theme == "light":
+        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
+    # else: system default, do not set QT_QPA_PLATFORM
     app = QApplication(sys.argv)
     main_window = MainApp()
     main_window.show()

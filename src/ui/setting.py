@@ -1,17 +1,19 @@
 import os
 import shutil
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton, QMessageBox, QFileDialog
+    QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton, 
+    QMessageBox, QFileDialog, QInputDialog
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 import webbrowser
 import requests
 import json
-from src.utility.constant import (current_version, icon_path, condition_path)
+from src.utility.constant import (current_version, icon_path, 
+                                  condition_path, theme_path)
 from src.utility.utils import (active_dir)
 
-class setting_window:
+class Setting:
     def open_settings_window(self):
         # Create a new dialog window
         settings_window = QDialog(self)
@@ -45,25 +47,25 @@ class setting_window:
         group_layout.addWidget(check_update_button, 0, 1, 1, 1)
 
         # On Boarding button
-        on_boarding_button = QPushButton("On Boarding")
-        on_boarding_button.setFixedHeight(40)
-        on_boarding_button.setFixedWidth(180)
-        on_boarding_button.clicked.connect(self.show_welcome_window)
-        group_layout.addWidget(on_boarding_button, 1, 0, 1, 1)
+        readme_button = QPushButton("Readme!")
+        readme_button.setFixedHeight(40)
+        readme_button.setFixedWidth(180)
+        readme_button.clicked.connect(self.show_welcome_window)
+        group_layout.addWidget(readme_button, 1, 0, 1, 1)
 
-        # Credit button (disabled)
-        credit_button = QPushButton("Credit")
-        credit_button.setFixedHeight(40)
-        credit_button.setFixedWidth(180)
-        credit_button.setEnabled(False)
-        group_layout.addWidget(credit_button, 1, 1, 1, 1)
+        # Theme button now lets user pick theme
+        theme_button = QPushButton("Change Theme")
+        theme_button.setFixedHeight(40)
+        theme_button.setFixedWidth(180)
+        theme_button.clicked.connect(self.change_theme_dialog)
+        group_layout.addWidget(theme_button, 1, 1, 1, 1)
 
         # Sponsor Me button
-        sponsor_button = QPushButton("Sponsor Me")
-        sponsor_button.setFixedHeight(40)
-        sponsor_button.setFixedWidth(370)
-        sponsor_button.clicked.connect(lambda: webbrowser.open("https://github.com/sponsors/Fajar-RahmadJaya"))
-        group_layout.addWidget(sponsor_button, 2, 0, 1, 2)
+        pro_upgrade_button = QPushButton("Upgrade to KeyTik Pro")
+        pro_upgrade_button.setFixedHeight(40)
+        pro_upgrade_button.setFixedWidth(370)
+        pro_upgrade_button.clicked.connect(lambda: webbrowser.open("https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
+        group_layout.addWidget(pro_upgrade_button, 2, 0, 1, 2)
 
         # Set stretch to make rows/columns resize equally
         group_layout.setRowStretch(0, 1)
@@ -146,12 +148,12 @@ class setting_window:
                 if current_version == latest_version:
                     # Only show up-to-date message if explicitly requested (button click)
                     if show_no_update_message:
-                        QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik Pro.")
+                        QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
                 else:
                     # If update is available, show message with option to update
                     reply = QMessageBox.question(
                         self, "Update Available",
-                        f"New update available: KeyTik Pro {latest_version}\n\nWould you like to go to the update page?",
+                        f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?",
                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
                     )
                     if reply == QMessageBox.StandardButton.Yes:
@@ -160,3 +162,42 @@ class setting_window:
                 QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred while checking for updates: {str(e)}")
+
+    def change_theme_dialog(self):
+        # Show a dialog to pick theme
+        options = ["Light", "Dark", "System"]
+        current_theme = self.get_saved_theme()
+        if current_theme == "dark":
+            current_index = 1
+        elif current_theme == "light":
+            current_index = 0
+        else:
+            current_index = 2  # system or empty
+        theme, ok = QInputDialog.getItem(self, "Change Theme", "Select theme:", options, current_index, False)
+        if ok:
+            # Save the theme to theme_path
+            self.save_theme(theme.lower())
+            QMessageBox.information(self, "Theme Changed", "Theme will be applied after restarting the app.")
+
+    def get_saved_theme(self):
+        # Read theme from theme_path, default to system (empty or missing)
+        try:
+            if os.path.exists(theme_path):
+                with open(theme_path, 'r') as f:
+                    theme = f.read().strip().lower()
+                if theme in ("dark", "light"):
+                    return theme
+            return "system"
+        except Exception:
+            return "system"
+
+    def save_theme(self, theme):
+        # Save theme to theme_path, empty for system
+        try:
+            with open(theme_path, 'w') as f:
+                if theme == "system":
+                    f.write("")
+                else:
+                    f.write(theme)
+        except Exception as e:
+            print(f"Failed to save theme: {e}")

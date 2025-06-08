@@ -1,5 +1,5 @@
 ; text
-^!m::ExitApp
+^!p::ExitApp
 
 #SingleInstance force
 Alt & Left::

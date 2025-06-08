@@ -9,19 +9,6 @@ from PySide6.QtCore import Qt
 from src.utility.constant import (interception_install_path)
 
 class EditScriptLogic:
-    # Function to handle the device selection
-    def select_device(self, tree, entry, window):
-        selected_items = tree.selectedItems()
-        if selected_items:
-            device = [selected_items[0].text(i) for i in range(tree.columnCount())]
-            device_type = device[0]
-            vid_pid = device[3]  # Use Handle instead
-
-            entry.setText(f"{device_type}, {vid_pid}")
-
-            # Close the device selection window
-            window.accept()
-
     def check_ahk_installation(self, show_installed_message=False):
         """
         Check if AutoHotkey v2 is installed
@@ -148,7 +135,11 @@ class EditScriptLogic:
                                     file.write('    }\n')
                                     file.write('}\n')
                                 elif hold_format_var.isChecked():
-                                    hold_interval = hold_interval_entry.text().strip() if hold_interval_entry.text().strip() != "Hold Interval" else "5"
+                                    # --- CHANGED: Default hold_interval to "10" if entry is None or empty ---
+                                    if hold_interval_entry is None or not hold_interval_entry.text().strip() or hold_interval_entry.text().strip() == "Hold Interval":
+                                        hold_interval = "10"
+                                    else:
+                                        hold_interval = hold_interval_entry.text().strip()
                                     hold_interval_ms = str(int(float(hold_interval) * 1000))
                                     if "+" in remap_key:
                                         remap_keys = [self.translate_key(key.strip(), key_translations) for key in remap_key.split("+")]
@@ -192,7 +183,11 @@ class EditScriptLogic:
                         if text_format_var.isChecked():
                             file.write(f'{original_translated}::SendText("{remap_key}")\n')
                         elif hold_format_var.isChecked():
-                            hold_interval = hold_interval_entry.text().strip() if hold_interval_entry.text().strip() != "Hold Interval" else "5"
+                            # --- CHANGED: Default hold_interval to "10" if entry is None or empty ---
+                            if hold_interval_entry is None or not hold_interval_entry.text().strip() or hold_interval_entry.text().strip() == "Hold Interval":
+                                hold_interval = "10"
+                            else:
+                                hold_interval = hold_interval_entry.text().strip()
                             hold_interval_ms = str(int(float(hold_interval) * 1000))
 
                             if "+" in remap_key:
@@ -239,55 +234,6 @@ class EditScriptLogic:
             return entry_widget is not None and button_widget is not None
         except Exception:
             return False
-
-    def toggle_mode(self):
-        if not self.is_text_mode:
-            # Switch to Text Mode
-            self.is_text_mode = True
-            self.text_button.setText("Default Mode")
-
-            # Remove existing key mapping widgets
-            for widget in self.key_frame.findChildren(QWidget):
-                widget.deleteLater()
-
-            self.key_rows = []
-            self.add_shortcut_mapping_row()
-            self.row_num += 1
-
-            # Add a text block for user input, only if it doesn't already exist
-            if not hasattr(self, 'text_block'):
-                self.text_block = QTextEdit(self.key_frame)
-                self.text_block.setAcceptRichText(False)
-                self.text_block.setPlaceholderText("Enter your text here...")
-                self.text_block.setStyleSheet("font-family: Consolas; font-size: 10pt;")
-                self.text_block.textChanged.connect(self.update_text_block_height)
-                self.key_frame.layout().addWidget(self.text_block, self.row_num, 0, 1, 4)
-
-            # Disable the add row button in Text Mode
-            self.continue_button.setEnabled(False)
-
-            # Update the layout after adding the text block
-            self.key_frame.update()
-            self.canvas.setScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-
-        else:
-            # Switch to Remap Mode
-            self.is_text_mode = False
-            self.text_button.setText("Text Mode")
-
-            # Remove text block if it exists
-            if hasattr(self, 'text_block'):
-                self.text_block.deleteLater()
-                del self.text_block
-
-            for widget in self.key_frame.findChildren(QWidget):
-                widget.deleteLater()
-
-            self.key_rows = []
-            self.add_key_mapping_row()
-
-            # Enable the add row button in Remap Mode
-            self.continue_button.setEnabled(True)
 
     def toggle_shortcut_key_listening(self, entry_widget, button):
         def toggle_other_buttons(state):
@@ -386,8 +332,6 @@ class EditScriptLogic:
             if self.mouse_listener is not None:
                 self.mouse_listener.stop()
                 self.mouse_listener = None
-
-            print("Shortcut key and mouse listening stopped.")
 
     def on_key_event(self, event):
         if self.is_listening and self.active_entry and event.event_type == 'down':

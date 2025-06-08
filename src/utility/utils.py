@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from src.utility.constant import (data_dir, appdata_dir, pinned_file, condition_path)
 
 # Load the condition from the condition.json file
@@ -87,3 +88,34 @@ if not os.path.exists(pinned_file):
 device_list_path = os.path.join(active_dir, "Autohotkey Interception", "shared_device_info.txt")
 device_finder_path = os.path.join(active_dir, "Autohotkey Interception", "find_device.ahk")
 coordinate_path = os.path.join(active_dir, "Autohotkey Interception", "Coordinate.ahk")
+
+TEMP_RUNNING_FILE = os.path.join(appdata_dir, "running_scripts.tmp")
+
+def read_running_scripts_temp():
+    start_time = time.perf_counter()
+    scripts = set()
+    if os.path.exists(TEMP_RUNNING_FILE):
+        try:
+            with open(TEMP_RUNNING_FILE, "r", encoding="utf-8") as f:
+                scripts = set(line.strip() for line in f if line.strip())
+        except Exception as e:
+            print(f"[read_running_scripts_temp] Error: {e}")
+    return scripts
+
+def write_running_scripts_temp(scripts):
+    try:
+        with open(TEMP_RUNNING_FILE, "w", encoding="utf-8") as f:
+            for s in scripts:
+                f.write(s + "\n")
+    except Exception as e:
+        print(f"[write_running_scripts_temp] Error: {e}")
+
+def add_script_to_temp(script_name):
+    scripts = read_running_scripts_temp()
+    scripts.add(script_name)
+    write_running_scripts_temp(scripts)
+
+def remove_script_from_temp(script_name):
+    scripts = read_running_scripts_temp()
+    scripts.discard(script_name)
+    write_running_scripts_temp(scripts)

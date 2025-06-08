@@ -1,7 +1,9 @@
 import os
 import json
 import random
-import traceback  # <-- Add this import
+import traceback  
+from PySide6.QtWidgets import (
+    QComboBox, QSpinBox, QRadioButton, QGroupBox, QFrame)
 from src.utility.constant import (exit_keys_file)
 from src.utility.utils import (active_dir)
 
@@ -84,12 +86,13 @@ class EditScriptSave:
                         exit_combo = f"^!{random.choice('abcdefghijklmnopqrstuvwxyz')}"
                         exit_keys[script_name] = exit_combo
 
-
                         if first_line == "; default":
+                            # Handle Files Opener script
                             new_content = ["; default\n",
                                         f"{exit_combo}::ExitApp\n\n"]
                             new_content.extend(lines[2:])
                         elif first_line == "; text":
+                            # Handle Files Opener script
                             new_content = ["; text\n",
                                         f"{exit_combo}::ExitApp\n\n"]
                             new_content.extend(lines[2:])
@@ -108,9 +111,6 @@ class EditScriptSave:
                         json.dump(exit_keys, f)
                 except Exception as e:
                     print(f"Error saving exit_keys.json: {e}")
-
-            else:
-                print("exit_keys.json found, using existing exit keys.")
 
         except Exception as e:
             print(f"Error in initialize_exit_keys: {e}")
@@ -169,6 +169,11 @@ cm1 := AHI.CreateContextManager(id1)
         key_translations = self.load_key_translations()
 
         try:
+            # Determine mode from combobox if available
+            mode = None
+            if hasattr(self, "mode_combobox"):
+                mode = self.mode_combobox.currentText().strip().lower()
+
             with open(output_path, 'w') as file:
                 self.write_first_line(file)
                 self.handle_device(file)
@@ -187,7 +192,7 @@ cm1 := AHI.CreateContextManager(id1)
                 else:
                     self.handle_default_mode(file, key_translations, program_condition, shortcuts_present,
                                             device_condition)
-                
+            # Finalize and update script list
             self.scripts = self.list_scripts()
             self.update_script_list()
             self.edit_window.destroy()
@@ -223,3 +228,68 @@ cm1 := AHI.CreateContextManager(id1)
         if device_name:
             device_condition = f"cm1.IsActive"  # Modify this if needed to generate the correct condition
         return device_condition
+    
+    def handle_text_mode(self, file, key_translations, program_condition, shortcuts_present, device_condition):
+        if not shortcuts_present:
+            # If no shortcuts, use #HotIf without toggle
+            if program_condition:
+                file.write(f"#HotIf ({program_condition})\n")
+            text_content = self.text_block.toPlainText().strip()
+            if text_content:
+                file.write("; Text mode start\n")
+                file.write(text_content + '\n')
+                file.write("; Text mode end\n")
+        else:
+            # If shortcuts present, use #HotIf with toggle
+            file.write("toggle := false\n\n")
+
+            # Start with the toggle condition and program condition combined
+            hotif_condition = "toggle"
+            if program_condition:
+                hotif_condition += f" && ({program_condition})"
+
+            self.process_shortcuts(file, key_translations)
+
+            # Write the merged #HotIf line
+            file.write(f"#HotIf {hotif_condition}\n")
+
+            text_content = self.text_block.toPlainText().strip()
+            if text_content:
+                for line in text_content.splitlines():
+                    file.write("; Text mode start\n")
+                    file.write(text_content + '\n')
+                    file.write("; Text mode end\n")
+
+        # Close #HotIf for both program and device conditions
+        file.write("#HotIf\n")
+
+        if device_condition:
+            file.write("#HotIf\n")
+
+    def handle_default_mode(self, file, key_translations, program_condition, shortcuts_present, device_condition):
+        if not shortcuts_present:
+            # If no shortcuts, use #HotIf without toggle
+            if program_condition:
+                file.write(f"#HotIf ({program_condition})\n")
+            self.process_key_remaps(file, key_translations)
+        else:
+            # If shortcuts present, use #HotIf with toggle
+            file.write("toggle := false\n\n")
+
+            # Start with the toggle condition and program condition combined
+            hotif_condition = "toggle"
+            if program_condition:
+                hotif_condition += f" && ({program_condition})"
+
+            self.process_shortcuts(file, key_translations)
+
+            # Write the merged #HotIf line
+            file.write(f"#HotIf {hotif_condition}\n")
+
+            self.process_key_remaps(file, key_translations)
+
+        # Close #HotIf for both program and device conditions
+        file.write("#HotIf\n")
+
+        if device_condition:
+            file.write("#HotIf\n")

@@ -1,5 +1,5 @@
 ; text
-^!y::ExitApp
+^!p::ExitApp
 
 #SingleInstance Force
 ClickInterval := 100 ; Change this if you want to change the interval

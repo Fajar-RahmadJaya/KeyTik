@@ -3,9 +3,10 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget, QSizePolicy, QGridLayout
 )
 from PySide6.QtCore import Qt
+import re
 
-class edit_frame_row:
-    def add_edit_mapping_row(self, original_key='', remap_key=''):
+class EditFrameRow:
+    def add_edit_mapping_row(self, original_key='', remap_key='', insert_after=None):
         # Ensure edit_frame has a layout
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -53,6 +54,12 @@ class edit_frame_row:
         if original_key:
             original_key_entry.setCurrentText(original_key)
         original_key_entry.setFixedWidth(120)
+        # Center text in combobox line edit
+        original_key_entry.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Disable mouse wheel changing selection
+        original_key_entry.wheelEvent = lambda event: None
+        # Disable auto-completion
+        original_key_entry.setCompleter(None)
         row_layout.addWidget(original_key_entry, 1, 1)
 
         remap_key_entry = QComboBox(row_widget)
@@ -61,6 +68,12 @@ class edit_frame_row:
         if remap_key:
             remap_key_entry.setCurrentText(remap_key)
         remap_key_entry.setFixedWidth(120)
+        # Center text in combobox line edit
+        remap_key_entry.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Disable mouse wheel changing selection
+        remap_key_entry.wheelEvent = lambda event: None
+        # Disable auto-completion
+        remap_key_entry.setCompleter(None)
         row_layout.addWidget(remap_key_entry, 1, 3)
 
         # Format label and checkboxes row
@@ -78,19 +91,22 @@ class edit_frame_row:
         hold_interval_entry.setPlaceholderText("Hold Interval")
         hold_interval_entry.setFixedWidth(120)
         hold_interval_entry.setStyleSheet("color: lightgray;")
+        hold_interval_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         row_layout.addWidget(hold_interval_entry, 2, 3)
+        
 
         # Save references for later use
         self.key_rows.append((original_key_entry, remap_key_entry, original_key_select, remap_key_select, text_format_checkbox, hold_format_checkbox, hold_interval_entry))
 
-        # Separator with plus button
+        # --- Separator with plus button ---
         separator_widget = QWidget(self.edit_frame)
         separator_layout = QHBoxLayout(separator_widget)
         separator_widget.setLayout(separator_layout)
         separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        separator_layout.setContentsMargins(20, 0, 20, 0)
-        separator_layout.setSpacing(5)
+        separator_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins for flush line
+        separator_layout.setSpacing(0)  # Remove spacing for flush line
 
+        # Only add the left/right separators and plus_label initially
         left_sep = QFrame(separator_widget)
         left_sep.setFrameShape(QFrame.Shape.HLine)
         left_sep.setFrameShadow(QFrame.Shadow.Sunken)
@@ -104,24 +120,52 @@ class edit_frame_row:
             font-weight: bold;
         """)
         plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        plus_label.setFixedWidth(20)  # Increased width to accommodate larger text
-        plus_label.setFixedHeight(20)  # Set fixed height to match width
-        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Center the text
+        plus_label.setFixedWidth(20)
+        plus_label.setFixedHeight(20)
+        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         separator_layout.addWidget(plus_label)
-        def on_plus_click(event):
-            self.add_edit_mapping_row()
-        plus_label.mousePressEvent = on_plus_click
 
         right_sep = QFrame(separator_widget)
         right_sep.setFrameShape(QFrame.Shape.HLine)
         right_sep.setFrameShadow(QFrame.Shadow.Sunken)
         separator_layout.addWidget(right_sep)
 
-        # Add row and separator to the main layout
-        self.edit_frame_layout.addWidget(row_widget)
-        self.edit_frame_layout.addWidget(separator_widget)
+        def on_plus_click(event):
+            # Remove all widgets from the separator_layout
+            while separator_layout.count():
+                item = separator_layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+            # Add a single full-width separator
+            full_sep = QFrame(separator_widget)
+            full_sep.setFrameShape(QFrame.Shape.HLine)
+            full_sep.setFrameShadow(QFrame.Shadow.Sunken)
+            full_sep.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            separator_layout.addWidget(full_sep)
+            self.add_edit_mapping_row(insert_after=(row_widget, separator_widget))
+        plus_label.mousePressEvent = on_plus_click
 
-    def add_edit_shortcut_mapping_row(self, shortcut=''):
+        # --- Insert at correct position ---
+        if not hasattr(self, "mapping_row_widgets"):
+            self.mapping_row_widgets = []
+        # Hide previous plus_label if exists
+        if self.mapping_row_widgets:
+            prev_plus = self.mapping_row_widgets[-1][1].findChild(QLabel, None)
+            if prev_plus:
+                prev_plus.setVisible(False)
+        # Insert at correct position
+        if insert_after is not None:
+            idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
+            self.edit_frame_layout.insertWidget(idx, row_widget)
+            self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
+            self.mapping_row_widgets.insert(idx // 2, (row_widget, separator_widget))
+        else:
+            self.edit_frame_layout.addWidget(row_widget)
+            self.edit_frame_layout.addWidget(separator_widget)
+            self.mapping_row_widgets.append((row_widget, separator_widget))
+
+    def add_edit_shortcut_mapping_row(self, shortcut='', insert_after=None):
         # Ensure edit_frame has a layout
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -167,28 +211,32 @@ class edit_frame_row:
         if shortcut:
             shortcut_entry.setCurrentText(shortcut)
         shortcut_entry.setFixedWidth(280)
+        # Center text in combobox line edit
+        shortcut_entry.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Disable mouse wheel changing selection
+        shortcut_entry.wheelEvent = lambda event: None
+        # Disable auto-completion
+        shortcut_entry.setCompleter(None)
         row_layout.addWidget(shortcut_entry, 1, 1, 1, 2)
         self.shortcut_entry = shortcut_entry
 
         # Save reference for later
         self.shortcut_rows.append((shortcut_entry, shortcut_key_select))
 
-        # Separator with plus button
+        # --- Separator with plus button ---
         separator_widget = QWidget(self.edit_frame)
         separator_layout = QHBoxLayout(separator_widget)
         separator_widget.setLayout(separator_layout)
         separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        separator_layout.setContentsMargins(20, 0, 20, 0)
-        separator_layout.setSpacing(5)
+        separator_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins for flush line
+        separator_layout.setSpacing(0)  # Remove spacing for flush line
 
         left_sep = QFrame(separator_widget)
         left_sep.setFrameShape(QFrame.Shape.HLine)
         left_sep.setFrameShadow(QFrame.Shadow.Sunken)
         separator_layout.addWidget(left_sep)
 
-        # Only add + button if not a special script
-        script_name = self.script_name_entry.text().strip().lower() if hasattr(self, 'script_name_entry') else ""
-        
+        plus_label = None
         plus_label = QLabel("+", separator_widget)
         plus_label.setStyleSheet("""
             color: gray;
@@ -197,23 +245,69 @@ class edit_frame_row:
             font-weight: bold;
         """)
         plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        plus_label.setFixedWidth(20)  # Increased width to accommodate larger text
-        plus_label.setFixedHeight(20)  # Set fixed height to match width
-        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Center the text
+        plus_label.setFixedWidth(20)
+        plus_label.setFixedHeight(20)
+        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         separator_layout.addWidget(plus_label)
-        def on_plus_click(event):
-            self.add_edit_shortcut_mapping_row()
-        plus_label.mousePressEvent = on_plus_click
-        
+
         right_sep = QFrame(separator_widget)
         right_sep.setFrameShape(QFrame.Shape.HLine)
         right_sep.setFrameShadow(QFrame.Shadow.Sunken)
         separator_layout.addWidget(right_sep)
 
-        # Add row and separator to the main layout
-        self.edit_frame_layout.addWidget(row_widget)
-        self.edit_frame_layout.addWidget(separator_widget)
+        def on_plus_click(event):
+            # Remove all widgets from the separator_layout
+            while separator_layout.count():
+                item = separator_layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+            # Add a single full-width separator
+            full_sep = QFrame(separator_widget)
+            full_sep.setFrameShape(QFrame.Shape.HLine)
+            full_sep.setFrameShadow(QFrame.Shadow.Sunken)
+            full_sep.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            separator_layout.addWidget(full_sep)
+            self.add_edit_shortcut_mapping_row(insert_after=(row_widget, separator_widget))
+        plus_label.mousePressEvent = on_plus_click
 
+        # Hide previous plus_label if exists
+        if not hasattr(self, "shortcut_row_widgets"):
+            self.shortcut_row_widgets = []
+        if self.shortcut_row_widgets:
+            prev_plus = self.shortcut_row_widgets[-1][1].findChild(QLabel, None)
+            if prev_plus:
+                prev_plus.setVisible(False)
+
+        # --- Insert at correct position ---
+        if not hasattr(self, "shortcut_row_widgets"):
+            self.shortcut_row_widgets = []
+        if insert_after is not None:
+            idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
+            self.edit_frame_layout.insertWidget(idx, row_widget)
+            self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
+            self.shortcut_row_widgets.insert(idx // 2, (row_widget, separator_widget))
+        else:
+            self.edit_frame_layout.insertWidget(0, row_widget)
+            self.edit_frame_layout.insertWidget(1, separator_widget)
+            self.shortcut_row_widgets.append((row_widget, separator_widget)
+                                             )
         # If in Text Mode, re-add the text block below the shortcut rows
         if self.is_text_mode and hasattr(self, 'text_block') and self.text_block is not None:
             self.edit_frame_layout.addWidget(self.text_block)
+
+    def extract_and_filter_content(self, lines):
+        # Extract content strictly between "; Text mode start" and "; Text mode end"
+        inside = False
+        result_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped == "; Text mode start":
+                inside = True
+                continue
+            if stripped == "; Text mode end":
+                inside = False
+                continue
+            if inside:
+                result_lines.append(line)
+        return ''.join(result_lines)

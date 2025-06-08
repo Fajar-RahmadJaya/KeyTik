@@ -1,6 +1,7 @@
 import os
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QCheckBox, QPushButton, QTextBrowser, QWidget, QFrame
+    QDialog, QVBoxLayout, QHBoxLayout, QCheckBox, QPushButton, 
+    QTextBrowser, QWidget, QFrame
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
@@ -8,7 +9,7 @@ from markdown import markdown
 import json
 from src.utility.constant import (data_dir, icon_path, dont_show_path)
 
-class welcome_window:
+class Welcome:
     def check_welcome(self):
         if self.welcome_condition:
             self.show_welcome_window()
@@ -160,10 +161,6 @@ class welcome_window:
                 self.save_welcome_condition()
 
             dont_show_checkbox.stateChanged.connect(toggle_dont_show)
-
-            # Connect navigation buttons
-            prev_button.clicked.connect(prev_page)
-            next_button.clicked.connect(next_page)
 
             # Save state when dialog is closed (in case user closes without toggling)
             def on_dialog_close(event):

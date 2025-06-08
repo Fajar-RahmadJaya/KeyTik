@@ -4,19 +4,12 @@ from win32com.client import Dispatch
 import keyboard
 import time
 from pynput import mouse
-import psutil
 import win32gui
 import win32process
-import json
-import random
-from src.utility.constant import(dont_show_path,
-                     script_dir, keylist_path, exit_keys_file)
-from src.utility.utils import (active_dir, store_dir, 
-                   device_finder_path, save_pinned_profiles)
+from src.utility.constant import(script_dir, keylist_path)
+from src.utility.utils import (active_dir, store_dir, save_pinned_profiles)
 
-class logic:
-
-
+class Logic:
     def list_scripts(self):
         # Create a list of all .ahk and .py files
         all_scripts = [f for f in os.listdir(self.SCRIPT_DIR) if f.endswith('.ahk') or f.endswith('.py')]
@@ -28,18 +21,6 @@ class logic:
         # Return a combined list with pinned scripts at the top
         self.scripts = pinned + unpinned
         return self.scripts  # Ensure it returns a list of scripts
-
-    def toggle_run_exit(self, script_name, button):
-        if button["text"] == "Run":
-            # Start the script
-            self.activate_script(script_name, button)
-            # Change button to Exit after script is running
-            button.config(text="Exit", command=lambda: self.toggle_run_exit(script_name, button))
-        else:
-            # Exit the script
-            self.exit_script(script_name, button)
-            # Change button to Run after script has exited
-            button.config(text="Run", command=lambda: self.toggle_run_exit(script_name, button))
 
     def toggle_pin(self, script, icon_label):
         if script in self.pinned_profiles:
@@ -175,24 +156,6 @@ class logic:
 
         return devices
 
-    # Function to refresh the device list by re-reading the device file
-    def refresh_device_list(self, file_path):
-        os.startfile(device_finder_path)  # Use the device finder path
-        time.sleep(1)  # Small delay to allow the AHK script to finish
-        devices = self.parse_device_info(file_path)
-        return devices
-
-    # Function to update the Treeview widget with the device list
-    def update_treeview(self, devices, tree):
-        for item in tree.get_children():
-            tree.delete(item)
-
-        for device in devices:
-            if device.get('VID') and device.get('PID') and device.get('Handle'):
-                # Replace 'Is Mouse' with 'Mouse' or 'Keyboard'
-                device_type = "Mouse" if device['Is Mouse'] == "Yes" else "Keyboard"
-                tree.insert("", "end", values=(device_type, device['VID'], device['PID'], device['Handle']))
-
     def cleanup_device_selection_window(self):
         self.device_selection_window.destroy()
         self.device_selection_window = None
@@ -215,49 +178,6 @@ class logic:
             return len(visible_pids) > 0
         except Exception as e:
             return False
-
-    def get_running_processes(self):
-        processes = []
-        for proc in psutil.process_iter(['pid', 'name', 'exe', 'status']):
-            try:
-                if proc.info['name'].lower() in ["system", "system idle process", "svchost.exe", "taskhostw.exe",
-                                                "explorer.exe"]:
-                    continue
-
-                pid = proc.info['pid']
-                exe_name = proc.info['exe'] if 'exe' in proc.info else None  # Get executable path (not full path)
-                exe_name = os.path.basename(exe_name) if exe_name else proc.info[
-                    'name']  # Use executable name (not full path)
-                status = proc.info['status']
-
-                if self.is_visible_application(pid):
-                    process_type = "Application"
-                else:
-                    process_type = "System"
-
-                try:
-                    def window_callback(hwnd, windows):
-                        _, process_pid = win32process.GetWindowThreadProcessId(hwnd)
-                        if process_pid == pid and win32gui.IsWindowVisible(hwnd):
-                            windows.append((win32gui.GetClassName(hwnd),
-                                            win32gui.GetWindowText(hwnd)))  # Get window class and title
-
-                    windows = []
-                    win32gui.EnumWindows(window_callback, windows)
-                    if windows:
-                        class_name, window_title = windows[0]  # Use the first window found
-                    else:
-                        class_name, window_title = "N/A", "N/A"  # Default to "N/A" if no window title
-
-                except Exception as e:
-                    class_name, window_title = "N/A", "N/A"  # Default if unable to retrieve class name or title
-
-                # Add window_title (Name), class_name (window class), and exe_name (process name) to the list
-                processes.append((window_title, class_name, exe_name, process_type))
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
-        return processes
-
 
     def cleanup_select_program_window(self):
         self.select_program_window.destroy()
@@ -480,66 +400,9 @@ class logic:
         except Exception as e:
             print(f"Error writing script: {e}")
 
-    def handle_text_mode(self, file, key_translations, program_condition, shortcuts_present, device_condition):
-        if not shortcuts_present:
-            # If no shortcuts, use #HotIf without toggle
-            if program_condition:
-                file.write(f"#HotIf ({program_condition})\n")
-            text_content = self.text_block.get("1.0", 'end').strip()
-            if text_content:
-                file.write(text_content + '\n')
-        else:
-            # If shortcuts present, use #HotIf with toggle
-            file.write("toggle := false\n\n")
 
-            # Start with the toggle condition and program condition combined
-            hotif_condition = "toggle"
-            if program_condition:
-                hotif_condition += f" && ({program_condition})"
 
-            self.process_shortcuts(file, key_translations)
 
-            # Write the merged #HotIf line
-            file.write(f"#HotIf {hotif_condition}\n")
-
-            text_content = self.text_block.get("1.0", 'end').strip()
-            if text_content:
-                for line in text_content.splitlines():
-                    file.write(line + '\n')
-
-        # Close #HotIf for both program and device conditions
-        file.write("#HotIf\n")
-
-        if device_condition:
-            file.write("#HotIf\n")
-
-    def handle_default_mode(self, file, key_translations, program_condition, shortcuts_present, device_condition):
-        if not shortcuts_present:
-            # If no shortcuts, use #HotIf without toggle
-            if program_condition:
-                file.write(f"#HotIf ({program_condition})\n")
-            self.process_key_remaps(file, key_translations)
-        else:
-            # If shortcuts present, use #HotIf with toggle
-            file.write("toggle := false\n\n")
-
-            # Start with the toggle condition and program condition combined
-            hotif_condition = "toggle"
-            if program_condition:
-                hotif_condition += f" && ({program_condition})"
-
-            self.process_shortcuts(file, key_translations)
-
-            # Write the merged #HotIf line
-            file.write(f"#HotIf {hotif_condition}\n")
-
-            self.process_key_remaps(file, key_translations)
-
-        # Close #HotIf for both program and device conditions
-        file.write("#HotIf\n")
-
-        if device_condition:
-            file.write("#HotIf\n")
 
     def update_edit_text_block_height(self, event=None):
         if hasattr(self, 'text_block'):
@@ -557,6 +420,8 @@ class logic:
             self.edit_frame.update_idletasks()
             self.edit_canvas.config(scrollregion=self.edit_canvas.bbox("all"))
 
+
+
     def load_key_list(self):
         key_map = {}
         try:
@@ -570,6 +435,37 @@ class logic:
         except FileNotFoundError:
             print("Key list file not found.")
         return key_map
+
+    def convert_milliseconds_to_time_units(self, milliseconds):
+        """
+        Convert milliseconds to hours, minutes, seconds, and milliseconds
+        Returns a tuple of (hours, minutes, seconds, milliseconds)
+        """
+        # Constants for conversion
+        MILLISECONDS_PER_SECOND = 1000
+        SECONDS_PER_MINUTE = 60
+        MINUTES_PER_HOUR = 60
+
+        # Calculate hours
+        total_seconds = milliseconds / MILLISECONDS_PER_SECOND
+        total_minutes = total_seconds / SECONDS_PER_MINUTE
+        hours = int(total_minutes / MINUTES_PER_HOUR)
+
+        # Calculate remaining minutes
+        remaining_milliseconds = milliseconds - (hours * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND)
+        minutes = int(remaining_milliseconds / (SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND))
+
+        # Calculate remaining seconds
+        remaining_milliseconds -= minutes * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND
+        seconds = int(remaining_milliseconds / MILLISECONDS_PER_SECOND)
+
+        # Calculate remaining milliseconds
+        remaining_milliseconds -= seconds * MILLISECONDS_PER_SECOND
+
+        return hours, minutes, seconds, int(remaining_milliseconds)
+
+
+
 
     def edit_cleanup_listeners(self):
         if self.is_listening:
@@ -596,63 +492,6 @@ class logic:
             self.edit_window.destroy()
             self.edit_window = None
 
-    def extract_and_filter_content(self, lines):
-        toggle_lines = []  # Lines captured from #HotIf toggle until next #HotIf
-        cm1_lines = []  # Lines captured from #HotIf cm1.IsActive until next #HotIf
-        inside_hotif_toggle = False
-        inside_hotif_cm1 = False  # To capture lines for #HotIf cm1.IsActive
-
-        for line in lines:
-            raw_line = line  # Keep the line unmodified for spacing purposes
-            stripped_line = line.strip()
-
-            # Skip lines starting with '^!p' or ';' (header or comment lines)
-            if stripped_line.startswith('^!p') or stripped_line.startswith(';'):
-                continue
-
-            # First filter: Capture lines between #HotIf toggle and next #HotIf
-            if '#HotIf toggle' in stripped_line:
-                inside_hotif_toggle = True
-                continue  # Skip the '#HotIf toggle' line itself
-
-            if inside_hotif_toggle:
-                # If we encounter another #HotIf, stop capturing for toggle
-                if '#HotIf' in stripped_line:
-                    inside_hotif_toggle = False
-                    continue  # Skip the '#HotIf' line (end marker)
-
-                # Otherwise, capture the original line inside #HotIf toggle
-                toggle_lines.append(raw_line)
-
-            # Second filter: Capture lines between #HotIf cm1.IsActive and next #HotIf
-            if '#HotIf cm1.IsActive' in stripped_line:
-                inside_hotif_cm1 = True
-                continue  # Skip the '#HotIf cm1.IsActive' line itself
-
-            if inside_hotif_cm1:
-                # If we encounter another #HotIf, stop capturing for cm1.IsActive
-                if '#HotIf' in stripped_line:
-                    inside_hotif_cm1 = False
-                    continue  # Skip the '#HotIf' line (end marker)
-
-                # Otherwise, capture the original line inside #HotIf cm1.IsActive
-                cm1_lines.append(raw_line)
-
-        # After both filters, combine the lines based on available results
-        if toggle_lines:
-            print(f"Cleaned toggle lines: {toggle_lines}")
-            result = ''.join(toggle_lines)  # Preserve original line breaks
-        elif cm1_lines:
-            print(f"Cleaned cm1 lines: {cm1_lines}")
-            result = ''.join(cm1_lines)  # Preserve original line breaks
-        else:
-            # If no #HotIf toggle or #HotIf cm1.IsActive lines, return original lines with comments and ^!p removed
-            cleaned_lines = [raw_line for raw_line in lines if
-                            not raw_line.strip().startswith('^!p') and not raw_line.strip().startswith(';')]
-            result = ''.join(cleaned_lines)  # Preserve original line breaks
-
-        return result  # Return the result
-
     def edit_on_mousewheel(self, event):
         # Check if the canvas can scroll up or down
         can_scroll_down = self.edit_canvas.yview()[1] < 1  # Check if we're not at the bottom
@@ -664,3 +503,4 @@ class logic:
         elif event.num == 4 or event.delta == 120:  # Scroll Up
             if can_scroll_up:  # Only scroll up if we're not at the top
                 self.edit_canvas.yview_scroll(-1, "units")
+

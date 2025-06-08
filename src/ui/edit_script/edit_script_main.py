@@ -1,16 +1,18 @@
 import os
 from PySide6.QtWidgets import (
     QWidget, QDialog, QLabel, QLineEdit, QPushButton, QTextEdit, QScrollArea,
-    QVBoxLayout, QHBoxLayout, QMessageBox, QTreeWidget, QTreeWidgetItem, 
-    QSpacerItem, QSizePolicy
+    QVBoxLayout, QSpacerItem, QSizePolicy, QComboBox
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from src.utility.constant import (icon_path)
-from src.utility.utils import (device_list_path)
 
-class EditScript:
+class EditScriptMain:
     def edit_script(self, script_name):
+        # Always clear row widget tracking lists to avoid stale/deleted widget references
+        self.shortcut_row_widgets = []
+        self.mapping_row_widgets = []
+
         self.is_text_mode = False  # Initialize is_text_mode to False
 
         # New profile mode if script_name is None or empty
@@ -128,6 +130,10 @@ class EditScript:
             self.edit_scroll = QScrollArea(self.edit_window)
             self.edit_scroll.setGeometry(int(0.067 * 600), int(0.178 * 450), int(0.875 * 600), int(0.678 * 450))
             self.edit_scroll.setWidgetResizable(True)
+            # Always show vertical scrollbar
+            self.edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+            # Optionally, always show horizontal scrollbar too:
+            # self.edit_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
             self.edit_frame = QWidget()
             self.edit_scroll.setWidget(self.edit_frame)
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -301,43 +307,85 @@ class EditScript:
                         else:  # Shortcut case (no remap key, just action or toggle logic)
                             shortcuts.append(original_key)
 
-
             elif mode_line == "; text":
                 self.is_text_mode = True
-                self.text_block = QTextEdit(self.edit_frame, wrap='word')
+                self.text_block = QTextEdit(self.edit_frame)
+                self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
                 self.text_block.setFixedHeight(14 * self.fontMetrics().height())
                 self.text_block.setFontPointSize(10)
                 self.edit_frame_layout.addWidget(self.text_block)
+
+                for line in lines[3:]:  # Skip the header lines
+                    if "::" in line:
+                        # Split the line into key parts
+                        parts = line.split("::")
+                        original_key = parts[0].strip()
+                        original_key = self.replace_raw_keys(original_key, key_map).replace("~", "").replace(" & ", "+").replace("*", "")
+                        shortcuts.append(original_key)
+
                 self.row_num += 1
 
                 text_content = self.extract_and_filter_content(lines)
                 self.text_block.setPlainText(text_content.strip())
 
-            for shortcut in shortcuts:
-                self.add_edit_shortcut_mapping_row(shortcut)
+            # Ensure at least one shortcut row and one key row are present, and order is shortcut row(s) first
+            # --- FIX: Do NOT add shortcut/key rows for special format scripts ---
+            if not shortcuts:
+                self.add_edit_shortcut_mapping_row()
+            else:
+                for shortcut in shortcuts:
+                    self.add_edit_shortcut_mapping_row(shortcut)
 
-            # Add remap rows to UI
-            for original_key, remap_key, is_text_format, is_hold_format, hold_interval in remaps:
-                self.add_edit_mapping_row(original_key, remap_key)
-                # Set the text format checkbox state for the last added row
-                if self.key_rows and len(self.key_rows[-1]) == 7:  # Changed from 5 to 7 to account for hold_format_var and hold_interval_entry
-                    _, _, _, _, text_format_var, hold_format_var, hold_interval_entry = self.key_rows[-1]
-                    text_format_var.setChecked(is_text_format)
-                    hold_format_var.setChecked(is_hold_format)
-                    if is_hold_format and hold_interval:
-                        hold_interval_entry.clear()
-                        # Convert string to float first, then format as integer if whole number
-                        hold_interval_float = float(hold_interval)
-                        hold_interval_str = str(int(hold_interval_float)) if hold_interval_float.is_integer() else str(hold_interval_float)
-                        hold_interval_entry.setText(hold_interval_str)
-                        hold_interval_entry.setStyleSheet("color: black")
-
+            # Only add mapping rows if not in text mode
+            if not self.is_text_mode:
+                if not remaps:
+                    self.add_edit_mapping_row()
+                else:
+                    for original_key, remap_key, is_text_format, is_hold_format, hold_interval in remaps:
+                        self.add_edit_mapping_row(original_key, remap_key)
+                        # Set the text format checkbox state for the last added row
+                        if self.key_rows and len(self.key_rows[-1]) == 7:  # Changed from 5 to 7 to account for hold_format_var and hold_interval_entry
+                            _, _, _, _, text_format_var, hold_format_var, hold_interval_entry = self.key_rows[-1]
+                            text_format_var.setChecked(is_text_format)
+                            hold_format_var.setChecked(is_hold_format)
+                            if is_hold_format and hold_interval:
+                                hold_interval_entry.clear()
+                                # Convert string to float first, then format as integer if whole number
+                                hold_interval_float = float(hold_interval)
+                                hold_interval_str = str(int(hold_interval_float)) if hold_interval_float.is_integer() else str(hold_interval_float)
+                                hold_interval_entry.setText(hold_interval_str)
+                                
             self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
             save_button = QPushButton("Save Changes", self.edit_window)
             save_button.move(int(0.070 * 600), int(0.889 * 450))
             save_button.resize(107, 26)
             save_button.clicked.connect(lambda: self.save_changes(script_name))
+
+            mode_combobox = QComboBox(self.edit_window)
+            mode_combobox.addItems([
+                "Default Mode",
+                "Text Mode",
+            ])
+            mode_combobox.move(450, 400)
+            mode_combobox.setEditable(True)
+            mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+            mode_combobox.lineEdit().setReadOnly(True)
+            mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+            self.mode_combobox = mode_combobox  # <-- Add this line
+
+            # Set default index based on first_line
+            first_line_lower = first_line.lower()
+            mode_map = {
+                "; default": 0,
+                "; text": 1,
+            }
+            default_index = mode_map.get(first_line_lower, 0)
+            mode_combobox.setCurrentIndex(default_index)
+
+            # --- Add combobox handler ---
+            on_mode_changed = self.handle_mode_changed
+            mode_combobox.currentIndexChanged.connect(on_mode_changed)
 
             # Update the scrollable region of the canvas
             self.update_scroll_region()
@@ -388,6 +436,10 @@ class EditScript:
             self.edit_scroll = QScrollArea(self.edit_window)
             self.edit_scroll.setGeometry(int(0.067 * 600), int(0.178 * 450), int(0.875 * 600), int(0.678 * 450))
             self.edit_scroll.setWidgetResizable(True)
+            # Always show vertical scrollbar
+            self.edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+            # Optionally, always show horizontal scrollbar too:
+            # self.edit_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
             self.edit_frame = QWidget()
             self.edit_scroll.setWidget(self.edit_frame)
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -403,180 +455,57 @@ class EditScript:
             self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
             save_button = QPushButton("Save Changes", self.edit_window)
-            save_button.move(int(0.070 * 600), int(0.889 * 450))
+            save_button.move(42, 400)
             save_button.resize(107, 26)
             save_button.clicked.connect(lambda: self.save_changes(script_name_entry.text()))
+
+            mode_combobox = QComboBox(self.edit_window)
+            mode_combobox.addItems([
+                "Default Mode",
+                "Text Mode",
+            ])
+            mode_combobox.move(400, 400)
+            mode_combobox.setEditable(True)
+            mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+            mode_combobox.lineEdit().setReadOnly(True)
+            mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+            self.mode_combobox = mode_combobox  # <-- Add this line
+
+            # --- Add combobox handler ---
+            on_mode_changed = self.handle_mode_changed
+            mode_combobox.currentIndexChanged.connect(on_mode_changed)
 
             self.update_scroll_region()
             self.edit_window.exec()
 
-    def edit_open_device_selection(self):
-        if not self.check_interception_driver():
-            return  # Don't open the device selection window if driver isn't installed
+    def handle_mode_changed(self, index):
+        # Clear the edit_frame_layout
+        while self.edit_frame_layout.count():
+            item = self.edit_frame_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)
+        # Reset row tracking
+        self.key_rows = []
+        self.shortcut_rows = []
+        if hasattr(self, "files_opener_rows"):
+            self.files_opener_rows = []
+        if hasattr(self, "files_opener_row_widgets"):
+            self.files_opener_row_widgets = []
+        if hasattr(self, "text_block"):
+            self.text_block = None
+        self.is_text_mode = False
 
-        # Remove .winfo_exists() checks, use isVisible() for PyQt if needed
-        if self.device_selection_window and self.device_selection_window.isVisible():
-            self.device_selection_window.raise_()
-            return
-
-        # Check if the parent window exists
-        parent_window = self.create_profile_window if self.create_profile_window and self.create_profile_window.isVisible() else self.edit_window
-        if not parent_window or not parent_window.isVisible():
-            QMessageBox.critical(self, "Error", "Parent window no longer exists.")  # <-- changed from self.root
-            return
-
-        self.device_selection_window = QDialog(parent_window)
-        self.device_selection_window.setWindowTitle("Select Device")
-        self.device_selection_window.setWindowIcon(QIcon(icon_path))
-        self.device_selection_window.setFixedSize(600, 300)
-        self.device_selection_window.setModal(True)  # Make modal
-        self.device_selection_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)  # Auto-delete on close
-
-        # Frame for treeview and buttons
-        main_layout = QVBoxLayout(self.device_selection_window)
-
-        # Treeview for device selection
-        self.device_tree = QTreeWidget(self.device_selection_window)
-        self.device_tree.setHeaderLabels(["Device Type", "VID", "PID", "Handle"])
-        main_layout.addWidget(self.device_tree)
-
-        # Button layout
-        button_layout = QHBoxLayout()
-        main_layout.addLayout(button_layout)
-
-        # Select button
-        select_button = QPushButton("Select", self.device_selection_window)
-        select_button.clicked.connect(lambda: self.select_device(self.device_tree, self.keyboard_entry,
-                                                                    self.device_selection_window))
-        button_layout.addWidget(select_button)
-
-        monitor_button = QPushButton("Open AHI Monitor To Test Device", self.device_selection_window)
-        monitor_button.clicked.connect(self.run_monitor)
-        button_layout.addWidget(monitor_button)
-
-        refresh_button = QPushButton("Refresh", self.device_selection_window)
-        refresh_button.clicked.connect(lambda: self.update_treeview(
-                self.refresh_device_list(device_list_path), self.device_tree))
-        button_layout.addWidget(refresh_button)
-
-        devices = self.refresh_device_list(device_list_path)  # Refresh device list
-        self.update_treeview(devices, self.device_tree)
-
-    def edit_open_select_program_window(self, entry_widget):
-        if self.select_program_window and self.select_program_window.isVisible():
-            self.select_program_window.raise_()
-            return
-
-        # Select appropriate parent window
-        if hasattr(self, 'edit_window') and self.edit_window and self.edit_window.isVisible():
-            parent_window = self.edit_window
-        else:
-            parent_window = self
-
-        self.select_program_window = QDialog(parent_window)
-        self.select_program_window.setWindowTitle("Select Programs")
-        self.select_program_window.setWindowIcon(QIcon(icon_path))
-        self.select_program_window.setFixedSize(600, 300)
-        self.select_program_window.setModal(True)  # Make modal
-        self.select_program_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)  # Auto-delete on close
-
-        # Frame for treeview and buttons
-        main_layout = QVBoxLayout(self.select_program_window)
-
-        # Treeview for displaying programs
-        self.program_tree = QTreeWidget(self.select_program_window)
-        self.program_tree.setHeaderLabels(["Window Title ↑", "Class", "Process", "Type"])
-        main_layout.addWidget(self.program_tree)
-
-        # Button layout
-        button_layout = QHBoxLayout()
-        main_layout.addLayout(button_layout)
-
-        # Save button
-        save_button = QPushButton("Select", self.select_program_window)
-        save_button.clicked.connect(lambda: self.save_selected_programs(entry_widget))
-        button_layout.addWidget(save_button)
-
-        # Search layout
-        search_layout = QHBoxLayout()
-        button_layout.addLayout(search_layout)
-
-        # Search label
-        search_label = QLabel("Search:", self.select_program_window)
-        search_layout.addWidget(search_label)
-
-        # Search entry
-        search_entry = QLineEdit(self.select_program_window)
-        search_layout.addWidget(search_entry)
-
-        # Search button
-        search_button = QPushButton("Search", self.select_program_window)
-        search_button.clicked.connect(lambda: self.search_programs(search_entry.text()))
-        search_layout.addWidget(search_button)
-
-        # Show All Processes button
-        self.show_all_button = QPushButton("Show All Processes", self.select_program_window)
-        self.show_all_button.clicked.connect(self.toggle_show_all_processes)
-        search_layout.addWidget(self.show_all_button)
-
-        # Populate the treeview with processes
-        self.update_program_treeview()
-
-        def toggle_checkmark(item, column):
-            current_values = self.program_tree.item(item, 'values')
-            name, class_name, proc_name, p_type = current_values
-            if column == 0:  # Name column
-                if "✔" in name:
-                    name = name.replace(" ✔", "")
-                else:
-                    name += " ✔"
-            elif column == 1:  # Class column
-                if "✔" in class_name:
-                    class_name = class_name.replace(" ✔", "")
-                else:
-                    class_name += " ✔"
-            else:  # Process column
-                if "✔" in proc_name:
-                    proc_name = proc_name.replace(" ✔", "")
-                else:
-                    proc_name += " ✔"
-            self.program_tree.item(item, values=(name, class_name, proc_name, p_type))
-
-        # Connect double-click signal to toggle checkmark
-        self.program_tree.itemDoubleClicked.connect(lambda item, column: toggle_checkmark(item, column))
-
-        # Show the dialog modally
-        self.select_program_window.exec()
-
-    def toggle_show_all_processes(self):
-        current_text = self.show_all_button.text()
-        if current_text == "Show All Processes":
-            self.show_all_button.setText("Show App Only")
-        else:
-            self.show_all_button.setText("Show All Processes")
-        self.update_program_treeview()
-
-    def search_programs(self, query):
-        # Filter programs in the treeview based on the search query
-        for index in range(self.program_tree.topLevelItemCount()):
-            item = self.program_tree.topLevelItem(index)
-            item.setHidden(query.lower() not in item.text(0).lower())
-
-    def update_program_treeview(self):
-        # Update the program treeview with the running processes
-        show_all_processes = self.show_all_button.text() == "Show All Processes"
-        self.program_tree.clear()
-        processes = self.get_running_processes()
-        for window_title, class_name, proc_name, p_type in processes:
-            if show_all_processes or p_type == "Application":
-                self.program_tree.addTopLevelItem(QTreeWidgetItem([window_title, class_name, proc_name, p_type]))
-
-    def save_selected_programs(self, entry_widget):
-        selected_programs = []
-        for index in range(self.program_tree.topLevelItemCount()):
-            item = self.program_tree.topLevelItem(index)
-            if item.checkState(0) == Qt.CheckState.Checked:
-                selected_programs.append(f"Name - {item.text(0).strip(' ✔')}")
+        # Call the appropriate function for the selected mode
+        if index == 0:  # Default Mode
+            self.add_edit_shortcut_mapping_row()
+            self.add_edit_mapping_row()
+            self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        elif index == 1:  # Text Mode
+            self.is_text_mode = True
+            self.add_edit_shortcut_mapping_row()
+            self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        self.update_scroll_region()
 
     def update_scroll_region(self):
         if hasattr(self, "edit_frame") and self.edit_frame is not None:

@@ -13,7 +13,7 @@ import winshell
 import json
 import shutil
 from src.utility.constant import (icon_unpinned_path, icon_pinned_path, 
-                                  icon_path, exit_keys_file)
+                                  icon_path, exit_keys_file, current_version)
 from src.utility.utils import (load_pinned_profiles, active_dir, store_dir,
                                save_pinned_profiles, read_running_scripts_temp,
                                add_script_to_temp, remove_script_from_temp)
@@ -29,16 +29,19 @@ from src.ui.edit_script.edit_script_save import EditScriptSave
 
 class StartupWorker(QThread):
     finished = Signal()
+    update_found = Signal(str)  # emits latest_version if update found
 
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
 
     def run(self):
-        # Run the startup checks
         self.main_window.initialize_exit_keys()
         self.main_window.check_ahk_installation(show_installed_message=False)
-        self.main_window.check_for_update(show_no_update_message=False)
+        # Only check for update, do not show UI here
+        latest_version = self.main_window.check_for_update()
+        if latest_version:
+            self.update_found.emit(latest_version)
         self.finished.emit()
 
 class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
@@ -499,7 +502,36 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
             return
         self._startup_worker_started = True
         self.startup_worker = StartupWorker(self)
+        self.startup_worker.update_found.connect(self.show_update_messagebox)
         self.startup_worker.start()
+
+    def check_for_update(self, show_no_update_message=False):
+        """
+        Checks for update and shows a message box.
+        If show_no_update_message is True, always show a message.
+        """
+        latest_version = self.get_latest_version()
+        if latest_version:
+            if current_version == latest_version:
+                if show_no_update_message:
+                    QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
+            else:
+                QMessageBox.information(self, "Check For Update", f"New update available: KeyTik {latest_version}")
+        else:
+            QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
+
+    def show_update_messagebox(self, latest_version):
+        """
+        Shows a QMessageBox indicating update status.
+        """
+        if not latest_version:
+            QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
+            return
+
+        if current_version == latest_version:
+            QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
+        else:
+            QMessageBox.information(self, "Check For Update", f"New update available: KeyTik {latest_version}")
 
 def get_theme_from_themefile():
     from src.utility.constant import theme_path

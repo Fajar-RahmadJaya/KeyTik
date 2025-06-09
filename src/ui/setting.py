@@ -135,33 +135,48 @@ class Setting:
             print(f"An error occurred: {e}")
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
 
-    def check_for_update(self, show_no_update_message=False):
+    def get_latest_version(self):
+        """
+        Checks GitHub for the latest KeyTik version.
+        Returns the latest version string if successful, else None.
+        """
         try:
-            # Make a GET request to your website to get the latest version
-            response = requests.get("https://keytik.com/pro-version.txt")
+            response = requests.get("https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest", timeout=5)
             if response.status_code == 200:
-                # Get the version number from the response text and strip whitespace
-                latest_version = response.text.strip()
-                if not latest_version.startswith('v'):
-                    latest_version = 'v' + latest_version
-
-                if current_version == latest_version:
-                    # Only show up-to-date message if explicitly requested (button click)
-                    if show_no_update_message:
-                        QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
-                else:
-                    # If update is available, show message with option to update
-                    reply = QMessageBox.question(
-                        self, "Update Available",
-                        f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?",
-                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-                    )
-                    if reply == QMessageBox.StandardButton.Yes:
-                        webbrowser.open("https://gumroad.com/library")
-            else:
-                QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
+                release_data = response.json()
+                latest_version = release_data.get("tag_name")
+                return latest_version
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"An error occurred while checking for updates: {str(e)}")
+            print(f"Error checking for update: {e}")
+        return None
+
+    def show_update_messagebox(self, latest_version):
+        """
+        Shows a QMessageBox indicating update status.
+        """
+        if not latest_version:
+            QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
+            return
+
+        if current_version == latest_version:
+            QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
+        else:
+            QMessageBox.information(self, "Check For Update", f"New update available: KeyTik {latest_version}")
+
+    def check_for_update(self, show_no_update_message=False):
+        """
+        Checks for update and shows a message box.
+        If show_no_update_message is True, always show a message.
+        """
+        latest_version = self.get_latest_version()
+        if latest_version:
+            if current_version == latest_version:
+                if show_no_update_message:
+                    QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
+            else:
+                QMessageBox.information(self, "Check For Update", f"New update available: KeyTik {latest_version}")
+        else:
+            QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
 
     def change_theme_dialog(self):
         # Show a dialog to pick theme

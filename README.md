@@ -73,23 +73,47 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - Expect an evolving software. My goal for KeyTik Pro is software that covers or combines many tools at once.
 
 ## Pro Version Preview
-<details>
-  <summary>Click to view pro version preview </summary>
-
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 221108.png" alt="Pro Version Preview 1" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 220847.png" alt="Pro Version Preview 2" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 220856.png" alt="Pro Version Preview 3" width="400" />
+  </div>
+<details>
+  <summary>Click to see more </summary>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 220906.png" alt="Pro Version Preview 4" width="400" />
-  <img src=".github/Picture/Select Device.png" alt="Pro Version Preview 5" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Select Programs.png" alt="Pro Version Preview 6" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 220919.png" alt="Pro Version Preview 7" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 220927.png" alt="Pro Version Preview 8" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 220944.png" alt="Pro Version Preview 9" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 221000.png" alt="Pro Version Preview 10" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 221021.png" alt="Pro Version Preview 11" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 221036.png" alt="Pro Version Preview 12" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 221045.png" alt="Pro Version Preview 13" width="400" />
+  </div>
+  <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 221058.png" alt="Pro Version Preview 14" width="400" />
+  </div>
 </details>
 
 <br>
@@ -166,28 +190,30 @@ KeyTik is available at the following platforms:
 <div align="center">
 <img src=".github/Picture/Example 1.png" alt="Example 1" width="400" />
 </div>
-<div align="center">
-<img src=".github/Picture/Example 2.png" alt="Example 2" width="400" />
-</div>
-<div align="center">
-<img src=".github/Picture/Example 3.png" alt="Example 3" width="400" />
-</div>
-<div align="center">
-<img src=".github/Picture/Drop Down.png" alt="Drop Down" width="400" />
-</div>
-<div align="center">
-<img src=".github/Picture/Select Device.png" alt="Select Device" width="400" />
-</div>
-<div align="center">
-<img src=".github/Picture/Select Programs.png" alt="Select Programs.png" width="400" />
-</div>
-<div align="center">
-<img src=".github/Picture/Programs and Devices Example.png" alt="Programs and Devices Example" width="400" />
-</div>
-<div align="center">
-<img src=".github/Picture/text mode.png" alt="Text Mode" width="400" />
-</div>
-
+<details>
+  <summary>Click to see more </summary>
+  <div align="center">
+  <img src=".github/Picture/Example 2.png" alt="Example 2" width="400" />
+  </div>
+  <div align="center">
+  <img src=".github/Picture/Example 3.png" alt="Example 3" width="400" />
+  </div>
+  <div align="center">
+  <img src=".github/Picture/Drop Down.png" alt="Drop Down" width="400" />
+  </div>
+  <div align="center">
+  <img src=".github/Picture/Select Device.png" alt="Select Device" width="400" />
+  </div>
+  <div align="center">
+  <img src=".github/Picture/Select Programs.png" alt="Select Programs.png" width="400" />
+  </div>
+  <div align="center">
+  <img src=".github/Picture/Programs and Devices Example.png" alt="Programs and Devices Example" width="400" />
+  </div>
+  <div align="center">
+  <img src=".github/Picture/text mode.png" alt="Text Mode" width="400" />
+  </div>
+</details>
 
 
 

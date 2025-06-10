@@ -56,64 +56,44 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - Additional UI for file openers.
 - Additional UI for auto clicker.
 - Additional UI for screen clicker.
-- Full macro. Combining auto clicker, screen clicker, keyboard remap, files opener, in a single profile.
-- Possibly AI integration.
 - New automation tool, make specific program window always on top.
 - New automation tool, OCR translator. Much like snipping tool but it will translate the chosen screen.
 - New automation tool, easy window always on top. Make window in the cursor to always on top with one click or shortcut.
 - New automation tool, window size changer. Change window size to full size, half screen vertical, half screen horizontal, quarter screen, with a single click or shortcut.
+- Full macro. Combining auto clicker, screen clicker, keyboard remap, files opener, in a single profile.
 - Macro recording. Record any input and simulate it.
-- Upcoming KeyTik update will be implemented on KeyTik Pro first. Including:
-   - Instead of "Add Another Row" or "Add Shortcut Row" button to add key mapping or shortcuts, use + instead on separator between mapping.
+- The upcoming KeyTik update will be implemented on KeyTik Pro first. KeyTik Pro will get a new version faster than normal KeyTik.
 
 ## Why You Choose Pro Version
 - Support the developer.
 - More feature than the regular version.
 - Get early access for the upcoming KeyTik update.
-- Expect an evolving software. My goal for KeyTik Pro is software that covers or combines many tools at once.
+- Expect evolving software. KeyTik Pro macro and automation will increase from time to time. My vision for KeyTik Pro will be a program with various tools inside.
 
 ## Pro Version Preview
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221108.png" alt="Pro Version Preview 1" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220847.png" alt="Pro Version Preview 2" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220856.png" alt="Pro Version Preview 3" width="400" />
-  </div>
+<div align="center">
+<img src=".github/Preview/Pro/main.png" alt="Pro Version Main" width="400" />
+</div>
+<div align="center">
+<img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="400" />
+</div>
 <div align="center">
 <details>
   <summary>Click to see more </summary>
   <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220906.png" alt="Pro Version Preview 4" width="400" />
+  <img src=".github/Preview/Pro/auto clicker1.png" alt="Pro Version Preview 1" width="400" />
   </div>
   <div align="center">
-  <img src=".github/Picture/Select Programs.png" alt="Pro Version Preview 6" width="400" />
+  <img src=".github/Preview/Pro/auto clicker2.png" alt="Pro Version Preview 2" width="400" />
   </div>
   <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220919.png" alt="Pro Version Preview 7" width="400" />
+  <img src=".github/Preview/Pro/files opener.png" alt="Pro Version Preview 3" width="400" />
   </div>
   <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220927.png" alt="Pro Version Preview 8" width="400" />
+  <img src=".github/Preview/Pro/window manager.png" alt="Pro Version Preview 4" width="400" />
   </div>
   <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220944.png" alt="Pro Version Preview 9" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221000.png" alt="Pro Version Preview 10" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221021.png" alt="Pro Version Preview 11" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221036.png" alt="Pro Version Preview 12" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221045.png" alt="Pro Version Preview 13" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221058.png" alt="Pro Version Preview 14" width="400" />
+  <img src=".github/Preview/Pro/always on top manager.png" alt="Pro Version Preview 5" width="400" />
   </div>
 </details>
 </div>

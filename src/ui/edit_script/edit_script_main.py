@@ -315,7 +315,17 @@ class EditScriptMain:
                 self.text_block.setFontPointSize(10)
                 self.edit_frame_layout.addWidget(self.text_block)
 
+                in_text_mode_block = False
                 for line in lines[3:]:  # Skip the header lines
+                    stripped_line = line.strip()
+                    if stripped_line == "; Text mode start":
+                        in_text_mode_block = True
+                        continue
+                    if stripped_line == "; Text mode end":
+                        in_text_mode_block = False
+                        continue
+                    if in_text_mode_block:
+                        continue
                     if "::" in line:
                         # Split the line into key parts
                         parts = line.split("::")

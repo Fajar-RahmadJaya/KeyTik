@@ -12,7 +12,7 @@ So if you download KeyTik and not KeyTik Source Code in the release, then you do
      
 * Building Commadn Using PyInstaller :
   - After all preparation done, copy below command and paste it to command prompt.
-    (pyinstaller --onedir --noconsole --noupx --add-data "_internal/Data;Data" --icon="_internal/Data/icon.ico" KeyTik.py)
+    (pyinstaller --onedir --noconsole --noupx --add-data "_internal/Data;Data" --icon="_internal/Data/icon.ico" main.py)
   - Wait until process done.
   - It should create folder and file like this (Build, KeyTik.spec, Dist)
   - Your KeyTik executeable file should be in the Dist including _internal folder.

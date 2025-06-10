@@ -72,7 +72,7 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 
 ## Pro Version Preview
 <div align="center">
-<img src=".github/Preview/Pro/main.png" alt="Pro Version Main" width="400" />
+<img src=".github/Preview/Pro/main.png" alt="Pro Version Main" width="500" />
 </div>
 <div align="center">
 <img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="400" />

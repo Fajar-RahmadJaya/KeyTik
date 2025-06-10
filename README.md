@@ -172,6 +172,9 @@ KeyTik is available at the following platforms:
 <img src=".github/Preview/default mode.png" alt="Default Mode" width="400" />
 </div>
 <div align="center">
+<img src=".github/Preview/key format.gif" alt="Key Format Example" width="400" />
+</div>
+<div align="center">
 <img src=".github/Preview/text mode.png" alt="Text Mode" width="400" />
 </div>
 <div align="center">

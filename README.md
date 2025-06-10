@@ -75,25 +75,25 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 <img src=".github/Preview/Pro/main.png" alt="Pro Version Main" width="500" />
 </div>
 <div align="center">
-<img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="400" />
+<img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="500" />
 </div>
 <div align="center">
 <details>
   <summary>Click to see more </summary>
   <div align="center">
-  <img src=".github/Preview/Pro/auto clicker1.png" alt="Pro Version Preview 1" width="400" />
+  <img src=".github/Preview/Pro/auto clicker1.png" alt="Pro Version Preview 1" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Pro/auto clicker2.png" alt="Pro Version Preview 2" width="400" />
+  <img src=".github/Preview/Pro/auto clicker2.png" alt="Pro Version Preview 2" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Pro/files opener.png" alt="Pro Version Preview 3" width="400" />
+  <img src=".github/Preview/Pro/files opener.png" alt="Pro Version Preview 3" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Pro/window manager.png" alt="Pro Version Preview 4" width="400" />
+  <img src=".github/Preview/Pro/window manager.png" alt="Pro Version Preview 4" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Pro/always on top manager.png" alt="Pro Version Preview 5" width="400" />
+  <img src=".github/Preview/Pro/always on top manager.png" alt="Pro Version Preview 5" width="500" />
   </div>
 </details>
 </div>
@@ -163,25 +163,25 @@ KeyTik is available at the following platforms:
 </div>
 
 <div align="center">
-<img src=".github/Preview/main dark.png" alt="Dark Mode" width="400" />
+<img src=".github/Preview/main dark.png" alt="Dark Mode" width="500" />
 </div>
 <div align="center">
-<img src=".github/Preview/main light.png" alt="Light Mode" width="400" />
+<img src=".github/Preview/main light.png" alt="Light Mode" width="500" />
 </div>
 <div align="center">
-<img src=".github/Preview/default mode.png" alt="Default Mode" width="400" />
+<img src=".github/Preview/default mode.png" alt="Default Mode" width="500" />
 </div>
 <div align="center">
-<img src=".github/Preview/key format.gif" alt="Key Format Example" width="400" />
+<img src=".github/Preview/key format.gif" alt="Key Format Example" width="500" />
 </div>
 <div align="center">
-<img src=".github/Preview/text mode.png" alt="Text Mode" width="400" />
+<img src=".github/Preview/text mode.png" alt="Text Mode" width="500" />
 </div>
 <div align="center">
-<img src=".github/Preview/select device.png" alt="Example 3" width="400" />
+<img src=".github/Preview/select device.png" alt="Example 3" width="500" />
 </div>
 <div align="center">
-<img src=".github/Preview/select program.png" alt="Select Programs.png" width="400" />
+<img src=".github/Preview/select program.png" alt="Select Programs.png" width="500" />
 </div>
 
 <br>

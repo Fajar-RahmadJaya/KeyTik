@@ -1,5 +1,7 @@
 ; text
-^!p::ExitApp
+^!t::ExitApp
+
+; Text mode start
 
 #SingleInstance Force
 Persistent
@@ -26,3 +28,4 @@ global
     ToolTip()
     return
 } 
+; Text mode end

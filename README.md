@@ -82,7 +82,6 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
   <div align="center">
   <img src=".github/Picture/Screenshot 2025-04-07 220856.png" alt="Pro Version Preview 3" width="400" />
   </div>
-<br>
 <div align="center">
 <details>
   <summary>Click to see more </summary>
@@ -193,7 +192,6 @@ KeyTik is available at the following platforms:
 <div align="center">
 <img src=".github/Picture/Example 1.png" alt="Example 1" width="400" />
 </div>
-<br>
 <div align="center">
 <details>
   <summary>Click to see more </summary>

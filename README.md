@@ -73,47 +73,29 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - Expect an evolving software. My goal for KeyTik Pro is software that covers or combines many tools at once.
 
 ## Pro Version Preview
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221108.png" alt="Pro Version Preview 1" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220847.png" alt="Pro Version Preview 2" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220856.png" alt="Pro Version Preview 3" width="400" />
-  </div>
+<div align="center">
+<img src=".github/Preview/Pro/main.png" alt="Pro Version Main" width="400" />
+</div>
+<div align="center">
+<img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="400" />
+</div>
 <div align="center">
 <details>
   <summary>Click to see more </summary>
   <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220906.png" alt="Pro Version Preview 4" width="400" />
+  <img src=".github/Preview/Pro/auto clicker1.png" alt="Pro Version Preview 1" width="400" />
   </div>
   <div align="center">
-  <img src=".github/Picture/Select Programs.png" alt="Pro Version Preview 6" width="400" />
+  <img src=".github/Preview/Pro/auto clicker2.png" alt="Pro Version Preview 2" width="400" />
   </div>
   <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220919.png" alt="Pro Version Preview 7" width="400" />
+  <img src=".github/Preview/Pro/files opener.png" alt="Pro Version Preview 3" width="400" />
   </div>
   <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220927.png" alt="Pro Version Preview 8" width="400" />
+  <img src=".github/Preview/Pro/window manager.png" alt="Pro Version Preview 4" width="400" />
   </div>
   <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 220944.png" alt="Pro Version Preview 9" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221000.png" alt="Pro Version Preview 10" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221021.png" alt="Pro Version Preview 11" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221036.png" alt="Pro Version Preview 12" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221045.png" alt="Pro Version Preview 13" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Screenshot 2025-04-07 221058.png" alt="Pro Version Preview 14" width="400" />
+  <img src=".github/Preview/Pro/always on top manager.png" alt="Pro Version Preview 5" width="400" />
   </div>
 </details>
 </div>

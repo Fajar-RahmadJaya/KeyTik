@@ -173,7 +173,6 @@ KeyTik is available at the following platforms:
 15. [Contributing](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#contributing)
 16. [Star History](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#star-history)
 17. [Acknowledgements](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#acknowledgements)
-18. [Thank You to the Sponsors](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#thank-you-to-the-sponsors)
 
 <br>
 
@@ -184,42 +183,23 @@ KeyTik is available at the following platforms:
 </div>
 
 <div align="center">
-<img src=".github/Picture/Main Window.png" alt="Main Window" width="400" />
+<img src=".github/Preview/main dark.png" alt="Dark Mode" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/Default Mode.png" alt="Default Mode" width="400" />
+<img src=".github/Preview/main light.png" alt="Light Mode" width="400" />
 </div>
 <div align="center">
-<img src=".github/Picture/Example 1.png" alt="Example 1" width="400" />
+<img src=".github/Preview/default mode.png" alt="Default Mode" width="400" />
 </div>
 <div align="center">
-<details>
-  <summary>Click to see more </summary>
-  <div align="center">
-  <img src=".github/Picture/Example 2.png" alt="Example 2" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Example 3.png" alt="Example 3" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Drop Down.png" alt="Drop Down" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Select Device.png" alt="Select Device" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Select Programs.png" alt="Select Programs.png" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/Programs and Devices Example.png" alt="Programs and Devices Example" width="400" />
-  </div>
-  <div align="center">
-  <img src=".github/Picture/text mode.png" alt="Text Mode" width="400" />
-  </div>
-</details>
+<img src=".github/Preview/text mode.png" alt="Text Mode" width="400" />
 </div>
-
-
+<div align="center">
+<img src=".github/Preview/select device.png" alt="Example 3" width="400" />
+</div>
+<div align="center">
+<img src=".github/Preview/select program.png" alt="Select Programs.png" width="400" />
+</div>
 
 <br>
 
@@ -236,9 +216,9 @@ Below is KeyTik key features that make KeyTik different than another automation 
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
 | 1      | **Multiple Keyboard Remap Profile**                  | Not like most of keyboard remapper, KeyTik can handle multiple keyboard remap. You don't have to set remap again when you need to use another remap then set it back again after done. Just create multiple remap and activate or deactivate it whenever you want. |
-| 2      | **Advance Keyboard Remap**                  | Various remap format you can use such as simulate typing or remap key to text, simulate key hold, shortcut remap and more. |
-| 3      | **Assign Script or Remap Profile to Specific Keyboard or Mouse Using Device VID & PID or Device Handle** | Make script or remap profile to only work for specific physical keyboard or mouse using device VID & PID or device handle as identifier.|
-| 4      | **Assign Script or Remap Profile to Specific Programs Using Class or Process** | Make script or remap profile to only work for specific programs class, like specific Chrome tab or entire program.|
+| 2      | **Advance Keyboard Remap**                  | Various remap format you can use such as simulate typing or remap key to text, simulate key hold, shortcut remap, double click key to simulate remap and more. |
+| 3      | **Bind Profile to Specific Keyboard and Mouse** | Make script or remap profile to only work for specific physical keyboard or mouse using device VID & PID or device handle as identifier.|
+| 4      | **Bind Profile to Specific Program** | Make script or remap profile to only work for specific programs class, like specific Chrome tab or entire program.|
 | 5      | **Auto Clicker**                   | KeyTik comes with Auto Clicker in the download. On default, it simulate 'left click' when 'e' is held. You can change the 'left click', 'e', interval part to your preference.|
 | 6      | **Screen Clicker**                   | KeyTik also comes with Screen Clicker in the download. It work with simulate 'left click' on specific screen coordinate. You can change coordinate and interval to your preference. Don't worry because KeyTik also comes with tool to find screen coordinate then it will automatically copy coordinate and you can paste it to screen clicker in text mode.|
 | 7      | **Screen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference.|
@@ -251,8 +231,8 @@ Below is another KeyTik feature to increase user experience and give ultimate co
 | 1      | **Manage Profiles** | Run, Exit, Delete, Store, Edit, Pin each profiles for better control over profiles.|
 | 2      | **Run Profile on Startup**                         | Run profiles on startup, so it will automatically activate when you open your device—no need to manually activate it each time. |
 | 3      | **Assign Shortcut on Each Profile**                | Enable or Disable your profile using shortcuts. |
-| 4      | **Default Mode in Create or Edit Profile**         | The easiest way to remap your keyboard. |
-| 5      | **Text Mode in Create or Edit Profile**            | Text Mode allows you to adjust or create your AutoHotkey script easily, without needing an external editor.|
+| 4      | **Default Mode**         | The easiest way to remap your keyboard with interactive UI. |
+| 5      | **Text Mode**            | Text Mode allows you to adjust or create your AutoHotkey script easily, without needing an external editor.|
 | 6     | **Make Window Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
 | 7| **Show Stored Profile** | Display your stored profile or restore it to main window. |
 | 8     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
@@ -276,8 +256,7 @@ KeyTik have unique capabilities and make it different than other automation tool
 - **Flexible with Great Potential**:
   - Using AutoHotkey as profile script language, allow KeyTik to utilize all feature and potential from AutoHotkey.
 
-- **Lightweight and Easy to Use**:
-  - It’s only 85.9MB!! (KeyTik v1.5.0)
+- **Easy to Use**:
   - User friendly and simple GUI to boost functionality and simplicity
   - Easy to understand while providing plenty of features.
 

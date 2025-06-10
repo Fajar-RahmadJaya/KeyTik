@@ -56,21 +56,19 @@ First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l
 - Additional UI for file openers.
 - Additional UI for auto clicker.
 - Additional UI for screen clicker.
-- Full macro. Combining auto clicker, screen clicker, keyboard remap, files opener, in a single profile.
-- Possibly AI integration.
 - New automation tool, make specific program window always on top.
 - New automation tool, OCR translator. Much like snipping tool but it will translate the chosen screen.
 - New automation tool, easy window always on top. Make window in the cursor to always on top with one click or shortcut.
 - New automation tool, window size changer. Change window size to full size, half screen vertical, half screen horizontal, quarter screen, with a single click or shortcut.
+- Full macro. Combining auto clicker, screen clicker, keyboard remap, files opener, in a single profile.
 - Macro recording. Record any input and simulate it.
-- Upcoming KeyTik update will be implemented on KeyTik Pro first. Including:
-   - Instead of "Add Another Row" or "Add Shortcut Row" button to add key mapping or shortcuts, use + instead on separator between mapping.
+- The upcoming KeyTik update will be implemented on KeyTik Pro first. KeyTik Pro will get a new version faster than normal KeyTik.
 
 ## Why You Choose Pro Version
 - Support the developer.
 - More feature than the regular version.
 - Get early access for the upcoming KeyTik update.
-- Expect an evolving software. My goal for KeyTik Pro is software that covers or combines many tools at once.
+- Expect evolving software. KeyTik Pro macro and automation will increase from time to time. My vision for KeyTik Pro will be a program with various tools inside.
 
 ## Pro Version Preview
 <div align="center">

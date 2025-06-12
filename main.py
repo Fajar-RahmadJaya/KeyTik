@@ -37,7 +37,6 @@ class StartupWorker(QThread):
 
     def run(self):
         self.main_window.initialize_exit_keys()
-        self.main_window.check_ahk_installation(show_installed_message=False)
         # Only check for update, do not show UI here
         latest_version = self.main_window.check_for_update()
         if latest_version:
@@ -71,6 +70,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.shortcut_entry = None
         self.sort_order = [True, True, True]
         self.previous_button_text = None
+        self.check_ahk_installation(show_installed_message=False)
 
         # UI initialization
         self.central_widget = QWidget()

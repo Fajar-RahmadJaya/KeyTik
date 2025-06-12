@@ -56,8 +56,18 @@ if %errorLevel% NEQ 0 (
     exit /b
 )
 
-:: Step 5: Clean up downloaded and extracted files
-cd ../..
+:: Step 5: Unblock interception.dll using Unblocker.ps1
+cd /d "%~dp0"
+echo Unblocking interception.dll...
+powershell -Command "Start-Process powershell -ArgumentList '-ExecutionPolicy Bypass -File \"Active\AutoHotkey Interception\Lib\Unblocker.ps1\"' -Verb RunAs -Wait"
+if %errorLevel% NEQ 0 (
+    echo Failed to run Unblocker.ps1.
+    pause
+    exit /b
+)
+
+:: Step 6: Clean up downloaded and extracted files
+cd /d "%~dp0"
 rmdir /s /q "%extractFolder%"
 del /q %zipFile%
 

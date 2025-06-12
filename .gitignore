@@ -26,5 +26,13 @@ Thumbs.db
 # Files
 exit_keys.json
 dont_show.json
+build.bat
 
+# Profiles Example
+Auto Clicker.ahk
+Key Format Example.ahk
+Multiple Files Opener.ahk
+Program and Device Example.ahk
+Screen Clicker.ahk
+Take Coordinate And Copy It For Screen Clicker.ahk
 

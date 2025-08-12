@@ -50,7 +50,20 @@ Sincerely,
 
 KeyTik Pro version is available at Gumroad at $20 for lifetime purchase. Check out KeyTik Pro at [https://fajarrahmadjaya.gumroad.com/l/keytik-pro](https://fajarrahmadjaya.gumroad.com/l/keytik-pro)
 
-First 10 purchase is 50% off, [Click here](https://fajarrahmadjaya.gumroad.com/l/keytik-pro/KeyTikPro) to get the discount. Get the discount before its gone!
+Take 25% Off for 10 people only. Check out [https://fajarrahmadjaya.gumroad.com/l/keytik-pro/KeyTikPro25](here) to get the discount. (10 Person Left)
+
+## KeyTik Pro v4.2.0 Update
+**Changelog**:
+- Add Multi Copy.
+- Improve Select Button Functionality.
+- Add Check Installation on Setting.
+- Add Run on Specific Program and Device For Automation Tool.
+- Add Caps Lock On and Off Condition for Shortcuts.
+- Move Dynamic Files to User Data so KeyTik Pro Doesn't Need Administration Privileges.
+- Fix Multiple Files Opener Error When One Files Not Opened.
+- Fix Incorrect Shortcuts Placement.
+- Fix Some Automation Tool Can't be Saved.
+- Minor Bug Fix.
 
 ## My Plan for the Pro Version
 - Additional UI for file openers.

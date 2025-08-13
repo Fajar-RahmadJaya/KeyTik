@@ -30,8 +30,8 @@ if path_from_condition:
     store_dir = os.path.join(path_from_condition, 'Store')
 else:
     # Fallback to the default directory structure if the condition path is not available
-    active_dir = os.path.join(data_dir, 'Active')
-    store_dir = os.path.join(data_dir, 'Store')
+    active_dir = os.path.join(appdata_dir, 'Active')
+    store_dir = os.path.join(appdata_dir, 'Store')
 
 # Ensure the Active and Store directories exist
 if not os.path.exists(active_dir):
@@ -42,7 +42,6 @@ if not os.path.exists(store_dir):
 
 # Define SCRIPT_DIR
 SCRIPT_DIR = active_dir
-
 
 # Load the pinned state from a file, if it exists
 def load_pinned_profiles():

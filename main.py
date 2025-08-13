@@ -1,17 +1,19 @@
 import os
 import shutil
+import webbrowser
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
     QFrame, QLabel, QPushButton, QGroupBox, QFileDialog, QMessageBox, 
     QInputDialog, QSizePolicy
 )
 from PySide6.QtGui import QPixmap, QIcon
-from PySide6.QtCore import Qt, QThread, Signal  # add QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal  
 from pynput.keyboard import Controller, Key
 import sys
 import winshell
 import json
 import shutil
+import requests
 from src.utility.constant import (icon_unpinned_path, icon_pinned_path, 
                                   icon_path, exit_keys_file, current_version)
 from src.utility.utils import (load_pinned_profiles, active_dir, store_dir,
@@ -26,6 +28,7 @@ from src.ui.edit_script.select_device import SelectDevice
 from src.ui.edit_script.edit_frame_row import EditFrameRow
 from src.ui.edit_script.edit_script_logic import EditScriptLogic
 from src.ui.edit_script.edit_script_save import EditScriptSave
+from src.ui.edit_script.parse_script import ParseScript
 
 class StartupWorker(QThread):
     finished = Signal()
@@ -42,10 +45,10 @@ class StartupWorker(QThread):
         if latest_version:
             self.update_found.emit(latest_version)
         self.finished.emit()
-
+        
 class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
            Setting, Welcome, SelectProgram, SelectDevice,
-           EditScriptLogic, EditScriptSave):
+           EditScriptLogic, EditScriptSave, ParseScript):
     def __init__(self):
         super().__init__()
         # Global variables
@@ -56,6 +59,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.create_profile_window = None
         self.edit_window = None
         self.key_rows = []
+        self.copas_rows = []
         self.shortcut_rows = []
         self.is_listening = False
         self.active_entry = None
@@ -376,7 +380,6 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
             QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
 
     def exit_script(self, script_name, button):
-        """Exit the script by sending its stored exit key combination"""
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
 
         if os.path.isfile(script_path):
@@ -505,33 +508,46 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.startup_worker.update_found.connect(self.show_update_messagebox)
         self.startup_worker.start()
 
-    def check_for_update(self, show_no_update_message=False):
-        """
-        Checks for update and shows a message box.
-        If show_no_update_message is True, always show a message.
-        """
-        latest_version = self.get_latest_version()
-        if latest_version:
-            if current_version == latest_version:
-                if show_no_update_message:
-                    QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
-            else:
-                QMessageBox.information(self, "Check For Update", f"New update available: KeyTik {latest_version}")
-        else:
-            QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
+    def check_for_update(self):
+        # Only check for update, no UI. Returns latest_version if update available, else None.
+        try:
+            response = requests.get("https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest", timeout=5)
+            if response.status_code == 200:
+                release_data = response.json()
+                latest_version = release_data.get("tag_name")
+                if current_version != latest_version:
+                    return latest_version
+        except Exception:
+            pass
+        return None
 
     def show_update_messagebox(self, latest_version):
-        """
-        Shows a QMessageBox indicating update status.
-        """
-        if not latest_version:
-            QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
-            return
+        reply = QMessageBox.question(
+            self, "Update Available",
+            f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            import webbrowser
+            webbrowser.open("https://github.com/Fajar-RahmadJaya/KeyTik/releases")
 
-        if current_version == latest_version:
-            QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
+    def check_ahk_installation(self, show_installed_message=False):
+        ahk_path = r"C:\Program Files\AutoHotkey\v2"
+
+        if os.path.exists(ahk_path):
+            if show_installed_message:
+                QMessageBox.information(None, "AHK Installation", "AutoHotkey v2 is installed on your system.")
+            return True
         else:
-            QMessageBox.information(self, "Check For Update", f"New update available: KeyTik {latest_version}")
+            reply = QMessageBox.question(
+                None,
+                "AHK Installation",
+                "AutoHotkey v2 is not installed on your system. AutoHotkey is required for KeyTik to work.\n\nWould you like to download it now?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                webbrowser.open("https://www.autohotkey.com/")
+            return False
 
 def get_theme_from_themefile():
     from src.utility.constant import theme_path

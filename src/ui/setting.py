@@ -2,16 +2,19 @@ import os
 import shutil
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton, 
-    QMessageBox, QFileDialog, QInputDialog
+    QMessageBox, QFileDialog, QInputDialog, QHBoxLayout, QCheckBox
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 import webbrowser
 import requests
 import json
-from src.utility.constant import (current_version, icon_path, 
-                                  condition_path, theme_path)
-from src.utility.utils import (active_dir)
+from src.utility.constant import (icon_path, 
+                                  condition_path, theme_path,
+                                  ahk_path, driver_path,
+                                  interception_install_path, interception_uninstall_path)
+from src.utility.utils import (active_dir, store_dir)
+import subprocess
 
 class Setting:
     def open_settings_window(self):
@@ -32,40 +35,47 @@ class Setting:
         group_layout = QGridLayout(group_box)
         group_layout.setContentsMargins(10, 10, 10, 10)
 
+        # Theme button now lets user pick theme
+        theme_button = QPushButton("Change Theme")
+        theme_button.setFixedHeight(40)
+        theme_button.setFixedWidth(180)
+        theme_button.clicked.connect(self.change_theme_dialog)
+        group_layout.addWidget(theme_button, 0, 0, 1, 1)
+
         # Change Profile Location button
         change_path_button = QPushButton("Change Profile Location")
         change_path_button.setFixedHeight(40)
         change_path_button.setFixedWidth(180)
         change_path_button.clicked.connect(self.change_data_location)
-        group_layout.addWidget(change_path_button, 0, 0, 1, 1)
+        group_layout.addWidget(change_path_button, 0, 1, 1, 1)
+
+        # Installation Setting
+        installation_button = QPushButton("Check Installation")
+        installation_button.setFixedHeight(40)
+        installation_button.setFixedWidth(180)
+        installation_button.clicked.connect(self.show_installation_dialog)
+        group_layout.addWidget(installation_button, 1, 0, 1, 1)
 
         # Check For Update button
         check_update_button = QPushButton("Check For Update")
         check_update_button.setFixedHeight(40)
         check_update_button.setFixedWidth(180)
-        check_update_button.clicked.connect(lambda: self.check_for_update(show_no_update_message=True))
-        group_layout.addWidget(check_update_button, 0, 1, 1, 1)
+        check_update_button.clicked.connect(self.check_update_and_show_messagebox)
+        group_layout.addWidget(check_update_button, 1, 1, 1, 1)
+
+        # Sponsor Me button
+        pro_upgrade_button = QPushButton("Open KeyTik Pro Page")
+        pro_upgrade_button.setFixedHeight(40)
+        pro_upgrade_button.setFixedWidth(180)
+        pro_upgrade_button.clicked.connect(lambda: webbrowser.open("https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
+        group_layout.addWidget(pro_upgrade_button, 2, 0, 1, 1)
 
         # On Boarding button
         readme_button = QPushButton("Readme!")
         readme_button.setFixedHeight(40)
         readme_button.setFixedWidth(180)
         readme_button.clicked.connect(self.show_welcome_window)
-        group_layout.addWidget(readme_button, 1, 0, 1, 1)
-
-        # Theme button now lets user pick theme
-        theme_button = QPushButton("Change Theme")
-        theme_button.setFixedHeight(40)
-        theme_button.setFixedWidth(180)
-        theme_button.clicked.connect(self.change_theme_dialog)
-        group_layout.addWidget(theme_button, 1, 1, 1, 1)
-
-        # Sponsor Me button
-        pro_upgrade_button = QPushButton("Upgrade to KeyTik Pro")
-        pro_upgrade_button.setFixedHeight(40)
-        pro_upgrade_button.setFixedWidth(370)
-        pro_upgrade_button.clicked.connect(lambda: webbrowser.open("https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
-        group_layout.addWidget(pro_upgrade_button, 2, 0, 1, 2)
+        group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
         # Set stretch to make rows/columns resize equally
         group_layout.setRowStretch(0, 1)
@@ -135,48 +145,25 @@ class Setting:
             print(f"An error occurred: {e}")
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
 
-    def get_latest_version(self):
-        """
-        Checks GitHub for the latest KeyTik version.
-        Returns the latest version string if successful, else None.
-        """
-        try:
-            response = requests.get("https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest", timeout=5)
-            if response.status_code == 200:
-                release_data = response.json()
-                latest_version = release_data.get("tag_name")
-                return latest_version
-        except Exception as e:
-            print(f"Error checking for update: {e}")
-        return None
-
-    def show_update_messagebox(self, latest_version):
-        """
-        Shows a QMessageBox indicating update status.
-        """
-        if not latest_version:
-            QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
-            return
-
-        if current_version == latest_version:
-            QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
-        else:
-            QMessageBox.information(self, "Check For Update", f"New update available: KeyTik {latest_version}")
-
-    def check_for_update(self, show_no_update_message=False):
-        """
-        Checks for update and shows a message box.
-        If show_no_update_message is True, always show a message.
-        """
-        latest_version = self.get_latest_version()
+    def update_messagebox(self, latest_version, show_no_update_message=False):
+        from src.utility.constant import current_version
         if latest_version:
-            if current_version == latest_version:
-                if show_no_update_message:
-                    QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
-            else:
-                QMessageBox.information(self, "Check For Update", f"New update available: KeyTik {latest_version}")
+            reply = QMessageBox.question(
+                self, "Update Available",
+                f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                import webbrowser
+                webbrowser.open("https://github.com/Fajar-RahmadJaya/KeyTik/releases")
         else:
-            QMessageBox.critical(self, "Error", "Failed to check for updates. Please try again later.")
+            if show_no_update_message:
+                QMessageBox.information(self, "Check For Update", "You are using the latest version of KeyTik.")
+
+    # Example usage for the settings button:
+    def check_update_and_show_messagebox(self):
+        latest_version = self.check_for_update()
+        self.update_messagebox(latest_version, show_no_update_message=True)
 
     def change_theme_dialog(self):
         # Show a dialog to pick theme
@@ -216,3 +203,81 @@ class Setting:
                     f.write(theme)
         except Exception as e:
             print(f"Failed to save theme: {e}")
+
+    def show_installation_dialog(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Installation Manager")
+        dialog.setWindowIcon(QIcon(icon_path))
+        dialog.setGeometry(414, 248, 380, 180)
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        # Group box for installation controls
+        install_group = QGroupBox()  # No label, just plain frame
+        install_group_layout = QHBoxLayout(install_group)
+        install_group_layout.setContentsMargins(10, 10, 10, 10)
+
+        # AutoHotkey vertical layout
+        ahk_vbox = QVBoxLayout()
+        ahk_checkbox = QCheckBox("AutoHotkey", dialog)
+        ahk_installed = os.path.exists(ahk_path)
+        ahk_checkbox.setChecked(ahk_installed)
+        ahk_checkbox.setEnabled(False)
+        ahk_button = QPushButton(dialog)
+        ahk_button.setText("Uninstall AutoHotkey" if ahk_installed else "Install AutoHotkey")
+        ahk_vbox.addWidget(ahk_checkbox, alignment=Qt.AlignmentFlag.AlignHCenter)
+        ahk_vbox.addWidget(ahk_button)
+
+        # Interception Driver vertical layout
+        driver_vbox = QVBoxLayout()
+        driver_checkbox = QCheckBox("Interception Driver", dialog)
+        driver_installed = os.path.exists(driver_path)
+        driver_checkbox.setChecked(driver_installed)
+        driver_checkbox.setEnabled(False)
+        driver_button = QPushButton(dialog)
+        driver_button.setText("Uninstall Interception Driver" if driver_installed else "Install Interception Driver")
+        driver_vbox.addWidget(driver_checkbox, alignment=Qt.AlignmentFlag.AlignHCenter)
+        driver_vbox.addWidget(driver_button)
+
+        # Add both vboxes to the horizontal group box layout
+        install_group_layout.addLayout(ahk_vbox)
+        install_group_layout.addLayout(driver_vbox)
+
+        # Add group box to main dialog layout
+        layout.addWidget(install_group)
+
+        # Button logic
+        def ahk_action():
+            if ahk_installed:
+                # Uninstall: run the uninstall command
+                uninstall_cmd = f'"{ahk_path}" "{os.path.join(os.path.dirname(ahk_path), "ui-uninstall.ahk")}"'
+                try:
+                    subprocess.Popen(uninstall_cmd, shell=True)
+                except Exception as e:
+                    QMessageBox.critical(dialog, "Error", f"Failed to start uninstall: {e}")
+            else:
+                # Install: open AutoHotkey website
+                import webbrowser
+                webbrowser.open("https://www.autohotkey.com")
+
+        def driver_action():
+            import sys
+            import ctypes
+            try:
+                if driver_installed:
+                    # Uninstall interception driver with UAC prompt
+                    ctypes.windll.shell32.ShellExecuteW(
+                        None, "runas", interception_uninstall_path, None, None, 1
+                    )
+                else:
+                    # Install interception driver with UAC prompt
+                    ctypes.windll.shell32.ShellExecuteW(
+                        None, "runas", interception_install_path, None, None, 1
+                    )
+            except Exception as e:
+                QMessageBox.critical(dialog, "Error", f"Failed to run driver installer/uninstaller: {e}")
+
+        ahk_button.clicked.connect(ahk_action)
+        driver_button.clicked.connect(driver_action)
+
+        dialog.exec()

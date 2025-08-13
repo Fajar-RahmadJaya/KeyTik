@@ -359,51 +359,6 @@ class Logic:
         # Join the keys back together with " & " for AHK format
         return " & ".join(translated_keys)
 
-    def finish_profile(self):
-        script_name = self.get_script_name()
-        if not script_name:
-            return  # If no script name is provided, return early
-
-        output_path = os.path.join(self.SCRIPT_DIR, script_name)
-        key_translations = self.load_key_translations()
-
-        # Get the program condition for #HotIf
-        program_condition = self.get_program_condition()
-
-        # Get the device condition (whether a device is selected)
-        device_condition = self.get_device_condition()
-
-        # Check if there are any shortcuts
-        shortcuts_present = any(
-            self.is_widget_valid(shortcut_row) and shortcut_row[0].get().strip() for shortcut_row in self.shortcut_rows)
-
-        try:
-            with open(output_path, 'w') as file:
-                self.write_first_line(file)  # Write initial lines (text/default)
-
-                # Handle device (mouse/keyboard)
-                self.handle_device(file)
-
-                # Handle program entry and shortcuts
-                if self.is_text_mode:
-                    self.handle_text_mode(file, key_translations, program_condition, shortcuts_present,
-                                        device_condition)
-                else:
-                    self.handle_default_mode(file, key_translations, program_condition, shortcuts_present,
-                                            device_condition)
-
-                # Finalize and update script list
-                self.scripts = self.list_scripts()
-                self.update_script_list()
-                self.create_profile_window.destroy()
-
-        except Exception as e:
-            print(f"Error writing script: {e}")
-
-
-
-
-
     def update_edit_text_block_height(self, event=None):
         if hasattr(self, 'text_block'):
             # Get the current number of lines in the text block
@@ -420,8 +375,6 @@ class Logic:
             self.edit_frame.update_idletasks()
             self.edit_canvas.config(scrollregion=self.edit_canvas.bbox("all"))
 
-
-
     def load_key_list(self):
         key_map = {}
         try:
@@ -437,10 +390,6 @@ class Logic:
         return key_map
 
     def convert_milliseconds_to_time_units(self, milliseconds):
-        """
-        Convert milliseconds to hours, minutes, seconds, and milliseconds
-        Returns a tuple of (hours, minutes, seconds, milliseconds)
-        """
         # Constants for conversion
         MILLISECONDS_PER_SECOND = 1000
         SECONDS_PER_MINUTE = 60

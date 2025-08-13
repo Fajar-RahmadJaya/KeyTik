@@ -3,7 +3,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget, QSizePolicy, QGridLayout
 )
 from PySide6.QtCore import Qt
-import re
 
 class EditFrameRow:
     def add_edit_mapping_row(self, original_key='', remap_key='', insert_after=None):
@@ -236,7 +235,10 @@ class EditFrameRow:
         left_sep.setFrameShadow(QFrame.Shadow.Sunken)
         separator_layout.addWidget(left_sep)
 
+        script_name = self.script_name_entry.text().strip().lower() if hasattr(self, 'script_name_entry') else ""
+
         plus_label = None
+
         plus_label = QLabel("+", separator_widget)
         plus_label.setStyleSheet("""
             color: gray;
@@ -268,16 +270,15 @@ class EditFrameRow:
             full_sep.setFrameShadow(QFrame.Shadow.Sunken)
             full_sep.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
             separator_layout.addWidget(full_sep)
-            self.add_edit_shortcut_mapping_row(insert_after=(row_widget, separator_widget))
+            # Insert new shortcut row directly below this separator
+            if hasattr(self, "shortcut_row_widgets") and self.shortcut_row_widgets:
+                # Find index of this separator_widget in the layout
+                idx = self.edit_frame_layout.indexOf(separator_widget)
+                # Add new shortcut row after this separator
+                self.add_edit_shortcut_mapping_row(insert_after=(row_widget, separator_widget))
+            else:
+                self.add_edit_shortcut_mapping_row()
         plus_label.mousePressEvent = on_plus_click
-
-        # Hide previous plus_label if exists
-        if not hasattr(self, "shortcut_row_widgets"):
-            self.shortcut_row_widgets = []
-        if self.shortcut_row_widgets:
-            prev_plus = self.shortcut_row_widgets[-1][1].findChild(QLabel, None)
-            if prev_plus:
-                prev_plus.setVisible(False)
 
         # --- Insert at correct position ---
         if not hasattr(self, "shortcut_row_widgets"):
@@ -288,10 +289,17 @@ class EditFrameRow:
             self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
             self.shortcut_row_widgets.insert(idx // 2, (row_widget, separator_widget))
         else:
-            self.edit_frame_layout.insertWidget(0, row_widget)
-            self.edit_frame_layout.insertWidget(1, separator_widget)
-            self.shortcut_row_widgets.append((row_widget, separator_widget)
-                                             )
+            self.edit_frame_layout.addWidget(row_widget)
+            self.edit_frame_layout.addWidget(separator_widget)
+            self.shortcut_row_widgets.append((row_widget, separator_widget))
+
+        # Hide previous plus_label if exists (so only last row shows "+")
+        if len(self.shortcut_row_widgets) > 1:
+            prev_sep_widget = self.shortcut_row_widgets[-2][1]
+            prev_plus = prev_sep_widget.findChild(QLabel, None)
+            if prev_plus:
+                prev_plus.setVisible(False)
+
         # If in Text Mode, re-add the text block below the shortcut rows
         if self.is_text_mode and hasattr(self, 'text_block') and self.text_block is not None:
             self.edit_frame_layout.addWidget(self.text_block)

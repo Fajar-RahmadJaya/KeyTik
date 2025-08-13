@@ -3,18 +3,19 @@ import webbrowser
 import keyboard
 from pynput import mouse
 from PySide6.QtWidgets import (
-    QMessageBox, QDialog, QLabel, QVBoxLayout, QWidget, QTextEdit
+    QMessageBox, QDialog, QLabel, QVBoxLayout
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer, Signal, QObject
 from src.utility.constant import (interception_install_path)
 
-class EditScriptLogic:
+class EditScriptLogic(QObject):
+    request_timer_start = Signal(object)  # Pass entry_widget
+
+    def __init__(self):
+        super().__init__()
+        self.request_timer_start.connect(self._start_release_timer)
+
     def check_ahk_installation(self, show_installed_message=False):
-        """
-        Check if AutoHotkey v2 is installed
-        :param show_installed_message: Boolean to control whether to show success message
-        :return: Boolean indicating if AHK is installed
-        """
         ahk_path = r"C:\Program Files\AutoHotkey\v2"
 
         if os.path.exists(ahk_path):
@@ -33,10 +34,7 @@ class EditScriptLogic:
             return False
 
     def check_interception_driver(self):
-        """
-        Check if Interception driver is installed
-        :return: Boolean indicating if driver is installed
-        """
+
         driver_path = r"C:\Windows\System32\drivers\keyboard.sys"
 
         if os.path.exists(driver_path):
@@ -228,7 +226,6 @@ class EditScriptLogic:
         return script_name
 
     def is_widget_valid(self, widget_tuple):
-        """Check if a widget tuple exists and is valid"""
         try:
             entry_widget, button_widget = widget_tuple
             return entry_widget is not None and button_widget is not None
@@ -245,6 +242,13 @@ class EditScriptLogic:
                         orig_button.setEnabled(state)
                     if remap_button != button and remap_button is not None:
                         remap_button.setEnabled(state)
+            if hasattr(self, 'copas_rows'):
+                for copas_row in self.copas_rows:
+                    copy_entry, paste_entry, copy_button, paste_button, disable_copy_var, disable_paste_var = copas_row
+                    if copy_entry != button and copy_entry is not None:
+                        copy_entry.setEnabled(state)
+                    if paste_entry != button and paste_entry is not None:
+                        paste_entry.setEnabled(state)
             for shortcut_entry, shortcut_button in self.shortcut_rows:
                 if shortcut_button != button and shortcut_button is not None:
                     shortcut_button.setEnabled(state)
@@ -263,14 +267,26 @@ class EditScriptLogic:
                 entries_to_disable.append((self.keyboard_entry, None))
             if hasattr(self, 'program_entry'):
                 entries_to_disable.append((self.program_entry, None))
-            if hasattr(self, 'original_key_entry'):
-                entries_to_disable.append((self.original_key_entry, None))
-            if hasattr(self, 'remap_key_entry'):
-                entries_to_disable.append((self.remap_key_entry, None))
-            if hasattr(self, 'shortcut_entry'):
-                entries_to_disable.append((self.shortcut_entry, None))
-            if hasattr(self, 'hold_interval_entry'):
-                entries_to_disable.append((self.hold_interval_entry, None))
+            # Add all key_rows entries
+            if hasattr(self, 'key_rows'):
+                for key_row in self.key_rows:
+                    orig_entry, remap_entry, _, _, _, _, hold_interval_entry = key_row
+                    entries_to_disable.append((orig_entry, None))
+                    entries_to_disable.append((remap_entry, None))
+                    entries_to_disable.append((hold_interval_entry, None))
+
+            # Add all shortcut_rows entries
+            if hasattr(self, 'shortcut_rows'):
+                for shortcut_entry, _ in self.shortcut_rows:
+                    entries_to_disable.append((shortcut_entry, None))
+
+            # Add copas_rows entries if needed
+            if hasattr(self, 'copas_rows'):
+                for copas_row in self.copas_rows:
+                    copy_entry, paste_entry, _, _, _, _ = copas_row
+                    entries_to_disable.append((copy_entry, None))
+                    entries_to_disable.append((paste_entry, None))
+                    
             self.disable_entry_input(entries_to_disable)
 
             self.ignore_next_click = True  # Ignore the first left-click
@@ -286,12 +302,18 @@ class EditScriptLogic:
             # Start keyboard listener if not already hooked
             if not self.hook_registered:
                 keyboard.hook(self.on_shortcut_key_event)
-                self.hook_registered = True
-
             # Start mouse listener if not already running
             if self.mouse_listener is None:
                 self.mouse_listener = mouse.Listener(on_click=self.on_shortcut_mouse_event)
                 self.mouse_listener.start()
+
+            # --- CHANGED: Use a list to preserve key order ---
+            self.currently_pressed_keys = []  # Track currently held keys in order
+            self.last_combination = ""           # Store last valid combination
+            self.release_timer = QTimer()
+            self.release_timer.setSingleShot(True)
+            self.release_timer.timeout.connect(lambda: self._finalize_combination(entry_widget))
+            keyboard.hook(lambda event: self._on_multi_key_event(event, entry_widget))
 
         else:
             # Stop listening
@@ -305,14 +327,25 @@ class EditScriptLogic:
                 entries_to_enable.append((self.keyboard_entry, None))
             if hasattr(self, 'program_entry'):
                 entries_to_enable.append((self.program_entry, None))
-            if hasattr(self, 'original_key_entry'):
-                entries_to_enable.append((self.original_key_entry, None))
-            if hasattr(self, 'remap_key_entry'):
-                entries_to_enable.append((self.remap_key_entry, None))
-            if hasattr(self, 'shortcut_entry'):
-                entries_to_enable.append((self.shortcut_entry, None))
-            if hasattr(self, 'hold_interval_entry'):
-                entries_to_enable.append((self.hold_interval_entry, None))
+            # Add all key_rows entries
+            if hasattr(self, 'key_rows'):
+                for key_row in self.key_rows:
+                    orig_entry, remap_entry, _, _, _, _, hold_interval_entry = key_row
+                    entries_to_enable.append((orig_entry, None))
+                    entries_to_enable.append((remap_entry, None))
+                    entries_to_enable.append((hold_interval_entry, None))
+
+            # Add all shortcut_rows entries
+            if hasattr(self, 'shortcut_rows'):
+                for shortcut_entry, _ in self.shortcut_rows:
+                    entries_to_enable.append((shortcut_entry, None))
+
+            # Add copas_rows entries if needed
+            if hasattr(self, 'copas_rows'):
+                for copas_row in self.copas_rows:
+                    copy_entry, paste_entry, _, _, _, _ = copas_row
+                    entries_to_enable.append((copy_entry, None))
+                    entries_to_enable.append((paste_entry, None))
             self.enable_entry_input(entries_to_enable)
 
             # Enable all buttons
@@ -332,6 +365,57 @@ class EditScriptLogic:
             if self.mouse_listener is not None:
                 self.mouse_listener.stop()
                 self.mouse_listener = None
+
+    def _on_multi_key_event(self, event, entry_widget):
+        if not self.is_listening or self.active_entry != entry_widget:
+            return
+
+        key = event.name
+        # Ignore modifier keys if needed (optional)
+        # if key in ["shift", "ctrl", "alt", "windows"]:
+        #     return
+
+        if event.event_type == "down":
+            # --- CHANGED: Only add if not already present, preserve order ---
+            if key not in self.currently_pressed_keys:
+                self.currently_pressed_keys.append(key)
+                self._update_entry_widget(entry_widget)
+            if hasattr(self, "release_timer") and self.release_timer.isActive():
+                self.release_timer.stop()
+        elif event.event_type == "up":
+            if key in self.currently_pressed_keys:
+                self.currently_pressed_keys.remove(key)
+                # If all keys released, finalize combination
+                if not self.currently_pressed_keys:
+                    # --- CHANGED: Use signal to start timer in main thread ---
+                    self.request_timer_start.emit(entry_widget)
+                else:
+                    # Start timer to wait for other releases
+                    if hasattr(self, "release_timer"):
+                        self.request_timer_start.emit(entry_widget)
+
+    def _start_release_timer(self, entry_widget):
+        # Called in main thread
+        if hasattr(self, "release_timer"):
+            self.release_timer.start(400)
+
+    def _update_entry_widget(self, entry_widget):
+        # --- CHANGED: Use the order of self.currently_pressed_keys ---
+        combo = "+".join(self.currently_pressed_keys)
+        if hasattr(entry_widget, "setCurrentText"):
+            entry_widget.setCurrentText(combo)
+        elif hasattr(entry_widget, "setText"):
+            entry_widget.setText(combo)
+        self.last_combination = combo
+
+    def _finalize_combination(self, entry_widget):
+        # Save the last combination to the widget
+        if hasattr(entry_widget, "setCurrentText"):
+            entry_widget.setCurrentText(self.last_combination)
+        elif hasattr(entry_widget, "setText"):
+            entry_widget.setText(self.last_combination)
+        # Reset pressed keys
+        self.currently_pressed_keys = set()
 
     def on_key_event(self, event):
         if self.is_listening and self.active_entry and event.event_type == 'down':
@@ -372,15 +456,14 @@ class EditScriptLogic:
                 self.active_entry.setText(current_text + event.name)
             self.active_entry.setEnabled(False)
 
-    def disable_entry_input(self, key_rows):
-        # Process each entry in the key_rows list
-        for entry_tuple in key_rows:
-            entry = entry_tuple[0]  # Get the entry widget from the tuple
+    def disable_entry_input(self, entry_rows):
+        for entry_tuple in entry_rows:
+            entry = entry_tuple[0]
             if entry is not None:
                 entry.setEnabled(False)
 
-    def enable_entry_input(self, key_rows):
-        for entry_tuple in key_rows:
+    def enable_entry_input(self, entry_rows):
+        for entry_tuple in entry_rows:
             entry = entry_tuple[0]
             if entry is not None:
                 entry.setEnabled(True)

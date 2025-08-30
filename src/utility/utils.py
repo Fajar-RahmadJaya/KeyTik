@@ -1,14 +1,13 @@
 import os
 import json
-import time
-from src.utility.constant import (data_dir, appdata_dir, pinned_file, condition_path)
+from src.utility.constant import (appdata_dir, pinned_file, condition_path)
 
-# Load the condition from the condition.json file
+
 def load_condition():
     try:
         if os.path.exists(condition_path):
             with open(condition_path, "r") as f:
-                content = f.read().strip()  # Read and strip any extra whitespace
+                content = f.read().strip()
                 if content:
                     data = json.loads(content)
                     if isinstance(data, dict) and "path" in data:
@@ -16,65 +15,66 @@ def load_condition():
                 else:
                     print("Condition file is empty. Returning None.")
     except json.JSONDecodeError:
-        print("Error: Condition file is not in valid JSON format. Resetting condition.")
+        print("Error: Condition file is not in valid JSON format. Resetting condition.") # noqa
     except Exception as e:
         print(f"An error occurred while loading condition: {e}")
-    return None  # Return None if there is an error or the path is not found
+    return None
 
-# Get the path from condition.json
+
 path_from_condition = load_condition()
 
-# If the path is successfully retrieved from the JSON, define the active and store directories
+
 if path_from_condition:
     active_dir = os.path.join(path_from_condition, 'Active')
     store_dir = os.path.join(path_from_condition, 'Store')
 else:
-    # Fallback to the default directory structure if the condition path is not available
+
     active_dir = os.path.join(appdata_dir, 'Active')
     store_dir = os.path.join(appdata_dir, 'Store')
 
-# Ensure the Active and Store directories exist
+
 if not os.path.exists(active_dir):
     os.makedirs(active_dir)
 
 if not os.path.exists(store_dir):
     os.makedirs(store_dir)
 
-# Define SCRIPT_DIR
+
 SCRIPT_DIR = active_dir
 
-# Load the pinned state from a file, if it exists
+
 def load_pinned_profiles():
     try:
         if os.path.exists(pinned_file):
             with open(pinned_file, "r") as f:
-                content = f.read().strip()  # Read and strip any extra whitespace
-                if content:  # Check if there's content in the file
-                    data = json.loads(content)  # Use json.loads to handle empty file gracefully
-                    if isinstance(data, list):  # Ensure it's a list
+                content = f.read().strip()
+                if content:
+                    data = json.loads(content)
+                    if isinstance(data, list):
                         return data
                 else:
-                    print("Pinned profiles file is empty. Returning an empty list.")
+                    print("Pinned profiles file is empty. Returning an empty list.") # noqa
     except json.JSONDecodeError:
-        print("Error: Pinned profiles file is not in valid JSON format. Resetting pinned profiles.")
+        print("Error: Pinned profiles file is not in valid JSON format. Resetting pinned profiles.") # noqa
     except Exception as e:
         print(f"An error occurred while loading pinned profiles: {e}")
-    return []  # Default to an empty list if there is an error
+    return []
 
-# Save the pinned state to a file
+
 def save_pinned_profiles(pinned_profiles):
     with open(pinned_file, "w") as f:
         json.dump(pinned_profiles, f)
 
+
 if not os.path.exists(appdata_dir):
     os.makedirs(appdata_dir)
 
-# Create path.json if missing
+
 if not os.path.exists(condition_path):
     with open(condition_path, "w") as f:
         json.dump({"path": ""}, f)
 
-# Create pinned_profiles.json if missing
+
 if not os.path.exists(pinned_file):
     with open(pinned_file, "w") as f:
         json.dump([
@@ -84,14 +84,17 @@ if not os.path.exists(pinned_file):
             "Auto Clicker.ahk"
         ], f)
 
-device_list_path = os.path.join(active_dir, "Autohotkey Interception", "shared_device_info.txt")
-device_finder_path = os.path.join(active_dir, "Autohotkey Interception", "find_device.ahk")
-coordinate_path = os.path.join(active_dir, "Autohotkey Interception", "Coordinate.ahk")
+device_list_path = os.path.join(
+    active_dir, "Autohotkey Interception", "shared_device_info.txt")
+device_finder_path = os.path.join(
+    active_dir, "Autohotkey Interception", "find_device.ahk")
+coordinate_path = os.path.join(
+    active_dir, "Autohotkey Interception", "Coordinate.ahk")
 
 TEMP_RUNNING_FILE = os.path.join(appdata_dir, "running_scripts.tmp")
 
+
 def read_running_scripts_temp():
-    start_time = time.perf_counter()
     scripts = set()
     if os.path.exists(TEMP_RUNNING_FILE):
         try:
@@ -101,6 +104,7 @@ def read_running_scripts_temp():
             print(f"[read_running_scripts_temp] Error: {e}")
     return scripts
 
+
 def write_running_scripts_temp(scripts):
     try:
         with open(TEMP_RUNNING_FILE, "w", encoding="utf-8") as f:
@@ -109,10 +113,12 @@ def write_running_scripts_temp(scripts):
     except Exception as e:
         print(f"[write_running_scripts_temp] Error: {e}")
 
+
 def add_script_to_temp(script_name):
     scripts = read_running_scripts_temp()
     scripts.add(script_name)
     write_running_scripts_temp(scripts)
+
 
 def remove_script_from_temp(script_name):
     scripts = read_running_scripts_temp()

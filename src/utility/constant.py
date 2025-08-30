@@ -19,4 +19,4 @@ changelog_path = os.path.join(data_dir, "changelog.md")
 interception_install_path = os.path.join(data_dir, "inter_install.bat")
 interception_uninstall_path = os.path.join(data_dir, "inter_uninstall.bat")
 ahk_path = r"C:\Program Files\AutoHotkey\UX\AutoHotkeyUX.exe"
-driver_path = os.path.join(os.getenv('SystemRoot'), "System32", "drivers", "interception.sys")
+driver_path = os.path.join(os.getenv('SystemRoot'), "System32", "drivers", "interception.sys") # noqa

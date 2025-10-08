@@ -1,13 +1,23 @@
 import os
-import webbrowser
 import keyboard
 import ctypes
+import time
 from pynput import mouse
-from PySide6.QtWidgets import (
-    QMessageBox, QDialog, QLabel, QVBoxLayout
-)
-from PySide6.QtCore import Qt, QTimer, Signal, QObject
-from src.utility.constant import (interception_install_path)
+from PySide6.QtWidgets import (QMessageBox)
+from PySide6.QtCore import QTimer, Signal, QObject, QEvent
+from utility.constant import (interception_install_path)
+
+
+class InputBlocker(QObject):
+    def eventFilter(self, obj, event):
+        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
+                            QEvent.KeyPress, QEvent.KeyRelease,
+                            QEvent.FocusIn, QEvent.FocusOut):
+            return True
+        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
+                            QEvent.Hide, QEvent.Leave):
+            return True
+        return False
 
 
 class EditScriptLogic(QObject):
@@ -15,25 +25,7 @@ class EditScriptLogic(QObject):
 
     def __init__(self):
         super().__init__()
-        self.request_timer_start.connect(self._start_release_timer)
-
-    def check_ahk_installation(self, show_installed_message=False):
-        ahk_path = r"C:\Program Files\AutoHotkey\v2"
-
-        if os.path.exists(ahk_path):
-            if show_installed_message:
-                QMessageBox.information(None, "AHK Installation", "AutoHotkey v2 is installed on your system.") # noqa
-            return True
-        else:
-            reply = QMessageBox.question(
-                None,
-                "AHK Installation",
-                "AutoHotkey v2 is not installed on your system. AutoHotkey is required for KeyTik to work.\n\nWould you like to download it now?", # noqa
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-            if reply == QMessageBox.StandardButton.Yes:
-                webbrowser.open("https://www.autohotkey.com/")
-            return False
+        self.request_timer_start.connect(self.release_timer)
 
     def check_interception_driver(self):
         driver_path = r"C:\Windows\System32\drivers\keyboard.sys"
@@ -74,184 +66,10 @@ class EditScriptLogic(QObject):
                     QMessageBox.critical(None, "Error", f"An error occurred during installation: {str(e)}") # noqa
             return False
 
-    def show_tooltip(self, event, tooltip_text):
-        tooltip = QDialog()
-        tooltip.setWindowFlags(Qt.WindowType.ToolTip)
-        tooltip.move(event.globalX() + 10, event.globalY() + 10)
-        label = QLabel(tooltip_text, tooltip)
-        label.setStyleSheet("background-color: white; color: black; border: 1px solid gray; padding: 5px;") # noqa
-        layout = QVBoxLayout(tooltip)
-        layout.addWidget(label)
-        tooltip.setLayout(layout)
-        tooltip.show()
-        self.tooltip = tooltip
-
     def update_entry(self):
         shortcut_combination = '+'.join(self.pressed_keys)
         if hasattr(self, "active_entry") and self.active_entry is not None:
-            if hasattr(self.active_entry, "setCurrentText"):
-                self.active_entry.setCurrentText(shortcut_combination)
-            elif hasattr(self.active_entry, "setText"):
-                self.active_entry.setText(shortcut_combination)
-
-    def process_shortcuts(self, file, key_translations):
-        for shortcut_row in self.shortcut_rows:
-            if self.is_widget_valid(shortcut_row):
-                try:
-                    shortcut_entry, _ = shortcut_row
-                    shortcut_key = shortcut_entry.currentText().strip()
-                    if shortcut_key:
-                        translated_key = self.translate_key(shortcut_key,
-                                                            key_translations)
-                        if "&" in translated_key:
-                            file.write(f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n") # noqa
-                        else:
-                            file.write(f"~{translated_key}::\n{{\n    global toggle\n    toggle := !toggle\n}}\n\n") # noqa
-                except Exception:
-                    continue
-
-    def process_key_remaps(self, file, key_translations):
-        for row in self.key_rows:
-            if len(row) >= 7:
-                (original_key_entry, remap_key_entry, original_key_select,
-                 remap_key_select, text_format_var, hold_format_var,
-                 hold_interval_entry) = row
-                try:
-                    original_key = original_key_entry.currentText().strip()
-                    remap_key = remap_key_entry.currentText().strip()
-
-                    if original_key and remap_key:
-                        has_multiple_keys = "+" in original_key
-                        original_translated = self.translate_key(
-                            original_key, key_translations)
-
-                        if has_multiple_keys:
-                            keys = [k.strip() for k in original_key.split("+")]
-                            if len(keys) == 2 and keys[0] == keys[1]:
-                                single_key = self.translate_key(
-                                    keys[0], key_translations)
-                                if text_format_var.isChecked():
-                                    file.write(f'*{single_key}::{{\n')
-                                    file.write(f'    if (A_PriorHotkey = "*{single_key}") and (A_TimeSincePriorHotkey < 400) {{\n') # noqa
-                                    file.write(f'        SendText("{remap_key}")\n') # noqa
-                                    file.write('    }\n')
-                                    file.write('}\n')
-                                elif hold_format_var.isChecked():
-
-                                    if (
-                                        hold_interval_entry is None
-                                        or not
-                                        hold_interval_entry.text().strip()
-                                        or
-                                        hold_interval_entry.text().strip()
-                                       ) == "Hold Interval":
-                                        hold_interval = "10"
-                                    else:
-                                        hold_interval = (hold_interval_entry.
-                                                         text().strip())
-                                    hold_interval_ms = str(int(float(
-                                        hold_interval) * 1000))
-                                    if "+" in remap_key:
-                                        remap_keys = [self.translate_key(
-                                            key.strip(), key_translations)
-                                            for key in remap_key.split("+")]
-                                        down_sequence = "".join([f"{{{key} Down}}" for key in remap_keys]) # noqa
-                                        up_sequence = "".join([f"{{{key} Up}}" for key in reversed(remap_keys)]) # noqa
-                                        file.write(f'*{single_key}::{{\n')
-                                        file.write(f'    if (A_PriorHotkey = "*{single_key}") and (A_TimeSincePriorHotkey < 400) {{\n') # noqa
-                                        file.write(f'        Send("{down_sequence}"), SetTimer(Send.Bind("{up_sequence}"), -{hold_interval_ms})\n') # noqa
-                                        file.write('    }\n')
-                                        file.write('}\n')
-                                    else:
-                                        remap_key_tr = self.translate_key(
-                                            remap_key, key_translations)
-                                        file.write(f'*{single_key}::{{\n')
-                                        file.write(f'    if (A_PriorHotkey = "*{single_key}") and (A_TimeSincePriorHotkey < 400) {{\n') # noqa
-                                        file.write(f'        Send("{{{remap_key_tr} Down}}")\n') # noqa
-                                        file.write(f'        SetTimer(() => Send("{{{remap_key_tr} Up}}"), -{hold_interval_ms})\n') # noqa
-                                        file.write('    }\n')
-                                        file.write('}\n')
-                                else:
-                                    if "+" in remap_key:
-                                        keys = [self.translate_key(
-                                            key.strip(), key_translations)
-                                            for key in remap_key.split("+")]
-                                        key_down = "".join([f"{{{key} down}}"
-                                                            for key in keys])
-                                        key_up = "".join([f"{{{key} up}}"
-                                                          for key
-                                                          in reversed(keys)])
-                                        file.write(f'*{single_key}::{{\n')
-                                        file.write(f'    if (A_PriorHotkey = "*{single_key}") and (A_TimeSincePriorHotkey < 400) {{\n') # noqa
-                                        file.write(f'        Send("{key_down}{key_up}")\n') # noqa
-                                        file.write('    }\n')
-                                        file.write('}\n')
-                                    else:
-                                        remap_key_tr = self.translate_key(
-                                            remap_key, key_translations)
-                                        file.write(f'*{single_key}::{{\n')
-                                        file.write(f'    if (A_PriorHotkey = "*{single_key}") and (A_TimeSincePriorHotkey < 400) {{\n') # noqa
-                                        file.write(f'        Send("{remap_key_tr}")\n') # noqa
-                                        file.write('    }\n')
-                                        file.write('}\n')
-                                continue
-
-                        if has_multiple_keys:
-                            original_translated = "~" + original_translated
-
-                        if text_format_var.isChecked():
-                            file.write(f'{original_translated}::SendText("{remap_key}")\n') # noqa
-                        elif hold_format_var.isChecked():
-
-                            if (
-                                hold_interval_entry is None
-                                or not hold_interval_entry.text().strip()
-                                or hold_interval_entry.text().strip()
-                               ) == "Hold Interval":
-                                hold_interval = "10"
-                            else:
-                                hold_interval = (hold_interval_entry.
-                                                 text().strip())
-                            hold_interval_ms = str(int(float
-                                                       (hold_interval) * 1000))
-
-                            if "+" in remap_key:
-                                remap_keys = [self.translate_key
-                                              (key.strip(), key_translations)
-                                              for key in remap_key.split("+")]
-                                down_sequence = "".join([f"{{{key} Down}}"
-                                                         for key
-                                                         in remap_keys])
-                                up_sequence = "".join([f"{{{key} Up}}"
-                                                       for key
-                                                       in reversed
-                                                       (remap_keys)])
-
-                                if has_multiple_keys:
-                                    file.write(f'{original_translated}:: Send("{down_sequence}"), SetTimer(Send.Bind("{up_sequence}"), -{hold_interval_ms})\n') # noqa
-                                else:
-                                    file.write(f'*{original_translated}:: Send("{down_sequence}"), SetTimer(Send.Bind("{up_sequence}"), -{hold_interval_ms})\n') # noqa
-                            else:
-                                remap_key_tr = self.translate_key(
-                                    remap_key, key_translations)
-                                if has_multiple_keys:
-                                    file.write(f'{original_translated}:: Send("{{{remap_key_tr} Down}}"), SetTimer(Send.Bind("{{{remap_key_tr} Up}}"), -{hold_interval_ms})\n') # noqa
-                                else:
-                                    file.write(f'*{original_translated}:: Send("{{{remap_key_tr} Down}}"), SetTimer(Send.Bind("{{{remap_key_tr} Up}}"), -{hold_interval_ms})\n') # noqa
-                        elif "+" in remap_key:
-                            keys = [key.strip()
-                                    for key in remap_key.split("+")]
-                            key_down = "".join([f"{{{key} down}}"
-                                                for key in keys])
-                            key_up = "".join([f"{{{key} up}}"
-                                              for key in reversed(keys)])
-                            file.write(f'{original_translated}::Send("{key_down}{key_up}")\n') # noqa
-                        else:
-                            remap_key_tr = self.translate_key(
-                                remap_key, key_translations)
-                            file.write(f'{original_translated}::{remap_key_tr}\n') # noqa
-                except Exception:
-                    continue
+            self.active_entry.setText(shortcut_combination)
 
     def get_script_name(self):
         script_name = self.script_name_entry.text().strip()
@@ -271,29 +89,27 @@ class EditScriptLogic(QObject):
         except Exception:
             return False
 
-    def toggle_shortcut_key_listening(self, entry_widget, button):
+    def key_listening(self, entry_widget, button):
         def toggle_other_buttons(state):
-
             if hasattr(self, 'key_rows'):
                 for key_row in self.key_rows:
-                    (orig_entry, remap_entry,
-                     orig_button, remap_button,
-                     text_format_var, hold_format_var,
-                     hold_interval_entry) = key_row
+                    (_, _, orig_button, remap_button, _, _, _) = key_row
+
                     if orig_button != button and orig_button is not None:
                         orig_button.setEnabled(state)
                     if remap_button != button and remap_button is not None:
                         remap_button.setEnabled(state)
+
             if hasattr(self, 'copas_rows'):
                 for copas_row in self.copas_rows:
-                    (copy_entry, paste_entry,
-                     copy_button, paste_button,
-                     disable_copy_var, disable_paste_var) = copas_row
-                    if copy_entry != button and copy_entry is not None:
-                        copy_entry.setEnabled(state)
-                    if paste_entry != button and paste_entry is not None:
-                        paste_entry.setEnabled(state)
-            for shortcut_entry, shortcut_button in self.shortcut_rows:
+                    (_, _, copy_button, paste_button, _, _) = copas_row
+
+                    if copy_button != button and copy_button is not None:
+                        copy_button.setEnabled(state)
+                    if paste_button != button and paste_button is not None:
+                        paste_button.setEnabled(state)
+
+            for _, shortcut_button in self.shortcut_rows:
                 if shortcut_button != button and shortcut_button is not None:
                     shortcut_button.setEnabled(state)
 
@@ -302,6 +118,25 @@ class EditScriptLogic(QObject):
             self.is_listening = True
             self.active_entry = entry_widget
             self.previous_button_text = button.text()
+
+            self.use_scan_code = False
+            if hasattr(self, 'key_rows'):
+                for key_row in self.key_rows:
+                    (orig_entry, remap_entry, orig_button, _, _, _,
+                     hold_interval_entry) = key_row
+
+                    if button == orig_button:
+                        parent_widget = button.parent()
+                        if parent_widget:
+                            sc_checkboxes = [child for child
+                                             in parent_widget.
+                                             findChildren(QObject)
+                                             if child.objectName() ==
+                                             "sc_checkbox"]
+                            if sc_checkboxes:
+                                self.use_scan_code = (
+                                    sc_checkboxes[0].isChecked())
+                            break
 
             entries_to_disable = []
             if hasattr(self, 'script_name_entry'):
@@ -331,24 +166,23 @@ class EditScriptLogic(QObject):
                     entries_to_disable.append((copy_entry, None))
                     entries_to_disable.append((paste_entry, None))
 
-            self.disable_entry_input(entries_to_disable)
+            self.disable_input(entries_to_disable)
+
+            if hasattr(self, "edit_window"):
+                if not hasattr(self, "_window_blocker"):
+                    self._window_blocker = InputBlocker()
+                self.edit_window.installEventFilter(self._window_blocker)
 
             self.ignore_next_click = True
-
             toggle_other_buttons(False)
 
-            button.setText("Save Selected Key")
             button.clicked.disconnect()
-            button.clicked.connect(lambda:
-                                   self.toggle_shortcut_key_listening
+            button.clicked.connect(lambda: self.key_listening
                                    (entry_widget, button))
-
-            if not self.hook_registered:
-                keyboard.hook(self.on_shortcut_key_event)
 
             if self.mouse_listener is None:
                 self.mouse_listener = mouse.Listener(
-                    on_click=self.on_shortcut_mouse_event)
+                    on_click=self.mouse_listening)
                 self.mouse_listener.start()
 
             self.currently_pressed_keys = []
@@ -356,10 +190,10 @@ class EditScriptLogic(QObject):
             self.release_timer = QTimer()
             self.release_timer.setSingleShot(True)
             self.release_timer.timeout.connect(lambda:
-                                               self._finalize_combination
+                                               self.finalize_combination
                                                (entry_widget))
-            keyboard.hook(lambda event: self._on_multi_key_event
-                          (event, entry_widget))
+            keyboard.hook(lambda event: self.multi_key_event
+                          (event, entry_widget, button))
 
         else:
             self.is_listening = False
@@ -394,33 +228,35 @@ class EditScriptLogic(QObject):
                     copy_entry, paste_entry, _, _, _, _ = copas_row
                     entries_to_enable.append((copy_entry, None))
                     entries_to_enable.append((paste_entry, None))
-            self.enable_entry_input(entries_to_enable)
 
+            self.enable_input(entries_to_enable)
             toggle_other_buttons(True)
 
-            button.setText(self.previous_button_text)
-            button.clicked.disconnect()
-            button.clicked.connect(lambda: self.toggle_shortcut_key_listening
-                                   (entry_widget, button))
+            if hasattr(self, "edit_window") and hasattr(
+                    self, "_window_blocker"):
+                self.edit_window.removeEventFilter(self._window_blocker)
 
-            if self.hook_registered:
-                keyboard.unhook_all()
-                self.hook_registered = False
+            if button is not None:
+                button.clicked.disconnect()
+                button.clicked.connect(lambda: self.key_listening
+                                       (entry_widget, button))
 
-            if self.mouse_listener is not None:
-                self.mouse_listener.stop()
-                self.mouse_listener = None
-
-    def _on_multi_key_event(self, event, entry_widget):
+    def multi_key_event(self, event, entry_widget, button):
         if not self.is_listening or self.active_entry != entry_widget:
             return
 
-        key = event.name
+        if hasattr(self, 'use_scan_code') and self.use_scan_code:
+            key = f"SC{event.scan_code:02X}"
+        else:
+            key = event.name
+
+        if (len(key) == 1 and key.isupper() and key.isalpha()):
+            key = key.lower()
 
         if event.event_type == "down":
             if key not in self.currently_pressed_keys:
                 self.currently_pressed_keys.append(key)
-                self._update_entry_widget(entry_widget)
+                self.update_widget(entry_widget)
             if (hasattr(self, "release_timer")
                     and self.release_timer.isActive()):
                 self.release_timer.stop()
@@ -429,87 +265,78 @@ class EditScriptLogic(QObject):
             if key in self.currently_pressed_keys:
                 self.currently_pressed_keys.remove(key)
                 if not self.currently_pressed_keys:
+                    self.key_listening(entry_widget, button)
                     self.request_timer_start.emit(entry_widget)
 
                 else:
                     if hasattr(self, "release_timer"):
                         self.request_timer_start.emit(entry_widget)
 
-    def _start_release_timer(self, entry_widget):
+    def mouse_listening(self, x, y, button, pressed):
+        if self.is_listening and self.active_entry and pressed:
+            if self.ignore_next_click and button == mouse.Button.left:
+                self.ignore_next_click = False
+                return
+
+            if button == mouse.Button.left:
+                mouse_button = "Left Button"
+            elif button == mouse.Button.right:
+                mouse_button = "Right Button"
+            elif button == mouse.Button.middle:
+                mouse_button = "Middle Button"
+            else:
+                mouse_button = button.name
+
+            current_time = time.time()
+
+            if current_time - self.last_key_time > self.timeout:
+                self.pressed_keys = []
+
+            if mouse_button not in self.pressed_keys:
+                self.pressed_keys.append(mouse_button)
+                self.update_entry()
+
+            self.last_key_time = current_time
+
+    def release_timer(self, entry_widget):
         if hasattr(self, "release_timer"):
             self.release_timer.start(400)
 
-    def _update_entry_widget(self, entry_widget):
-        combo = "+".join(self.currently_pressed_keys)
-        if hasattr(entry_widget, "setCurrentText"):
-            entry_widget.setCurrentText(combo)
-        elif hasattr(entry_widget, "setText"):
-            entry_widget.setText(combo)
+    def format_key_combo(self, keys):
+        def format_key(k):
+            if len(k) == 1 and k.islower():
+                return k
+            return k[:1].upper() + k[1:] if k else k
+
+        if isinstance(keys, (list, set)):
+            keys = list(keys)
+        if len(keys) == 1:
+            return format_key(keys[0])
+        return ' + '.join(format_key(k) for k in keys)
+
+    def update_widget(self, entry_widget):
+        combo = self.format_key_combo(self.currently_pressed_keys)
+        entry_widget.setText(combo)
         self.last_combination = combo
 
-    def _finalize_combination(self, entry_widget):
-        if hasattr(entry_widget, "setCurrentText"):
-            entry_widget.setCurrentText(self.last_combination)
-        elif hasattr(entry_widget, "setText"):
-            entry_widget.setText(self.last_combination)
-
+    def finalize_combination(self, entry_widget):
+        entry_widget.setText(self.last_combination)
         self.currently_pressed_keys = set()
 
-    def on_key_event(self, event):
-        if (self.is_listening
-                and self.active_entry
-                and event.event_type) == 'down':
-            key_pressed = event.name
-            if hasattr(self.active_entry, "setCurrentText"):
-                self.active_entry.setCurrentText(key_pressed)
-            elif hasattr(self.active_entry, "setText"):
-                self.active_entry.setText(key_pressed)
-
-    def on_mouse_event(self, x, y, button, pressed):
-        if self.is_listening and self.active_entry:
-            if (self.ignore_next_click
-                    and button == mouse.Button.left
-                    and pressed):
-                self.ignore_next_click = False
-                return
-            if pressed:
-                if button == mouse.Button.left:
-                    mouse_button = "Left Click"
-                elif button == mouse.Button.right:
-                    mouse_button = "Right Click"
-                elif button == mouse.Button.middle:
-                    mouse_button = "Middle Click"
-                else:
-                    mouse_button = str(button)
-                if hasattr(self.active_entry, "setCurrentText"):
-                    self.active_entry.setCurrentText(mouse_button)
-                elif hasattr(self.active_entry, "setText"):
-                    self.active_entry.setText(mouse_button)
-
-    def handle_shortcut_key_event(self, event):
-        if self.is_listening and self.active_entry is not None:
-            self.active_entry.setEnabled(True)
-            if (hasattr(self.active_entry, "text")
-                    and hasattr(self.active_entry, "setCurrentText")):
-                current_text = self.active_entry.currentText()
-                self.active_entry.setCurrentText(current_text + event.name)
-            elif (hasattr(self.active_entry, "text")
-                  and hasattr(self.active_entry, "setText")):
-                current_text = self.active_entry.text()
-                self.active_entry.setText(current_text + event.name)
-            self.active_entry.setEnabled(False)
-
-    def disable_entry_input(self, entry_rows):
+    def disable_input(self, entry_rows):
+        if not hasattr(self, "_input_blocker"):
+            self._input_blocker = InputBlocker()
         for entry_tuple in entry_rows:
             entry = entry_tuple[0]
             if entry is not None:
-                entry.setEnabled(False)
+                entry.installEventFilter(self._input_blocker)
 
-    def enable_entry_input(self, entry_rows):
-        for entry_tuple in entry_rows:
-            entry = entry_tuple[0]
-            if entry is not None:
-                entry.setEnabled(True)
+    def enable_input(self, entry_rows):
+        if hasattr(self, "_input_blocker"):
+            for entry_tuple in entry_rows:
+                entry = entry_tuple[0]
+                if entry is not None:
+                    entry.removeEventFilter(self._input_blocker)
 
     def replace_raw_keys(self, key, key_map):
         return key_map.get(key, key)

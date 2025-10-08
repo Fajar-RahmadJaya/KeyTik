@@ -6,8 +6,8 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from src.utility.constant import (icon_path)
-from src.utility.utils import (device_list_path, device_finder_path)
+from utility.constant import (icon_path)
+from utility.utils import (device_list_path, device_finder_path)
 
 
 class SelectDevice:
@@ -23,7 +23,7 @@ class SelectDevice:
 
             window.accept()
 
-    def edit_open_device_selection(self):
+    def open_device_selection(self):
         if not self.check_interception_driver():
             return
         self.device_selection_window = None

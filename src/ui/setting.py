@@ -1,27 +1,29 @@
 import os
 import shutil
-import webbrowser
-import json
-import ctypes
-import subprocess
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton,
     QMessageBox, QFileDialog, QInputDialog, QHBoxLayout, QCheckBox
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
-from src.utility.constant import (icon_path,
-                                  condition_path, theme_path,
-                                  ahk_path, driver_path,
-                                  interception_install_path,
-                                  interception_uninstall_path)
+import webbrowser
+import json
+import subprocess
+import ctypes
+from utility.constant import (icon_path,
+                              condition_path, theme_path,
+                              ahk_path, driver_path,
+                              interception_install_path,
+                              interception_uninstall_path)
+from utility.utils import (active_dir, store_dir) # noqa
 
 
 class Setting:
     def open_settings_window(self):
         settings_window = QDialog(self)
         settings_window.setWindowTitle("Settings")
-        settings_window.setGeometry(400, 225, 400, 300)
+        # settings_window.setGeometry(400, 225, 400, 300)
+        settings_window.setFixedSize(400, 250)
         settings_window.setWindowIcon(QIcon(icon_path))
         settings_window.setModal(True)
         settings_window.setWindowFlag(
@@ -33,43 +35,39 @@ class Setting:
 
         group_box = QGroupBox()
         group_layout = QGridLayout(group_box)
+        group_layout.setHorizontalSpacing(20)
         group_layout.setContentsMargins(10, 10, 10, 10)
 
         theme_button = QPushButton("Change Theme")
         theme_button.setFixedHeight(40)
-        theme_button.setFixedWidth(180)
         theme_button.clicked.connect(self.change_theme_dialog)
         group_layout.addWidget(theme_button, 0, 0, 1, 1)
 
         change_path_button = QPushButton("Change Profile Location")
         change_path_button.setFixedHeight(40)
-        change_path_button.setFixedWidth(180)
         change_path_button.clicked.connect(self.change_data_location)
         group_layout.addWidget(change_path_button, 0, 1, 1, 1)
 
         installation_button = QPushButton("Check Installation")
         installation_button.setFixedHeight(40)
-        installation_button.setFixedWidth(180)
         installation_button.clicked.connect(self.show_installation_dialog)
         group_layout.addWidget(installation_button, 1, 0, 1, 1)
 
         check_update_button = QPushButton("Check For Update")
         check_update_button.setFixedHeight(40)
-        check_update_button.setFixedWidth(180)
         check_update_button.clicked.connect(
             self.check_update_and_show_messagebox)
         group_layout.addWidget(check_update_button, 1, 1, 1, 1)
 
-        pro_upgrade_button = QPushButton("Open KeyTik Pro Page")
+        pro_upgrade_button = QPushButton("Get KeyTik Pro")
         pro_upgrade_button.setFixedHeight(40)
-        pro_upgrade_button.setFixedWidth(180)
         pro_upgrade_button.clicked.connect(
-            lambda: webbrowser.open("https://fajarrahmadjaya.gumroad.com/l/keytik-pro")) # noqa
+            lambda: webbrowser.open(
+                "https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
         group_layout.addWidget(pro_upgrade_button, 2, 0, 1, 1)
 
         readme_button = QPushButton("Readme!")
         readme_button.setFixedHeight(40)
-        readme_button.setFixedWidth(180)
         readme_button.clicked.connect(self.show_welcome_window)
         group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
@@ -84,6 +82,7 @@ class Setting:
 
     def change_data_location(self):
         global active_dir, store_dir
+
         new_path = QFileDialog.getExistingDirectory(
             self, "Select a New Path for Active and Store Folders"
         )
@@ -133,12 +132,12 @@ class Setting:
             print(f"An error occurred: {e}")
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
 
-    def update_messagebox(self, latest_version, show_no_update_message=False):
+    def update_messagebox(self, latest_version, show_no_update_message=False): # noqa
         if latest_version:
             reply = QMessageBox.question(
                 self, "Update Available",
                 f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?", # noqa
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No # noqa
             )
             if reply == QMessageBox.StandardButton.Yes:
                 webbrowser.open("https://github.com/Fajar-RahmadJaya/KeyTik/releases") # noqa
@@ -154,7 +153,7 @@ class Setting:
 
     def change_theme_dialog(self):
         options = ["Light", "Dark", "System"]
-        current_theme = self.get_saved_theme()
+        current_theme = self.read_theme()
         if current_theme == "dark":
             current_index = 1
         elif current_theme == "light":
@@ -166,11 +165,9 @@ class Setting:
             options, current_index, False)
         if ok:
             self.save_theme(theme.lower())
-            QMessageBox.information(
-                self, "Theme Changed",
-                "Theme will be applied after restarting the app.")
+            QMessageBox.information(self, "Theme Changed", "Theme will be applied after restarting the app.") # noqa
 
-    def get_saved_theme(self):
+    def read_theme(self):
         try:
             if os.path.exists(theme_path):
                 with open(theme_path, 'r') as f:
@@ -195,7 +192,8 @@ class Setting:
         dialog = QDialog(self)
         dialog.setWindowTitle("Installation Manager")
         dialog.setWindowIcon(QIcon(icon_path))
-        dialog.setGeometry(414, 248, 380, 180)
+        # dialog.setGeometry(414, 248, 380, 180)
+        dialog.setFixedSize(380, 180)
         layout = QVBoxLayout(dialog)
         layout.setContentsMargins(20, 20, 20, 20)
 
@@ -209,9 +207,10 @@ class Setting:
         ahk_checkbox.setChecked(ahk_installed)
         ahk_checkbox.setEnabled(False)
         ahk_button = QPushButton(dialog)
-        ahk_button.setText("Uninstall AutoHotkey"
-                           if ahk_installed
-                           else "Install AutoHotkey")
+        ahk_button.setText(
+            "Uninstall AutoHotkey"
+            if ahk_installed
+            else "Install AutoHotkey")
         ahk_vbox.addWidget(
             ahk_checkbox, alignment=Qt.AlignmentFlag.AlignHCenter)
         ahk_vbox.addWidget(ahk_button)
@@ -241,29 +240,23 @@ class Setting:
                 try:
                     subprocess.Popen(uninstall_cmd, shell=True)
                 except Exception as e:
-                    QMessageBox.critical(
-                        dialog, "Error", f"Failed to start uninstall: {e}")
+                    QMessageBox.critical(dialog, "Error", f"Failed to start uninstall: {e}") # noqa
             else:
                 webbrowser.open("https://www.autohotkey.com")
 
         def driver_action():
             try:
                 if driver_installed:
-
                     ctypes.windll.shell32.ShellExecuteW(
                         None, "runas",
                         interception_uninstall_path, None, None, 1
                     )
                 else:
-
                     ctypes.windll.shell32.ShellExecuteW(
-                        None, "runas",
-                        interception_install_path, None, None, 1
+                        None, "runas", interception_install_path, None, None, 1
                     )
             except Exception as e:
-                QMessageBox.critical(
-                    dialog, "Error",
-                    f"Failed to run driver installer/uninstaller: {e}")
+                QMessageBox.critical(dialog, "Error", f"Failed to run driver installer/uninstaller: {e}") # noqa
 
         ahk_button.clicked.connect(ahk_action)
         driver_button.clicked.connect(driver_action)

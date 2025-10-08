@@ -7,14 +7,10 @@ from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 from markdown import markdown
 import json
-from src.utility.constant import (data_dir, icon_path, dont_show_path)
+from utility.constant import (data_dir, icon_path, dont_show_path)
 
 
 class Welcome:
-    def check_welcome(self):
-        if self.welcome_condition:
-            self.show_welcome_window()
-
     def load_welcome_condition(self):
         try:
             if os.path.exists(dont_show_path):
@@ -48,7 +44,8 @@ class Welcome:
 
             welcome_dialog = QDialog(self)
             welcome_dialog.setWindowTitle("Readme!")
-            welcome_dialog.setGeometry(350, 220, 525, 290)
+            # welcome_dialog.setGeometry(350, 220, 525, 290)
+            welcome_dialog.setFixedSize(525, 290)
             welcome_dialog.setWindowIcon(QIcon(icon_path))
             welcome_dialog.setModal(True)
             welcome_dialog.setWindowModality(Qt.WindowModality.WindowModal)
@@ -145,17 +142,20 @@ class Welcome:
                 next_button.setEnabled(
                     self.current_welcome_index < len(self.welcome_files) - 1)
 
-            def next_page():
+            def next_doc():
                 if self.current_welcome_index < len(self.welcome_files) - 1:
                     self.current_welcome_index += 1
                     load_content(self.current_welcome_index)
                     update_buttons()
 
-            def prev_page():
+            def prev_doc():
                 if self.current_welcome_index > 0:
                     self.current_welcome_index -= 1
                     load_content(self.current_welcome_index)
                     update_buttons()
+
+            prev_button.clicked.connect(prev_doc)
+            next_button.clicked.connect(next_doc)
 
             def toggle_dont_show():
                 self.welcome_condition = not dont_show_checkbox.isChecked()

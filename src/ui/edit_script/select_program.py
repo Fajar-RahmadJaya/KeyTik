@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from src.utility.constant import (icon_path)
+from utility.constant import (icon_path)
 
 
 class SelectProgram:
@@ -48,7 +48,6 @@ class SelectProgram:
         self.program_tree = QTreeWidget(self.select_program_window)
         self.program_tree.setHeaderLabels(["Window Title", "Class", "Process"])
         self.program_tree.setSortingEnabled(True)
-        self.program_tree.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         main_layout.addWidget(self.program_tree)
 
         header = self.program_tree.header()

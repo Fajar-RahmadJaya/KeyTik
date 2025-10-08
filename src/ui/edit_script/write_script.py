@@ -4,11 +4,11 @@ import random
 import traceback
 from PySide6.QtWidgets import (QMessageBox)
 from PySide6.QtGui import QIcon
-from src.utility.constant import (exit_keys_file, icon_path)
-from src.utility.utils import (active_dir, store_dir)
+from utility.constant import (exit_keys_file, icon_path)
+from utility.utils import (active_dir, store_dir)
 
 
-class EditScriptSave:
+class WriteScript:
     def generate_exit_key(self, script_name, file=None):
         possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', # noqa
                         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] # noqa
@@ -16,7 +16,7 @@ class EditScriptSave:
         try:
             if os.path.exists(exit_keys_file):
                 try:
-                    with open(exit_keys_file, 'r') as f:
+                    with open(exit_keys_file, 'r', encoding='utf-8') as f:
                         exit_keys = json.load(f)
                 except json.JSONDecodeError:
                     exit_keys = {}
@@ -32,7 +32,7 @@ class EditScriptSave:
             exit_combo = f"^!{random.choice(available_keys)}"
 
             exit_keys[script_name] = exit_combo
-            with open(exit_keys_file, 'w') as f:
+            with open(exit_keys_file, 'w', encoding='utf-8') as f:
                 json.dump(exit_keys, f)
 
             if file is not None:
@@ -58,7 +58,7 @@ class EditScriptSave:
             exit_keys = {}
             if os.path.exists(exit_keys_file):
                 try:
-                    with open(exit_keys_file, 'r') as f:
+                    with open(exit_keys_file, 'r', encoding='utf-8') as f:
                         exit_keys = json.load(f)
                 except Exception:
                     exit_keys = {}
@@ -120,7 +120,7 @@ class EditScriptSave:
                             continue
 
             try:
-                with open(exit_keys_file, 'w') as f:
+                with open(exit_keys_file, 'w', encoding='utf-8') as f:
                     json.dump(exit_keys, f)
             except Exception as e:
                 print(f"Error saving exit_keys.json: {e}")
@@ -134,12 +134,18 @@ class EditScriptSave:
             return
 
         shortcut_types = {"normal": [], "caps": []}
+        caps_on_present = False
+        caps_off_present = False
         for shortcut_row in self.shortcut_rows:
             if self.is_widget_valid(shortcut_row):
-                shortcut = shortcut_row[0].currentText().strip()
+                shortcut = shortcut_row[0].text().strip()
                 if shortcut:
-                    if shortcut.lower() in ["caps on", "caps off"]:
+                    if shortcut.lower() == "caps on":
                         shortcut_types["caps"].append(shortcut)
+                        caps_on_present = True
+                    elif shortcut.lower() == "caps off":
+                        shortcut_types["caps"].append(shortcut)
+                        caps_off_present = True
                     else:
                         shortcut_types["normal"].append(shortcut)
         if shortcut_types["normal"] and shortcut_types["caps"]:
@@ -148,7 +154,17 @@ class EditScriptSave:
                                else None))
             msg.setIcon(QMessageBox.Icon.Warning)
             msg.setWindowTitle("Shortcut Conflict")
-            msg.setText("You cannot use 'Caps On' or 'Caps Off' together with normal keys as shortcuts. Please use only one type (either normal keys or Caps On/Off) for all shortcuts.") # noqa
+            msg.setText("You cannot use 'Caps On' or 'Caps Off' together with normal keys as shortcuts. Please use only one type (either normal keys or Caps ON/OFF) for all shortcuts.") # noqa
+            msg.setWindowIcon(QIcon(icon_path))
+            msg.exec()
+            return
+        if caps_on_present and caps_off_present:
+            msg = (QMessageBox(self.edit_window
+                               if hasattr(self, "edit_window")
+                               else None))
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setWindowTitle("Shortcut Conflict")
+            msg.setText("You cannot use both 'Caps On' and 'Caps Off' as shortcuts. Please use only one (either Caps ON or OFF). If you need both, just use 'CapsLock'.") # noqa
             msg.setWindowIcon(QIcon(icon_path))
             msg.exec()
             return
@@ -162,12 +178,11 @@ class EditScriptSave:
                 mode = self.mode_combobox.currentText().strip().lower()
             self.is_text_mode = (mode == "text mode")
 
-            with open(output_path, 'w') as file:
+            with open(output_path, 'w', encoding='utf-8') as file:
                 if mode == "text mode":
                     self.handle_text_mode(file, key_translations)
                 elif mode == "default mode":
                     self.handle_default_mode(file, key_translations)
-
                 else:
                     self.handle_default_mode(file, key_translations)
 
@@ -214,10 +229,10 @@ class EditScriptSave:
         shortcuts = None
         if write_shortcuts:
             shortcuts = [
-                shortcut_row[0].currentText().strip()
+                shortcut_row[0].text().strip()
                 for shortcut_row in self.shortcut_rows
                 if self.is_widget_valid(shortcut_row)
-                and shortcut_row[0].currentText().strip()
+                and shortcut_row[0].text().strip()
             ] or None
 
         device_condition = None
@@ -277,6 +292,7 @@ class EditScriptSave:
         file.write("; default\n")
         self.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
+        file.write("#Requires AutoHotkey v2.0\n")
 
         write_hotif = self.write_condition(file, key_translations,
                                            write_shortcuts=True,
@@ -292,6 +308,7 @@ class EditScriptSave:
         file.write("; text\n")
         self.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
+        file.write("#Requires AutoHotkey v2.0\n")
 
         write_hotif = self.write_condition(file, key_translations,
                                            write_shortcuts=True,
@@ -306,3 +323,207 @@ class EditScriptSave:
 
         if write_hotif:
             file.write("#HotIf\n")
+
+    def process_key_remaps(self, file, key_translations):
+        for row in self.key_rows:
+            if len(row) >= 7:
+                (default_key_entry, remap_key_entry, _,
+                 _, text_format_var, hold_format_var,
+                 hold_interval_entry) = row
+            try:
+                default_key = default_key_entry.text().strip()
+                remap_key = remap_key_entry.text().strip()
+
+                if not default_key or not remap_key:
+                    continue
+
+                has_multiple_keys = "+" in default_key
+
+                if has_multiple_keys:
+                    keys = [k.strip() for k in default_key.split("+")]
+                    if len(keys) == 2 and keys[0] == keys[1]:
+                        self.write_double_click(
+                            file, keys[0], remap_key, key_translations,
+                            text_format_var.isChecked(),
+                            hold_format_var.isChecked(),
+                            hold_format_var,
+                            hold_interval_entry
+                        )
+                        continue
+                    default_translated = self.write_multiple_key_default(
+                        file, default_key, key_translations)
+
+                else:
+                    default_translated = self.write_single_key_default(
+                        file, default_key, key_translations)
+
+                self.handle_remap_type(
+                    file, default_translated, remap_key, key_translations,
+                    text_format_var.isChecked(),
+                    hold_format_var.isChecked(),
+                    hold_format_var,
+                    hold_interval_entry,
+                    has_multiple_keys
+                )
+
+            except Exception:
+                continue
+
+    def handle_remap_type(self, file, default_translated, remap_key,
+                          key_translations, is_text_mode, is_hold_mode,
+                          hold_format_var, hold_interval_entry,
+                          has_multiple_keys):
+        if is_text_mode:
+            self.write_text_format(file, default_translated, remap_key)
+        elif is_hold_mode:
+            self.write_hold_format(
+                file, default_translated, remap_key,
+                key_translations, hold_format_var,
+                hold_interval_entry, has_multiple_keys
+            )
+        elif "+" in remap_key:
+            self.write_multiple_key_remap(file, default_translated,
+                                          remap_key, key_translations)
+        else:
+            self.write_single_key_remap(file, default_translated,
+                                        remap_key, key_translations)
+
+    def write_single_key_default(self, file, default_key, key_translations):
+        translated_key = self.translate_key(default_key, key_translations)
+        return translated_key
+
+    def write_single_key_remap(self, file, default_translated, remap_key,
+                               key_translations):
+        if hasattr(self, "is_unicode_key") and self.is_unicode_key(remap_key):
+            file.write(f'{default_translated}::SendInput Chr({ord(remap_key)})\n') # noqa
+        else:
+            remap_key_tr = self.translate_key(remap_key, key_translations)
+            file.write(f'{default_translated}::{remap_key_tr}\n')
+
+    def write_multiple_key_default(self, file, default_key, key_translations):
+        translated_key = "~" + self.translate_key(
+            default_key, key_translations)
+        return translated_key
+
+    def write_multiple_key_remap(self, file, default_translated, remap_key,
+                                 key_translations):
+        keys = [key.strip() for key in remap_key.split("+")]
+        send_parts_down = []
+        send_parts_up = []
+
+        for key in keys:
+            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key):
+                send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
+                send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
+            else:
+                tr_key = self.translate_key(key, key_translations)
+                send_parts_down.append(f'{{{tr_key} down}}')
+                send_parts_up.insert(0, f'{{{tr_key} up}}')
+
+        send_sequence = "".join(send_parts_down + send_parts_up)
+        file.write(f'{default_translated}::SendInput("{send_sequence}")\n')
+
+    def write_double_click(self, file, single_key, remap_key,
+                           key_translations, is_text_mode, is_hold_mode,
+                           hold_format_var, hold_interval_entry):
+        translated_key = self.translate_key(single_key, key_translations)
+
+        file.write(f'*{translated_key}::{{\n')
+        file.write(f'    if (A_PriorHotkey = "*{translated_key}") and (A_TimeSincePriorHotkey < 400) {{\n') # noqa
+
+        if is_text_mode:
+            file.write(f'        SendText("{remap_key}")\n')
+        elif is_hold_mode:
+            hold_interval_ms = "10000"
+            if hold_format_var.isChecked() and hold_interval_entry is not None:
+                hold_interval = "10"
+                if (hold_interval_entry.text().strip() and
+                    hold_interval_entry.text().strip()
+                        != "Hold Interval"):
+                    hold_interval = hold_interval_entry.text().strip()
+                hold_interval_ms = str(int(float(hold_interval) * 1000))
+
+            keys = [key.strip() for key in remap_key.split("+")]
+            down_parts = []
+            up_parts = []
+
+            for key in keys:
+                if (hasattr(self, "is_unicode_key") and
+                        self.is_unicode_key(key)):
+                    down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
+                    up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
+                else:
+                    tr_key = self.translate_key(key, key_translations)
+                    down_parts.append(f'{{{tr_key} Down}}')
+                    up_parts.insert(0, f'{{{tr_key} Up}}')
+
+            down_sequence = "".join(down_parts)
+            up_sequence = "".join(up_parts)
+
+            file.write(f'        (SendInput("{down_sequence}"), SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n') # noqa
+
+        else:
+            if "+" in remap_key:
+                keys = [key.strip() for key in remap_key.split("+")]
+                send_parts_down = []
+                send_parts_up = []
+
+                for key in keys:
+                    if (hasattr(self, "is_unicode_key") and
+                            self.is_unicode_key(key)):
+                        send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
+                        send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
+                    else:
+                        tr_key = self.translate_key(key, key_translations)
+                        send_parts_down.append(f'{{{tr_key} down}}')
+                        send_parts_up.insert(0, f'{{{tr_key} up}}')
+
+                send_sequence = "".join(send_parts_down + send_parts_up)
+                file.write(f'        SendInput("{send_sequence}")\n')
+            else:
+                if (hasattr(self, "is_unicode_key") and
+                        self.is_unicode_key(remap_key)):
+                    file.write(f'        Send Chr({ord(remap_key)})\n')
+                else:
+                    remap_key_tr = self.translate_key(
+                        remap_key, key_translations)
+                    file.write(f'        SendInput("{remap_key_tr}")\n')
+
+        file.write('    }\n')
+        file.write('}\n')
+
+    def write_text_format(self, file, default_translated, remap_key):
+        file.write(f'{default_translated}::SendText("{remap_key}")\n')
+
+    def write_hold_format(self, file, default_translated, remap_key,
+                          key_translations, hold_format_var,
+                          hold_interval_entry, is_multiple_keys):
+        hold_interval_ms = "10000"
+        if hold_format_var.isChecked() and hold_interval_entry is not None:
+            hold_interval = "10"
+            if (hold_interval_entry.text().strip() and
+                hold_interval_entry.text().strip()
+                    != "Hold Interval"):
+                hold_interval = hold_interval_entry.text().strip()
+            hold_interval_ms = str(int(float(hold_interval) * 1000))
+
+        keys = [key.strip() for key in remap_key.split("+")]
+        down_parts = []
+        up_parts = []
+
+        for key in keys:
+            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key):
+                down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
+                up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
+            else:
+                tr_key = self.translate_key(key, key_translations)
+                down_parts.append(f'{{{tr_key} Down}}')
+                up_parts.insert(0, f'{{{tr_key} Up}}')
+
+        down_sequence = "".join(down_parts)
+        up_sequence = "".join(up_parts)
+
+        if "&" in default_translated:
+            file.write(f'{default_translated}::(SendInput("{down_sequence}"), SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n') # noqa
+        else:
+            file.write(f'*{default_translated}::(SendInput("{down_sequence}"), SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n') # noqa

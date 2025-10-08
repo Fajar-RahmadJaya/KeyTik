@@ -5,31 +5,41 @@ import sys
 import winshell
 import json
 import requests
+import keyboard
+import pynput
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QFrame, QLabel, QPushButton, QGroupBox, QFileDialog, QMessageBox,
-    QInputDialog, QSizePolicy
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QGridLayout,
+    QFrame, QPushButton, QGroupBox, QFileDialog, QMessageBox,
+    QInputDialog, QSizePolicy, QLabel
 )
-from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtGui import QFont, QFontDatabase
 from pynput.keyboard import Controller, Key
-from src.utility.constant import (icon_unpinned_path, icon_pinned_path,
-                                  icon_path, exit_keys_file, current_version,
-                                  theme_path)
-from src.utility.utils import (load_pinned_profiles, active_dir, store_dir,
-                               save_pinned_profiles, read_running_scripts_temp,
-                               add_script_to_temp, remove_script_from_temp)
-from src.logic.logic import Logic
-from src.ui.setting import Setting
-from src.ui.welcome import Welcome
+from utility.constant import (icon_path, exit_keys_file, current_version)
+from utility.utils import (load_pinned_profiles, active_dir, store_dir,
+                           save_pinned_profiles, read_running_scripts_temp,
+                           add_script_to_temp, remove_script_from_temp,
+                           theme)
+from utility.icon import (icon_pin, icon_pin_fill, icon_rocket,
+                          icon_rocket_fill, icon_exit, icon_run, icon_edit,
+                          icon_copy, icon_delete, icon_store, icon_plus,
+                          icon_next, icon_prev, icon_setting, icon_import,
+                          icon_on_top, icon_on_top_fill, icon_show_stored,
+                          icon_show_stored_fill)
+from logic.logic import Logic
+from ui.setting import Setting
+from ui.welcome import Welcome
 
-from src.ui.edit_script.edit_script_main import EditScriptMain
-from src.ui.edit_script.select_program import SelectProgram
-from src.ui.edit_script.select_device import SelectDevice
-from src.ui.edit_script.edit_frame_row import EditFrameRow
-from src.ui.edit_script.edit_script_logic import EditScriptLogic
-from src.ui.edit_script.edit_script_save import EditScriptSave
-from src.ui.edit_script.parse_script import ParseScript
+from ui.edit_script.edit_script_main import EditScriptMain
+from ui.edit_script.select_program import SelectProgram
+from ui.edit_script.select_device import SelectDevice
+from ui.edit_script.edit_frame_row import EditFrameRow
+from ui.edit_script.edit_script_logic import EditScriptLogic
+from ui.edit_script.write_script import WriteScript
+from ui.edit_script.parse_script import ParseScript
+from ui.edit_script.choose_key import ChooseKey
 
 
 class StartupWorker(QThread):
@@ -48,13 +58,22 @@ class StartupWorker(QThread):
             self.update_found.emit(latest_version)
         self.finished.emit()
 
+        if not hasattr(self.main_window, "keyboard_hook_initialized"):
+            keyboard.hook(lambda event: self.main_window.multi_key_event(
+                event, self.main_window.active_entry, None))
+            self.main_window.mouse_listener = pynput.mouse.Listener(
+                on_click=lambda *args: self.main_window.mouse_listening(*args)
+            )
+            self.main_window.mouse_listener.start()
+            self.main_window.keyboard_hook_initialized = True
+
 
 class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
               Setting, Welcome, SelectProgram, SelectDevice,
-              EditScriptLogic, EditScriptSave, ParseScript):
+              EditScriptLogic, WriteScript, ParseScript, ChooseKey):
     def __init__(self):
         super().__init__()
-        # Global Variables
+        # Global variables
         self.first_load = True
         self.device_selection_window = None
         self.select_program_window = None
@@ -66,7 +85,6 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.shortcut_rows = []
         self.is_listening = False
         self.active_entry = None
-        self.hook_registered = False
         self.row_num = 0
         self.shortcut_rows = []
         self.pressed_keys = []
@@ -76,22 +94,21 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.ignore_next_click = False
         self.shortcut_entry = None
         self.sort_order = [True, True, True]
-        self.previous_button_text = None
         self.check_ahk_installation(show_installed_message=False)
 
-        # UI Initialization
+        # UI initialization
+        self.font_fallback()
         self.central_widget = QWidget()
         self.main_layout = QVBoxLayout(self.central_widget)
         self.current_page = 0
         self.SCRIPT_DIR = active_dir
         self.pinned_profiles = load_pinned_profiles()
-        self.icon_unpinned = QPixmap(icon_unpinned_path).scaled(14, 14)
-        self.icon_pinned = QPixmap(icon_pinned_path).scaled(14, 14)
         self.scripts = self.list_scripts()
         self.create_ui()
         self.update_script_list()
         self.setWindowTitle("KeyTik")
-        self.setGeometry(284, 97, 650, 492)
+        # self.setGeometry(284, 97, 650, 492)
+        self.setFixedSize(650, 492)
         self.setWindowIcon(QIcon(icon_path))
         self.setCentralWidget(self.central_widget)
         self.welcome_condition = self.load_welcome_condition()
@@ -101,55 +118,80 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.main_layout.addWidget(self.frame)
         self.frame_layout = QVBoxLayout(self.frame)
 
-        self.script_frame = QFrame()
-        self.script_grid = QGridLayout(self.script_frame)
-        self.frame_layout.addWidget(self.script_frame)
+        self.profile_frame = QFrame()
+        self.profile_layout = QGridLayout(self.profile_frame)
+        self.profile_layout.setContentsMargins(0, 0, 0, 10)
+        self.profile_frame.setFixedHeight(400)
+        self.profile_layout.setHorizontalSpacing(15)
+        self.profile_layout.setVerticalSpacing(10)
+        self.frame_layout.addWidget(self.profile_frame)
 
-        nav_frame = QFrame()
-        nav_layout = QHBoxLayout(nav_frame)
-        self.prev_button = QPushButton("Previous")
-        self.prev_button.setFixedWidth(120)
+        button_frame = QFrame()
+        button_layout = QGridLayout(button_frame)
+        button_layout.setContentsMargins(40, 20, 40, 10)
+
+        self.prev_button = QPushButton()
+        self.prev_button.setFixedWidth(80)
+        self.prev_button.setIcon(QIcon(icon_prev))
+        self.prev_button.setToolTip("Previous Profile")
         self.prev_button.clicked.connect(self.prev_page)
-        nav_layout.addWidget(
-            self.prev_button, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.next_button = QPushButton("Next")
-        self.next_button.setFixedWidth(120)
-        self.next_button.clicked.connect(self.next_page)
-        nav_layout.addWidget(
-            self.next_button, alignment=Qt.AlignmentFlag.AlignRight)
-        self.frame_layout.addWidget(nav_frame)
+        button_layout.addWidget(self.prev_button, 0, 0)
 
-        action_container = QFrame()
-        action_layout = QGridLayout(action_container)
-        self.create_button = QPushButton("Create New Profile")
-        self.create_button.setFixedWidth(180)
-        self.create_button.clicked.connect(lambda: self.edit_script(None))
-        action_layout.addWidget(self.create_button, 0, 0)
-        self.import_button = QPushButton("Import Profile")
-        self.import_button.setFixedWidth(180)
-        self.import_button.clicked.connect(self.import_button_clicked)
-        action_layout.addWidget(self.import_button, 0, 1)
-        self.always_top = QPushButton("Always On Top")
-        self.always_top.setFixedWidth(180)
-        self.always_top.clicked.connect(self.toggle_on_top)
-        action_layout.addWidget(self.always_top, 1, 1)
-        self.show_stored = QPushButton("Show Stored Profile")
-        self.show_stored.setFixedWidth(180)
+        self.show_stored = QPushButton()
+        self.show_stored.setFixedWidth(30)
+        self.show_stored.setIcon(QIcon(icon_show_stored))
+        self.show_stored.setToolTip("Show Stored Profile")
         self.show_stored.clicked.connect(self.toggle_script_dir)
-        action_layout.addWidget(self.show_stored, 1, 0)
-        self.setting_button = QPushButton("Setting")
-        self.setting_button.setFixedWidth(100)
-        self.setting_button.clicked.connect(self.open_settings_window)
-        self.frame_layout.addWidget(action_container)
-        self.setting_button.move(550, 450)
+        button_layout.addWidget(self.show_stored, 0, 1)
 
-        self.main_layout.addWidget(
-            self.setting_button, alignment=Qt.AlignmentFlag.AlignRight |
-            Qt.AlignmentFlag.AlignBottom)
+        self.import_button = QPushButton()
+        self.import_button.setFixedWidth(30)
+        self.import_button.setIcon(QIcon(icon_import))
+        self.import_button.setToolTip("Import AutoHotkey Script")
+        self.import_button.clicked.connect(self.import_button_clicked)
+        button_layout.addWidget(self.import_button, 0, 2)
+
+        dummy_left = QLabel()
+        dummy_left.setFixedWidth(10)
+        button_layout.addWidget(dummy_left, 0, 3)
+
+        self.create_button = QPushButton(" Create New Profile")
+        self.create_button.setIcon(QIcon(icon_plus))
+        self.create_button.setFixedWidth(150)
+        self.create_button.setFixedHeight(30)
+        self.create_button.clicked.connect(lambda: self.edit_script(None))
+        button_layout.addWidget(self.create_button, 0, 4)
+
+        dummy_right = QLabel()
+        dummy_right.setFixedWidth(10)
+        button_layout.addWidget(dummy_right, 0, 5)
+
+        self.always_top = QPushButton()
+        self.always_top.setFixedWidth(30)
+        self.always_top.setIcon(QIcon(icon_on_top))
+        self.always_top.setToolTip("Enable  Window Always on Top")
+        self.always_top.clicked.connect(self.toggle_on_top)
+        button_layout.addWidget(self.always_top, 0, 6)
+
+        self.setting_button = QPushButton()
+        self.setting_button.setFixedWidth(30)
+        self.setting_button.setIcon(QIcon(icon_setting))
+        self.setting_button.setToolTip("Setting")
+        self.setting_button.clicked.connect(self.open_settings_window)
+        button_layout.addWidget(self.setting_button, 0, 7)
+
+        self.next_button = QPushButton()
+        self.next_button.setFixedWidth(80)
+        self.next_button.setIcon(QIcon(icon_next))
+        self.next_button.setToolTip("Next Profile")
+        self.next_button.clicked.connect(self.next_page)
+        button_layout.addWidget(self.next_button, 0, 8)
+
+        self.frame_layout.addWidget(button_frame)
 
     def update_script_list(self):
-        for i in reversed(range(self.script_grid.count())):
-            widget = self.script_grid.itemAt(i).widget()
+        for i in reversed(range(self.profile_layout.count())):
+            widget = self.profile_layout.itemAt(i).widget()
             if widget:
                 widget.setParent(None)
 
@@ -162,20 +204,20 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         for index, script in enumerate(scripts_to_display):
             row = index // 2
             column = index % 2
-            icon = (self.icon_pinned
+            icon = (icon_pin_fill
                     if script in self.pinned_profiles
-                    else self.icon_unpinned)
+                    else icon_pin)
 
             group_box = QGroupBox(os.path.splitext(script)[0])
             group_layout = QGridLayout(group_box)
 
-            icon_label = QLabel(group_box)
-            icon_label.setPixmap(icon)
-            icon_label.setFixedSize(18, 18)
+            icon_label = QSvgWidget(icon, group_box)
+            icon_label.setFixedSize(17, 17)
+            icon_label.setToolTip(f'Pin "{os.path.splitext(script)[0]}"')
             icon_label.setCursor(Qt.CursorShape.PointingHandCursor)
             icon_label.mousePressEvent = (lambda event, s=script,
                                           i=icon_label: self.toggle_pin(s, i))
-            icon_label.move(281, 2)
+            icon_label.move(285, 3)
 
             run_button = QPushButton()
             run_button.setFixedWidth(80)
@@ -186,51 +228,91 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
             is_startup = os.path.exists(shortcut_path)
 
             if is_startup or script in running_scripts:
-                run_button.setText("Exit")
+                run_button.setText(" Exit")
+                run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
+                run_button.setIcon(QIcon(icon_exit))
             else:
-                run_button.setText("Run")
-            run_button.clicked.connect(
-                lambda checked, s=script,
-                b=run_button: self.toggle_run_exit(s, b))
+                run_button.setText(" Run")
+                run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
+                run_button.setIcon(QIcon(icon_run))
+            run_button.clicked.connect(lambda checked, s=script, b=run_button:
+                                       self.toggle_run_exit(s, b))
             group_layout.addWidget(run_button, 0, 0)
 
-            edit_button = QPushButton("Edit")
+            edit_button = QPushButton(" Edit")
+            edit_button.setIcon(QIcon(icon_edit))
             edit_button.setFixedWidth(80)
-            edit_button.clicked.connect(
-                lambda checked, s=script: self.edit_script(s))
+            edit_button.setToolTip(f'Adjust "{os.path.splitext(script)[0]}"')
+
+            def handle_edit(checked=False, s=script, rb=run_button):
+                was_running = rb.text() == " Exit"
+                if was_running:
+                    self.exit_script(s, rb)
+                self.edit_script(s)
+                if was_running:
+                    for i in range(self.profile_layout.count()):
+                        group_box = self.profile_layout.itemAt(i).widget()
+                        if (isinstance(group_box, QGroupBox) and
+                                group_box.title() == os.path.splitext(s)[0]):
+                            layout = group_box.layout()
+                            if layout:
+                                btn = layout.itemAtPosition(0, 0)
+                                if btn:
+                                    run_btn = btn.widget()
+                                    if isinstance(run_btn, QPushButton):
+                                        self.activate_script(s, run_btn)
+                                        break
+
+            edit_button.clicked.connect(handle_edit)
             group_layout.addWidget(edit_button, 0, 1)
 
-            copy_button = QPushButton("Copy")
+            copy_button = QPushButton(" Copy")
             copy_button.setFixedWidth(80)
-            copy_button.clicked.connect(
-                lambda checked, s=script: self.copy_script(s))
+            copy_button.setIcon(QIcon(icon_copy))
+            copy_button.setToolTip(f'Copy "{os.path.splitext(script)[0]}"')
+            copy_button.clicked.connect(lambda checked,
+                                        s=script: self.copy_script(s))
             group_layout.addWidget(copy_button, 1, 0)
 
-            delete_button = QPushButton("Delete")
+            delete_button = QPushButton(" Delete")
             delete_button.setFixedWidth(80)
-            delete_button.clicked.connect(
-                lambda checked, s=script: self.delete_script(s))
+            delete_button.setIcon(QIcon(icon_delete))
+            delete_button.setToolTip(f'Remove "{os.path.splitext(script)[0]}"')
+            delete_button.clicked.connect(lambda checked,
+                                          s=script: self.delete_script(s))
             group_layout.addWidget(delete_button, 1, 2)
 
-            store_button = QPushButton(
-                "Store" if self.SCRIPT_DIR == active_dir else "Restore")
+            store_button = QPushButton(" Store" if
+                                       self.SCRIPT_DIR == active_dir
+                                       else " Restore")
             store_button.setFixedWidth(80)
-            store_button.clicked.connect(
-                lambda checked, s=script: self.store_script(s))
+            store_button.setIcon(QIcon(icon_store))
+            if self.SCRIPT_DIR == active_dir:
+                store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"') # noqa
+            else:
+                store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"') # noqa
+            store_button.clicked.connect(lambda checked,
+                                         s=script: self.store_script(s))
             group_layout.addWidget(store_button, 1, 1)
 
             if is_startup:
-                startup_button = QPushButton("Unstart")
-                startup_button.clicked.connect(
-                    lambda checked, s=script: self.remove_ahk_from_startup(s))
+                startup_button = QPushButton(" Unstartup")
+                startup_button.setIcon(QIcon(icon_rocket_fill))
+                startup_button.setToolTip(
+                    f'Remove from startup: Dont run"{os.path.splitext(script)[0]}" automatically when computer starts') # noqa
+                startup_button.clicked.connect(lambda checked, s=script:
+                                               self.remove_ahk_from_startup(s))
             else:
-                startup_button = QPushButton("Startup")
-                startup_button.clicked.connect(
-                    lambda checked, s=script: self.add_ahk_to_startup(s))
+                startup_button = QPushButton(" Startup")
+                startup_button.setIcon(QIcon(icon_rocket))
+                startup_button.setToolTip(
+                    f'Add to startup: Run "{os.path.splitext(script)[0]}" automatically when computer starts') # noqa
+                startup_button.clicked.connect(lambda checked, s=script:
+                                               self.add_ahk_to_startup(s))
             startup_button.setFixedWidth(80)
             group_layout.addWidget(startup_button, 0, 2)
 
-            self.script_grid.addWidget(group_box, row, column)
+            self.profile_layout.addWidget(group_box, row, column)
 
         total_cells = 6
         for i in range(len(scripts_to_display), total_cells):
@@ -238,10 +320,10 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
             column = i % 2
             spacer = QWidget()
             spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            self.script_grid.addWidget(spacer, row, column)
+            self.profile_layout.addWidget(spacer, row, column)
 
-        self.script_grid.setColumnStretch(0, 1)
-        self.script_grid.setColumnStretch(1, 1)
+        self.profile_layout.setColumnStretch(0, 1)
+        self.profile_layout.setColumnStretch(1, 1)
 
     def import_button_clicked(self):
         file_dialog = QFileDialog(self)
@@ -251,16 +333,16 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
             if selected_files:
                 selected_file = selected_files[0]
                 if not selected_file.endswith('.ahk'):
-                    QMessageBox.warning(
-                        self, "Error", "Only .ahk files are allowed.")
+                    QMessageBox.warning(self, "Error",
+                                        "Only .ahk files are allowed.")
                     return
                 file_name = os.path.basename(selected_file)
                 destination_path = os.path.join(self.SCRIPT_DIR, file_name)
                 try:
                     shutil.move(selected_file, destination_path)
                 except Exception as e:
-                    QMessageBox.warning(
-                        self, "Error", f"Failed to move file: {e}")
+                    QMessageBox.warning(self, "Error",
+                                        f"Failed to move file: {e}")
                     return
                 try:
                     exit_key = self.generate_exit_key(file_name)
@@ -270,9 +352,8 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
                     lines = [line for line in lines if "::ExitApp" not in line]
 
                     first_line = lines[0].strip() if lines else ""
-                    has_text_or_default = (
-                        first_line.startswith("; text")
-                        or first_line.startswith("; default"))
+                    has_text_or_default = (first_line.startswith("; text") or
+                                           first_line.startswith("; default"))
                     new_lines = []
                     if not has_text_or_default:
 
@@ -289,20 +370,20 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
                                 "\n"
                             ] + lines
                     else:
-                        new_lines = [lines[0] +
-                                     f"{exit_key}::ExitApp\n",
+
+                        new_lines = [lines[0] + f"{exit_key}::ExitApp\n",
                                      "\n"] + lines[1:]
+
                     content = ''.join(new_lines)
                     content_lines = content.splitlines()
-                    content_lines = [line
-                                     for line in content_lines
-                                     if line.strip()
-                                     not in ["; Text mode start",
-                                             "; Text mode end"]]
+                    content_lines = [line for line in content_lines if
+                                     line.strip() not in ["; Text mode start",
+                                                          "; Text mode end"]]
+
                     header = content_lines[:3]
                     body = content_lines[3:]
-                    result_lines = header + ["; Text mode start"] + body + [
-                        "; Text mode end"]
+                    result_lines = (header + ["; Text mode start"]
+                                    + body + ["; Text mode end"])
 
                     with open(destination_path, 'w', encoding='utf-8') as file:
                         file.write('\n'.join(result_lines) + '\n')
@@ -323,8 +404,12 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
                 self.update_script_list()
 
     def copy_script(self, script):
-        new_name, ok = QInputDialog.getText(
-            self, "Copy Script", "Enter the new script name:")
+        dialog = QInputDialog(self)
+        dialog.setWindowTitle("Copy Script")
+        dialog.setLabelText("Enter the new script name:")
+        dialog.resize(250, 100)
+        ok = dialog.exec()
+        new_name = dialog.textValue()
         if not ok or not new_name:
             return
         if not new_name.lower().endswith('.ahk'):
@@ -341,49 +426,58 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
     def delete_script(self, script_name):
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
         if os.path.isfile(script_path):
+            reply = QMessageBox.question(
+                self,
+                "Delete Script",
+                f"Are you sure you want to delete '{script_name}'?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply != QMessageBox.StandardButton.Yes:
+                return
             try:
                 os.remove(script_path)
                 self.scripts = self.list_scripts()
                 self.update_script_list()
             except Exception as e:
-                QMessageBox.warning(
-                    self, "Error", f"Failed to delete the script: {e}")
+                QMessageBox.warning(self, "Error",
+                                    f"Failed to delete the script: {e}")
         else:
-            QMessageBox.warning(
-                self, "Error", f"{script_name} does not exist.")
+            QMessageBox.warning(self, "Error",
+                                f"{script_name} does not exist.")
 
     def toggle_on_top(self):
         self.is_on_top = not self.is_on_top
         self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, self.is_on_top)
         self.show()
-        self.setWindowTitle(
-            f"KeyTik{' (Always on Top)' if self.is_on_top else ''}")
-        self.always_top.setText(
-            "Disable Always on Top"
-            if self.is_on_top
-            else "Enable Always on Top")
+        onTopText = (f"KeyTik{' (Always on Top)' if self.is_on_top else ''}")
+        self.setWindowTitle(onTopText)
+        if self.is_on_top:
+            self.always_top.setToolTip("Disable Window Always on Top")
+            self.always_top.setIcon(QIcon(icon_on_top_fill))
+        else:
+            self.always_top.setToolTip("Enable  Window Always on Top")
+            self.always_top.setIcon(QIcon(icon_on_top))
 
         parent_window = self.create_profile_window or self.edit_window
-        self.set_on_top(
-            self.create_profile_window, "Create New Profile", parent_window)
-        self.set_on_top(
-            self.edit_window, "Edit Profile", parent_window)
-        self.set_on_top(
-            self.device_selection_window, "Select Device", parent_window)
-        self.set_on_top(
-            self.select_program_window, "Select Program", parent_window)
+        self.set_on_top(self.create_profile_window, "Create New Profile",
+                        parent_window)
+        self.set_on_top(self.edit_window, "Edit Profile", parent_window)
+        self.set_on_top(self.device_selection_window, "Select Device",
+                        parent_window)
+        self.set_on_top(self.select_program_window, "Select Program",
+                        parent_window)
 
     def set_on_top(self, window, title, parent=None):
         if window is not None and window.isVisible():
             try:
                 if parent:
-                    window.setWindowModality(
-                        Qt.WindowModality.ApplicationModal)
+                    window.setWindowModality(Qt.WindowModality.
+                                             ApplicationModal)
                 else:
                     window.setWindowModality(Qt.WindowModality.NonModal)
 
-                window.setWindowFlag(
-                    Qt.WindowType.WindowStaysOnTopHint, self.is_on_top)
+                window.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint,
+                                     self.is_on_top)
                 title_suffix = " (Always on Top)" if self.is_on_top else ""
                 window.setWindowTitle(f"{title}{title_suffix}")
 
@@ -399,13 +493,13 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
             os.startfile(script_path)
 
-            button.setText("Exit")
+            button.setText(" Exit")
+            button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"') # noqa
             button.clicked.disconnect()
-            button.clicked.connect(
-                lambda: self.exit_script(script_name, button))
+            button.clicked.connect(lambda: self.exit_script(script_name,
+                                                            button))
         else:
-            QMessageBox.critical(
-                self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
 
     def exit_script(self, script_name, button):
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
@@ -418,8 +512,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
                 exit_combo = exit_keys.get(script_name)
                 if not exit_combo:
-                    QMessageBox.critical(
-                        self, "Error", f"No exit key found for {script_name}")
+                    QMessageBox.critical(self, "Error", f"No exit key found for {script_name}") # noqa
                     return
 
                 keyboard = Controller()
@@ -437,17 +530,16 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
                 if '^' in exit_combo:
                     keyboard.release(Key.ctrl)
 
-                button.setText("Run")
+                button.setText(" Run")
+                button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"') # noqa
                 button.clicked.disconnect()
-                button.clicked.connect(
-                    lambda: self.activate_script(script_name, button))
+                button.clicked.connect(lambda: self.activate_script(
+                    script_name, button))
 
             except Exception as e:
-                QMessageBox.critical(
-                    self, "Error", f"Failed to exit script: {e}")
+                QMessageBox.critical(self, "Error", f"Failed to exit script: {e}") # noqa
         else:
-            QMessageBox.critical(
-                self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
 
     def store_script(self, script_name):
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
@@ -461,44 +553,43 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
         if os.path.isfile(script_path):
             try:
+
                 shutil.move(script_path, target_path)
+
                 self.scripts = self.list_scripts()
                 self.update_script_list()
-
             except Exception as e:
-                QMessageBox.critical(
-                    self, "Error", f"Failed to move the script: {e}")
+                QMessageBox.critical(self, "Error", f"Failed to move the script: {e}") # noqa
         else:
-            QMessageBox.critical(
-                self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
 
     def toggle_run_exit(self, script_name, button):
-        if button.text() == "Run":
+        if button.text() == " Run":
+
             self.activate_script(script_name, button)
             add_script_to_temp(script_name)
 
-            button.setText("Exit")
             button.clicked.disconnect()
-            button.clicked.connect(
-                lambda checked=False: self.toggle_run_exit(
-                    script_name, button))
+            button.clicked.connect(lambda checked=False: self.toggle_run_exit(
+                script_name, button))
         else:
+
             self.exit_script(script_name, button)
             remove_script_from_temp(script_name)
 
-            button.setText("Run")
             button.clicked.disconnect()
-            button.clicked.connect(
-                lambda checked=False: self.toggle_run_exit(
-                    script_name, button))
+            button.clicked.connect(lambda checked=False: self.toggle_run_exit(
+                script_name, button))
 
     def toggle_script_dir(self):
         if self.SCRIPT_DIR == active_dir:
             self.SCRIPT_DIR = store_dir
-            self.show_stored.setText("Show Active Profile")
+            self.show_stored.setToolTip("Show Active Profile")
+            self.show_stored.setIcon(QIcon(icon_show_stored_fill))
         else:
             self.SCRIPT_DIR = active_dir
-            self.show_stored.setText("Show Stored Profile")
+            self.show_stored.setToolTip("Show Stored Profile")
+            self.show_stored.setIcon(QIcon(icon_show_stored))
 
         self.list_scripts()
         self.update_script_list()
@@ -507,10 +598,11 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         if script in self.pinned_profiles:
 
             self.pinned_profiles.remove(script)
-            icon_label.setPixmap(self.icon_unpinned)
+            icon_label.load(icon_pin)
         else:
+
             self.pinned_profiles.insert(0, script)
-            icon_label.setPixmap(self.icon_pinned)
+            icon_label.load(icon_pin_fill)
 
         save_pinned_profiles(self.pinned_profiles)
         self.list_scripts()
@@ -571,21 +663,28 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
                 webbrowser.open("https://www.autohotkey.com/")
             return False
 
+    def font_fallback(self):
+        available_fonts = []
+        all_fonts = QFontDatabase.families()
+        for font_name in all_fonts:
+            is_scalable = QFontDatabase.isSmoothlyScalable(font_name)
+            if is_scalable:
+                available_fonts.append(font_name)
 
-def get_theme_from_themefile():
-    try:
-        if os.path.exists(theme_path):
-            with open(theme_path, 'r') as f:
-                theme = f.read().strip().lower()
-            if theme in ("dark", "light"):
-                return theme
-        return "system"
-    except Exception:
-        return "system"
+        default_font = QApplication.font()
+        default_font_family = default_font.family()
+
+        fallback_font = QFont(default_font_family, 9, QFont.Normal, False)
+
+        for font_name in available_fonts:
+            if font_name != default_font_family:
+                fallback_font.insertSubstitution(default_font_family,
+                                                 font_name)
+
+        QApplication.setFont(fallback_font)
 
 
 def main():
-    theme = get_theme_from_themefile()
     if theme == "dark":
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
     elif theme == "light":

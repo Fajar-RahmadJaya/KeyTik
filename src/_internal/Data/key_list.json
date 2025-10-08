@@ -1,0 +1,2696 @@
+[
+    {
+        "Shortcut Special":{
+            "Caps ON":{
+                "translate": "",
+                "description": "When caps lock is ON (Only for shortcuts)"
+            },
+            "Caps OFF":{
+                "translate": "",
+                "description": "When caps lock is OFF (Only for shortcuts)"
+            }
+        },
+        "Mouse":{
+            "Left Button":{
+                "translate": "LButton",
+                "description": "Primary mouse button. Which physical button this corresponds to depends on system settings; by default it is the left button."
+            },
+            "Right Button":{
+                "translate": "RButton",
+                "description": "Secondary mouse button. Which physical button this corresponds to depends on system settings; by default it is the right button."
+            },
+            "Middle Button":{
+                "translate": "MButton",
+                "description": "Middle or wheel mouse button."
+            },
+            "XButton1":{
+                "translate": "XButton1",
+                "description": "4th mouse button. Typically performs the same function as Browser_Back."
+            },
+            "XButton2":{
+                "translate": "XButton2",
+                "description": "5th mouse button. Typically performs the same function as Browser_Forward."
+            },
+            "Wheel Up":{
+                "translate": "WheelUp",
+                "description": "Turn the wheel downward (toward you)."
+            },
+            "Wheel Down":{
+                "translate": "WheelDown",
+                "description": "Turn the wheel upward (away from you)."
+            },
+            "Wheel Left":{
+                "translate": "WheelLeft",
+                "description": "Scroll to the left. These can be used as hotkeys with some (but not all) mice which have a second wheel or support tilting the wheel to either side. In some cases, software bundled with the mouse must instead be used to control this feature. Regardless of the particular mouse."
+            },
+            "Wheel Right":{
+                "translate": "WheelRight",
+                "description": "Scroll to the rigt. These can be used as hotkeys with some (but not all) mice which have a second wheel or support tilting the wheel to either side. In some cases, software bundled with the mouse must instead be used to control this feature. Regardless of the particular mouse."
+            }                                                    
+        },
+
+        "General Keys":{
+            "Caps Lock":{
+                "translate": "CapsLock",
+                "description": "CapsLock (caps lock key)"
+            },
+            "Space":{
+                "translate": "Space",
+                "description": "Space (space bar)"
+            },
+            "Tab":{
+                "translate": "Tab",
+                "description": "Tab (tabulator key)"
+            }, 
+            "Enter":{
+                "translate": "Enter",
+                "description": ""
+            }, 
+            "Esc":{
+                "translate": "Esc",
+                "description": ""
+            }, 
+            "Backspace":{
+                "translate": "Backspace",
+                "description": ""
+            }
+        },
+
+        "Modifier Keys":{
+            "Left Win":{
+                "translate": "LWin",
+                "description": "Left Win"
+            }, 
+            "Right Win":{
+                "translate": "RWin",
+                "description": "Right Win"
+            }, 
+            "Ctrl":{
+                "translate": "Ctrl",
+                "description": "Control (or Ctrl)"
+            }, 
+            "Left Ctrl ":{
+                "translate": "LCtrl ",
+                "description": "Left Control (or Ctrl)"
+            }, 
+            "Right Ctrl":{
+                "translate": "RCtrl",
+                "description": "Right Control (or Ctrl)"
+            }, 
+            "Alt":{
+                "translate": "Alt",
+                "description": ""
+            }, 
+            "Left Alt":{
+                "translate": "LAlt",
+                "description": "Left Alt"
+            }, 
+            "Right Alt":{
+                "translate": "RAlt",
+                "description": "Right Alt"
+            }, 
+            "Shift":{
+                "translate": "Shift",
+                "description": ""
+            }, 
+            "Left Shift":{
+                "translate": "LShift",
+                "description": "Left Shift"
+            }, 
+            "Right Shift":{
+                "translate": "RShift",
+                "description": "Right Shift"
+            }
+        },
+
+        "Cursor Control Keys":{
+            "Scroll Lock":{
+                "translate": "ScrollLock",
+                "description": "ScrollLock (scroll lock key). While Ctrl is held down, ScrollLock produces the key code of CtrlBreak, but can be differentiated from Pause by scan code (SC)."
+            }, 
+            "Delete":{
+                "translate": "Delete",
+                "description": "Del"
+            }, 
+            "Insert":{
+                "translate": "Insert",
+                "description": "Ins"
+            }, 
+            "Home":{
+                "translate": "Home",
+                "description": ""
+            }, 
+            "End":{
+                "translate": "End",
+                "description": ""
+            }, 
+            "Page Up":{
+                "translate": "PgUp",
+                "description": "PgUp (page up key)"
+            }, 
+            "Page Down":{
+                "translate": "PgDn",
+                "description": "PgDn (page down key)"
+            }, 
+            "Up":{
+                "translate": "Up",
+                "description": "↑ (up arrow key)"
+            }, 
+            "Down":{
+                "translate": "Down",
+                "description": "↓ (down arrow key)"
+            }, 
+            "Left":{
+                "translate": "Left",
+                "description": "← (left arrow key)"
+            }, 
+            "Right":{
+                "translate": "Right",
+                "description": "→ (right arrow key)"
+            }
+        },
+
+        "Other Keys":{
+            "Apps Key": {
+                "translate": "AppsKey",
+                "description": "Menu. This is the key that invokes the right-click context menu."
+            },
+            "Print Screen": {
+                "translate": "PrintScreen",
+                "description": "PrtSc (print screen key)"
+            },
+            "Ctrl Break": {
+                "translate": "CtrlBreak",
+                "description": "Ctrl+Pause or Ctrl+ScrollLock"
+            },
+            "Pause": {
+                "translate": "Pause",
+                "description": "Pause or Ctrl+NumLock. While Ctrl is held down, Pause produces the key code of CtrlBreak and NumLock produces Pause, so use CtrlBreak in hotkeys instead of Pause."
+            },
+            "Help": {
+                "translate": "Help",
+                "description": "Help. This probably doesn't exist on most keyboards. It's usually not the same as F1."
+            },
+            "Sleep": {
+                "translate": "Sleep",
+                "description": "Sleep. Note that the sleep key on some keyboards might not work with this."
+            }
+        },
+
+        "Multimedia Keys":{
+            "Browser Back": {
+                "translate": "Browser_Back",
+                "description": "Back"
+            },
+            "Browser Forward": {
+                "translate": "Browser_Forward",
+                "description": "Forward"
+            },
+            "Browser Refresh": {
+                "translate": "Browser_Refresh",
+                "description": "Refresh"
+            },
+            "Browser Stop": {
+                "translate": "Browser_Stop",
+                "description": "Stop"
+            },
+            "Browser Search": {
+                "translate": "Browser_Search",
+                "description": "Search"
+            },
+            "Browser Favorites": {
+                "translate": "Browser_Favorites",
+                "description": "Favorites"
+            },
+            "Browser Home": {
+                "translate": "Browser_Home",
+                "description": "Homepage"
+            },
+            "Volume Mute": {
+                "translate": "Volume_Mute",
+                "description": "Mute the volume"
+            },
+            "Volume Down": {
+                "translate": "Volume_Down",
+                "description": "Lower the volume"
+            },
+            "Volume Up": {
+                "translate": "Volume_Up",
+                "description": "Increase the volume"
+            },
+            "Media Next": {
+                "translate": "Media_Next",
+                "description": "Next Track"
+            },
+            "Media Prev": {
+                "translate": "Media_Prev",
+                "description": "Previous Track"
+            },
+            "Media Stop": {
+                "translate": "Media_Stop",
+                "description": "Stop"
+            },
+            "Media Play Pause": {
+                "translate": "Media_Play_Pause",
+                "description": "Play/Pause"
+            },
+            "Launch Mail": {
+                "translate": "Launch_Mail",
+                "description": "Launch default e-mail program"
+            },
+            "Launch Media": {
+                "translate": "Launch_Media",
+                "description": "Launch default media player"
+            },
+            "Launch App1": {
+                "translate": "Launch_App1",
+                "description": "Launch This PC (formerly My Computer or Computer)"
+            },
+            "Launch App2": {
+                "translate": "Launch_App2",
+                "description": "Launch Calculator"
+            }
+        },
+
+        "Numpad Keys":{
+            "Num Lock": {
+                "translate": "NumLock",
+                "description": "NumLock (number lock key). While Ctrl is held down, NumLock produces the key code of Pause, so use Pause in hotkeys instead of NumLock."
+            }, 
+            "Numpad 0": {
+                "translate": "Numpad0",
+                "description": "(NumLock ON) 0"
+            },
+            "Numpad Ins": {
+                "translate": "NumpadIns",
+                "description": "(NumLock OFF) Ins"
+            },
+            "Numpad 1": {
+                "translate": "Numpad1",
+                "description": "(NumLock ON) 1"
+            },
+            "Numpad End": {
+                "translate": "NumpadEnd",
+                "description": "(NumLock OFF) End"
+            },
+            "Numpad 2": {
+                "translate": "Numpad2",
+                "description": "(NumLock ON) 2"
+            },
+            "Numpad Down": {
+                "translate": "NumpadDown",
+                "description": "(NumLock OFF) ↓"
+            },
+            "Numpad 3": {
+                "translate": "Numpad3",
+                "description": "(NumLock ON) 3"
+            },
+            "Numpad Page Down": {
+                "translate": "NumpadPgDn",
+                "description": "(NumLock OFF) PgDn"
+            },
+            "Numpad 4": {
+                "translate": "Numpad4",
+                "description": "(NumLock ON) 4"
+            },
+            "Numpad Left": {
+                "translate": "NumpadLeft",
+                "description": "(NumLock OFF) ←"
+            },
+            "Numpad 5": {
+                "translate": "Numpad5",
+                "description": "(NumLock ON) 5"
+            },
+            "Numpad Clear": {
+                "translate": "NumpadClear",
+                "description": "(NumLock OFF) typically does nothing"
+            },
+            "Numpad 6": {
+                "translate": "Numpad6",
+                "description": "(NumLock ON) 6"
+            },
+            "Numpad Right": {
+                "translate": "NumpadRight",
+                "description": "(NumLock OFF) →"
+            },
+            "Numpad 7": {
+                "translate": "Numpad7",
+                "description": "(NumLock ON) 7"
+            },
+            "Numpad Home": {
+                "translate": "NumpadHome",
+                "description": "(NumLock OFF) Home"
+            },
+            "Numpad 8": {
+                "translate": "Numpad8",
+                "description": "(NumLock ON) 8"
+            },
+            "Numpad Up": {
+                "translate": "NumpadUp",
+                "description": "(NumLock OFF) ↑"
+            },
+            "Numpad 9": {
+                "translate": "Numpad9",
+                "description": "(NumLock ON) 9"
+            },
+            "Numpad Page Up": {
+                "translate": "NumpadPgUp",
+                "description": "(NumLock OFF) PgUp"
+            },
+            "Numpad Dot": {
+                "translate": "NumpadDot",
+                "description": "(NumLock ON) ."
+            },
+            "Numpad Del": {
+                "translate": "NumpadDel",
+                "description": "(NumLock OFF) Del"
+            },
+            "Numpad Div": {
+                "translate": "NumpadDiv",
+                "description": "/ (division)"
+            },
+            "Numpad Multip": {
+                "translate": "NumpadMult",
+                "description": "* (multiplication)"
+            },
+            "Numpad Add": {
+                "translate": "NumpadAdd",
+                "description": "+ (addition)"
+            },
+            "Numpad Sub": {
+                "translate": "NumpadSub",
+                "description": "- (subtraction)"
+            },
+            "Numpad Enter": {
+                "translate": "NumpadEnter",
+                "description": "Enter"
+            }
+        },
+
+        "Function Keys":{
+            "F1":{
+                "translate": "F1",
+                "description": ""
+            },
+            "F2":{
+                "translate": "F2",
+                "description": ""
+            },
+            "F3":{
+                "translate": "F3",
+                "description": ""
+            },
+            "F4":{
+                "translate": "F4",
+                "description": ""
+            },
+            "F5":{
+                "translate": "F5",
+                "description": ""
+            },
+            "F6":{
+                "translate": "F6",
+                "description": ""
+            },
+            "F7":{
+                "translate": "F7",
+                "description": ""
+            },
+            "F8":{
+                "translate": "F8",
+                "description": ""
+            },
+            "F9":{
+                "translate": "F9",
+                "description": ""
+            },
+            "F10":{
+                "translate": "F10",
+                "description": ""
+            },
+            "F11":{
+                "translate": "F11",
+                "description": ""
+            },
+            "F12":{
+                "translate": "F12",
+                "description": ""
+            },
+            "F13":{
+                "translate": "F13",
+                "description": ""
+            },
+            "F14":{
+                "translate": "F14",
+                "description": ""
+            },
+            "F15":{
+                "translate": "F15",
+                "description": ""
+            },
+            "F16":{
+                "translate": "F16",
+                "description": ""
+            },
+            "F17":{
+                "translate": "F17",
+                "description": ""
+            },
+            "F18":{
+                "translate": "F18",
+                "description": ""
+            },
+            "F19":{
+                "translate": "F19",
+                "description": ""
+            },
+            "F20":{
+                "translate": "F20",
+                "description": ""
+            },
+            "F21":{
+                "translate": "F21",
+                "description": ""
+            },
+            "F22":{
+                "translate": "F22",
+                "description": ""
+            },
+            "F23":{
+                "translate": "F23",
+                "description": ""
+            },
+            "F24":{
+                "translate": "F24",
+                "description": ""
+            }
+        },
+
+        "ASCII Character":{
+            "!": {
+                "translate": "!",
+                "description": "Exclamation mark"
+            },
+            "\"": {
+                "translate": "\"",
+                "description": "Quotation mark"
+            },
+            "#": {
+                "translate": "#",
+                "description": "Number sign"
+            },
+            "$": {
+                "translate": "$",
+                "description": "Dollar sign"
+            },
+            "%": {
+                "translate": "%",
+                "description": "Percent sign"
+            },
+            "&": {
+                "translate": "&",
+                "description": "Ampersand"
+            },
+            "'": {
+                "translate": "'",
+                "description": "Apostrophe"
+            },
+            "(": {
+                "translate": "(",
+                "description": "Left parenthesis"
+            },
+            ")": {
+                "translate": ")",
+                "description": "Right parenthesis"
+            },
+            "*": {
+                "translate": "*",
+                "description": "Asterisk"
+            },
+            "+": {
+                "translate": "+",
+                "description": "Plus sign"
+            },
+            ",": {
+                "translate": ",",
+                "description": "Comma"
+            },
+            "-": {
+                "translate": "-",
+                "description": "Hyphen (minus sign)"
+            },
+            ".": {
+                "translate": ".",
+                "description": "Period"
+            },
+            "/": {
+                "translate": "/",
+                "description": "Slash"
+            },
+            "0": {
+                "translate": "0",
+                "description": "Digit 0"
+            },
+            "1": {
+                "translate": "1",
+                "description": "Digit 1"
+            },
+            "2": {
+                "translate": "2",
+                "description": "Digit 2"
+            },
+            "3": {
+                "translate": "3",
+                "description": "Digit 3"
+            },
+            "4": {
+                "translate": "4",
+                "description": "Digit 4"
+            },
+            "5": {
+                "translate": "5",
+                "description": "Digit 5"
+            },
+            "6": {
+                "translate": "6",
+                "description": "Digit 6"
+            },
+            "7": {
+                "translate": "7",
+                "description": "Digit 7"
+            },
+            "8": {
+                "translate": "8",
+                "description": "Digit 8"
+            },
+            "9": {
+                "translate": "9",
+                "description": "Digit 9"
+            },
+            ":": {
+                "translate": ":",
+                "description": "Colon"
+            },
+            ";": {
+                "translate": ";",
+                "description": "Semicolon"
+            },
+            "<": {
+                "translate": "<",
+                "description": "Less-than"
+            },
+            "=": {
+                "translate": "=",
+                "description": "Equals sign"
+            },
+            ">": {
+                "translate": ">",
+                "description": "Greater-than"
+            },
+            "?": {
+                "translate": "?",
+                "description": "Question mark"
+            },
+            "@": {
+                "translate": "@",
+                "description": "At sign"
+            },
+            "A": {
+                "translate": "A",
+                "description": "Uppercase letter A"
+            },
+            "B": {
+                "translate": "B",
+                "description": "Uppercase letter B"
+            },
+            "C": {
+                "translate": "C",
+                "description": "Uppercase letter C"
+            },
+            "D": {
+                "translate": "D",
+                "description": "Uppercase letter D"
+            },
+            "E": {
+                "translate": "E",
+                "description": "Uppercase letter E"
+            },
+            "F": {
+                "translate": "F",
+                "description": "Uppercase letter F"
+            },
+            "G": {
+                "translate": "G",
+                "description": "Uppercase letter G"
+            },
+            "H": {
+                "translate": "H",
+                "description": "Uppercase letter H"
+            },
+            "I": {
+                "translate": "I",
+                "description": "Uppercase letter I"
+            },
+            "J": {
+                "translate": "J",
+                "description": "Uppercase letter J"
+            },
+            "K": {
+                "translate": "K",
+                "description": "Uppercase letter K"
+            },
+            "L": {
+                "translate": "L",
+                "description": "Uppercase letter L"
+            },
+            "M": {
+                "translate": "M",
+                "description": "Uppercase letter M"
+            },
+            "N": {
+                "translate": "N",
+                "description": "Uppercase letter N"
+            },
+            "O": {
+                "translate": "O",
+                "description": "Uppercase letter O"
+            },
+            "P": {
+                "translate": "P",
+                "description": "Uppercase letter P"
+            },
+            "Q": {
+                "translate": "Q",
+                "description": "Uppercase letter Q"
+            },
+            "R": {
+                "translate": "R",
+                "description": "Uppercase letter R"
+            },
+            "S": {
+                "translate": "S",
+                "description": "Uppercase letter S"
+            },
+            "T": {
+                "translate": "T",
+                "description": "Uppercase letter T"
+            },
+            "U": {
+                "translate": "U",
+                "description": "Uppercase letter U"
+            },
+            "V": {
+                "translate": "V",
+                "description": "Uppercase letter V"
+            },
+            "W": {
+                "translate": "W",
+                "description": "Uppercase letter W"
+            },
+            "X": {
+                "translate": "X",
+                "description": "Uppercase letter X"
+            },
+            "Y": {
+                "translate": "Y",
+                "description": "Uppercase letter Y"
+            },
+            "Z": {
+                "translate": "Z",
+                "description": "Uppercase letter Z"
+            },
+            "[": {
+                "translate": "[",
+                "description": "Left square bracket"
+            },
+            "\\": {
+                "translate": "\\",
+                "description": "Backslash"
+            },
+            "]": {
+                "translate": "]",
+                "description": "Right square bracket"
+            },
+            "^": {
+                "translate": "^",
+                "description": "Caret"
+            },
+            "_": {
+                "translate": "_",
+                "description": "Underscore"
+            },
+            "`": {
+                "translate": "`",
+                "description": "Grave accent"
+            },
+            "a": {
+                "translate": "a",
+                "description": "Lowercase letter a"
+            },
+            "b": {
+                "translate": "b",
+                "description": "Lowercase letter b"
+            },
+            "c": {
+                "translate": "c",
+                "description": "Lowercase letter c"
+            },
+            "d": {
+                "translate": "d",
+                "description": "Lowercase letter d"
+            },
+            "e": {
+                "translate": "e",
+                "description": "Lowercase letter e"
+            },
+            "f": {
+                "translate": "f",
+                "description": "Lowercase letter f"
+            },
+            "g": {
+                "translate": "g",
+                "description": "Lowercase letter g"
+            },
+            "h": {
+                "translate": "h",
+                "description": "Lowercase letter h"
+            },
+            "i": {
+                "translate": "i",
+                "description": "Lowercase letter i"
+            },
+            "j": {
+                "translate": "j",
+                "description": "Lowercase letter j"
+            },
+            "k": {
+                "translate": "k",
+                "description": "Lowercase letter k"
+            },
+            "l": {
+                "translate": "l",
+                "description": "Lowercase letter l"
+            },
+            "m": {
+                "translate": "m",
+                "description": "Lowercase letter m"
+            },
+            "n": {
+                "translate": "n",
+                "description": "Lowercase letter n"
+            },
+            "o": {
+                "translate": "o",
+                "description": "Lowercase letter o"
+            },
+            "p": {
+                "translate": "p",
+                "description": "Lowercase letter p"
+            },
+            "q": {
+                "translate": "q",
+                "description": "Lowercase letter q"
+            },
+            "r": {
+                "translate": "r",
+                "description": "Lowercase letter r"
+            },
+            "s": {
+                "translate": "s",
+                "description": "Lowercase letter s"
+            },
+            "t": {
+                "translate": "t",
+                "description": "Lowercase letter t"
+            },
+            "u": {
+                "translate": "u",
+                "description": "Lowercase letter u"
+            },
+            "v": {
+                "translate": "v",
+                "description": "Lowercase letter v"
+            },
+            "w": {
+                "translate": "w",
+                "description": "Lowercase letter w"
+            },
+            "x": {
+                "translate": "x",
+                "description": "Lowercase letter x"
+            },
+            "y": {
+                "translate": "y",
+                "description": "Lowercase letter y"
+            },
+            "z": {
+                "translate": "z",
+                "description": "Lowercase letter z"
+            },
+            "{": {
+                "translate": "{",
+                "description": "Left curly brace"
+            },
+            "|": {
+                "translate": "|",
+                "description": "Vertical bar"
+            },
+            "}": {
+                "translate": "}",
+                "description": "Right curly brace"
+            },
+            "~": {
+                "translate": "~",
+                "description": "Tilde"
+            }
+        },
+
+        "ANSI Character":{
+            "¡": {
+                "translate": "¡",
+                "description": "Inverted exclamation mark"
+            },
+            "¢": {
+                "translate": "¢",
+                "description": "Cent sign"
+            },
+            "£": {
+                "translate": "£",
+                "description": "Pound sign"
+            },
+            "¤": {
+                "translate": "¤",
+                "description": "Currency sign"
+            },
+            "¥": {
+                "translate": "¥",
+                "description": "Yen sign"
+            },
+            "¦": {
+                "translate": "¦",
+                "description": "Broken bar"
+            },
+            "§": {
+                "translate": "§",
+                "description": "Section sign"
+            },
+            "¨": {
+                "translate": "¨",
+                "description": "Diaeresis"
+            },
+            "©": {
+                "translate": "©",
+                "description": "Copyright sign"
+            },
+            "ª": {
+                "translate": "ª",
+                "description": "Feminine ordinal indicator"
+            },
+            "«": {
+                "translate": "«",
+                "description": "Left-pointing double angle quotation mark"
+            },
+            "¬": {
+                "translate": "¬",
+                "description": "Not sign"
+            },
+            "­": {
+                "translate": "­",
+                "description": "Soft hyphen"
+            },
+            "®": {
+                "translate": "®",
+                "description": "Registered sign"
+            },
+            "¯": {
+                "translate": "¯",
+                "description": "Macron"
+            },
+            "°": {
+                "translate": "°",
+                "description": "Degree sign"
+            },
+            "±": {
+                "translate": "±",
+                "description": "Plus-minus sign"
+            },
+            "²": {
+                "translate": "²",
+                "description": "Superscript two"
+            },
+            "³": {
+                "translate": "³",
+                "description": "Superscript three"
+            },
+            "´": {
+                "translate": "´",
+                "description": "Acute accent"
+            },
+            "µ": {
+                "translate": "µ",
+                "description": "Micro sign"
+            },
+            "¶": {
+                "translate": "¶",
+                "description": "Pilcrow sign"
+            },
+            "·": {
+                "translate": "·",
+                "description": "Middle dot"
+            },
+            "¸": {
+                "translate": "¸",
+                "description": "Cedilla"
+            },
+            "¹": {
+                "translate": "¹",
+                "description": "Superscript one"
+            },
+            "º": {
+                "translate": "º",
+                "description": "Masculine ordinal indicator"
+            },
+            "»": {
+                "translate": "»",
+                "description": "Right-pointing double angle quotation mark"
+            },
+            "¼": {
+                "translate": "¼",
+                "description": "Vulgar fraction one quarter"
+            },
+            "½": {
+                "translate": "½",
+                "description": "Vulgar fraction one half"
+            },
+            "¾": {
+                "translate": "¾",
+                "description": "Vulgar fraction three quarters"
+            },
+            "¿": {
+                "translate": "¿",
+                "description": "Inverted question mark"
+            },
+            "À": {
+                "translate": "À",
+                "description": "Latin capital letter A with grave"
+            },
+            "Á": {
+                "translate": "Á",
+                "description": "Latin capital letter A with acute"
+            },
+            "Â": {
+                "translate": "Â",
+                "description": "Latin capital letter A with circumflex"
+            },
+            "Ã": {
+                "translate": "Ã",
+                "description": "Latin capital letter A with tilde"
+            },
+            "Ä": {
+                "translate": "Ä",
+                "description": "Latin capital letter A with diaeresis"
+            },
+            "Å": {
+                "translate": "Å",
+                "description": "Latin capital letter A with ring above"
+            },
+            "Æ": {
+                "translate": "Æ",
+                "description": "Latin capital letter AE"
+            },
+            "Ç": {
+                "translate": "Ç",
+                "description": "Latin capital letter C with cedilla"
+            },
+            "È": {
+                "translate": "È",
+                "description": "Latin capital letter E with grave"
+            },
+            "É": {
+                "translate": "É",
+                "description": "Latin capital letter E with acute"
+            },
+            "Ê": {
+                "translate": "Ê",
+                "description": "Latin capital letter E with circumflex"
+            },
+            "Ë": {
+                "translate": "Ë",
+                "description": "Latin capital letter E with diaeresis"
+            },
+            "Ì": {
+                "translate": "Ì",
+                "description": "Latin capital letter I with grave"
+            },
+            "Í": {
+                "translate": "Í",
+                "description": "Latin capital letter I with acute"
+            },
+            "Î": {
+                "translate": "Î",
+                "description": "Latin capital letter I with circumflex"
+            },
+            "Ï": {
+                "translate": "Ï",
+                "description": "Latin capital letter I with diaeresis"
+            },
+            "Ð": {
+                "translate": "Ð",
+                "description": "Latin capital letter Eth"
+            },
+            "Ñ": {
+                "translate": "Ñ",
+                "description": "Latin capital letter N with tilde"
+            },
+            "Ò": {
+                "translate": "Ò",
+                "description": "Latin capital letter O with grave"
+            },
+            "Ó": {
+                "translate": "Ó",
+                "description": "Latin capital letter O with acute"
+            },
+            "Ô": {
+                "translate": "Ô",
+                "description": "Latin capital letter O with circumflex"
+            },
+            "Õ": {
+                "translate": "Õ",
+                "description": "Latin capital letter O with tilde"
+            },
+            "Ö": {
+                "translate": "Ö",
+                "description": "Latin capital letter O with diaeresis"
+            },
+            "×": {
+                "translate": "×",
+                "description": "Multiplication sign"
+            },
+            "Ø": {
+                "translate": "Ø",
+                "description": "Latin capital letter O with stroke"
+            },
+            "Ù": {
+                "translate": "Ù",
+                "description": "Latin capital letter U with grave"
+            },
+            "Ú": {
+                "translate": "Ú",
+                "description": "Latin capital letter U with acute"
+            },
+            "Û": {
+                "translate": "Û",
+                "description": "Latin capital letter U with circumflex"
+            },
+            "Ü": {
+                "translate": "Ü",
+                "description": "Latin capital letter U with diaeresis"
+            },
+            "Ý": {
+                "translate": "Ý",
+                "description": "Latin capital letter Y with acute"
+            },
+            "Þ": {
+                "translate": "Þ",
+                "description": "Latin capital letter Thorn"
+            },
+            "ß": {
+                "translate": "ß",
+                "description": "Latin small letter sharp s"
+            },
+            "à": {
+                "translate": "à",
+                "description": "Latin small letter a with grave"
+            },
+            "á": {
+                "translate": "á",
+                "description": "Latin small letter a with acute"
+            },
+            "â": {
+                "translate": "â",
+                "description": "Latin small letter a with circumflex"
+            },
+            "ã": {
+                "translate": "ã",
+                "description": "Latin small letter a with tilde"
+            },
+            "ä": {
+                "translate": "ä",
+                "description": "Latin small letter a with diaeresis"
+            },
+            "å": {
+                "translate": "å",
+                "description": "Latin small letter a with ring above"
+            },
+            "æ": {
+                "translate": "æ",
+                "description": "Latin small letter ae"
+            },
+            "ç": {
+                "translate": "ç",
+                "description": "Latin small letter c with cedilla"
+            },
+            "è": {
+                "translate": "è",
+                "description": "Latin small letter e with grave"
+            },
+            "é": {
+                "translate": "é",
+                "description": "Latin small letter e with acute"
+            },
+            "ê": {
+                "translate": "ê",
+                "description": "Latin small letter e with circumflex"
+            },
+            "ë": {
+                "translate": "ë",
+                "description": "Latin small letter e with diaeresis"
+            },
+            "ì": {
+                "translate": "ì",
+                "description": "Latin small letter i with grave"
+            },
+            "í": {
+                "translate": "í",
+                "description": "Latin small letter i with acute"
+            },
+            "î": {
+                "translate": "î",
+                "description": "Latin small letter i with circumflex"
+            },
+            "ï": {
+                "translate": "ï",
+                "description": "Latin small letter i with diaeresis"
+            },
+            "ð": {
+                "translate": "ð",
+                "description": "Latin small letter eth"
+            },
+            "ñ": {
+                "translate": "ñ",
+                "description": "Latin small letter n with tilde"
+            },
+            "ò": {
+                "translate": "ò",
+                "description": "Latin small letter o with grave"
+            },
+            "ó": {
+                "translate": "ó",
+                "description": "Latin small letter o with acute"
+            },
+            "ô": {
+                "translate": "ô",
+                "description": "Latin small letter o with circumflex"
+            },
+            "õ": {
+                "translate": "õ",
+                "description": "Latin small letter o with tilde"
+            },
+            "ö": {
+                "translate": "ö",
+                "description": "Latin small letter o with diaeresis"
+            },
+            "÷": {
+                "translate": "÷",
+                "description": "Division sign"
+            },
+            "ø": {
+                "translate": "ø",
+                "description": "Latin small letter o with stroke"
+            },
+            "ù": {
+                "translate": "ù",
+                "description": "Latin small letter u with grave"
+            },
+            "ú": {
+                "translate": "ú",
+                "description": "Latin small letter u with acute"
+            },
+            "û": {
+                "translate": "û",
+                "description": "Latin small letter u with circumflex"
+            },
+            "ü": {
+                "translate": "ü",
+                "description": "Latin small letter u with diaeresis"
+            },
+            "ý": {
+                "translate": "ý",
+                "description": "Latin small letter y with acute"
+            },
+            "þ": {
+                "translate": "þ",
+                "description": "Latin small letter thorn"
+            },
+            "ÿ": {
+                "translate": "ÿ",
+                "description": "Latin small letter y with diaeresis"
+            },
+            "Œ": {
+                "translate": "Œ",
+                "description": "Latin capital ligature OE"
+            },
+            "œ": {
+                "translate": "œ",
+                "description": "Latin small ligature oe"
+            },
+            "Š": {
+                "translate": "Š",
+                "description": "Latin capital letter S with caron"
+            },
+            "š": {
+                "translate": "š",
+                "description": "Latin small letter s with caron"
+            },
+            "Ÿ": {
+                "translate": "Ÿ",
+                "description": "Latin capital letter Y with diaeresis"
+            },
+            "Ž": {
+                "translate": "Ž",
+                "description": "Latin capital letter Z with caron"
+            },
+            "ž": {
+                "translate": "ž",
+                "description": "Latin small letter z with caron"
+            },
+            "ƒ": {
+                "translate": "ƒ",
+                "description": "Latin small letter f with hook"
+            },
+            "ˆ": {
+                "translate": "ˆ",
+                "description": "Modifier letter circumflex accent"
+            },
+            "˜": {
+                "translate": "˜",
+                "description": "Small tilde"
+            },
+            "–": {
+                "translate": "–",
+                "description": "En dash"
+            },
+            "—": {
+                "translate": "—",
+                "description": "Em dash"
+            },
+            "‘": {
+                "translate": "‘",
+                "description": "Left single quotation mark"
+            },
+            "’": {
+                "translate": "’",
+                "description": "Right single quotation mark"
+            },
+            "‚": {
+                "translate": "‚",
+                "description": "Single low-9 quotation mark"
+            },
+            "“": {
+                "translate": "“",
+                "description": "Left double quotation mark"
+            },
+            "”": {
+                "translate": "”",
+                "description": "Right double quotation mark"
+            },
+            "„": {
+                "translate": "„",
+                "description": "Double low-9 quotation mark"
+            },
+            "†": {
+                "translate": "†",
+                "description": "Dagger"
+            },
+            "‡": {
+                "translate": "‡",
+                "description": "Double dagger"
+            },
+            "•": {
+                "translate": "•",
+                "description": "Bullet"
+            },
+            "…": {
+                "translate": "…",
+                "description": "Horizontal ellipsis"
+            },
+            "‰": {
+                "translate": "‰",
+                "description": "Per mille sign"
+            },
+            "‹": {
+                "translate": "‹",
+                "description": "Single left-pointing angle quotation mark"
+            },
+            "›": {
+                "translate": "›",
+                "description": "Single right-pointing angle quotation mark"
+            },
+            "€": {
+                "translate": "€",
+                "description": "Euro sign"
+            },
+            "™": {
+                "translate": "™",
+                "description": "Trade mark sign"
+            }
+        },
+
+        "VK Code": {
+        "VK_LBUTTON": {
+            "translate": "vk01",
+            "description": "Left mouse button"
+        },
+        "VK_RBUTTON": {
+            "translate": "vk02",
+            "description": "Right mouse button"
+        },
+        "VK_CANCEL": {
+            "translate": "vk03",
+            "description": "Control-break processing"
+        },
+        "VK_MBUTTON": {
+            "translate": "vk04",
+            "description": "Middle mouse button"
+        },
+        "VK_XBUTTON1": {
+            "translate": "vk05",
+            "description": "X1 mouse button"
+        },
+        "VK_XBUTTON2": {
+            "translate": "vk06",
+            "description": "X2 mouse button"
+        },
+        "0x07": {
+            "translate": "vk07",
+            "description": "Reserved"
+        },
+        "VK_BACK": {
+            "translate": "vk08",
+            "description": "Backspace key"
+        },
+        "VK_TAB": {
+            "translate": "vk09",
+            "description": "Tab key"
+        },
+        "0x0A": {
+            "translate": "vk0A",
+            "description": "Reserved"
+        },
+        "0x0B": {
+            "translate": "vk0B",
+            "description": "Reserved"
+        },
+        "VK_CLEAR": {
+            "translate": "vk0C",
+            "description": "Clear key"
+        },
+        "VK_RETURN": {
+            "translate": "vk0D",
+            "description": "Enter key"
+        },
+        "0x0E": {
+            "translate": "vk0E",
+            "description": "Unassigned"
+        },
+        "0x0F": {
+            "translate": "vk0F",
+            "description": "Unassigned"
+        },
+        "VK_SHIFT": {
+            "translate": "vk10",
+            "description": "Shift key"
+        },
+        "VK_CONTROL": {
+            "translate": "vk11",
+            "description": "Ctrl key"
+        },
+        "VK_MENU": {
+            "translate": "vk12",
+            "description": "Alt key"
+        },
+        "VK_PAUSE": {
+            "translate": "vk13",
+            "description": "Pause key"
+        },
+        "VK_CAPITAL": {
+            "translate": "vk14",
+            "description": "Caps lock key"
+        },
+        "VK_KANA": {
+            "translate": "vk15",
+            "description": "IME Kana mode"
+        },
+        "VK_HANGUL": {
+            "translate": "vk15",
+            "description": "IME Hangul mode"
+        },
+        "VK_IME_ON": {
+            "translate": "vk16",
+            "description": "IME On"
+        },
+        "VK_JUNJA": {
+            "translate": "vk17",
+            "description": "IME Junja mode"
+        },
+        "VK_FINAL": {
+            "translate": "vk18",
+            "description": "IME final mode"
+        },
+        "VK_HANJA": {
+            "translate": "vk19",
+            "description": "IME Hanja mode"
+        },
+        "VK_KANJI": {
+            "translate": "vk19",
+            "description": "IME Kanji mode"
+        },
+        "VK_IME_OFF": {
+            "translate": "vk1A",
+            "description": "IME Off"
+        },
+        "VK_ESCAPE": {
+            "translate": "vk1B",
+            "description": "Esc key"
+        },
+        "VK_CONVERT": {
+            "translate": "vk1C",
+            "description": "IME convert"
+        },
+        "VK_NONCONVERT": {
+            "translate": "vk1D",
+            "description": "IME nonconvert"
+        },
+        "VK_ACCEPT": {
+            "translate": "vk1E",
+            "description": "IME accept"
+        },
+        "VK_MODECHANGE": {
+            "translate": "vk1F",
+            "description": "IME mode change request"
+        },
+        "VK_SPACE": {
+            "translate": "vk20",
+            "description": "Spacebar key"
+        },
+        "VK_PRIOR": {
+            "translate": "vk21",
+            "description": "Page up key"
+        },
+        "VK_NEXT": {
+            "translate": "vk22",
+            "description": "Page down key"
+        },
+        "VK_END": {
+            "translate": "vk23",
+            "description": "End key"
+        },
+        "VK_HOME": {
+            "translate": "vk24",
+            "description": "Home key"
+        },
+        "VK_LEFT": {
+            "translate": "vk25",
+            "description": "Left arrow key"
+        },
+        "VK_UP": {
+            "translate": "vk26",
+            "description": "Up arrow key"
+        },
+        "VK_RIGHT": {
+            "translate": "vk27",
+            "description": "Right arrow key"
+        },
+        "VK_DOWN": {
+            "translate": "vk28",
+            "description": "Down arrow key"
+        },
+        "VK_SELECT": {
+            "translate": "vk29",
+            "description": "Select key"
+        },
+        "VK_PRINT": {
+            "translate": "vk2A",
+            "description": "Print key"
+        },
+        "VK_EXECUTE": {
+            "translate": "vk2B",
+            "description": "Execute key"
+        },
+        "VK_SNAPSHOT": {
+            "translate": "vk2C",
+            "description": "Print screen key"
+        },
+        "VK_INSERT": {
+            "translate": "vk2D",
+            "description": "Insert key"
+        },
+        "VK_DELETE": {
+            "translate": "vk2E",
+            "description": "Delete key"
+        },
+        "VK_HELP": {
+            "translate": "vk2F",
+            "description": "Help key"
+        },
+        "VK_0": {
+            "translate": "vk30",
+            "description": "0 key"
+        },
+        "VK_1": {
+            "translate": "vk31",
+            "description": "1 key"
+        },
+        "VK_2": {
+            "translate": "vk32",
+            "description": "2 key"
+        },
+        "VK_3": {
+            "translate": "vk33",
+            "description": "3 key"
+        },
+        "VK_4": {
+            "translate": "vk34",
+            "description": "4 key"
+        },
+        "VK_5": {
+            "translate": "vk35",
+            "description": "5 key"
+        },
+        "VK_6": {
+            "translate": "vk36",
+            "description": "6 key"
+        },
+        "VK_7": {
+            "translate": "vk37",
+            "description": "7 key"
+        },
+        "VK_8": {
+            "translate": "vk38",
+            "description": "8 key"
+        },
+        "VK_9": {
+            "translate": "vk39",
+            "description": "9 key"
+        },
+        "0x3A": {
+            "translate": "vk3A",
+            "description": "Undefined"
+        },
+        "0x3B": {
+            "translate": "vk3B",
+            "description": "Undefined"
+        },
+        "0x3C": {
+            "translate": "vk3C",
+            "description": "Undefined"
+        },
+        "0x3D": {
+            "translate": "vk3D",
+            "description": "Undefined"
+        },
+        "0x3E": {
+            "translate": "vk3E",
+            "description": "Undefined"
+        },
+        "0x3F": {
+            "translate": "vk3F",
+            "description": "Undefined"
+        },
+        "0x40": {
+            "translate": "vk40",
+            "description": "Undefined"
+        },
+        "VK_A": {
+            "translate": "vk41",
+            "description": "A key"
+        },
+        "VK_B": {
+            "translate": "vk42",
+            "description": "B key"
+        },
+        "VK_C": {
+            "translate": "vk43",
+            "description": "C key"
+        },
+        "VK_D": {
+            "translate": "vk44",
+            "description": "D key"
+        },
+        "VK_E": {
+            "translate": "vk45",
+            "description": "E key"
+        },
+        "VK_F": {
+            "translate": "vk46",
+            "description": "F key"
+        },
+        "VK_G": {
+            "translate": "vk47",
+            "description": "G key"
+        },
+        "VK_H": {
+            "translate": "vk48",
+            "description": "H key"
+        },
+        "VK_I": {
+            "translate": "vk49",
+            "description": "I key"
+        },
+        "VK_J": {
+            "translate": "vk4A",
+            "description": "J key"
+        },
+        "VK_K": {
+            "translate": "vk4B",
+            "description": "K key"
+        },
+        "VK_L": {
+            "translate": "vk4C",
+            "description": "L key"
+        },
+        "VK_M": {
+            "translate": "vk4D",
+            "description": "M key"
+        },
+        "VK_N": {
+            "translate": "vk4E",
+            "description": "N key"
+        },
+        "VK_O": {
+            "translate": "vk4F",
+            "description": "O key"
+        },
+        "VK_P": {
+            "translate": "vk50",
+            "description": "P key"
+        },
+        "VK_Q": {
+            "translate": "vk51",
+            "description": "Q key"
+        },
+        "VK_R": {
+            "translate": "vk52",
+            "description": "R key"
+        },
+        "VK_S": {
+            "translate": "vk53",
+            "description": "S key"
+        },
+        "VK_T": {
+            "translate": "vk54",
+            "description": "T key"
+        },
+        "VK_U": {
+            "translate": "vk55",
+            "description": "U key"
+        },
+        "VK_V": {
+            "translate": "vk56",
+            "description": "V key"
+        },
+        "VK_W": {
+            "translate": "vk57",
+            "description": "W key"
+        },
+        "VK_X": {
+            "translate": "vk58",
+            "description": "X key"
+        },
+        "VK_Y": {
+            "translate": "vk59",
+            "description": "Y key"
+        },
+        "VK_Z": {
+            "translate": "vk5A",
+            "description": "Z key"
+        },
+        "VK_LWIN": {
+            "translate": "vk5B",
+            "description": "Left Windows logo key"
+        },
+        "VK_RWIN": {
+            "translate": "vk5C",
+            "description": "Right Windows logo key"
+        },
+        "VK_APPS": {
+            "translate": "vk5D",
+            "description": "Application key"
+        },
+        "0x5E": {
+            "translate": "vk5E",
+            "description": "Reserved"
+        },
+        "VK_SLEEP": {
+            "translate": "vk5F",
+            "description": "Computer Sleep key"
+        },
+        "VK_NUMPAD0": {
+            "translate": "vk60",
+            "description": "Numeric keypad 0 key"
+        },
+        "VK_NUMPAD1": {
+            "translate": "vk61",
+            "description": "Numeric keypad 1 key"
+        },
+        "VK_NUMPAD2": {
+            "translate": "vk62",
+            "description": "Numeric keypad 2 key"
+        },
+        "VK_NUMPAD3": {
+            "translate": "vk63",
+            "description": "Numeric keypad 3 key"
+        },
+        "VK_NUMPAD4": {
+            "translate": "vk64",
+            "description": "Numeric keypad 4 key"
+        },
+        "VK_NUMPAD5": {
+            "translate": "vk65",
+            "description": "Numeric keypad 5 key"
+        },
+        "VK_NUMPAD6": {
+            "translate": "vk66",
+            "description": "Numeric keypad 6 key"
+        },
+        "VK_NUMPAD7": {
+            "translate": "vk67",
+            "description": "Numeric keypad 7 key"
+        },
+        "VK_NUMPAD8": {
+            "translate": "vk68",
+            "description": "Numeric keypad 8 key"
+        },
+        "VK_NUMPAD9": {
+            "translate": "vk69",
+            "description": "Numeric keypad 9 key"
+        },
+        "VK_MULTIPLY": {
+            "translate": "vk6A",
+            "description": "Multiply key"
+        },
+        "VK_ADD": {
+            "translate": "vk6B",
+            "description": "Add key"
+        },
+        "VK_SEPARATOR": {
+            "translate": "vk6C",
+            "description": "Separator key"
+        },
+        "VK_SUBTRACT": {
+            "translate": "vk6D",
+            "description": "Subtract key"
+        },
+        "VK_DECIMAL": {
+            "translate": "vk6E",
+            "description": "Decimal key"
+        },
+        "VK_DIVIDE": {
+            "translate": "vk6F",
+            "description": "Divide key"
+        },
+        "VK_F1": {
+            "translate": "vk70",
+            "description": "F1 key"
+        },
+        "VK_F2": {
+            "translate": "vk71",
+            "description": "F2 key"
+        },
+        "VK_F3": {
+            "translate": "vk72",
+            "description": "F3 key"
+        },
+        "VK_F4": {
+            "translate": "vk73",
+            "description": "F4 key"
+        },
+        "VK_F5": {
+            "translate": "vk74",
+            "description": "F5 key"
+        },
+        "VK_F6": {
+            "translate": "vk75",
+            "description": "F6 key"
+        },
+        "VK_F7": {
+            "translate": "vk76",
+            "description": "F7 key"
+        },
+        "VK_F8": {
+            "translate": "vk77",
+            "description": "F8 key"
+        },
+        "VK_F9": {
+            "translate": "vk78",
+            "description": "F9 key"
+        },
+        "VK_F10": {
+            "translate": "vk79",
+            "description": "F10 key"
+        },
+        "VK_F11": {
+            "translate": "vk7A",
+            "description": "F11 key"
+        },
+        "VK_F12": {
+            "translate": "vk7B",
+            "description": "F12 key"
+        },
+        "VK_F13": {
+            "translate": "vk7C",
+            "description": "F13 key"
+        },
+        "VK_F14": {
+            "translate": "vk7D",
+            "description": "F14 key"
+        },
+        "VK_F15": {
+            "translate": "vk7E",
+            "description": "F15 key"
+        },
+        "VK_F16": {
+            "translate": "vk7F",
+            "description": "F16 key"
+        },
+        "VK_F17": {
+            "translate": "vk80",
+            "description": "F17 key"
+        },
+        "VK_F18": {
+            "translate": "vk81",
+            "description": "F18 key"
+        },
+        "VK_F19": {
+            "translate": "vk82",
+            "description": "F19 key"
+        },
+        "VK_F20": {
+            "translate": "vk83",
+            "description": "F20 key"
+        },
+        "VK_F21": {
+            "translate": "vk84",
+            "description": "F21 key"
+        },
+        "VK_F22": {
+            "translate": "vk85",
+            "description": "F22 key"
+        },
+        "VK_F23": {
+            "translate": "vk86",
+            "description": "F23 key"
+        },
+        "VK_F24": {
+            "translate": "vk87",
+            "description": "F24 key"
+        },
+        "0x88": {
+            "translate": "vk88",
+            "description": "Reserved"
+        },
+        "0x89": {
+            "translate": "vk89",
+            "description": "Reserved"
+        },
+        "0x8A": {
+            "translate": "vk8A",
+            "description": "Reserved"
+        },
+        "0x8B": {
+            "translate": "vk8B",
+            "description": "Reserved"
+        },
+        "0x8C": {
+            "translate": "vk8C",
+            "description": "Reserved"
+        },
+        "0x8D": {
+            "translate": "vk8D",
+            "description": "Reserved"
+        },
+        "0x8E": {
+            "translate": "vk8E",
+            "description": "Reserved"
+        },
+        "0x8F": {
+            "translate": "vk8F",
+            "description": "Reserved"
+        },
+        "VK_NUMLOCK": {
+            "translate": "vk90",
+            "description": "Num lock key"
+        },
+        "VK_SCROLL": {
+            "translate": "vk91",
+            "description": "Scroll lock key"
+        },
+        "0x92": {
+            "translate": "vk92",
+            "description": "OEM specific"
+        },
+        "0x93": {
+            "translate": "vk93",
+            "description": "OEM specific"
+        },
+        "0x94": {
+            "translate": "vk94",
+            "description": "OEM specific"
+        },
+        "0x95": {
+            "translate": "vk95",
+            "description": "OEM specific"
+        },
+        "0x96": {
+            "translate": "vk96",
+            "description": "OEM specific"
+        },
+        "0x97": {
+            "translate": "vk97",
+            "description": "Unassigned"
+        },
+        "0x98": {
+            "translate": "vk98",
+            "description": "Unassigned"
+        },
+        "0x99": {
+            "translate": "vk99",
+            "description": "Unassigned"
+        },
+        "0x9A": {
+            "translate": "vk9A",
+            "description": "Unassigned"
+        },
+        "0x9B": {
+            "translate": "vk9B",
+            "description": "Unassigned"
+        },
+        "0x9C": {
+            "translate": "vk9C",
+            "description": "Unassigned"
+        },
+        "0x9D": {
+            "translate": "vk9D",
+            "description": "Unassigned"
+        },
+        "0x9E": {
+            "translate": "vk9E",
+            "description": "Unassigned"
+        },
+        "0x9F": {
+            "translate": "vk9F",
+            "description": "Unassigned"
+        },
+        "VK_LSHIFT": {
+            "translate": "vkA0",
+            "description": "Left Shift key"
+        },
+        "VK_RSHIFT": {
+            "translate": "vkA1",
+            "description": "Right Shift key"
+        },
+        "VK_LCONTROL": {
+            "translate": "vkA2",
+            "description": "Left Ctrl key"
+        },
+        "VK_RCONTROL": {
+            "translate": "vkA3",
+            "description": "Right Ctrl key"
+        },
+        "VK_LMENU": {
+            "translate": "vkA4",
+            "description": "Left Alt key"
+        },
+        "VK_RMENU": {
+            "translate": "vkA5",
+            "description": "Right Alt key"
+        },
+        "VK_BROWSER_BACK": {
+            "translate": "vkA6",
+            "description": "Browser Back key"
+        },
+        "VK_BROWSER_FORWARD": {
+            "translate": "vkA7",
+            "description": "Browser Forward key"
+        },
+        "VK_BROWSER_REFRESH": {
+            "translate": "vkA8",
+            "description": "Browser Refresh key"
+        },
+        "VK_BROWSER_STOP": {
+            "translate": "vkA9",
+            "description": "Browser Stop key"
+        },
+        "VK_BROWSER_SEARCH": {
+            "translate": "vkAA",
+            "description": "Browser Search key"
+        },
+        "VK_BROWSER_FAVORITES": {
+            "translate": "vkAB",
+            "description": "Browser Favorites key"
+        },
+        "VK_BROWSER_HOME": {
+            "translate": "vkAC",
+            "description": "Browser Start and Home key"
+        },
+        "VK_VOLUME_MUTE": {
+            "translate": "vkAD",
+            "description": "Volume Mute key"
+        },
+        "VK_VOLUME_DOWN": {
+            "translate": "vkAE",
+            "description": "Volume Down key"
+        },
+        "VK_VOLUME_UP": {
+            "translate": "vkAF",
+            "description": "Volume Up key"
+        },
+        "VK_MEDIA_NEXT_TRACK": {
+            "translate": "vkB0",
+            "description": "Next Track key"
+        },
+        "VK_MEDIA_PREV_TRACK": {
+            "translate": "vkB1",
+            "description": "Previous Track key"
+        },
+        "VK_MEDIA_STOP": {
+            "translate": "vkB2",
+            "description": "Stop Media key"
+        },
+        "VK_MEDIA_PLAY_PAUSE": {
+            "translate": "vkB3",
+            "description": "Play/Pause Media key"
+        },
+        "VK_LAUNCH_MAIL": {
+            "translate": "vkB4",
+            "description": "Start Mail key"
+        },
+        "VK_LAUNCH_MEDIA_SELECT": {
+            "translate": "vkB5",
+            "description": "Select Media key"
+        },
+        "VK_LAUNCH_APP1": {
+            "translate": "vkB6",
+            "description": "Start Application 1 key"
+        },
+        "VK_LAUNCH_APP2": {
+            "translate": "vkB7",
+            "description": "Start Application 2 key"
+        },
+        "0xB8": {
+            "translate": "vkB8",
+            "description": "Reserved"
+        },
+        "0xB9": {
+            "translate": "vkB9",
+            "description": "Reserved"
+        },
+        "VK_OEM_1": {
+            "translate": "vkBA",
+            "description": "It can vary by keyboard. For the US ANSI keyboard , the Semiсolon and Colon key"
+        },
+        "VK_OEM_PLUS": {
+            "translate": "vkBB",
+            "description": "For any country/region, the Equals and Plus key"
+        },
+        "VK_OEM_COMMA": {
+            "translate": "vkBC",
+            "description": "For any country/region, the Comma and Less Than key"
+        },
+        "VK_OEM_MINUS": {
+            "translate": "vkBD",
+            "description": "For any country/region, the Dash and Underscore key"
+        },
+        "VK_OEM_PERIOD": {
+            "translate": "vkBE",
+            "description": "For any country/region, the Period and Greater Than key"
+        },
+        "VK_OEM_2": {
+            "translate": "vkBF",
+            "description": "It can vary by keyboard. For the US ANSI keyboard, the Forward Slash and Question Mark key"
+        },
+        "VK_OEM_3": {
+            "translate": "vkC0",
+            "description": "It can vary by keyboard. For the US ANSI keyboard, the Grave Accent and Tilde key"
+        },
+        "0xC1": {
+            "translate": "vkC1",
+            "description": "Reserved"
+        },
+        "0xC2": {
+            "translate": "vkC2",
+            "description": "Reserved"
+        },
+        "VK_GAMEPAD_A": {
+            "translate": "vkC3",
+            "description": "Gamepad A button"
+        },
+        "VK_GAMEPAD_B": {
+            "translate": "vkC4",
+            "description": "Gamepad B button"
+        },
+        "VK_GAMEPAD_X": {
+            "translate": "vkC5",
+            "description": "Gamepad X button"
+        },
+        "VK_GAMEPAD_Y": {
+            "translate": "vkC6",
+            "description": "Gamepad Y button"
+        },
+        "VK_GAMEPAD_RIGHT_SHOULDER": {
+            "translate": "vkC7",
+            "description": "Gamepad Right Shoulder button"
+        },
+        "VK_GAMEPAD_LEFT_SHOULDER": {
+            "translate": "vkC8",
+            "description": "Gamepad Left Shoulder button"
+        },
+        "VK_GAMEPAD_LEFT_TRIGGER": {
+            "translate": "vkC9",
+            "description": "Gamepad Left Trigger button"
+        },
+        "VK_GAMEPAD_RIGHT_TRIGGER": {
+            "translate": "vkCA",
+            "description": "Gamepad Right Trigger button"
+        },
+        "VK_GAMEPAD_DPAD_UP": {
+            "translate": "vkCB",
+            "description": "Gamepad D-pad Up button"
+        },
+        "VK_GAMEPAD_DPAD_DOWN": {
+            "translate": "vkCC",
+            "description": "Gamepad D-pad Down button"
+        },
+        "VK_GAMEPAD_DPAD_LEFT": {
+            "translate": "vkCD",
+            "description": "Gamepad D-pad Left button"
+        },
+        "VK_GAMEPAD_DPAD_RIGHT": {
+            "translate": "vkCE",
+            "description": "Gamepad D-pad Right button"
+        },
+        "VK_GAMEPAD_MENU": {
+            "translate": "vkCF",
+            "description": "Gamepad Menu/Start button"
+        },
+        "VK_GAMEPAD_VIEW": {
+            "translate": "vkD0",
+            "description": "Gamepad View/Back button"
+        },
+        "VK_GAMEPAD_LEFT_THUMBSTICK_BUTTON": {
+            "translate": "vkD1",
+            "description": "Gamepad Left Thumbstick button"
+        },
+        "VK_GAMEPAD_RIGHT_THUMBSTICK_BUTTON": {
+            "translate": "vkD2",
+            "description": "Gamepad Right Thumbstick button"
+        },
+        "VK_GAMEPAD_LEFT_THUMBSTICK_UP": {
+            "translate": "vkD3",
+            "description": "Gamepad Left Thumbstick up"
+        },
+        "VK_GAMEPAD_LEFT_THUMBSTICK_DOWN": {
+            "translate": "vkD4",
+            "description": "Gamepad Left Thumbstick down"
+        },
+        "VK_GAMEPAD_LEFT_THUMBSTICK_RIGHT": {
+            "translate": "vkD5",
+            "description": "Gamepad Left Thumbstick right"
+        },
+        "VK_GAMEPAD_LEFT_THUMBSTICK_LEFT": {
+            "translate": "vkD6",
+            "description": "Gamepad Left Thumbstick left"
+        },
+        "VK_GAMEPAD_RIGHT_THUMBSTICK_UP": {
+            "translate": "vkD7",
+            "description": "Gamepad Right Thumbstick up"
+        },
+        "VK_GAMEPAD_RIGHT_THUMBSTICK_DOWN": {
+            "translate": "vkD8",
+            "description": "Gamepad Right Thumbstick down"
+        },
+        "VK_GAMEPAD_RIGHT_THUMBSTICK_RIGHT": {
+            "translate": "vkD9",
+            "description": "Gamepad Right Thumbstick right"
+        },
+        "VK_GAMEPAD_RIGHT_THUMBSTICK_LEFT": {
+            "translate": "vkDA",
+            "description": "Gamepad Right Thumbstick left"
+        },
+        "VK_OEM_4": {
+            "translate": "vkDB",
+            "description": "It can vary by keyboard. For the US ANSI keyboard, the Left Brace key"
+        },
+        "VK_OEM_5": {
+            "translate": "vkDC",
+            "description": "It can vary by keyboard. For the US ANSI keyboard, the Backslash and Pipe key"
+        },
+        "VK_OEM_6": {
+            "translate": "vkDD",
+            "description": "It can vary by keyboard. For the US ANSI keyboard, the Right Brace key"
+        },
+        "VK_OEM_7": {
+            "translate": "vkDE",
+            "description": "It can vary by keyboard. For the US ANSI keyboard, the Apostrophe and Double Quotation Mark key"
+        },
+        "VK_OEM_8": {
+            "translate": "vkDF",
+            "description": "It can vary by keyboard. For the Canadian CSA keyboard, the Right Ctrl key"
+        },
+        "0xE0": {
+            "translate": "vkE0",
+            "description": "Reserved"
+        },
+        "0xE1": {
+            "translate": "vkE1",
+            "description": "OEM specific"
+        },
+        "VK_OEM_102": {
+            "translate": "vkE2",
+            "description": "It can vary by keyboard. For the European ISO keyboard, the Backslash and Pipe key"
+        },
+        "0xE3": {
+            "translate": "vkE3",
+            "description": "OEM specific"
+        },
+        "0xE4": {
+            "translate": "vkE4",
+            "description": "OEM specific"
+        },
+        "VK_PROCESSKEY": {
+            "translate": "vkE5",
+            "description": "IME PROCESS key"
+        },
+        "0xE6": {
+            "translate": "vkE6",
+            "description": "OEM specific"
+        },
+        "VK_PACKET": {
+            "translate": "vkE7",
+            "description": "Used to pass Unicode characters as if they were keystrokes. The VK_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods. For more information, see Remark in KEYBDINPUT, SendInput, WM_KEYDOWN, and WM_KEYUP"
+        },
+        "0xE8": {
+            "translate": "vkE8",
+            "description": "Unassigned"
+        },
+        "0xE9": {
+            "translate": "vkE9",
+            "description": "OEM specific"
+        },
+        "0xEA": {
+            "translate": "vkEA",
+            "description": "OEM specific"
+        },
+        "0xEB": {
+            "translate": "vkEB",
+            "description": "OEM specific"
+        },
+        "0xEC": {
+            "translate": "vkEC",
+            "description": "OEM specific"
+        },
+        "0xED": {
+            "translate": "vkED",
+            "description": "OEM specific"
+        },
+        "0xEE": {
+            "translate": "vkEE",
+            "description": "OEM specific"
+        },
+        "0xEF": {
+            "translate": "vkEF",
+            "description": "OEM specific"
+        },
+        "0xF0": {
+            "translate": "vkF0",
+            "description": "OEM specific"
+        },
+        "0xF1": {
+            "translate": "vkF1",
+            "description": "OEM specific"
+        },
+        "0xF2": {
+            "translate": "vkF2",
+            "description": "OEM specific"
+        },
+        "0xF3": {
+            "translate": "vkF3",
+            "description": "OEM specific"
+        },
+        "0xF4": {
+            "translate": "vkF4",
+            "description": "OEM specific"
+        },
+        "0xF5": {
+            "translate": "vkF5",
+            "description": "OEM specific"
+        },
+        "VK_ATTN": {
+            "translate": "vkF6",
+            "description": "Attn key"
+        },
+        "VK_CRSEL": {
+            "translate": "vkF7",
+            "description": "CrSel key"
+        },
+        "VK_EXSEL": {
+            "translate": "vkF8",
+            "description": "ExSel key"
+        },
+        "VK_EREOF": {
+            "translate": "vkF9",
+            "description": "Erase EOF key"
+        },
+        "VK_PLAY": {
+            "translate": "vkFA",
+            "description": "Play key"
+        },
+        "VK_ZOOM": {
+            "translate": "vkFB",
+            "description": "Zoom key"
+        },
+        "VK_NONAME": {
+            "translate": "vkFC",
+            "description": "Reserved"
+        },
+        "VK_PA1": {
+            "translate": "vkFD",
+            "description": "PA1 key"
+        },
+        "VK_OEM_CLEAR": {
+            "translate": "vkFE",
+            "description": "Clear key"
+        },
+        "0x00": {
+            "translate": "vk00",
+            "description": "Undefined"
+        },
+        "0xFF": {
+            "translate": "vkFF",
+            "description": "Undefined"
+        }
+        },
+        "Basic Latin":{},
+        "Latin-1 Supplement":{},
+        "Latin Extended-A":{},
+        "Latin Extended-B":{},
+        "IPA Extensions":{},
+        "Spacing Modifier Letters":{},
+        "Combining Diacritical Marks":{},
+        "Greek and Coptic":{},
+        "Cyrillic":{},
+        "Cyrillic Supplement":{},
+        "Armenian":{},
+        "Hebrew":{},
+        "Arabic":{},
+        "Syriac":{},
+        "Arabic Supplement":{},
+        "Thaana":{},
+        "NKo":{},
+        "Samaritan":{},
+        "Mandaic":{},
+        "Syriac Supplement":{},
+        "Arabic Extended-A":{},
+        "Devanagari":{},
+        "Bengali":{},
+        "Gurmukhi":{},
+        "Gujarati":{},
+        "Oriya":{},
+        "Tamil":{},
+        "Telugu":{},
+        "Kannada":{},
+        "Malayalam":{},
+        "Sinhala":{},
+        "Thai":{},
+        "Lao":{},
+        "Tibetan":{},
+        "Myanmar":{},
+        "Georgian":{},
+        "Hangul Jamo":{},
+        "Ethiopic":{},
+        "Ethiopic Supplement":{},
+        "Cherokee":{},
+        "Unified Canadian Aboriginal Syllabics":{},
+        "Ogham":{},
+        "Runic":{},
+        "Tagalog":{},
+        "Hanunoo":{},
+        "Buhid":{},
+        "Tagbanwa":{},
+        "Khmer":{},
+        "Mongolian":{},
+        "Unified Canadian Aboriginal Syllabics Extended":{},
+        "Limbu":{},
+        "Tai Le":{},
+        "New Tai Lue":{},
+        "Khmer Symbols":{},
+        "Buginese":{},
+        "Tai Tham":{},
+        "Combining Diacritical Marks Extended":{},
+        "Balinese":{},
+        "Sundanese":{},
+        "Batak":{},
+        "Lepcha":{},
+        "Ol Chiki":{},
+        "Cyrillic Extended-C":{},
+        "Georgian Extended":{},
+        "Sundanese Supplement":{},
+        "Vedic Extensions":{},
+        "Phonetic Extensions":{},
+        "Phonetic Extensions Supplement":{},
+        "Combining Diacritical Marks Supplement":{},
+        "Latin Extended Additional":{},
+        "Greek Extended":{},
+        "General Punctuation":{},
+        "Superscripts and Subscripts":{},
+        "Currency Symbols":{},
+        "Combining Diacritical Marks for Symbols":{},
+        "Letterlike Symbols":{},
+        "Number Forms":{},
+        "Arrows":{},
+        "Mathematical Operators":{},
+        "Miscellaneous Technical":{},
+        "Control Pictures":{},
+        "Optical Character Recognition":{},
+        "Enclosed Alphanumerics":{},
+        "Box Drawing":{},
+        "Block Elements":{},
+        "Geometric Shapes":{},
+        "Miscellaneous Symbols":{},
+        "Dingbats":{},
+        "Miscellaneous Mathematical Symbols-A":{},
+        "Supplemental Arrows-A":{},
+        "Braille Patterns":{},
+        "Supplemental Arrows-B":{},
+        "Miscellaneous Mathematical Symbols-B":{},
+        "Supplemental Mathematical Operators":{},
+        "Miscellaneous Symbols and Arrows":{},
+        "Glagolitic":{},
+        "Latin Extended-C":{},
+        "Coptic":{},
+        "Georgian Supplement":{},
+        "Tifinagh":{},
+        "Ethiopic Extended":{},
+        "Cyrillic Extended-A":{},
+        "Supplemental Punctuation":{},
+        "CJK Radicals Supplement":{},
+        "Kangxi Radicals":{},
+        "Ideographic Description Characters":{},
+        "CJK Symbols and Punctuation":{},
+        "Hiragana":{},
+        "Katakana":{},
+        "Bopomofo":{},
+        "Hangul Compatibility Jamo":{},
+        "Kanbun":{},
+        "Bopomofo Extended":{},
+        "CJK Strokes":{},
+        "Katakana Phonetic Extensions":{},
+        "Enclosed CJK Letters and Months":{},
+        "CJK Compatibility":{},
+        "CJK Unified Ideographs Extension A":{},
+        "Yijing Hexagram Symbols":{},
+        "CJK Unified Ideographs":{},
+        "Yi Syllables":{},
+        "Yi Radicals":{},
+        "Lisu":{},
+        "Vai":{},
+        "Cyrillic Extended-B":{},
+        "Bamum":{},
+        "Modifier Tone Letters":{},
+        "Latin Extended-D":{},
+        "Syloti Nagri":{},
+        "Common Indic Number Forms":{},
+        "Phags-pa":{},
+        "Saurashtra":{},
+        "Devanagari Extended":{},
+        "Kayah Li":{},
+        "Rejang":{},
+        "Hangul Jamo Extended-A":{},
+        "Javanese":{},
+        "Myanmar Extended-B":{},
+        "Cham":{},
+        "Myanmar Extended-A":{},
+        "Tai Viet":{},
+        "Meetei Mayek Extensions":{},
+        "Ethiopic Extended-A":{},
+        "Latin Extended-E":{},
+        "Cherokee Supplement":{},
+        "Meetei Mayek":{},
+        "Hangul Syllables":{},
+        "Hangul Jamo Extended-B":{},
+        "CJK Compatibility Ideographs":{},
+        "Alphabetic Presentation Forms":{},
+        "Arabic Presentation Forms-A":{},
+        "Variation Selectors":{},
+        "Vertical Forms":{},
+        "Combining Half Marks":{},
+        "CJK Compatibility Forms":{},
+        "Small Form Variants":{},
+        "Arabic Presentation Forms-B":{},
+        "Halfwidth and Fullwidth Forms":{},
+        "Specials":{},
+        "Linear B Syllabary":{},
+        "Linear B Ideograms":{},
+        "Aegean Numbers":{},
+        "Ancient Greek Numbers":{},
+        "Ancient Symbols":{},
+        "Phaistos Disc":{},
+        "Lycian":{},
+        "Carian":{},
+        "Coptic Epact Numbers":{},
+        "Old Italic":{},
+        "Gothic":{},
+        "Old Permic":{},
+        "Ugaritic":{},
+        "Old Persian":{},
+        "Deseret":{},
+        "Shavian":{},
+        "Osmanya":{},
+        "Osage":{},
+        "Elbasan":{},
+        "Caucasian Albanian":{},
+        "Linear A":{},
+        "Cypriot Syllabary":{},
+        "Imperial Aramaic":{},
+        "Palmyrene":{},
+        "Nabataean":{},
+        "Hatran":{},
+        "Phoenician":{},
+        "Lydian":{},
+        "Meroitic Hieroglyphs":{},
+        "Meroitic Cursive":{},
+        "Kharoshthi":{},
+        "Old South Arabian":{},
+        "Old North Arabian":{},
+        "Manichaean":{},
+        "Avestan":{},
+        "Inscriptional Parthian":{},
+        "Inscriptional Pahlavi":{},
+        "Psalter Pahlavi":{},
+        "Old Turkic":{},
+        "Old Hungarian":{},
+        "Hanifi Rohingya":{},
+        "Rumi Numeral Symbols":{},
+        "Yezidi":{},
+        "Old Sogdian":{},
+        "Sogdian":{},
+        "Chorasmian":{},
+        "Elymaic":{},
+        "Brahmi":{},
+        "Kaithi":{},
+        "Sora Sompeng":{},
+        "Chakma":{},
+        "Mahajani":{},
+        "Sharada":{},
+        "Sinhala Archaic Numbers":{},
+        "Khojki":{},
+        "Multani":{},
+        "Khudawadi":{},
+        "Grantha":{},
+        "Newa":{},
+        "Tirhuta":{},
+        "Siddham":{},
+        "Modi":{},
+        "Mongolian Supplement":{},
+        "Takri":{},
+        "Ahom":{},
+        "Dogra":{},
+        "Warang Citi":{},
+        "Dives Akuru":{},
+        "Nandinagari":{},
+        "Zanabazar Square":{},
+        "Soyombo":{},
+        "Pau Cin Hau":{},
+        "Bhaiksuki":{},
+        "Marchen":{},
+        "Masaram Gondi":{},
+        "Gunjala Gondi":{},
+        "Makasar":{},
+        "Lisu Supplement":{},
+        "Tamil Supplement":{},
+        "Cuneiform":{},
+        "Cuneiform Numbers and Punctuation":{},
+        "Early Dynastic Cuneiform":{},
+        "Egyptian Hieroglyphs":{},
+        "Egyptian Hieroglyph Format Controls":{},
+        "Anatolian Hieroglyphs":{},
+        "Bamum Supplement":{},
+        "Mro":{},
+        "Bassa Vah":{},
+        "Pahawh Hmong":{},
+        "Medefaidrin":{},
+        "Miao":{},
+        "Ideographic Symbols and Punctuation":{},
+        "Tangut":{},
+        "Tangut Components":{},
+        "Khitan Small Script":{},
+        "Tangut Supplement":{},
+        "Kana Supplement":{},
+        "Kana Extended-A":{},
+        "Small Kana Extension":{},
+        "Nushu":{},
+        "Duployan":{},
+        "Shorthand Format Controls":{},
+        "Byzantine Musical Symbols":{},
+        "Musical Symbols":{},
+        "Ancient Greek Musical Notation":{},
+        "Mayan Numerals":{},
+        "Tai Xuan Jing Symbols":{},
+        "Counting Rod Numerals":{},
+        "Mathematical Alphanumeric Symbols":{},
+        "Sutton SignWriting":{},
+        "Glagolitic Supplement":{},
+        "Nyiakeng Puachue Hmong":{},
+        "Wancho":{},
+        "Mende Kikakui":{},
+        "Adlam":{},
+        "Indic Siyaq Numbers":{},
+        "Ottoman Siyaq Numbers":{},
+        "Arabic Mathematical Alphabetic Symbols":{},
+        "Mahjong Tiles":{},
+        "Domino Tiles":{},
+        "Playing Cards":{},
+        "Enclosed Alphanumeric Supplement":{},
+        "Enclosed Ideographic Supplement":{},
+        "Miscellaneous Symbols and Pictographs":{},
+        "Emoticons":{},
+        "Ornamental Dingbats":{},
+        "Transport and Map Symbols":{},
+        "Alchemical Symbols":{},
+        "Geometric Shapes Extended":{},
+        "Supplemental Arrows-C":{},
+        "Supplemental Symbols and Pictographs":{},
+        "Chess Symbols":{},
+        "Symbols and Pictographs Extended-A":{},
+        "Symbols for Legacy Computing":{},
+        "CJK Unified Ideographs Extension B":{},
+        "CJK Unified Ideographs Extension C":{},
+        "CJK Unified Ideographs Extension D":{},
+        "CJK Unified Ideographs Extension E":{},
+        "CJK Unified Ideographs Extension F":{},
+        "CJK Compatibility Ideographs Supplement":{},
+        "CJK Unified Ideographs Extension G":{},
+        "Tags":{},
+        "Variation Selectors Supplement":{}
+    }
+]

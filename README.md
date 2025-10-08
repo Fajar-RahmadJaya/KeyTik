@@ -303,35 +303,6 @@ Below is another KeyTik feature to increase user experience and give ultimate co
 
 <div align="center">
   
-## What Make KeyTik Different Then Other Automation Tool
-
-</div>
-
-KeyTik have unique capabilities and make it different than other automation tool. Here’s why KeyTik is the best choice for your need:
-
-- **Various Functionality**:
-  - KeyTik offer various remapping and scripting functionalities that will give you more control over your profiles.
-  - Check out [Feature Section for more]([feature](https://github.com/Fajar-RahmadJaya/KeyTik?tab=readme-ov-file#features-))
-
-- **Flexible with Great Potential**:
-  - Using AutoHotkey as profile script language, allow KeyTik to utilize all feature and potential from AutoHotkey.
-
-- **Easy to Use**:
-  - User friendly and simple GUI to boost functionality and simplicity
-  - Easy to understand while providing plenty of features.
-
-- **All-in-One Automation Tool**:
-  - **Auto Clicker**: Bundled with the download, and considered as advance auto clicker where you can adjust the key to click (not just left click), interval between click and condition to activate it such as hold 'e'.
-  - **Screen Clicker**: Bundled with the download, allow you to click on multiple screen coordinate automatically. Same with auto clicker, you can adjust coordinate (you can use Screen Coordinate Auto Detect And Copy below this to easily find screen coordinate), interval between click, condition to activate it.
-  - **Screen Coordinate Auto Detect And Copy**: Bundled with the download, allow you to get screen coordinate and automatically copy it. You can adjust condition to activate it to your preference.
-  - **Multiple Files Opener**: Bundled with the download, allow you to open multiple files or program using shortcut such as 'ctrl+alt'. You can change the shortcut and what files or program to open to your preference.
-
-- **And More**.
-
-<br>
-
-<div align="center">
-  
 ## Have a Suggestion or Question?
 
 </div>

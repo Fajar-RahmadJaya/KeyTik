@@ -201,7 +201,7 @@ KeyTik is available at the following platforms:
 
 ### Other Resources
 1. [Video Guide](https://www.youtube.com/@Fajar-RahmadJaya)
-2. [Installation](https://keytik.com/docs/getting-started/installation)
+2. [Installation](https://keytik.com/download/#installation)
 3. [Use Case Example](https://keytik.com/docs/introduction/use-case)
 4. [Automation Tool](https://keytik.com/docs/getting-started/automation-tool)
 5. [KeyTik Mechanism](https://keytik.com/docs/getting-started/mechanism)

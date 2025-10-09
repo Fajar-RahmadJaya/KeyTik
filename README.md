@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=".github/Picture/KeyTik Icon.png" alt="KeyTik Icon" width="150">
+  <img src=".github/Preview/KeyTik Icon.png" alt="KeyTik Icon" width="150">
   <br><br>
 
 [![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Fajar-RahmadJaya/KeyTik/total?style=plastic&logo=Github&logoColor=white&label=Total%20Downloads&color=white)](https://tooomm.github.io/github-release-stats/?username=Fajar-RahmadJaya&repository=KeyTik)
@@ -224,6 +224,12 @@ KeyTik is available at the following platforms:
 </div>
 <div align="center">
 <img src=".github/Preview/default mode.png" alt="Default Mode" width="500" />
+</div>
+<div align="center">
+<img src=".github/Preview/choosing key1.png" alt="Choosing Key 1" width="500" />
+</div>
+<div align="center">
+<img src=".github/Preview/choosing key2.png" alt="Choosing Key 2" width="500" />
 </div>
 <div align="center">
 <img src=".github/Preview/key format.gif" alt="Key Format Example" width="500" />

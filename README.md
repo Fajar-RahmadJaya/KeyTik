@@ -9,7 +9,7 @@
 
 # KeyTik: The All-in-One Automation Tool
 
-### GUI-Based Keyboard Remapper with Profiles, Auto Clicker, Screen Clicker, Multiple Files Opener, AutoHotkey Script Manager and More.
+### A Powerful Multi-Profile Key Remapper, Clicker, Macro, and More.
 
 </div>
 

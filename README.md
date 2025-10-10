@@ -29,7 +29,7 @@ KeyTik is also packed with [features](#features) like Bind to Programs and Devic
 </div>
 
 > [!NOTE]
-> If you're satisfied with KeyTik, don't forget to share give us a star!
+> If you're satisfied with KeyTik, don't forget to share and give us a star!
 
 <br>
 

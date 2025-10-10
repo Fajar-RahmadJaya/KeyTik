@@ -64,15 +64,15 @@ Pro version has additional features compared to the normal version while not ove
   
   ## KeyTik Pro v4.3.0 Update
   **Changelog**:
-- Overall UI improvement.
-- Improve key list.
-- Keyboard and mouse key addition.
-- Add virtual keyboard code on key list.
-- Ability to detect and use scan code on default key.
-- Add ASCII character on key list.
-- Add ANSI character on key list.
-- Add Unicode character on key list.
-- Bug fixes.
+  - Overall UI improvement.
+  - Improve key list.
+  - Keyboard and mouse key addition.
+  - Add virtual keyboard code on key list.
+  - Ability to detect and use scan code on default key.
+  - Add ASCII character on key list.
+  - Add ANSI character on key list.
+  - Add Unicode character on key list.
+  - Bug fixes.
 
   ## What You Get With the Pro Version
   On KeyTik Pro, you will get every feature on the normal version (see [Normal Version Features](/docs/introduction/features) for more) plus additional features. Below are the additional features on KeyTik Pro:
@@ -152,7 +152,7 @@ Pro version has additional features compared to the normal version while not ove
   - On Progress: Worked on.
   - Completed: Implemented.
   - No Description: Not implemented and yet worked on.
-
+</details>
 <br>
 
 <div align="center">

@@ -74,22 +74,16 @@ Pro version has additional features compared to the normal version while not ove
 - Add Unicode character on key list.
 - Bug fixes.
 
-  ## Why You Choose Pro Version
-  - Support the developer.
-  - More feature than the regular version.
-  - Get early access for the upcoming KeyTik update.
-  - Expect evolving software. KeyTik Pro macro and automation will increase from time to time. My vision for KeyTik Pro will be a program with various tools inside.
+  ## What You Get With the Pro Version
+  On KeyTik Pro, you will get every feature on the normal version (see [Normal Version Features](/docs/introduction/features) for more) plus additional features. Below are the additional features on KeyTik Pro:
 
-  ## Pro Version Feature
-  **Keyboard Remapper**
-  - Remap on specific devices and programs.
-  - Original key (key that you press will simulate remap key): Single key, multiple key or shortcuts, double click.
-  - Remap key (Key that will be shown or simulated when you press original key): Single key, multiple key or shortcuts, hold key, text (Simulate typing such as 'Hello').
-  - Vast key and character support. Keyboard and mouse keys, ASCII characters, ANSI characters, keyboard scan codes, virtual keyboard codes, and Unicode characters.
-  - Example: Pressing the left shift will hold left click, with the interval chosen by user. Pressing Ctrl+H will type Hello. And more.
-  - Multiple remap settings or profiles: You can create your remap settings as much as you want and activate or deactivate them separately.
+  ### Better Auto Clicker
 
-  **Auto Clicker**
+  <p align="center">
+    <img src=".github/Preview/Pro/auto clicker.png" alt="Pro Version Auto Clicker" width="400" />
+  </p>
+  <br>
+
   - Shortcuts: What key to press to activate auto clicker.
   - Click Interval: Interval between each click.
   - Key to press (Mouse Button): What key to press for auto clicker (not just left click or right click but more keys on the keyboard such as all alphabet, shift, ctrl and more)
@@ -97,77 +91,67 @@ Pro version has additional features compared to the normal version while not ove
   - Click Location: Where click will pressed. Follow cursor, clicking on cursor. Fixed position, position on screen.
   - Click Repeat: How long does the click will pressed. Infinite clicks, stop until it deactivates by shortcuts. Fixed count, click as much as the count specified.
 
-  **Easy Always on Top**
-  - Make the window where cursor is located always on top with a shortcut or click.
-  - Shortcuts or clicks can be changed by user.
+  ### Better Files Opener
 
-  **Window Size Changer**
-  - Change window size with shortcut or click.
-  - How window will be changed: Full, horizontal half top, horizontal half bottom, vertical half left, vertical half right, quarter top left, quarter top
-right, quarter bottom left, quarter bottom right, original position.
-  - The window size will be changed alternately with each click.
-Shortcuts or clicks can be changed by user.
+  <p align="center">
+    <img src=".github/Preview/Pro/files opener.png" alt="Pro Version Files Opener" width="400" />
+  </p>
+  <br>
 
-  **Multiple Files Opener**
   - Using shortcuts to open multiple files.
   - You can specify what files to open yourself without limit.
 
-  **Multi Copy Paste**
+  ### Multi Copy Paste
+
+  <p align="center">
+    <img src=".github/Preview/Pro/multi copy paste.png" alt="Pro Version Multi Copy Paste" width="400" />
+  </p>
+  <br>
+
   - Make multiple shortcuts for copy and paste.
   - Each shortcuts have different room to save copied text.
   - For example: First copy shortcuts copied "text1" and second copy shortcuts copied "text2". Pressing second paste shortcuts will paste "text2" and pressing first shortcuts will paste "text1".
 
-  **General Features**
-  
-  This is a feature that all profile has. Profile is what setting you create whether it's for auto clicker, keyboard remap or anything I have described earlier.
-  - Run on startup for individual profiles.
-  - Managed profiles: Run, exit, delete, edit, copy each profile.
-  - Assign profiles on specific devices: Make profiles only work on specific keyboards or mouse.
-  - Assign profiles on specific programs; Make profiles only work on specific programs using program class or process.
-  - Store profiles: Move profiles to storage UI and remove them from the main UI.
-  - Import profiles: Find AutoHotkey script online and import it to software.
-  - Always on top: Make software always on top.
+  ### Always on Top Manager
 
-  ## My Plan for the Pro Version
-  - Additional UI for file openers.
-  - Additional UI for auto clicker.
-  - Additional UI for screen clicker.
+  <p align="center">
+    <img src=".github/Preview/Pro/always on top manager.png" alt="Pro Version Always on Top Manager" width="400" />
+  </p>
+  <br>
+
+  - Make the window where cursor is located always on top with a shortcut or click.
+  - Shortcuts or clicks can be changed by user.
+
+  ### Window Size Changer
+
+  <p align="center">
+    <img src=".github/Preview/Pro/window manager.png" alt="Pro Version Window Mnaager" width="400" />
+  </p>
+  <br>
+
+  - Change window size with shortcut or click.
+  - How window will be changed: Full, horizontal half top, horizontal half bottom, vertical half left, vertical half right, quarter top left, quarter top right, quarter bottom left, quarter bottom right, original position.
+  - The window size will be changed alternately with each click.
+  - Shortcuts or clicks can be changed by user.
+
+  ## Future Plan for the Pro Version
+  - Additional UI for file openers. (Completed)
+  - Additional UI for auto clicker. (Completed)
+  - Additional UI for screen clicker. (On Progress)
+  - Full macro. Combining auto clicker, screen clicker, keyboard remap, and file opener in a single profile.
+  - Possibly AI integration.
+  - New automation tool, make specific program window always on top. (Completed)
   - New automation tool, OCR translator. Much like snipping tool but it will translate the chosen screen.
-  - New automation tool, easy window always on top. Make window in the cursor to always on top with one click or shortcut.
-  - New automation tool, window size changer. Change window size to full size, half screen vertical, half screen horizontal, quarter screen, with a single click or shortcut.
-  - New automation tool, multi copy-paste. For example: First copy shortcuts copied "text1" and second copy shortcuts copied "text2". Pressing second paste shortcuts will paste "text2" and pressing first shortcuts will paste "text1".
-  - Full macro. Combining auto clicker, screen clicker, keyboard remap, files opener, in a single profile.
+  - New automation tool, easy window always on top. Make window in the cursor to always on top with one click or shortcut. (Completed)
+  - New automation tool, window size changer. Change window size to full size, half screen vertical, half screen horizontal, quarter screen, with a single click or shortcut. (Completed)
   - Macro recording. Record any input and simulate it.
-  - The upcoming KeyTik update will be implemented on KeyTik Pro first. KeyTik Pro will get a new version faster than normal KeyTik.
+  - Upcoming KeyTik update will be implemented on KeyTik Pro first.
 
-  ## Pro Version Preview
-  <div align="center">
-  <img src=".github/Preview/Pro/main.png" alt="Pro Version Main" width="500" />
-  </div>
-  <div align="center">
-  <img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="500" />
-  </div>
-  <div align="center">
-  <details>
-    <summary>Click to see more </summary>
-    <div align="center">
-    <img src=".github/Preview/Pro/auto clicker1.png" alt="Pro Version Preview 1" width="500" />
-    </div>
-    <div align="center">
-    <img src=".github/Preview/Pro/auto clicker2.png" alt="Pro Version Preview 2" width="500" />
-    </div>
-    <div align="center">
-    <img src=".github/Preview/Pro/files opener.png" alt="Pro Version Preview 3" width="500" />
-    </div>
-    <div align="center">
-    <img src=".github/Preview/Pro/window manager.png" alt="Pro Version Preview 4" width="500" />
-    </div>
-    <div align="center">
-    <img src=".github/Preview/Pro/always on top manager.png" alt="Pro Version Preview 5" width="500" />
-    </div>
-  </details>
-</details>
-</div>
+
+  Note:
+  - On Progress: Worked on.
+  - Completed: Implemented.
+  - No Description: Not implemented and yet worked on.
 
 <br>
 

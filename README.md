@@ -22,23 +22,14 @@
   
 ## Overview
 
+KeyTik is a Python program that uses AutoHotkey to handle many things, including a powerful key mapper and various macros such as clickers and more. It comes with comprehensive [key support](https://keytik.com/docs/getting-started/key-list/keyboard), including ASCII, ANSI, Unicode, Scan Code, Virtual Keyboard Code, and more. 
 
-KeyTik is an open-source, all-in-one automation tool that lets you automate nearly anything at your will. Initially, KeyTik focused on being a keyboard remapper with profiles, allowing you to activate or deactivate each remap individually. However, since KeyTik uses AutoHotkey as the scripting language, it can handle all types of automation available in AutoHotkey, such as auto-clicking, keyboard remapping, screen clicking, opening multiple files, and more. Additionally, the use of AutoHotkey has made KeyTik an AutoHotkey script manager. This means you can easily run, exit, run on startup, edit, store, delete, and more on your AutoHotkey scripts.
-
-With a bit of scripting, you can do almost all automation tasks with ease. If you don't have coding experience, don't worry! I’ve created a beginner-friendly open-source [AutoHotkey script collection and template](https://github.com/Fajar-RahmadJaya/AutoHotkeyCollection) that allows you to download pre-made scripts or edit them to your preference. I’ve tried to make it as easy to understand as possible, with guides on how to use the templates or customize the scripts.
-
-So, if you're looking for a lightweight auto-clicker, keyboard remapper, screen clicker, multiple files opener, and AutoHotkey script manager with a user-friendly GUI in a single software, then this is exactly what you need! I hope you enjoy using KeyTik and find it useful.
-
-**[Note: KeyTik is only available for Windows only following AutoHotkey supported operating system](https://www.autohotkey.com/v2/#:~:text=0.-,v2.,7%20and%20later%20are%20supported.).**
+KeyTik is also packed with [features](#features) like Bind to Programs and Devices, Assign Shortcuts, Text Format, Hold Format, and more.
 
 </div>
 
-Sincerely,  
-**Fajar Rahmad Jaya**
-
 > [!NOTE]
-> **If you're satisfied with KeyTik, don't forget to give us a star!**  
-> **Also, share it and help the world learn more about us.**
+> If you're satisfied with KeyTik, don't forget to share give us a star!
 
 <br>
 

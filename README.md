@@ -9,7 +9,7 @@
 
 # KeyTik: The All-in-One Automation Tool
 
-### A Powerful Multi-Profile Key Remapper, Clicker, Macro, and More.
+### A Powerful Multi-Profile Key Mapper, Clicker, Macro, and More.
 
 </div>
 

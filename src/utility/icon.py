@@ -1,6 +1,16 @@
 import os
 from utility.utils import theme
 from utility.constant import script_dir
+from PySide6.QtGui import QIcon
+
+icon_cache = {}
+
+
+def get_icon(path):
+    if path not in icon_cache:
+        icon_cache[path] = QIcon(path)
+    return icon_cache[path]
+
 
 icon_dir = os.path.join(script_dir, '_internal', 'Data', 'icon')
 if theme == "dark":

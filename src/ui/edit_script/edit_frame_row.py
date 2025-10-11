@@ -3,10 +3,9 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit
 )
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
 from PySide6.QtSvgWidgets import QSvgWidget
 from utility.utils import theme
-from utility.icon import icon_search, icon_arrow
+from utility.icon import (get_icon, icon_search, icon_arrow)
 
 
 class EditFrameRow:
@@ -53,7 +52,7 @@ class EditFrameRow:
 
         default_key_choose = QPushButton(default_key_widget)
         default_key_choose.setFixedWidth(28)
-        default_key_choose.setIcon(QIcon(icon_search))
+        default_key_choose.setIcon(get_icon(icon_search))
         default_key_choose.setToolTip("Choose Default/Original key")
         default_key_choose.clicked.connect(
             lambda: self.choose_key(default_key_entry, context="default"))
@@ -91,7 +90,7 @@ class EditFrameRow:
 
         remap_key_choose = QPushButton(remap_key_widget)
         remap_key_choose.setFixedWidth(28)
-        remap_key_choose.setIcon(QIcon(icon_search))
+        remap_key_choose.setIcon(get_icon(icon_search))
         remap_key_choose.setToolTip("Choose Remap key")
         remap_key_choose.clicked.connect(
             lambda: self.choose_key(remap_key_entry, context="remap"))
@@ -335,7 +334,7 @@ class EditFrameRow:
 
         shortcut_choose = QPushButton(shortcut_widget)
         shortcut_choose.setFixedWidth(28)
-        shortcut_choose.setIcon(QIcon(icon_search))
+        shortcut_choose.setIcon(get_icon(icon_search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
             lambda: self.choose_key(shortcut_entry, context="shortcut"))

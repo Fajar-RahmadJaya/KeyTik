@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt, QPoint, QEvent
 from utility.constant import (icon_path, keylist_path, unicode_blocks)
-from utility.icon import (icon_question, icon_filter)
+from utility.icon import (get_icon, icon_question, icon_filter)
 
 
 class ChooseKey:
@@ -88,7 +88,7 @@ class ChooseKey:
         main_layout.addLayout(choose_search_layout)
 
         filter_button = QPushButton()
-        filter_button.setIcon(QIcon(icon_filter))
+        filter_button.setIcon(get_icon(icon_filter))
         choose_search_layout.addWidget(filter_button)
 
         search_entry = QLineEdit()

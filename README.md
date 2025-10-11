@@ -156,7 +156,6 @@ Pro version has additional features compared to the normal version while not ove
 KeyTik is available at the following platforms:
 - [KeyTik Website](https://keytik.com)
 - [Source Forge](https://sourceforge.net/projects/keytik/)
-- [PitchHut](https://www.pitchhut.com/project/keytik)
 
 <br>
 

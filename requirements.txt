@@ -1,0 +1,9 @@
+keyboard
+markdown
+psutil
+pynput
+PySide6
+pywin32
+requests
+winshell
+

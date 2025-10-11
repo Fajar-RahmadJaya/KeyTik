@@ -7,7 +7,7 @@ data_dir = os.path.join(script_dir, '_internal', 'Data')
 appdata_dir = os.path.join(os.getenv('APPDATA'), 'KeyTik')
 
 # General
-current_version = "v2.3.0"
+current_version = "v2.3.1"
 condition_path = os.path.join(appdata_dir, "path.json")
 theme_path = os.path.join(appdata_dir, "theme.json")
 dont_show_path = os.path.join(appdata_dir, "dont_show.json")

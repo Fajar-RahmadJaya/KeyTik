@@ -66,7 +66,7 @@ class Setting:
                 "https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
         group_layout.addWidget(pro_upgrade_button, 2, 0, 1, 1)
 
-        readme_button = QPushButton("Readme!")
+        readme_button = QPushButton("Announcement")
         readme_button.setFixedHeight(40)
         readme_button.clicked.connect(self.show_welcome_window)
         group_layout.addWidget(readme_button, 2, 1, 1, 1)

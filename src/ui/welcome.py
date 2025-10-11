@@ -1,13 +1,14 @@
 import os
+import json
+import requests
+from markdown import markdown
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QCheckBox, QPushButton,
     QTextBrowser, QWidget, QFrame
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
-from markdown import markdown
-import json
-from utility.constant import (data_dir, icon_path, dont_show_path)
+from utility.constant import (icon_path, dont_show_path)
 
 
 class Welcome:
@@ -30,20 +31,23 @@ class Welcome:
 
     def show_welcome_window(self):
         try:
-
-            md_files = [
-                f for f in os.listdir(data_dir)
-                if f.endswith(".md") and f[:-3].isdigit()]
-            md_files.sort(key=lambda x: int(x[:-3]))
-
-            if not md_files:
-                md_files = ["welcome.md"]
-
+            self.welcome_files = []
+            i = 1
+            while True:
+                url = f"https://keytik.com/normal-md/{i}.txt"
+                try:
+                    response = requests.get(url, timeout=5)
+                    if response.status_code == 404:
+                        break
+                    response.raise_for_status()
+                    self.welcome_files.append(url)
+                    i += 1
+                except Exception:
+                    break
             self.current_welcome_index = 0
-            self.welcome_files = [os.path.join(data_dir, f) for f in md_files]
 
             welcome_dialog = QDialog(self)
-            welcome_dialog.setWindowTitle("Readme!")
+            welcome_dialog.setWindowTitle("Announcement")
             # welcome_dialog.setGeometry(350, 220, 525, 290)
             welcome_dialog.setFixedSize(525, 290)
             welcome_dialog.setWindowIcon(QIcon(icon_path))
@@ -79,8 +83,7 @@ class Welcome:
                     background-color: {bg_color};
                     color: {text_color};
                     border: none;
-                    font-family: 'Open Sans';
-                    font-size: 10px;
+                    font-family: 'Segoe UI';
                     padding: 2px;
                 }}
             """)
@@ -107,34 +110,21 @@ class Welcome:
 
             def load_content(index):
                 try:
-                    with open(
-                            self.welcome_files[index], "r",
-                            encoding="utf-8") as f:
-                        md_content = f.read()
-                        html_content = markdown(md_content)
-
-                        html_content = html_content.replace(
-                            "<p>", f"<p style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px; color: {text_color};'>" # noqa
-                        ).replace(
-                            "<h1>",
-                            f"<h1 style='font-family: Open Sans; font-size: 18px; font-weight: 600; margin: 10px; color: {text_color};'>" # noqa
-                        ).replace(
-                            "<h2>",
-                            f"<h2 style='font-family: Open Sans; font-size: 11px; font-weight: 500; margin: 10px; color: {text_color};'>" # noqa
-                        ).replace(
-                            "<ul>",
-                            f"<ul style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px; color: {text_color};'>" # noqa
-                        ).replace(
-                            "<ol>",
-                            f"<ol style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px; color: {text_color};'>" # noqa
-                        ).replace(
-                            "<li>",
-                            f"<li style='font-family: Open Sans; font-size: 9px; font-weight: 300; margin: 10px; color: {text_color};'>" # noqa
-                        )
-                        html_label.setHtml(html_content)
-                except FileNotFoundError:
+                    url = self.welcome_files[index]
+                    response = requests.get(url, timeout=5)
+                    response.raise_for_status()
+                    md_content = response.text
+                    html_content = markdown(md_content)
+                    styling = """
+                    <style>
+                    ol { -qt-list-indent: 1; margin-left: -20px; padding-left: 0px; } # noqa
+                    ol li { margin-left: -5px; padding-left: 0px; }
+                    </style>
+                    """
+                    html_label.setHtml(styling + html_content)
+                except requests.HTTPError:
                     html_label.setHtml(
-                        f"<p style='font-family: Open Sans; font-size: 10px; font-weight: 300; color: {text_color};'>File not found!</p>" # noqa
+                        f"<p>File not found.</p>" # noqa
                     )
 
             def update_buttons():
@@ -169,8 +159,13 @@ class Welcome:
                 event.accept()
             welcome_dialog.closeEvent = on_dialog_close
 
-            load_content(self.current_welcome_index)
-            update_buttons()
+            if self.welcome_files:
+                load_content(self.current_welcome_index)
+                update_buttons()
+            else:
+                html_label.setHtml(
+                    "<p>Unable to load announcements. Please check your internet connection.</p>" # noqa
+                )
 
             welcome_dialog.raise_()
             welcome_dialog.activateWindow()

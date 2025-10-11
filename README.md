@@ -298,7 +298,7 @@ This project is licensed under the [Apache License 2.0](http://www.apache.org/li
 <div align="center">
   
 ## Contributing
-Contributions are welcome! You can contribute by submitting a **pull request** for improvements, such as bug fixes, new features, or automation tool additions. Please follow the [Contribution Guidelines](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/CONTRIBUTING.md) when making contributions.
+Pull requests are welcome! We welcome contributions of all kinds, including bug fixes, features, improvements, documentation improvement and more. Check out the [Contribution Guidelines](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/CONTRIBUTING.md) to set up the workplace.
 
 Thank you for helping improve this project!
 

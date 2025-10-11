@@ -10,7 +10,7 @@ import pynput
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QGridLayout,
     QFrame, QPushButton, QGroupBox, QFileDialog, QMessageBox,
-    QInputDialog, QSizePolicy, QLabel
+    QInputDialog, QLabel
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt, QThread, Signal
@@ -22,12 +22,12 @@ from utility.utils import (load_pinned_profiles, active_dir, store_dir,
                            save_pinned_profiles, read_running_scripts_temp,
                            add_script_to_temp, remove_script_from_temp,
                            theme)
-from utility.icon import (icon_pin, icon_pin_fill, icon_rocket,
-                          icon_rocket_fill, icon_exit, icon_run, icon_edit,
+from utility.icon import (get_icon, icon_pin, icon_pin_fill,
+                          icon_rocket, icon_rocket_fill, icon_exit, icon_run,
                           icon_copy, icon_delete, icon_store, icon_plus,
                           icon_next, icon_prev, icon_setting, icon_import,
                           icon_on_top, icon_on_top_fill, icon_show_stored,
-                          icon_show_stored_fill)
+                          icon_show_stored_fill, icon_edit)
 from logic.logic import Logic
 from ui.setting import Setting
 from ui.welcome import Welcome
@@ -107,7 +107,6 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.create_ui()
         self.update_script_list()
         self.setWindowTitle("KeyTik")
-        # self.setGeometry(284, 97, 650, 492)
         self.setFixedSize(650, 492)
         self.setWindowIcon(QIcon(icon_path))
         self.setCentralWidget(self.central_widget)
@@ -132,21 +131,21 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
         self.prev_button = QPushButton()
         self.prev_button.setFixedWidth(80)
-        self.prev_button.setIcon(QIcon(icon_prev))
+        self.prev_button.setIcon(get_icon(icon_prev))
         self.prev_button.setToolTip("Previous Profile")
         self.prev_button.clicked.connect(self.prev_page)
         button_layout.addWidget(self.prev_button, 0, 0)
 
         self.show_stored = QPushButton()
         self.show_stored.setFixedWidth(30)
-        self.show_stored.setIcon(QIcon(icon_show_stored))
+        self.show_stored.setIcon(get_icon(icon_show_stored))
         self.show_stored.setToolTip("Show Stored Profile")
         self.show_stored.clicked.connect(self.toggle_script_dir)
         button_layout.addWidget(self.show_stored, 0, 1)
 
         self.import_button = QPushButton()
         self.import_button.setFixedWidth(30)
-        self.import_button.setIcon(QIcon(icon_import))
+        self.import_button.setIcon(get_icon(icon_import))
         self.import_button.setToolTip("Import AutoHotkey Script")
         self.import_button.clicked.connect(self.import_button_clicked)
         button_layout.addWidget(self.import_button, 0, 2)
@@ -156,7 +155,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         button_layout.addWidget(dummy_left, 0, 3)
 
         self.create_button = QPushButton(" Create New Profile")
-        self.create_button.setIcon(QIcon(icon_plus))
+        self.create_button.setIcon(get_icon(icon_plus))
         self.create_button.setFixedWidth(150)
         self.create_button.setFixedHeight(30)
         self.create_button.clicked.connect(lambda: self.edit_script(None))
@@ -168,21 +167,21 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
         self.always_top = QPushButton()
         self.always_top.setFixedWidth(30)
-        self.always_top.setIcon(QIcon(icon_on_top))
+        self.always_top.setIcon(get_icon(icon_on_top))
         self.always_top.setToolTip("Enable  Window Always on Top")
         self.always_top.clicked.connect(self.toggle_on_top)
         button_layout.addWidget(self.always_top, 0, 6)
 
         self.setting_button = QPushButton()
         self.setting_button.setFixedWidth(30)
-        self.setting_button.setIcon(QIcon(icon_setting))
+        self.setting_button.setIcon(get_icon(icon_setting))
         self.setting_button.setToolTip("Setting")
         self.setting_button.clicked.connect(self.open_settings_window)
         button_layout.addWidget(self.setting_button, 0, 7)
 
         self.next_button = QPushButton()
         self.next_button.setFixedWidth(80)
-        self.next_button.setIcon(QIcon(icon_next))
+        self.next_button.setIcon(get_icon(icon_next))
         self.next_button.setToolTip("Next Profile")
         self.next_button.clicked.connect(self.next_page)
         button_layout.addWidget(self.next_button, 0, 8)
@@ -230,17 +229,17 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
             if is_startup or script in running_scripts:
                 run_button.setText(" Exit")
                 run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
-                run_button.setIcon(QIcon(icon_exit))
+                run_button.setIcon(get_icon(icon_exit))
             else:
                 run_button.setText(" Run")
                 run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
-                run_button.setIcon(QIcon(icon_run))
+                run_button.setIcon(get_icon(icon_run))
             run_button.clicked.connect(lambda checked, s=script, b=run_button:
                                        self.toggle_run_exit(s, b))
             group_layout.addWidget(run_button, 0, 0)
 
             edit_button = QPushButton(" Edit")
-            edit_button.setIcon(QIcon(icon_edit))
+            edit_button.setIcon(get_icon(icon_edit))
             edit_button.setFixedWidth(80)
             edit_button.setToolTip(f'Adjust "{os.path.splitext(script)[0]}"')
 
@@ -268,7 +267,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
             copy_button = QPushButton(" Copy")
             copy_button.setFixedWidth(80)
-            copy_button.setIcon(QIcon(icon_copy))
+            copy_button.setIcon(get_icon(icon_copy))
             copy_button.setToolTip(f'Copy "{os.path.splitext(script)[0]}"')
             copy_button.clicked.connect(lambda checked,
                                         s=script: self.copy_script(s))
@@ -276,7 +275,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
             delete_button = QPushButton(" Delete")
             delete_button.setFixedWidth(80)
-            delete_button.setIcon(QIcon(icon_delete))
+            delete_button.setIcon(get_icon(icon_delete))
             delete_button.setToolTip(f'Remove "{os.path.splitext(script)[0]}"')
             delete_button.clicked.connect(lambda checked,
                                           s=script: self.delete_script(s))
@@ -286,7 +285,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
                                        self.SCRIPT_DIR == active_dir
                                        else " Restore")
             store_button.setFixedWidth(80)
-            store_button.setIcon(QIcon(icon_store))
+            store_button.setIcon(get_icon(icon_store))
             if self.SCRIPT_DIR == active_dir:
                 store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"') # noqa
             else:
@@ -297,14 +296,14 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
             if is_startup:
                 startup_button = QPushButton(" Unstartup")
-                startup_button.setIcon(QIcon(icon_rocket_fill))
+                startup_button.setIcon(get_icon(icon_rocket_fill))
                 startup_button.setToolTip(
                     f'Remove from startup: Dont run"{os.path.splitext(script)[0]}" automatically when computer starts') # noqa
                 startup_button.clicked.connect(lambda checked, s=script:
                                                self.remove_ahk_from_startup(s))
             else:
                 startup_button = QPushButton(" Startup")
-                startup_button.setIcon(QIcon(icon_rocket))
+                startup_button.setIcon(get_icon(icon_rocket))
                 startup_button.setToolTip(
                     f'Add to startup: Run "{os.path.splitext(script)[0]}" automatically when computer starts') # noqa
                 startup_button.clicked.connect(lambda checked, s=script:
@@ -314,16 +313,11 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
             self.profile_layout.addWidget(group_box, row, column)
 
-        total_cells = 6
-        for i in range(len(scripts_to_display), total_cells):
-            row = i // 2
-            column = i % 2
-            spacer = QWidget()
-            spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            self.profile_layout.addWidget(spacer, row, column)
-
         self.profile_layout.setColumnStretch(0, 1)
         self.profile_layout.setColumnStretch(1, 1)
+        self.profile_layout.setRowStretch(0, 1)
+        self.profile_layout.setRowStretch(1, 1)
+        self.profile_layout.setRowStretch(2, 1)
 
     def import_button_clicked(self):
         file_dialog = QFileDialog(self)
@@ -453,10 +447,10 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.setWindowTitle(onTopText)
         if self.is_on_top:
             self.always_top.setToolTip("Disable Window Always on Top")
-            self.always_top.setIcon(QIcon(icon_on_top_fill))
+            self.always_top.setIcon(get_icon(icon_on_top_fill))
         else:
             self.always_top.setToolTip("Enable  Window Always on Top")
-            self.always_top.setIcon(QIcon(icon_on_top))
+            self.always_top.setIcon(get_icon(icon_on_top))
 
         parent_window = self.create_profile_window or self.edit_window
         self.set_on_top(self.create_profile_window, "Create New Profile",
@@ -495,6 +489,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
             button.setText(" Exit")
             button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"') # noqa
+            button.setIcon(get_icon(icon_exit))
             button.clicked.disconnect()
             button.clicked.connect(lambda: self.exit_script(script_name,
                                                             button))
@@ -532,6 +527,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
 
                 button.setText(" Run")
                 button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"') # noqa
+                button.setIcon(get_icon(icon_run))
                 button.clicked.disconnect()
                 button.clicked.connect(lambda: self.activate_script(
                     script_name, button))
@@ -585,11 +581,11 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         if self.SCRIPT_DIR == active_dir:
             self.SCRIPT_DIR = store_dir
             self.show_stored.setToolTip("Show Active Profile")
-            self.show_stored.setIcon(QIcon(icon_show_stored_fill))
+            self.show_stored.setIcon(get_icon(icon_show_stored_fill))
         else:
             self.SCRIPT_DIR = active_dir
             self.show_stored.setToolTip("Show Stored Profile")
-            self.show_stored.setIcon(QIcon(icon_show_stored))
+            self.show_stored.setIcon(get_icon(icon_show_stored))
 
         self.list_scripts()
         self.update_script_list()

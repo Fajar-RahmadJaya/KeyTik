@@ -173,7 +173,6 @@ KeyTik is available at the following platforms:
 4. [License](#license)
 5. [Contributing](#contributing)
 6. [Star History](#star-history)
-7. [Acknowledgements](#acknowledgements)
 
 ### Other Resources
 1. [Video Guide](https://www.youtube.com/@Fajar-RahmadJaya)
@@ -321,27 +320,3 @@ Thank you for helping improve this project!
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date" />
  </picture>
 </a>
-
-<br>
-
-<div align="center">
-  
-## Acknowledgements
-
-</div>
-
-This project uses the following libraries:
-
-- **Python Standard Library**: Includes modules like `os`, `shutil`, `tkinter`, `subprocess`, `json`, `time`, and `sys`, licensed under the [Python Software Foundation License](https://docs.python.org/3/license.html).
-- **pynput**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
-- **win32com.client**: Licensed under the [Python Software Foundation License](https://docs.python.org/3/license.html).
-- **PIL**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
-- **keyboard**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
-- **AutoHotkey Interception**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
-- **Winshell**: Licensed under the [MIT License](https://opensource.org/licenses/MIT).
-- **Interception**: Licensed under the [LGPL 3.0 License](https://www.gnu.org/licenses/lgpl-3.0.en.html#license-text).
-  - Source Code: https://github.com/oblitum/Interception 
-
-<br>
-
-<div align="center">

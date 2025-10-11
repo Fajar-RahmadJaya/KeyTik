@@ -3,7 +3,7 @@ markdown
 psutil
 pynput
 PySide6
-pywin32
+pywin32; platform_system == "Windows"
 requests
 winshell
 

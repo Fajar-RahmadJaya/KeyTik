@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
-from utility.constant import (icon_path, dont_show_path)
+from utility.constant import (icon_path, dont_show_path, welcome_cache)
 
 
 class Welcome:
@@ -48,7 +48,6 @@ class Welcome:
 
             welcome_dialog = QDialog(self)
             welcome_dialog.setWindowTitle("Announcement")
-            # welcome_dialog.setGeometry(350, 220, 525, 290)
             welcome_dialog.setFixedSize(525, 290)
             welcome_dialog.setWindowIcon(QIcon(icon_path))
             welcome_dialog.setModal(True)
@@ -111,9 +110,13 @@ class Welcome:
             def load_content(index):
                 try:
                     url = self.welcome_files[index]
-                    response = requests.get(url, timeout=5)
-                    response.raise_for_status()
-                    md_content = response.text
+                    if url in welcome_cache:
+                        md_content = welcome_cache[url]
+                    else:
+                        response = requests.get(url, timeout=5)
+                        response.raise_for_status()
+                        md_content = response.text
+                        welcome_cache[url] = md_content
                     html_content = markdown(md_content)
                     styling = """
                     <style>

@@ -45,9 +45,13 @@ class ParseScript:
             if line.startswith("#HotIf"):
                 in_hotif_block = not in_hotif_block
                 if 'GetKeyState("CapsLock", "T")' in line:
-                    shortcuts.append("Caps ON")
+                    shortcuts.append("CapsLock ON")
                 elif '!GetKeyState("CapsLock", "T")' in line:
-                    shortcuts.append("Caps OFF")
+                    shortcuts.append("CapsLock OFF")
+                elif 'GetKeyState("NumLock", "T")' in line:
+                    shortcuts.append("NumLock ON")
+                elif '!GetKeyState("NumLock", "T")' in line:
+                    shortcuts.append("NumLock OFF")
                 continue
             if ":: ; Shortcuts" in line and not in_hotif_block:
                 parts = line.split("::")
@@ -101,7 +105,7 @@ class ParseScript:
     def parse_default_key(self, default_key, key_map):
         return (self.replace_raw_keys(default_key, key_map)
                 .replace("~", "")
-                .replace(" & ", "+")
+                .replace(" & ", " + ")
                 .replace("*", ""))
 
     def parse_remap_key(self, line, key_map, remaps):

@@ -128,6 +128,39 @@ class WriteScript:
         except Exception as e:
             print(f"Error in initialize_exit_keys: {e}")
 
+    def check_key_integrity(self, shortcut_types, caps_on_present, caps_off_present, num_on_present, num_off_present): # noqa
+        if shortcut_types["normal"] and shortcut_types["caps"]:
+            msg = (QMessageBox(self.edit_window
+                               if hasattr(self, "edit_window")
+                               else None))
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setWindowTitle("Shortcut Conflict")
+            msg.setText("You cannot use 'CapsLock On' or 'CapsLock Off' or 'NumLock On' or 'Numlock Off' together with normal keys as shortcuts. Please use only one type (either normal keys or CapsLock NumLock ON/OFF) for all shortcuts.") # noqa
+            msg.setWindowIcon(QIcon(icon_path))
+            msg.exec()
+            return False
+        if caps_on_present and caps_off_present:
+            msg = (QMessageBox(self.edit_window
+                               if hasattr(self, "edit_window")
+                               else None))
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setWindowTitle("Shortcut Conflict")
+            msg.setText("You cannot use both 'CapsLock ON' and 'CapsLock OFF' at the same time. Please use only one of of them. If you need both, just use 'Caps Lock'.") # noqa
+            msg.setWindowIcon(QIcon(icon_path))
+            msg.exec()
+            return False
+        if num_on_present and num_off_present:
+            msg = (QMessageBox(self.edit_window
+                               if hasattr(self, "edit_window")
+                               else None))
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setWindowTitle("Shortcut Conflict")
+            msg.setText("You cannot use both 'NumLock ON' and 'NumLock OFF' at the same time. Please use only one of of them. If you need both, just use 'Caps Lock'.") # noqa
+            msg.setWindowIcon(QIcon(icon_path))
+            msg.exec()
+            return False
+        return True
+
     def save_changes(self, script_name):
         script_name = self.get_script_name()
         if not script_name:
@@ -136,37 +169,29 @@ class WriteScript:
         shortcut_types = {"normal": [], "caps": []}
         caps_on_present = False
         caps_off_present = False
+        num_on_present = False
+        num_off_present = False
         for shortcut_row in self.shortcut_rows:
             if self.is_widget_valid(shortcut_row):
                 shortcut = shortcut_row[0].text().strip()
                 if shortcut:
-                    if shortcut.lower() == "caps on":
+                    if shortcut.lower() == "capslock on":
                         shortcut_types["caps"].append(shortcut)
                         caps_on_present = True
-                    elif shortcut.lower() == "caps off":
+                    elif shortcut.lower() == "capslock off":
                         shortcut_types["caps"].append(shortcut)
                         caps_off_present = True
+                    elif shortcut.lower() == "numlock on":
+                        shortcut_types["caps"].append(shortcut)
+                        num_on_present = True
+                    elif shortcut.lower() == "numlock off":
+                        shortcut_types["caps"].append(shortcut)
+                        num_off_present = True
                     else:
                         shortcut_types["normal"].append(shortcut)
-        if shortcut_types["normal"] and shortcut_types["caps"]:
-            msg = (QMessageBox(self.edit_window
-                               if hasattr(self, "edit_window")
-                               else None))
-            msg.setIcon(QMessageBox.Icon.Warning)
-            msg.setWindowTitle("Shortcut Conflict")
-            msg.setText("You cannot use 'Caps On' or 'Caps Off' together with normal keys as shortcuts. Please use only one type (either normal keys or Caps ON/OFF) for all shortcuts.") # noqa
-            msg.setWindowIcon(QIcon(icon_path))
-            msg.exec()
-            return
-        if caps_on_present and caps_off_present:
-            msg = (QMessageBox(self.edit_window
-                               if hasattr(self, "edit_window")
-                               else None))
-            msg.setIcon(QMessageBox.Icon.Warning)
-            msg.setWindowTitle("Shortcut Conflict")
-            msg.setText("You cannot use both 'Caps On' and 'Caps Off' as shortcuts. Please use only one (either Caps ON or OFF). If you need both, just use 'CapsLock'.") # noqa
-            msg.setWindowIcon(QIcon(icon_path))
-            msg.exec()
+        if not self.check_key_integrity(shortcut_types, caps_on_present,
+                                        caps_off_present, num_on_present,
+                                        num_off_present):
             return
 
         output_path = os.path.join(self.SCRIPT_DIR, script_name)
@@ -260,10 +285,14 @@ class WriteScript:
                 caps_shortcuts = []
                 normal_shortcuts = []
                 for shortcut in valid_shortcuts:
-                    if shortcut.lower() == "caps on":
+                    if shortcut.lower() == "capslock on":
                         caps_shortcuts.append('GetKeyState("CapsLock", "T")')
-                    elif shortcut.lower() == "caps off":
+                    elif shortcut.lower() == "capslock off":
                         caps_shortcuts.append('!GetKeyState("CapsLock", "T")')
+                    elif shortcut.lower() == "numlock on":
+                        caps_shortcuts.append('GetKeyState("NumLock", "T")')
+                    elif shortcut.lower() == "numlock off":
+                        caps_shortcuts.append('!GetKeyState("NumLock", "T")')
                     else:
                         normal_shortcuts.append(shortcut)
                 if normal_shortcuts:

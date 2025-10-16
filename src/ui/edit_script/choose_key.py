@@ -99,8 +99,9 @@ class ChooseKey:
         search_unicode_checkbox = QCheckBox("Search Unicode")
         search_unicode_checkbox.setChecked(False)
         search_unicode_checkbox.setToolTip(
-            "Unicode search may be slow. Enable only if you need to search Unicode characters.\n" # noqa
-            "Requires at least 3 characters to avoid freezing."
+            "Search key by name and description.\n"
+            "Unicode search may be slow. Enable only if needed.\n"
+            "Letter search needs at least 3 letters."
         )
         choose_search_layout.addWidget(search_unicode_checkbox)
         self.search_unicode_checkbox = search_unicode_checkbox
@@ -306,7 +307,19 @@ class ChooseKey:
                         parent_item.addChild(child_item)
                     parent_item.setExpanded(True)
 
-        if search_unicode and filter_text and len(filter_text) >= 3:
+        def get_letter(s):
+            return s.isalpha() and all('a' <= c <= 'z' for c in s)
+
+        unicode_search_enabled = False
+        if search_unicode and filter_text:
+            if get_letter(filter_text):
+                if len(filter_text) >= 3:
+                    unicode_search_enabled = True
+            else:
+                if len(filter_text) >= 1:
+                    unicode_search_enabled = True
+
+        if unicode_search_enabled:
             unicode_matches = {}
             for start, end, block_name in unicode_blocks:
                 if block_name in hide_parents:
@@ -319,8 +332,13 @@ class ChooseKey:
                         try:
                             char_name = unicodedata.name(char)
                         except ValueError:
-                            continue
-                        if filter_text in char_name.lower():
+                            char_name = ""
+                        if get_letter(filter_text):
+                            match = filter_text in char_name.lower()
+                        else:
+                            match = (filter_text in char_name.lower() or
+                                     filter_text in char.lower())
+                        if match:
                             if block_name not in unicode_matches:
                                 unicode_matches[block_name] = []
                             unicode_matches[block_name].append(

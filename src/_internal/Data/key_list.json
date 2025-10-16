@@ -1,13 +1,21 @@
 [
     {
         "Shortcut Special":{
-            "Caps ON":{
+            "CapsLock ON":{
                 "translate": "",
                 "description": "When caps lock is ON (Only for shortcuts)"
             },
-            "Caps OFF":{
+            "CapsLock OFF":{
                 "translate": "",
                 "description": "When caps lock is OFF (Only for shortcuts)"
+            },
+            "NumLock ON":{
+                "translate": "",
+                "description": "When num lock is ON (Only for shortcuts)"
+            },
+            "NumLock OFF":{
+                "translate": "",
+                "description": "When num lock is OFF (Only for shortcuts)"
             }
         },
         "Mouse":{

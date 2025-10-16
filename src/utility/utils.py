@@ -2,6 +2,7 @@ import os
 import json
 import tempfile
 import sys
+import winreg
 from utility.constant import (appdata_dir, pinned_file, condition_path,
                               theme_path)
 
@@ -155,3 +156,23 @@ def get_theme():
 
 
 theme = get_theme()
+
+
+def get_ahk_install_dir():
+    reg_paths = [
+        r"SOFTWARE\AutoHotkey",
+        r"SOFTWARE\WOW6432Node\AutoHotkey"
+    ]
+    for reg_path in reg_paths:
+        try:
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
+                install_dir, _ = winreg.QueryValueEx(key, "InstallDir")
+                return install_dir
+        except FileNotFoundError:
+            continue
+        except Exception:
+            continue
+    return None
+
+ahk_uninstall_path = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk", "UX", "ui-uninstall.ahk") # noqa
+ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2") # noqa

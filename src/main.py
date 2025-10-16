@@ -21,7 +21,7 @@ from utility.constant import (icon_path, exit_keys_file, current_version)
 from utility.utils import (load_pinned_profiles, active_dir, store_dir,
                            save_pinned_profiles, read_running_scripts_temp,
                            add_script_to_temp, remove_script_from_temp,
-                           theme)
+                           theme, ahkv2_dir)
 from utility.icon import (get_icon, icon_pin, icon_pin_fill,
                           icon_rocket, icon_rocket_fill, icon_exit, icon_run,
                           icon_copy, icon_delete, icon_store, icon_plus,
@@ -45,6 +45,7 @@ from ui.edit_script.choose_key import ChooseKey
 class StartupWorker(QThread):
     finished = Signal()
     update_found = Signal(str)
+    show_welcome = Signal()
 
     def __init__(self, main_window):
         super().__init__()
@@ -57,6 +58,9 @@ class StartupWorker(QThread):
         if latest_version:
             self.update_found.emit(latest_version)
         self.finished.emit()
+
+        if self.main_window.welcome_condition:
+            self.show_welcome.emit()
 
         if not hasattr(self.main_window, "keyboard_hook_initialized"):
             keyboard.hook(lambda event: self.main_window.multi_key_event(
@@ -73,31 +77,17 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
               EditScriptLogic, WriteScript, ParseScript, ChooseKey):
     def __init__(self):
         super().__init__()
-        # Global variables
-        self.first_load = True
-        self.device_selection_window = None
-        self.select_program_window = None
-        self.is_on_top = False
-        self.create_profile_window = None
-        self.edit_window = None
-        self.key_rows = []
-        self.copas_rows = []
-        self.shortcut_rows = []
+        # Key Listening
         self.is_listening = False
         self.active_entry = None
-        self.row_num = 0
-        self.shortcut_rows = []
-        self.pressed_keys = []
+        # Mouse Listening
         self.last_key_time = 0
         self.timeout = 1
-        self.mouse_listener = None
+        self.pressed_keys = []
         self.ignore_next_click = False
-        self.shortcut_entry = None
-        self.sort_order = [True, True, True]
-        self.check_ahk_installation(show_installed_message=False)
 
         # UI initialization
-        self.font_fallback()
+        self.check_ahk_installation(show_installed_message=False)
         self.central_widget = QWidget()
         self.main_layout = QVBoxLayout(self.central_widget)
         self.current_page = 0
@@ -111,6 +101,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.setWindowIcon(QIcon(icon_path))
         self.setCentralWidget(self.central_widget)
         self.welcome_condition = self.load_welcome_condition()
+        self.font_fallback()
 
     def create_ui(self):
         self.frame = QFrame()
@@ -440,45 +431,18 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
                                 f"{script_name} does not exist.")
 
     def toggle_on_top(self):
-        self.is_on_top = not self.is_on_top
-        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, self.is_on_top)
+        is_on_top = bool(self.windowFlags() &
+                         Qt.WindowType.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, not is_on_top)
         self.show()
-        onTopText = (f"KeyTik{' (Always on Top)' if self.is_on_top else ''}")
+        onTopText = (f"KeyTik{' (Always on Top)' if not is_on_top else ''}")
         self.setWindowTitle(onTopText)
-        if self.is_on_top:
+        if not is_on_top:
             self.always_top.setToolTip("Disable Window Always on Top")
             self.always_top.setIcon(get_icon(icon_on_top_fill))
         else:
             self.always_top.setToolTip("Enable  Window Always on Top")
             self.always_top.setIcon(get_icon(icon_on_top))
-
-        parent_window = self.create_profile_window or self.edit_window
-        self.set_on_top(self.create_profile_window, "Create New Profile",
-                        parent_window)
-        self.set_on_top(self.edit_window, "Edit Profile", parent_window)
-        self.set_on_top(self.device_selection_window, "Select Device",
-                        parent_window)
-        self.set_on_top(self.select_program_window, "Select Program",
-                        parent_window)
-
-    def set_on_top(self, window, title, parent=None):
-        if window is not None and window.isVisible():
-            try:
-                if parent:
-                    window.setWindowModality(Qt.WindowModality.
-                                             ApplicationModal)
-                else:
-                    window.setWindowModality(Qt.WindowModality.NonModal)
-
-                window.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint,
-                                     self.is_on_top)
-                title_suffix = " (Always on Top)" if self.is_on_top else ""
-                window.setWindowTitle(f"{title}{title_suffix}")
-
-                window.setWindowIcon(QIcon(icon_path))
-
-            except Exception as e:
-                print(f"Error: Unable to set always-on-top for {title} window. {e}") # noqa
 
     def activate_script(self, script_name, button):
         script_path = os.path.join(self.SCRIPT_DIR, script_name)
@@ -610,16 +574,6 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         except Exception as e:
             print(f"Error displaying welcome window: {e}")
 
-    def showEvent(self, event):
-        super().showEvent(event)
-
-        if getattr(self, "_startup_worker_started", False):
-            return
-        self._startup_worker_started = True
-        self.startup_worker = StartupWorker(self)
-        self.startup_worker.update_found.connect(self.show_update_messagebox)
-        self.startup_worker.start()
-
     def check_for_update(self):
         try:
             response = requests.get("https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest", timeout=5) # noqa
@@ -642,9 +596,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
             webbrowser.open("https://github.com/Fajar-RahmadJaya/KeyTik/releases") # noqa
 
     def check_ahk_installation(self, show_installed_message=False):
-        ahk_path = r"C:\Program Files\AutoHotkey\v2"
-
-        if os.path.exists(ahk_path):
+        if os.path.exists(ahkv2_dir):
             if show_installed_message:
                 QMessageBox.information(None, "AHK Installation", "AutoHotkey v2 is installed on your system.") # noqa
             return True
@@ -690,8 +642,13 @@ def main():
     main_window = MainApp()
     main_window.show()
 
-    if main_window.welcome_condition:
-        main_window.show_welcome_window()
+    main_window.startup_worker = StartupWorker(main_window)
+    main_window.startup_worker.update_found.connect(
+        main_window.show_update_messagebox)
+    main_window.startup_worker.show_welcome.connect(
+        main_window.show_welcome_window)
+    main_window.startup_worker.start()
+
     sys.exit(app.exec())
 
 

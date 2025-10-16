@@ -10,19 +10,17 @@ import webbrowser
 import json
 import subprocess
 import ctypes
-from utility.constant import (icon_path,
-                              condition_path, theme_path,
-                              ahk_path, driver_path,
-                              interception_install_path,
+from utility.constant import (icon_path, condition_path, theme_path,
+                              driver_path, interception_install_path,
                               interception_uninstall_path)
-from utility.utils import (active_dir, store_dir) # noqa
+from utility.utils import (active_dir, store_dir, ahkv2_dir, # noqa
+                           ahk_uninstall_path)
 
 
 class Setting:
     def open_settings_window(self):
         settings_window = QDialog(self)
         settings_window.setWindowTitle("Settings")
-        # settings_window.setGeometry(400, 225, 400, 300)
         settings_window.setFixedSize(400, 250)
         settings_window.setWindowIcon(QIcon(icon_path))
         settings_window.setModal(True)
@@ -192,7 +190,6 @@ class Setting:
         dialog = QDialog(self)
         dialog.setWindowTitle("Installation Manager")
         dialog.setWindowIcon(QIcon(icon_path))
-        # dialog.setGeometry(414, 248, 380, 180)
         dialog.setFixedSize(380, 180)
         layout = QVBoxLayout(dialog)
         layout.setContentsMargins(20, 20, 20, 20)
@@ -203,7 +200,7 @@ class Setting:
 
         ahk_vbox = QVBoxLayout()
         ahk_checkbox = QCheckBox("AutoHotkey", dialog)
-        ahk_installed = os.path.exists(ahk_path)
+        ahk_installed = os.path.exists(ahkv2_dir)
         ahk_checkbox.setChecked(ahk_installed)
         ahk_checkbox.setEnabled(False)
         ahk_button = QPushButton(dialog)
@@ -236,9 +233,8 @@ class Setting:
 
         def ahk_action():
             if ahk_installed:
-                uninstall_cmd = f'"{ahk_path}" "{os.path.join(os.path.dirname(ahk_path), "ui-uninstall.ahk")}"' # noqa
                 try:
-                    subprocess.Popen(uninstall_cmd, shell=True)
+                    subprocess.Popen(ahk_uninstall_path, shell=True)
                 except Exception as e:
                     QMessageBox.critical(dialog, "Error", f"Failed to start uninstall: {e}") # noqa
             else:

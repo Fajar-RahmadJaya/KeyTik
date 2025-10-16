@@ -180,11 +180,6 @@ class EditScriptLogic(QObject):
             button.clicked.connect(lambda: self.key_listening
                                    (entry_widget, button))
 
-            if self.mouse_listener is None:
-                self.mouse_listener = mouse.Listener(
-                    on_click=self.mouse_listening)
-                self.mouse_listener.start()
-
             self.currently_pressed_keys = []
             self.last_combination = ""
             self.release_timer = QTimer()
@@ -273,30 +268,50 @@ class EditScriptLogic(QObject):
                         self.request_timer_start.emit(entry_widget)
 
     def mouse_listening(self, x, y, button, pressed):
-        if self.is_listening and self.active_entry and pressed:
-            if self.ignore_next_click and button == mouse.Button.left:
-                self.ignore_next_click = False
-                return
+        if self.is_listening and self.active_entry:
+            if pressed:
+                if self.ignore_next_click and button == mouse.Button.left:
+                    self.ignore_next_click = False
+                    return
 
-            if button == mouse.Button.left:
-                mouse_button = "Left Button"
-            elif button == mouse.Button.right:
-                mouse_button = "Right Button"
-            elif button == mouse.Button.middle:
-                mouse_button = "Middle Button"
+                if button == mouse.Button.left:
+                    mouse_button = "Left Button"
+                elif button == mouse.Button.right:
+                    mouse_button = "Right Button"
+                elif button == mouse.Button.middle:
+                    mouse_button = "Middle Button"
+                else:
+                    mouse_button = button.name
+
+                current_time = time.time()
+
+                if current_time - self.last_key_time > self.timeout:
+                    self.pressed_keys = []
+
+                if mouse_button not in self.pressed_keys:
+                    self.pressed_keys.append(mouse_button)
+                    self.update_entry()
+
+                self.last_key_time = current_time
+
             else:
-                mouse_button = button.name
+                if button == mouse.Button.left:
+                    mouse_button = "Left Button"
+                elif button == mouse.Button.right:
+                    mouse_button = "Right Button"
+                elif button == mouse.Button.middle:
+                    mouse_button = "Middle Button"
+                else:
+                    mouse_button = button.name
 
-            current_time = time.time()
-
-            if current_time - self.last_key_time > self.timeout:
-                self.pressed_keys = []
-
-            if mouse_button not in self.pressed_keys:
-                self.pressed_keys.append(mouse_button)
-                self.update_entry()
-
-            self.last_key_time = current_time
+                if mouse_button in self.pressed_keys:
+                    self.pressed_keys.remove(mouse_button)
+                    if not self.pressed_keys:
+                        self.key_listening(self.active_entry, None)
+                        self.request_timer_start.emit(self.active_entry)
+                    else:
+                        if hasattr(self, "release_timer"):
+                            self.request_timer_start.emit(self.active_entry)
 
     def release_timer(self, entry_widget):
         if hasattr(self, "release_timer"):

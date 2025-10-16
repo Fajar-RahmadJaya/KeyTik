@@ -95,8 +95,6 @@ class EditScriptMain:
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
         self.edit_scroll = QScrollArea(self.edit_window)
-        # self.edit_scroll.setGeometry(int(0.067 * 600), int(0.178 * 450),
-        # int(0.875 * 600), int(0.678 * 450))
         self.edit_scroll.setFixedSize(535, 305)
         self.edit_scroll.setWidgetResizable(True)
         self.edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)

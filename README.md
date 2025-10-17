@@ -22,14 +22,14 @@
   
 ## Overview
 
-KeyTik is a Python program that uses AutoHotkey to handle many things, including a powerful key mapper and various macros such as clickers and more. It comes with comprehensive [key support](https://keytik.com/docs/getting-started/key-list/keyboard), including ASCII, ANSI, Unicode, Scan Code, Virtual Keyboard Code, and more. 
+KeyTik is a Python program that uses AutoHotkey to handle many things, including a powerful key mapper and various macros such as clickers and more. It comes with comprehensive [key support](https://keytik.com/docs/getting-started/key-list/keyboard), such as ASCII, ANSI, Unicode, Scan Code, Virtual Keyboard Code, and more. 
 
 KeyTik is also packed with [features](#features) like Bind to Programs and Devices, Assign Shortcuts, Text Format, Hold Format, and more.
 
 </div>
 
 > [!NOTE]
-> If you're satisfied with KeyTik, don't forget to share and give us a star!
+> If you like KeyTik, don't forget to share and give it a star!
 
 <br>
 
@@ -226,10 +226,7 @@ KeyTik is available at the following platforms:
 
 </div>
 
-KeyTik comes packed with a wide range of features designed to give you ultimate control over your profiles. Here’s a breakdown of everything you can do with KeyTik:
-
 ### Key Features
-Below is KeyTik key features that make KeyTik different than another automation tool:
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
 | 1      | **Multiple Remap/Macro Profile**                  | Not like most of keyboard remapper, KeyTik can handle multiple keyboard remap. You don't have to set remap again when you need to use another remap then set it back again after done. Just create multiple remap and activate or deactivate it whenever you want. |
@@ -252,7 +249,6 @@ Below is KeyTik key features that make KeyTik different than another automation 
 | 17      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference.|
 
 ### Additional Feature
-Below is another KeyTik feature to increase user experience and give ultimate control over each profiles:
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
 | 1      | **Manage Profiles** | Run, Exit, Delete, Store, Edit, Pin each profiles for better control over profiles.|
@@ -271,18 +267,13 @@ Below is another KeyTik feature to increase user experience and give ultimate co
 
 </div>
 
-We’d love to hear from you! Your feedback is essential for the continued improvement of KeyTik. If you have any suggestions or question, please submit it on the [KeyTik Issues page](https://github.com/Fajar-RahmadJaya/KeyTik/issues).
-
-To make it easier for you to submit feedback, we’ve provided several issue templates. Please select the one that best matches your feedback:
+If you have any suggestions or question, don't hesitate to submit it on the issues page.
 - **[Automation Tool Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Automation+Tool+Suggestion%2C+Supported+Key+Suggestion&projects=&template=automation-tool-suggestion.md&title=Automation+Tool+Suggestion)**: Suggest additions to KeyTik’s built-in automation tools.
-- **[Bug Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=bug&projects=&template=bug-report.md&title=Bug+Report)**: Report any bugs or issues you’ve encountered to help us improve.
-- **[Feature Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Feature+Suggestion&projects=&template=feature_suggestion.md&title=Feature+Suggestion)**: Suggest an idea for a new feature or improvement for the project.
-- **[Question](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Question&projects=&template=question.md&title=Question)**: Ask any question about KeyTik.
-- **[Supported Key Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Supported+Key+Suggestion&projects=&template=supported-key-suggestion.md&title=Supported+Key+Suggestion)**: Suggest a key to include in the list if you find some keys aren’t working.
+- **[Bug Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=bug&projects=&template=bug-report.md&title=Bug+Report)**: Report any bugs or issue.
+- **[Feature Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Feature+Suggestion&projects=&template=feature_suggestion.md&title=Feature+Suggestion)**: Suggest an idea for a new feature.
+- **[Question](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Question&projects=&template=question.md&title=Question)**: Ask any question.
+- **[Supported Key Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Supported+Key+Suggestion&projects=&template=supported-key-suggestion.md&title=Supported+Key+Suggestion)**: Suggest a key to include in the list.
 - **[Windows Warning Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Windows+Warning+Report&projects=&template=windows-warning-report.md&title=Windows+Warning+Report)**: Report any Windows warnings, such as untrusted author notifications or false positives.
-Simply choose the most relevant template and provide as much detail as possible. Your input will help us improve KeyTik for everyone!
-
-Thank you for your support — we truly appreciate it!
 
 <br>
 
@@ -298,9 +289,7 @@ This project is licensed under the [Apache License 2.0](http://www.apache.org/li
 <div align="center">
   
 ## Contributing
-Pull requests are welcome! We welcome contributions of all kinds, including bug fixes, features, improvements, documentation improvement and more. Check out the [Contribution Guidelines](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/CONTRIBUTING.md) to set up the workplace.
-
-Thank you for helping improve this project!
+Pull requests are welcome! We welcome contributions of all kinds, including bug fixes, features, improvements, documentation improvement and more. Check out the [Contribution Guidelines](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/CONTRIBUTING.md) for more info.
 
 </div>
 

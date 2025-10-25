@@ -44,7 +44,7 @@ KeyTik Pro version is available at Gumroad at $20 for lifetime purchase. Check o
 Pro version has additional features compared to the normal version while not overwhelming it. Think of Pro version as a way to support the developer or as a more user-friendly version of the normal version. Pro version consists of additional UI for the auto clicker, file opener, screen clicker, and additional automation tools such as window manager, easy always-on-top, and multi copy-paste.
 
 > [!Tip]
-> Get it for $15 with 25% off — limited to the first 10 people. (6 people left) Check out [here](https://fajarrahmadjaya.gumroad.com/l/keytik-pro/KeyTikPro25) to claim your discount.
+> Get it for $15 with 25% off — limited to the first 10 people. (5 people left) Check out [here](https://fajarrahmadjaya.gumroad.com/l/keytik-pro/KeyTikPro25) to claim your discount.
 
 <div align="center">
 <img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="500" />

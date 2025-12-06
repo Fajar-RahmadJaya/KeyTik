@@ -4,6 +4,7 @@ psutil
 pynput
 PySide6
 pywin32; platform_system == "Windows"
+urllib3==2.6.0
 requests
 winshell
 

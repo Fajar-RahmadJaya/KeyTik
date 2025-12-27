@@ -21,7 +21,17 @@ interception_uninstall_path = os.path.join(data_dir, "inter_uninstall.bat")
 driver_path = os.path.join(os.getenv('SystemRoot'), "System32", "drivers", "interception.sys") # noqa
 
 # Cache
-welcome_cache = {}
+announcement_cache = {}
+
+# Key Listening Change Key
+changes_key = {
+    "caps lock": "Caps Lock",
+    "capslock": "Caps Lock",
+    "num lock": "Num Lock",
+    "numlock": "Num Lock",
+    "scroll lock": "Scroll Lock",
+    "scrolllock": "Scroll Lock",
+}
 
 # Unicode
 unicode_blocks = [

@@ -8,7 +8,7 @@ from PySide6.QtGui import QIcon
 from utility.constant import (icon_path)
 
 
-class EditScriptMain:
+class EditProfileMain:
     def edit_script(self, script_name):
         self.shortcut_row_widgets = []
         self.mapping_row_widgets = []
@@ -86,11 +86,11 @@ class EditScriptMain:
 
         device_id = self.parse_device(lines)
         if device_id:
-            keyboard_entry.setText("    " + device_id)
+            keyboard_entry.setText(device_id)
 
         program_entry_value = self.parse_program(lines)
         if program_entry_value:
-            program_entry.setText("    " + program_entry_value)
+            program_entry.setText(program_entry_value)
 
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 

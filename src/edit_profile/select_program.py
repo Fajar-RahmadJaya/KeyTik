@@ -2,11 +2,13 @@ import os
 import win32gui
 import win32process
 import psutil
+import ctypes
+from ctypes import wintypes
 from PySide6.QtWidgets import (
     QDialog, QLabel, QLineEdit, QPushButton, QTreeWidget,
-    QTreeWidgetItem, QVBoxLayout, QHBoxLayout, QHeaderView
+    QTreeWidgetItem, QVBoxLayout, QHBoxLayout
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 from utility.constant import (icon_path)
 
@@ -48,36 +50,31 @@ class SelectProgram:
         self.program_tree = QTreeWidget(self.select_program_window)
         self.program_tree.setHeaderLabels(["Window Title", "Class", "Process"])
         self.program_tree.setSortingEnabled(True)
+        self.program_tree.setFixedWidth(580)
         main_layout.addWidget(self.program_tree)
 
         header = self.program_tree.header()
 
         for col in range(self.program_tree.columnCount()):
-            header.setSectionResizeMode(col, QHeaderView.Interactive)
             self.program_tree.setColumnWidth(col, 120)
 
         def fit_sorted_column():
             sort_col = header.sortIndicatorSection()
-
-            header.setSectionResizeMode(sort_col, QHeaderView.ResizeToContents)
-            self.program_tree.resizeColumnToContents(sort_col)
-
-            sorted_col_width = self.program_tree.columnWidth(sort_col)
-
-            header.setSectionResizeMode(sort_col, QHeaderView.Interactive)
-
             total_width = self.program_tree.viewport().width()
             other_cols = [i for i in range(self.program_tree.columnCount())
                           if i != sort_col]
-
-            min_other_col_width = 80
-
-            remaining_width = max(total_width - sorted_col_width,
-                                  min_other_col_width * len(other_cols))
-            other_col_width = remaining_width // len(other_cols)
             for col in other_cols:
-                self.program_tree.setColumnWidth(col, other_col_width)
+                self.program_tree.setColumnWidth(col, 120)
+            expanded_width = (total_width -
+                              120 * len(other_cols))
+            if expanded_width < 120:
+                expanded_width = 120
+            self.program_tree.setColumnWidth(sort_col, expanded_width)
 
+        self.fit_sorted_column = fit_sorted_column
+
+        header.setSortIndicator(0, Qt.AscendingOrder)
+        QTimer.singleShot(0, fit_sorted_column)
         header.sectionClicked.connect(lambda _: fit_sorted_column())
 
         button_layout = QHBoxLayout()
@@ -115,27 +112,61 @@ class SelectProgram:
 
         self.select_program_window.exec()
 
+    def get_application_type(self):
+        DWMWA_CLOAKED = 14
+        WS_EX_TOOLWINDOW = 0x00000080
+        WS_EX_APPWINDOW = 0x00040000
+
+        def is_window_cloaked(hwnd):
+            try:
+                dwmapi = ctypes.WinDLL("dwmapi")
+                cloaked = wintypes.DWORD()
+                dwmapi.DwmGetWindowAttribute(
+                    wintypes.HWND(hwnd),
+                    wintypes.DWORD(DWMWA_CLOAKED),
+                    ctypes.byref(cloaked),
+                    ctypes.sizeof(cloaked)
+                )
+                return cloaked.value != 0
+            except Exception:
+                return False
+
+        pid_name_map = {}
+        for proc in psutil.process_iter(['pid', 'name']):
+            pid_name_map[proc.info['pid']] = proc.info['name']
+
+        windows = []
+        seen = set()
+
+        def callback(hwnd, _):
+            if not win32gui.IsWindowVisible(hwnd):
+                return
+            if win32gui.GetWindowText(hwnd) == "":
+                return
+            exstyle = win32gui.GetWindowLong(hwnd, -20)
+            if exstyle & WS_EX_TOOLWINDOW:
+                return
+            if (not (exstyle & WS_EX_APPWINDOW)
+                    and win32gui.GetWindow(hwnd, 4) != 0):
+                return
+            if win32gui.GetParent(hwnd) != 0:
+                return
+            if is_window_cloaked(hwnd):
+                return
+            title = win32gui.GetWindowText(hwnd)
+            class_name = win32gui.GetClassName(hwnd)
+            _, pid = win32process.GetWindowThreadProcessId(hwnd)
+            key = (pid, title, class_name)
+            if key not in seen:
+                seen.add(key)
+                proc_name = pid_name_map.get(pid, "")
+                windows.append((title, class_name, proc_name, "Application"))
+        win32gui.EnumWindows(callback, None)
+        return windows
+
     def get_running_processes(self, app_only=True):
         if app_only:
-            pid_name_map = {}
-            for proc in psutil.process_iter(['pid', 'name']):
-                pid_name_map[proc.info['pid']] = proc.info['name']
-
-            results = []
-
-            def enum_window_callback(hwnd, _):
-                if not win32gui.IsWindowVisible(hwnd):
-                    return
-                title = win32gui.GetWindowText(hwnd)
-                if not title:
-                    return
-                class_name = win32gui.GetClassName(hwnd)
-                _, pid = win32process.GetWindowThreadProcessId(hwnd)
-                proc_name = pid_name_map.get(pid, "")
-                results.append((title, class_name, proc_name, "Application"))
-
-            win32gui.EnumWindows(enum_window_callback, None)
-            return results
+            return self.get_application_type()
         else:
 
             processes = []
@@ -192,22 +223,8 @@ class SelectProgram:
                 item = self.multi_check([window_title, class_name, proc_name])
                 self.program_tree.addTopLevelItem(item)
 
-        header = self.program_tree.header()
-        sort_col = header.sortIndicatorSection()
-        header.setSectionResizeMode(sort_col, QHeaderView.ResizeToContents)
-        self.program_tree.resizeColumnToContents(sort_col)
-        header.setSectionResizeMode(sort_col, QHeaderView.Interactive)
-        sorted_col_width = self.program_tree.columnWidth(sort_col)
-        total_width = self.program_tree.viewport().width()
-        other_cols = [i for i in range(self.program_tree.columnCount())
-                      if i != sort_col]
-        min_other_col_width = 80
-        remaining_width = max(
-            total_width - sorted_col_width,
-            min_other_col_width * len(other_cols))
-        other_col_width = remaining_width // len(other_cols)
-        for col in other_cols:
-            self.program_tree.setColumnWidth(col, other_col_width)
+        if hasattr(self, "fit_sorted_column"):
+            self.fit_sorted_column()
 
     def toggle_show_all_processes(self):
         current_text = self.show_all_button.text()
@@ -230,13 +247,13 @@ class SelectProgram:
         for index in range(self.program_tree.topLevelItemCount()):
             item = self.program_tree.topLevelItem(index)
             if item.checkState(0) == Qt.Checked:
-                name_checked.append(f"Name - {item.text(0).strip(' ✔')}")
+                name_checked.append(f"[Tittle, {item.text(0)}]")
             if item.checkState(1) == Qt.Checked:
-                class_checked.append(f"Class - {item.text(1).strip(' ✔')}")
+                class_checked.append(f"[Class, {item.text(1)}]")
             if item.checkState(2) == Qt.Checked:
-                process_checked.append(f"Process - {item.text(2).strip(' ✔')}")
+                process_checked.append(f"[Process, {item.text(2)}]")
         selected_programs = name_checked + class_checked + process_checked
 
         if selected_programs:
-            entry_widget.setText(", ".join(selected_programs))
+            entry_widget.setText(" ".join(selected_programs))
         self.select_program_window.accept()

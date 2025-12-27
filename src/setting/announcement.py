@@ -8,11 +8,11 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
-from utility.constant import (icon_path, dont_show_path, welcome_cache)
+from utility.constant import (icon_path, dont_show_path, announcement_cache)
 
 
-class Welcome:
-    def load_welcome_condition(self):
+class Announcement:
+    def load_announcement_condition(self):
         try:
             if os.path.exists(dont_show_path):
                 with open(dont_show_path, "r") as f:
@@ -22,16 +22,17 @@ class Welcome:
             print(f"Error loading condition file: {e}")
         return True
 
-    def save_welcome_condition(self):
+    def save_announcement_condition(self):
         try:
             with open(dont_show_path, "w") as f:
-                json.dump({"welcome_condition": self.welcome_condition}, f)
+                json.dump({"welcome_condition":
+                           self.announcement_condition}, f)
         except Exception as e:
             print(f"Error saving condition file: {e}")
 
-    def show_welcome_window(self):
+    def show_announcement_window(self):
         try:
-            self.welcome_files = []
+            self.announcement_files = []
             i = 1
             while True:
                 url = f"https://keytik.com/normal-md/{i}.txt"
@@ -40,24 +41,25 @@ class Welcome:
                     if response.status_code == 404:
                         break
                     response.raise_for_status()
-                    self.welcome_files.append(url)
+                    self.announcement_files.append(url)
                     i += 1
                 except Exception:
                     break
-            self.current_welcome_index = 0
+            self.current_announcement_index = 0
 
-            welcome_dialog = QDialog(self)
-            welcome_dialog.setWindowTitle("Announcement")
-            welcome_dialog.setFixedSize(525, 290)
-            welcome_dialog.setWindowIcon(QIcon(icon_path))
-            welcome_dialog.setModal(True)
-            welcome_dialog.setWindowModality(Qt.WindowModality.WindowModal)
-            welcome_dialog.setFixedSize(525, 290)
+            announcement_dialog = QDialog(self)
+            announcement_dialog.setWindowTitle("Announcement")
+            announcement_dialog.setFixedSize(525, 290)
+            announcement_dialog.setWindowIcon(QIcon(icon_path))
+            announcement_dialog.setModal(True)
+            announcement_dialog.setWindowModality(
+                Qt.WindowModality.WindowModal)
+            announcement_dialog.setFixedSize(525, 290)
 
-            main_layout = QVBoxLayout(welcome_dialog)
+            main_layout = QVBoxLayout(announcement_dialog)
             main_layout.setContentsMargins(10, 10, 10, 10)
 
-            app_palette = welcome_dialog.palette()
+            app_palette = announcement_dialog.palette()
             bg_color = app_palette.window().color().name()
             text_color = app_palette.windowText().color().name()
 
@@ -100,7 +102,7 @@ class Welcome:
             next_button.setFixedWidth(100)
 
             dont_show_checkbox = QCheckBox("Don't show again")
-            dont_show_checkbox.setChecked(not self.welcome_condition)
+            dont_show_checkbox.setChecked(not self.announcement_condition)
             button_layout.addWidget(prev_button)
             button_layout.addWidget(next_button)
             button_layout.addWidget(dont_show_checkbox)
@@ -109,14 +111,14 @@ class Welcome:
 
             def load_content(index):
                 try:
-                    url = self.welcome_files[index]
-                    if url in welcome_cache:
-                        md_content = welcome_cache[url]
+                    url = self.announcement_files[index]
+                    if url in announcement_cache:
+                        md_content = announcement_cache[url]
                     else:
                         response = requests.get(url, timeout=5)
                         response.raise_for_status()
                         md_content = response.text
-                        welcome_cache[url] = md_content
+                        announcement_cache[url] = md_content
                     html_content = markdown(md_content)
                     styling = """
                     <style>
@@ -131,48 +133,52 @@ class Welcome:
                     )
 
             def update_buttons():
-                prev_button.setEnabled(self.current_welcome_index > 0)
+                prev_button.setEnabled(self.current_announcement_index > 0)
                 next_button.setEnabled(
-                    self.current_welcome_index < len(self.welcome_files) - 1)
+                    self.current_announcement_index < len(
+                        self.announcement_files) - 1)
 
             def next_doc():
-                if self.current_welcome_index < len(self.welcome_files) - 1:
-                    self.current_welcome_index += 1
-                    load_content(self.current_welcome_index)
+                if self.current_announcement_index < len(
+                      self.announcement_files) - 1:
+                    self.current_announcement_index += 1
+                    load_content(self.current_announcement_index)
                     update_buttons()
 
             def prev_doc():
-                if self.current_welcome_index > 0:
-                    self.current_welcome_index -= 1
-                    load_content(self.current_welcome_index)
+                if self.current_announcement_index > 0:
+                    self.current_announcement_index -= 1
+                    load_content(self.current_announcement_index)
                     update_buttons()
 
             prev_button.clicked.connect(prev_doc)
             next_button.clicked.connect(next_doc)
 
             def toggle_dont_show():
-                self.welcome_condition = not dont_show_checkbox.isChecked()
-                self.save_welcome_condition()
+                self.announcement_condition = not (
+                    dont_show_checkbox.isChecked())
+                self.save_announcement_condition()
 
             dont_show_checkbox.stateChanged.connect(toggle_dont_show)
 
             def on_dialog_close(event):
-                self.welcome_condition = not dont_show_checkbox.isChecked()
-                self.save_welcome_condition()
+                self.announcement_condition = not (
+                    dont_show_checkbox.isChecked())
+                self.save_announcement_condition()
                 event.accept()
-            welcome_dialog.closeEvent = on_dialog_close
+            announcement_dialog.closeEvent = on_dialog_close
 
-            if self.welcome_files:
-                load_content(self.current_welcome_index)
+            if self.announcement_files:
+                load_content(self.current_announcement_index)
                 update_buttons()
             else:
                 html_label.setHtml(
                     "<p>Unable to load announcements. Please check your internet connection.</p>" # noqa
                 )
 
-            welcome_dialog.raise_()
-            welcome_dialog.activateWindow()
-            welcome_dialog.exec()
+            announcement_dialog.raise_()
+            announcement_dialog.activateWindow()
+            announcement_dialog.exec()
 
         except Exception as e:
-            print(f"Error displaying welcome window: {e}")
+            print(f"Error displaying announcement window: {e}")

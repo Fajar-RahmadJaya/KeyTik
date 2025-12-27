@@ -1,11 +1,10 @@
 import os
 import keyboard
 import ctypes
-import time
 from pynput import mouse
-from PySide6.QtWidgets import (QMessageBox)
+from PySide6.QtWidgets import (QMessageBox, QPushButton)
 from PySide6.QtCore import QTimer, Signal, QObject, QEvent
-from utility.constant import (interception_install_path)
+from utility.constant import (interception_install_path, changes_key)
 
 
 class InputBlocker(QObject):
@@ -20,7 +19,7 @@ class InputBlocker(QObject):
         return False
 
 
-class EditScriptLogic(QObject):
+class EditProfileLogic(QObject):
     request_timer_start = Signal(object)
 
     def __init__(self):
@@ -173,14 +172,13 @@ class EditScriptLogic(QObject):
                     self._window_blocker = InputBlocker()
                 self.edit_window.installEventFilter(self._window_blocker)
 
-            self.ignore_next_click = True
             toggle_other_buttons(False)
 
             button.clicked.disconnect()
             button.clicked.connect(lambda: self.key_listening
                                    (entry_widget, button))
 
-            self.currently_pressed_keys = []
+            self.pressed_keys = []
             self.last_combination = ""
             self.release_timer = QTimer()
             self.release_timer.setSingleShot(True)
@@ -193,6 +191,7 @@ class EditScriptLogic(QObject):
         else:
             self.is_listening = False
             self.active_entry = None
+            self.pressed_keys = []
 
             entries_to_enable = []
             if hasattr(self, 'script_name_entry'):
@@ -245,21 +244,25 @@ class EditScriptLogic(QObject):
         else:
             key = event.name
 
+        key_lower = key.lower()
+        if key_lower in changes_key:
+            key = changes_key[key_lower]
+
         if (len(key) == 1 and key.isupper() and key.isalpha()):
             key = key.lower()
 
         if event.event_type == "down":
-            if key not in self.currently_pressed_keys:
-                self.currently_pressed_keys.append(key)
+            if key not in self.pressed_keys:
+                self.pressed_keys.append(key)
                 self.update_widget(entry_widget)
             if (hasattr(self, "release_timer")
                     and self.release_timer.isActive()):
                 self.release_timer.stop()
 
         elif event.event_type == "up":
-            if key in self.currently_pressed_keys:
-                self.currently_pressed_keys.remove(key)
-                if not self.currently_pressed_keys:
+            if key in self.pressed_keys:
+                self.pressed_keys.remove(key)
+                if not self.pressed_keys:
                     self.key_listening(entry_widget, button)
                     self.request_timer_start.emit(entry_widget)
 
@@ -267,51 +270,39 @@ class EditScriptLogic(QObject):
                     if hasattr(self, "release_timer"):
                         self.request_timer_start.emit(entry_widget)
 
-    def mouse_listening(self, x, y, button, pressed):
-        if self.is_listening and self.active_entry:
-            if pressed:
-                if self.ignore_next_click and button == mouse.Button.left:
-                    self.ignore_next_click = False
+    def mouse_listening(self, x, y, button, pressed, injected=None):
+        if not (self.is_listening and self.active_entry):
+            return
+
+        if pressed and hasattr(self, "edit_window"):
+            widget = self.edit_window.childAt(
+                self.edit_window.mapFromGlobal(
+                    self.edit_window.cursor().pos()))
+            while widget:
+                if isinstance(widget, QPushButton):
                     return
+                widget = widget.parent()
 
-                if button == mouse.Button.left:
-                    mouse_button = "Left Button"
-                elif button == mouse.Button.right:
-                    mouse_button = "Right Button"
-                elif button == mouse.Button.middle:
-                    mouse_button = "Middle Button"
-                else:
-                    mouse_button = button.name
+        button_map = {
+            mouse.Button.left: "Left Button",
+            mouse.Button.right: "Right Button",
+            mouse.Button.middle: "Middle Button"
+        }
+        mouse_button = button_map.get(button, getattr(
+            button, "name", str(button)))
 
-                current_time = time.time()
-
-                if current_time - self.last_key_time > self.timeout:
-                    self.pressed_keys = []
-
-                if mouse_button not in self.pressed_keys:
-                    self.pressed_keys.append(mouse_button)
-                    self.update_entry()
-
-                self.last_key_time = current_time
-
-            else:
-                if button == mouse.Button.left:
-                    mouse_button = "Left Button"
-                elif button == mouse.Button.right:
-                    mouse_button = "Right Button"
-                elif button == mouse.Button.middle:
-                    mouse_button = "Middle Button"
-                else:
-                    mouse_button = button.name
-
-                if mouse_button in self.pressed_keys:
-                    self.pressed_keys.remove(mouse_button)
-                    if not self.pressed_keys:
-                        self.key_listening(self.active_entry, None)
-                        self.request_timer_start.emit(self.active_entry)
-                    else:
-                        if hasattr(self, "release_timer"):
-                            self.request_timer_start.emit(self.active_entry)
+        if pressed:
+            if mouse_button not in self.pressed_keys:
+                self.pressed_keys.append(mouse_button)
+                self.update_widget(self.active_entry)
+        else:
+            if mouse_button in self.pressed_keys:
+                self.pressed_keys.remove(mouse_button)
+                if not self.pressed_keys:
+                    self.key_listening(self.active_entry, None)
+                    self.request_timer_start.emit(self.active_entry)
+                elif hasattr(self, "release_timer"):
+                    self.request_timer_start.emit(self.active_entry)
 
     def release_timer(self, entry_widget):
         if hasattr(self, "release_timer"):
@@ -330,13 +321,13 @@ class EditScriptLogic(QObject):
         return ' + '.join(format_key(k) for k in keys)
 
     def update_widget(self, entry_widget):
-        combo = self.format_key_combo(self.currently_pressed_keys)
+        combo = self.format_key_combo(self.pressed_keys)
         entry_widget.setText(combo)
         self.last_combination = combo
 
     def finalize_combination(self, entry_widget):
         entry_widget.setText(self.last_combination)
-        self.currently_pressed_keys = set()
+        self.pressed_keys = []
 
     def disable_input(self, entry_rows):
         if not hasattr(self, "_input_blocker"):
@@ -352,6 +343,3 @@ class EditScriptLogic(QObject):
                 entry = entry_tuple[0]
                 if entry is not None:
                     entry.removeEventFilter(self._input_blocker)
-
-    def replace_raw_keys(self, key, key_map):
-        return key_map.get(key, key)

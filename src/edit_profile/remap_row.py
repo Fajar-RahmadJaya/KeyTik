@@ -8,7 +8,7 @@ from utility.utils import theme
 from utility.icon import (get_icon, icon_search, icon_arrow)
 
 
-class EditFrameRow:
+class RemapRow:
     def remap_row(self, default_key='', remap_key='', insert_after=None,
                   is_text_format=False, is_hold_format=False,
                   hold_interval=""):
@@ -103,6 +103,12 @@ class EditFrameRow:
         options_layout = QHBoxLayout(options_widget)
         options_layout.setContentsMargins(0, 5, 0, 0)
 
+        first_key_checkbox = QCheckBox("Disable First Key", options_widget)
+        first_key_checkbox.setToolTip(
+            "Default Key Only: Check this to disable the first key when using multiple keys.\n"  # noqa
+        )
+        options_layout.addWidget(first_key_checkbox)
+
         sc_checkbox = QCheckBox("Use Scan Code", options_widget)
         sc_checkbox.setObjectName("sc_checkbox")
         sc_checkbox.setToolTip(
@@ -110,13 +116,11 @@ class EditFrameRow:
             "Scan Code is the hardware coordinate of the key, use this if the key is not detected or missing from the list." # noqa
         )
         options_layout.addWidget(sc_checkbox)
-        options_layout.addSpacing(20)
 
         text_format_checkbox = QCheckBox("Text Format", options_widget)
         text_format_checkbox.setChecked(is_text_format)
         text_format_checkbox.setToolTip("Remap Key Only: Check this to send the actual text instead of a key") # noqa
         options_layout.addWidget(text_format_checkbox)
-        options_layout.addSpacing(20)
 
         hold_format_checkbox = QCheckBox("Hold Format", options_widget)
         hold_format_checkbox.setChecked(is_hold_format)
@@ -141,7 +145,7 @@ class EditFrameRow:
         self.key_rows.append((default_key_entry, remap_key_entry,
                               default_key_select, remap_key_select,
                               text_format_checkbox, hold_format_checkbox,
-                              hold_interval_entry))
+                              hold_interval_entry, first_key_checkbox))
 
         card_frame = QFrame(self.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)

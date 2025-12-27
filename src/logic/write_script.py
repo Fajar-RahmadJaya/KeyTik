@@ -2,6 +2,7 @@ import os
 import json
 import random
 import traceback
+import re
 from PySide6.QtWidgets import (QMessageBox)
 from PySide6.QtGui import QIcon
 from utility.constant import (exit_keys_file, icon_path)
@@ -224,18 +225,17 @@ class WriteScript:
         program_condition = ""
 
         if program_entry:
-            program_parts = program_entry.split(",")
+            pattern = r"\[(Tittle|Class|Process),\s*([^\]]+)\]"
+            matches = re.findall(pattern, program_entry)
             conditions = []
-
-            for part in program_parts:
-                part = part.strip()
-                if part.lower().startswith("process"):
-                    process_name = part.split("-")[1].strip()
-                    conditions.append(f'WinActive("ahk_exe {process_name}")')
-                elif part.lower().startswith("class"):
-                    class_name = part.split("-")[1].strip()
-                    conditions.append(f'WinActive("ahk_class {class_name}")')
-
+            for typ, value in matches:
+                value = value.strip()
+                if typ.lower() == "process":
+                    conditions.append(f'WinActive("ahk_exe {value}")')
+                elif typ.lower() == "class":
+                    conditions.append(f'WinActive("ahk_class {value}")')
+                elif typ.lower() == "tittle":
+                    conditions.append(f'WinActive("{value}")')
             program_condition = " || ".join(conditions)
 
         return program_condition
@@ -313,6 +313,7 @@ class WriteScript:
             hotif_conditions.append(device_condition)
 
         if hotif_conditions:
+            file.write("SetTitleMatchMode 2\n")
             file.write(f"#HotIf {' && '.join(hotif_conditions)}\n")
             return True
         return False
@@ -355,7 +356,11 @@ class WriteScript:
 
     def process_key_remaps(self, file, key_translations):
         for row in self.key_rows:
-            if len(row) >= 7:
+            if len(row) >= 8:
+                (default_key_entry, remap_key_entry, _,
+                 _, text_format_var, hold_format_var,
+                 hold_interval_entry, first_key_checkbox) = row
+            else:
                 (default_key_entry, remap_key_entry, _,
                  _, text_format_var, hold_format_var,
                  hold_interval_entry) = row
@@ -380,7 +385,8 @@ class WriteScript:
                         )
                         continue
                     default_translated = self.write_multiple_key_default(
-                        file, default_key, key_translations)
+                        file, default_key, key_translations,
+                        first_key_checkbox)
 
                 else:
                     default_translated = self.write_single_key_default(
@@ -429,9 +435,13 @@ class WriteScript:
             remap_key_tr = self.translate_key(remap_key, key_translations)
             file.write(f'{default_translated}::{remap_key_tr}\n')
 
-    def write_multiple_key_default(self, file, default_key, key_translations):
-        translated_key = "~" + self.translate_key(
-            default_key, key_translations)
+    def write_multiple_key_default(self, file, default_key, key_translations,
+                                   first_key_checkbox=None):
+        if first_key_checkbox is not None and first_key_checkbox.isChecked():
+            translated_key = self.translate_key(default_key, key_translations)
+        else:
+            translated_key = "~" + self.translate_key(default_key,
+                                                      key_translations)
         return translated_key
 
     def write_multiple_key_remap(self, file, default_translated, remap_key,

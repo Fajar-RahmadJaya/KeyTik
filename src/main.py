@@ -28,24 +28,26 @@ from utility.icon import (get_icon, icon_pin, icon_pin_fill,
                           icon_next, icon_prev, icon_setting, icon_import,
                           icon_on_top, icon_on_top_fill, icon_show_stored,
                           icon_show_stored_fill, icon_edit)
-from logic.logic import Logic
-from ui.setting import Setting
-from ui.welcome import Welcome
 
-from ui.edit_script.edit_script_main import EditScriptMain
-from ui.edit_script.select_program import SelectProgram
-from ui.edit_script.select_device import SelectDevice
-from ui.edit_script.edit_frame_row import EditFrameRow
-from ui.edit_script.edit_script_logic import EditScriptLogic
-from ui.edit_script.write_script import WriteScript
-from ui.edit_script.parse_script import ParseScript
-from ui.edit_script.choose_key import ChooseKey
+from logic.main_logic import MainLogic
+from logic.write_script import WriteScript
+from logic.parse_script import ParseScript
+
+from setting.setting import Setting
+from setting.announcement import Announcement
+
+from edit_profile.edit_profile_main import EditProfileMain
+from edit_profile.select_program import SelectProgram
+from edit_profile.select_device import SelectDevice
+from edit_profile.remap_row import RemapRow
+from edit_profile.edit_profile_logic import EditProfileLogic
+from edit_profile.choose_key import ChooseKey
 
 
 class StartupWorker(QThread):
     finished = Signal()
     update_found = Signal(str)
-    show_welcome = Signal()
+    show_announcement = Signal()
 
     def __init__(self, main_window):
         super().__init__()
@@ -59,8 +61,8 @@ class StartupWorker(QThread):
             self.update_found.emit(latest_version)
         self.finished.emit()
 
-        if self.main_window.welcome_condition:
-            self.show_welcome.emit()
+        if self.main_window.announcement_condition:
+            self.show_announcement.emit()
 
         if not hasattr(self.main_window, "keyboard_hook_initialized"):
             keyboard.hook(lambda event: self.main_window.multi_key_event(
@@ -72,19 +74,17 @@ class StartupWorker(QThread):
             self.main_window.keyboard_hook_initialized = True
 
 
-class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
-              Setting, Welcome, SelectProgram, SelectDevice,
-              EditScriptLogic, WriteScript, ParseScript, ChooseKey):
+class MainApp(QMainWindow, MainLogic, RemapRow, EditProfileMain,
+              Setting, Announcement, SelectProgram, SelectDevice,
+              EditProfileLogic, WriteScript, ParseScript, ChooseKey):
     def __init__(self):
         super().__init__()
         # Key Listening
         self.is_listening = False
         self.active_entry = None
-        # Mouse Listening
-        self.last_key_time = 0
-        self.timeout = 1
         self.pressed_keys = []
-        self.ignore_next_click = False
+        # Variable
+        self.row_num = 0
 
         # UI initialization
         self.check_ahk_installation(show_installed_message=False)
@@ -100,7 +100,7 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.setFixedSize(650, 492)
         self.setWindowIcon(QIcon(icon_path))
         self.setCentralWidget(self.central_widget)
-        self.welcome_condition = self.load_welcome_condition()
+        self.announcement_condition = self.load_announcement_condition()
         self.font_fallback()
 
     def create_ui(self):
@@ -568,11 +568,11 @@ class MainApp(QMainWindow, Logic, EditFrameRow, EditScriptMain,
         self.list_scripts()
         self.update_script_list()
 
-    def show_welcome_window(self):
+    def show_announcement_window(self):
         try:
-            Welcome.show_welcome_window(self)
+            Announcement.show_announcement_window(self)
         except Exception as e:
-            print(f"Error displaying welcome window: {e}")
+            print(f"Error displaying announcement window: {e}")
 
     def check_for_update(self):
         try:
@@ -645,8 +645,8 @@ def main():
     main_window.startup_worker = StartupWorker(main_window)
     main_window.startup_worker.update_found.connect(
         main_window.show_update_messagebox)
-    main_window.startup_worker.show_welcome.connect(
-        main_window.show_welcome_window)
+    main_window.startup_worker.show_announcement.connect(
+        main_window.show_announcement_window)
     main_window.startup_worker.start()
 
     sys.exit(app.exec())

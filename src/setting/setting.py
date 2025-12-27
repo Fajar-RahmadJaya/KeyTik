@@ -66,7 +66,7 @@ class Setting:
 
         readme_button = QPushButton("Announcement")
         readme_button.setFixedHeight(40)
-        readme_button.clicked.connect(self.show_welcome_window)
+        readme_button.clicked.connect(self.show_announcement_window)
         group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
         group_layout.setRowStretch(0, 1)

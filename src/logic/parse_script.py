@@ -32,10 +32,16 @@ class ParseScript:
                 for match in matches:
                     program_type, program_name = match
                     if program_type == "exe":
-                        programs.append(f"Process - {program_name}")
+                        programs.append(f"[Process, {program_name}]")
                     elif program_type == "class":
-                        programs.append(f"Class - {program_name}")
-        return ", ".join(programs)
+                        programs.append(f"[Class, {program_name}]")
+                tittle_matches = re.findall(
+                    r'WinActive\("([^"]+)"\)', line)
+                for tittle in tittle_matches:
+                    if (not (tittle.startswith("ahk_exe ")
+                             or tittle.startswith("ahk_class "))):
+                        programs.append(f"[Tittle, {tittle}]")
+        return " ".join(programs)
 
     def parse_shortcuts(self, lines, key_map):
         shortcuts = []
@@ -53,13 +59,18 @@ class ParseScript:
                 elif '!GetKeyState("NumLock", "T")' in line:
                     shortcuts.append("NumLock OFF")
                 continue
-            if ":: ; Shortcuts" in line and not in_hotif_block:
+            if ":: ; Shortcuts" in line:
                 parts = line.split("::")
                 shortcuts_key = parts[0].strip()
-                shortcuts_key = (self.replace_raw_keys(shortcuts_key, key_map)
-                                 .replace("~", "")
-                                 .replace(" & ", "+")
-                                 .replace("*", ""))
+                shortcuts_key = shortcuts_key.replace("~", "").replace("*", "")
+                if " & " in shortcuts_key:
+                    keys = [k.strip() for k in shortcuts_key.split(" & ")]
+                    translated = [self.replace_raw_keys(
+                        k, key_map) for k in keys]
+                    shortcuts_key = " + ".join(translated)
+                else:
+                    shortcuts_key = self.replace_raw_keys(
+                        shortcuts_key, key_map)
                 shortcuts.append(shortcuts_key)
 
         return shortcuts
@@ -83,7 +94,8 @@ class ParseScript:
                 if line == "}":
                     in_block = False
                     block_text = " ".join(current_block)
-                    self.parse_double_click(default_key, block_text, remaps)
+                    self.parse_double_click(default_key, block_text,
+                                            remaps, key_map)
                     current_block = []
                     continue
 
@@ -103,10 +115,14 @@ class ParseScript:
         return shortcuts, remaps
 
     def parse_default_key(self, default_key, key_map):
-        return (self.replace_raw_keys(default_key, key_map)
-                .replace("~", "")
-                .replace(" & ", " + ")
-                .replace("*", ""))
+        key = default_key.replace("~", "").replace("*", "")
+        if " & " in key:
+            keys = [k.strip() for k in key.split(" & ")]
+            translated = [self.replace_raw_keys(k, key_map) for k in keys]
+            key = " + ".join(translated)
+        else:
+            key = self.replace_raw_keys(key, key_map)
+        return key
 
     def parse_remap_key(self, line, key_map, remaps):
         parts = line.split("::")
@@ -130,9 +146,12 @@ class ParseScript:
                 is_hold_format = True
             elif (remap_or_action.startswith('Send') or
                   remap_or_action.startswith('SendInput')):
-                remap_key = self.parse_send_remap(remap_or_action, default_key)
+                remap_key = self.parse_send_remap(
+                    remap_or_action, default_key, key_map)
             else:
                 remap_key = remap_or_action
+
+            remap_key = self.replace_raw_keys(remap_key, key_map)
 
             remaps.append((default_key, remap_key, is_text_format,
                            is_hold_format, hold_interval))
@@ -163,7 +182,7 @@ class ParseScript:
 
         return remap_key, hold_interval
 
-    def parse_send_remap(self, remap_or_action, default_key):
+    def parse_send_remap(self, remap_or_action, default_key, key_map):
         if remap_or_action.startswith("SendInput("):
             key_sequence = remap_or_action[len("SendInput("):-1]
         elif remap_or_action.startswith("Send("):
@@ -181,11 +200,11 @@ class ParseScript:
                 key = match[0]
                 if key not in seen_keys:
                     seen_keys.add(key)
-                    keys.append(key)
+                    keys.append(self.replace_raw_keys(key, key_map))
             remap_key = " + ".join(keys)
         else:
             remap_key = key_sequence.strip('"{}"')
-
+            remap_key = self.replace_raw_keys(remap_key, key_map)
         return remap_key
 
     def parse_text_format(self, block_text):
@@ -195,7 +214,7 @@ class ParseScript:
             remap_key = text_match.group(1)
         return remap_key
 
-    def parse_double_click(self, default_key, block_text, remaps):
+    def parse_double_click(self, default_key, block_text, remaps, key_map):
         is_text_format = False
         is_hold_format = False
         hold_interval = "10"
@@ -216,10 +235,51 @@ class ParseScript:
                     r'Send(?:Input)?\("(.+?)"\)', block_text)
                 if send_match:
                     remap_key = self.parse_send_remap(
-                        send_match.group(0), default_key)
+                        send_match.group(0), default_key,
+                        key_map)
                 else:
                     remap_key = ""
 
         remaps.append((f"{default_key} + {default_key}",
                        remap_key, is_text_format,
                        is_hold_format, hold_interval))
+
+    def replace_raw_keys(self, key, key_map):
+        return key_map.get(key, key)
+    
+    def parse_device_info(self, file_path):
+        devices = []
+        try:
+            with open(file_path, 'r') as file:
+                lines = file.readlines()
+
+            lines = [line.strip() for line in lines if line.strip()]
+
+            device_info = {}
+            for line in lines:
+                line = line.strip()
+                if line.startswith("Device ID"):
+                    if device_info:
+                        if (device_info.get('VID') and
+                                device_info.get('PID') and
+                                device_info.get('Handle')):
+                            devices.append(device_info)
+                    device_info = {'Device ID': line.split(":")[1].strip()}
+                elif line.startswith("VID:"):
+                    device_info['VID'] = line.split(":")[1].strip()
+                elif line.startswith("PID:"):
+                    device_info['PID'] = line.split(":")[1].strip()
+                elif line.startswith("Handle:"):
+                    device_info['Handle'] = line.split(":")[1].strip()
+                elif line.startswith("Is Mouse:"):
+                    device_info['Is Mouse'] = line.split(":")[1].strip()
+
+            if (device_info.get('VID') and
+                    device_info.get('PID') and
+                    device_info.get('Handle')):
+                devices.append(device_info)
+
+        except Exception as e:
+            print(f"Error reading device info: {e}")
+
+        return devices

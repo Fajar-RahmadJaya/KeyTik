@@ -7,7 +7,7 @@ import json
 from utility.constant import (script_dir, keylist_path)
 
 
-class Logic:
+class MainLogic:
     def list_scripts(self):
         all_scripts = [f for f in os.listdir(self.SCRIPT_DIR)
                        if f.endswith('.ahk') or f.endswith('.py')]
@@ -66,43 +66,6 @@ class Logic:
 
         except Exception as e:
             print(f"Error removing {shortcut_path}: {e}")
-
-    def parse_device_info(self, file_path):
-        devices = []
-        try:
-            with open(file_path, 'r') as file:
-                lines = file.readlines()
-
-            lines = [line.strip() for line in lines if line.strip()]
-
-            device_info = {}
-            for line in lines:
-                line = line.strip()
-                if line.startswith("Device ID"):
-                    if device_info:
-                        if (device_info.get('VID') and
-                                device_info.get('PID') and
-                                device_info.get('Handle')):
-                            devices.append(device_info)
-                    device_info = {'Device ID': line.split(":")[1].strip()}
-                elif line.startswith("VID:"):
-                    device_info['VID'] = line.split(":")[1].strip()
-                elif line.startswith("PID:"):
-                    device_info['PID'] = line.split(":")[1].strip()
-                elif line.startswith("Handle:"):
-                    device_info['Handle'] = line.split(":")[1].strip()
-                elif line.startswith("Is Mouse:"):
-                    device_info['Is Mouse'] = line.split(":")[1].strip()
-
-            if (device_info.get('VID') and
-                    device_info.get('PID') and
-                    device_info.get('Handle')):
-                devices.append(device_info)
-
-        except Exception as e:
-            print(f"Error reading device info: {e}")
-
-        return devices
 
     def is_visible_application(self, pid):
         try:

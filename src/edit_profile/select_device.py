@@ -2,7 +2,7 @@ import os
 import time
 from PySide6.QtWidgets import (
     QDialog, QPushButton,
-    QVBoxLayout, QHBoxLayout, QMessageBox, QTreeWidget, QTreeWidgetItem
+    QVBoxLayout, QHBoxLayout, QTreeWidget, QTreeWidgetItem
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
@@ -33,15 +33,7 @@ class SelectDevice:
             self.device_selection_window.raise_()
             return
 
-        parent_window = (self.create_profile_window
-                         if self.create_profile_window
-                         and self.create_profile_window.isVisible()
-                         else self.edit_window)
-        if not parent_window or not parent_window.isVisible():
-            QMessageBox.critical(self, "Error", "Parent window no longer exists.") # noqa
-            return
-
-        self.device_selection_window = QDialog(parent_window)
+        self.device_selection_window = QDialog(self.edit_window)
         self.device_selection_window.setWindowTitle("Select Device")
         self.device_selection_window.setWindowIcon(QIcon(icon_path))
         self.device_selection_window.setFixedSize(600, 300)

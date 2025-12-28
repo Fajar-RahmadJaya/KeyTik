@@ -7,9 +7,10 @@ from PySide6.QtWidgets import (QMessageBox)
 from PySide6.QtGui import QIcon
 from utility.constant import (exit_keys_file, icon_path)
 from utility.utils import (active_dir, store_dir)
+from utility.diff import Diff
 
 
-class WriteScript:
+class WriteScript(Diff):
     def generate_exit_key(self, script_name, file=None):
         possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', # noqa
                         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] # noqa
@@ -195,23 +196,12 @@ class WriteScript:
                                         num_off_present):
             return
 
-        output_path = os.path.join(self.SCRIPT_DIR, script_name)
-        key_translations = self.load_key_translations()
-
         try:
             mode = None
             if hasattr(self, "mode_combobox"):
                 mode = self.mode_combobox.currentText().strip().lower()
             self.is_text_mode = (mode == "text mode")
-
-            with open(output_path, 'w', encoding='utf-8') as file:
-                if mode == "text mode":
-                    self.handle_text_mode(file, key_translations)
-                elif mode == "default mode":
-                    self.handle_default_mode(file, key_translations)
-                else:
-                    self.handle_default_mode(file, key_translations)
-
+            self.handle_write(script_name, mode)
             self.scripts = self.list_scripts()
             self.update_script_list()
             self.edit_window.destroy()

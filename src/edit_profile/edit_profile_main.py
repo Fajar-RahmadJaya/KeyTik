@@ -1,14 +1,15 @@
 import os
 from PySide6.QtWidgets import (
-    QWidget, QDialog, QLabel, QLineEdit, QPushButton, QTextEdit, QScrollArea,
+    QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
     QVBoxLayout, QSpacerItem, QSizePolicy, QComboBox, QGridLayout
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from utility.constant import (icon_path)
+from utility.diff import (Diff, mode_item, mode_map)
 
 
-class EditProfileMain:
+class EditProfileMain(Diff):
     def edit_script(self, script_name):
         self.shortcut_row_widgets = []
         self.mapping_row_widgets = []
@@ -29,8 +30,6 @@ class EditProfileMain:
                 return
 
         first_line = lines[0].strip()
-        key_map = self.load_key_list()
-        mode_line = lines[0].strip() if lines else "; default"
 
         self.edit_window = QDialog(self)
         if is_new_profile:
@@ -109,60 +108,7 @@ class EditProfileMain:
         self.key_rows = []
         self.shortcut_rows = []
 
-        shortcuts = []
-        remaps = []
-
-        if mode_line == "; default":
-            shortcuts, remaps = self.parse_default_mode(lines, key_map)
-
-            self.shortcut_title()
-
-            if not shortcuts:
-                self.shortcut_row()
-            else:
-                for shortcut in shortcuts:
-                    self.shortcut_row(shortcut)
-
-            self.remap_title()
-
-            if not remaps:
-                self.remap_row()
-            else:
-                for (default_key, remap_key, is_text_format,
-                     is_hold_format, hold_interval) in remaps:
-                    self.remap_row(
-                        default_key,
-                        remap_key,
-                        is_text_format=is_text_format,
-                        is_hold_format=is_hold_format,
-                        hold_interval=hold_interval
-                    )
-
-            self.update_plus_visibility('shortcut')
-            self.update_plus_visibility('remap')
-
-        elif mode_line == "; text":
-            self.is_text_mode = True
-            self.text_block = QTextEdit(self.edit_frame)
-            self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
-            self.text_block.setFixedHeight(14 * self.fontMetrics().height())
-            self.text_block.setFontPointSize(10)
-            self.edit_frame_layout.addWidget(self.text_block)
-
-            shortcuts = self.parse_shortcuts(lines, key_map)
-
-            self.row_num += 1
-
-            text_content = self.extract_and_filter_content(lines)
-            self.text_block.setPlainText(text_content.strip())
-
-            if not shortcuts:
-                self.shortcut_row()
-            else:
-                for shortcut in shortcuts:
-                    self.shortcut_row(shortcut)
-
-            self.update_plus_visibility('shortcut')
+        self.handle_parser(lines, first_line)
 
         self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum,
                                                    QSizePolicy.Expanding))
@@ -177,10 +123,7 @@ class EditProfileMain:
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
-        mode_combobox.addItems([
-            "Default Mode",
-            "Text Mode",
-        ])
+        mode_combobox.addItems(mode_item)
         mode_combobox.setEditable(True)
         mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         mode_combobox.lineEdit().setReadOnly(True)
@@ -191,10 +134,7 @@ class EditProfileMain:
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
         first_line_lower = first_line.lower()
-        mode_map = {
-            "; default": 0,
-            "; text": 1,
-        }
+
         default_index = mode_map.get(first_line_lower, 0)
         mode_combobox.setCurrentIndex(default_index)
 
@@ -203,37 +143,3 @@ class EditProfileMain:
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()
-
-    def handle_mode_changed(self, index):
-        while self.edit_frame_layout.count():
-            item = self.edit_frame_layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.setParent(None)
-
-        self.key_rows = []
-        self.shortcut_rows = []
-        if hasattr(self, "files_opener_rows"):
-            self.files_opener_rows = []
-        if hasattr(self, "files_opener_row_widgets"):
-            self.files_opener_row_widgets = []
-        if hasattr(self, "text_block"):
-            self.text_block = None
-        self.is_text_mode = False
-
-        if index == 0:
-            self.is_text_mode = False
-            self.shortcut_title()
-            self.shortcut_row()
-            self.remap_title()
-            self.remap_row()
-            self.edit_frame_layout.addItem(QSpacerItem(20, 40,
-                                           QSizePolicy.Minimum,
-                                           QSizePolicy.Expanding))
-        elif index == 1:
-            self.is_text_mode = True
-            self.shortcut_title()
-            self.shortcut_row()
-            self.edit_frame_layout.addItem(QSpacerItem(20, 40,
-                                           QSizePolicy.Minimum,
-                                           QSizePolicy.Expanding))

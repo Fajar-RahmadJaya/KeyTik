@@ -4,7 +4,6 @@ import webbrowser
 import sys
 import winshell
 import json
-import requests
 import keyboard
 import pynput
 from PySide6.QtWidgets import (
@@ -17,7 +16,7 @@ from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import QFont, QFontDatabase
 from pynput.keyboard import Controller, Key
-from utility.constant import (icon_path, exit_keys_file, current_version)
+from utility.constant import (icon_path, exit_keys_file)
 from utility.utils import (load_pinned_profiles, active_dir, store_dir,
                            save_pinned_profiles, read_running_scripts_temp,
                            add_script_to_temp, remove_script_from_temp,
@@ -28,6 +27,7 @@ from utility.icon import (get_icon, icon_pin, icon_pin_fill,
                           icon_next, icon_prev, icon_setting, icon_import,
                           icon_on_top, icon_on_top_fill, icon_show_stored,
                           icon_show_stored_fill, icon_edit)
+from utility.diff import (program_name, Diff)
 
 from logic.main_logic import MainLogic
 from logic.write_script import WriteScript
@@ -44,7 +44,7 @@ from edit_profile.edit_profile_logic import EditProfileLogic
 from edit_profile.choose_key import ChooseKey
 
 
-class StartupWorker(QThread):
+class StartupWorker(QThread, Diff):
     finished = Signal()
     update_found = Signal(str)
     show_announcement = Signal()
@@ -96,12 +96,14 @@ class MainApp(QMainWindow, MainLogic, RemapRow, EditProfileMain,
         self.scripts = self.list_scripts()
         self.create_ui()
         self.update_script_list()
-        self.setWindowTitle("KeyTik")
+        self.setWindowTitle(program_name)
         self.setFixedSize(650, 492)
         self.setWindowIcon(QIcon(icon_path))
         self.setCentralWidget(self.central_widget)
         self.announcement_condition = self.load_announcement_condition()
         self.font_fallback()
+
+        # Diff initialization
 
     def create_ui(self):
         self.frame = QFrame()
@@ -573,27 +575,6 @@ class MainApp(QMainWindow, MainLogic, RemapRow, EditProfileMain,
             Announcement.show_announcement_window(self)
         except Exception as e:
             print(f"Error displaying announcement window: {e}")
-
-    def check_for_update(self):
-        try:
-            response = requests.get("https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest", timeout=5) # noqa
-            if response.status_code == 200:
-                release_data = response.json()
-                latest_version = release_data.get("tag_name")
-                if current_version != latest_version:
-                    return latest_version
-        except Exception:
-            pass
-        return None
-
-    def show_update_messagebox(self, latest_version):
-        reply = QMessageBox.question(
-            self, "Update Available",
-            f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?", # noqa
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-        if reply == QMessageBox.StandardButton.Yes:
-            webbrowser.open("https://github.com/Fajar-RahmadJaya/KeyTik/releases") # noqa
 
     def check_ahk_installation(self, show_installed_message=False):
         if os.path.exists(ahkv2_dir):

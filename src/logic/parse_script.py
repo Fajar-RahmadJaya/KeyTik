@@ -246,7 +246,7 @@ class ParseScript:
 
     def replace_raw_keys(self, key, key_map):
         return key_map.get(key, key)
-    
+
     def parse_device_info(self, file_path):
         devices = []
         try:

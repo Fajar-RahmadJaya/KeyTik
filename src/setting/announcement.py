@@ -9,9 +9,10 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 from utility.constant import (icon_path, dont_show_path, announcement_cache)
+from utility.diff import Diff
 
 
-class Announcement:
+class Announcement(Diff):
     def load_announcement_condition(self):
         try:
             if os.path.exists(dont_show_path):
@@ -33,18 +34,7 @@ class Announcement:
     def show_announcement_window(self):
         try:
             self.announcement_files = []
-            i = 1
-            while True:
-                url = f"https://keytik.com/normal-md/{i}.txt"
-                try:
-                    response = requests.get(url, timeout=5)
-                    if response.status_code == 404:
-                        break
-                    response.raise_for_status()
-                    self.announcement_files.append(url)
-                    i += 1
-                except Exception:
-                    break
+            self.loop_announcefile()
             self.current_announcement_index = 0
 
             announcement_dialog = QDialog(self)
@@ -140,7 +130,7 @@ class Announcement:
 
             def next_doc():
                 if self.current_announcement_index < len(
-                      self.announcement_files) - 1:
+                       self.announcement_files) - 1:
                     self.current_announcement_index += 1
                     load_content(self.current_announcement_index)
                     update_buttons()
@@ -155,15 +145,15 @@ class Announcement:
             next_button.clicked.connect(next_doc)
 
             def toggle_dont_show():
-                self.announcement_condition = not (
-                    dont_show_checkbox.isChecked())
+                self.announcement_condition = (
+                    not dont_show_checkbox.isChecked())
                 self.save_announcement_condition()
 
             dont_show_checkbox.stateChanged.connect(toggle_dont_show)
 
             def on_dialog_close(event):
-                self.announcement_condition = not (
-                    dont_show_checkbox.isChecked())
+                self.announcement_condition = (
+                    not dont_show_checkbox.isChecked())
                 self.save_announcement_condition()
                 event.accept()
             announcement_dialog.closeEvent = on_dialog_close

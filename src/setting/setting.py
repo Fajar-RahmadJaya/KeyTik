@@ -15,9 +15,10 @@ from utility.constant import (icon_path, condition_path, theme_path,
                               interception_uninstall_path)
 from utility.utils import (active_dir, store_dir, ahkv2_dir, # noqa
                            ahk_uninstall_path)
+from utility.diff import Diff
 
 
-class Setting:
+class Setting(Diff):
     def open_settings_window(self):
         settings_window = QDialog(self)
         settings_window.setWindowTitle("Settings")
@@ -129,21 +130,6 @@ class Setting:
         except Exception as e:
             print(f"An error occurred: {e}")
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
-
-    def update_messagebox(self, latest_version, show_no_update_message=False): # noqa
-        if latest_version:
-            reply = QMessageBox.question(
-                self, "Update Available",
-                f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?", # noqa
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No # noqa
-            )
-            if reply == QMessageBox.StandardButton.Yes:
-                webbrowser.open("https://github.com/Fajar-RahmadJaya/KeyTik/releases") # noqa
-        else:
-            if show_no_update_message:
-                QMessageBox.information(
-                    self, "Check For Update",
-                    "You are using the latest version of KeyTik.")
 
     def check_update_and_show_messagebox(self):
         latest_version = self.check_for_update()

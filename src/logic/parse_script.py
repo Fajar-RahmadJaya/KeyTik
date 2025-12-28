@@ -129,17 +129,23 @@ class ParseScript:
         default_key = parts[0].strip()
         remap_or_action = parts[1].strip() if len(parts) > 1 else ""
 
-        default_key = self.parse_default_key(default_key, key_map)
+        defaults_key = self.parse_default_key(default_key, key_map)
 
         if remap_or_action:
             is_text_format = False
             is_hold_format = False
+            is_first_key = False
+            is_sc = False
             remap_key = ""
             hold_interval = "10"
 
             if remap_or_action.startswith('SendText'):
                 remap_key = self.parse_text_format(remap_or_action)
                 is_text_format = True
+            if not default_key.startswith('~') and '&' in default_key:
+                is_first_key = True
+            if default_key.startswith('SC') or default_key.startswith('~SC'):
+                is_sc = True
             elif 'SetTimer' in remap_or_action:
                 remap_key, hold_interval = self.parse_hold_format(
                     remap_or_action, default_key)
@@ -153,8 +159,8 @@ class ParseScript:
 
             remap_key = self.replace_raw_keys(remap_key, key_map)
 
-            remaps.append((default_key, remap_key, is_text_format,
-                           is_hold_format, hold_interval))
+            remaps.append((defaults_key, remap_key, is_text_format,
+                           is_hold_format, hold_interval, is_first_key, is_sc))
 
     def get_unicode(self, text):
         def chr_replacer(match):

@@ -69,13 +69,16 @@ class Diff():
                 self.remap_row()
             else:
                 for (default_key, remap_key, is_text_format,
-                        is_hold_format, hold_interval) in remaps:
+                        is_hold_format, hold_interval, is_first_key,
+                        is_sc) in remaps:
                     self.remap_row(
                         default_key,
                         remap_key,
                         is_text_format=is_text_format,
                         is_hold_format=is_hold_format,
-                        hold_interval=hold_interval
+                        hold_interval=hold_interval,
+                        is_first_key=is_first_key,
+                        is_sc=is_sc
                     )
 
             self.update_plus_visibility('shortcut')

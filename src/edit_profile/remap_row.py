@@ -11,7 +11,7 @@ from utility.icon import (get_icon, icon_search, icon_arrow)
 class RemapRow:
     def remap_row(self, default_key='', remap_key='', insert_after=None,
                   is_text_format=False, is_hold_format=False,
-                  hold_interval=""):
+                  hold_interval="", is_first_key=False, is_sc=False):
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
             self.edit_frame.setLayout(self.edit_frame_layout)
@@ -107,6 +107,7 @@ class RemapRow:
         first_key_checkbox.setToolTip(
             "Default Key Only: Check this to disable the first key when using multiple keys.\n"  # noqa
         )
+        first_key_checkbox.setChecked(is_first_key)
         options_layout.addWidget(first_key_checkbox)
 
         sc_checkbox = QCheckBox("Use Scan Code", options_widget)
@@ -115,6 +116,7 @@ class RemapRow:
             "Default Key Only: Check this to make the Select button use Scan Code (SC) instead.\n" # noqa
             "Scan Code is the hardware coordinate of the key, use this if the key is not detected or missing from the list." # noqa
         )
+        sc_checkbox.setChecked(is_sc)
         options_layout.addWidget(sc_checkbox)
 
         text_format_checkbox = QCheckBox("Text Format", options_widget)

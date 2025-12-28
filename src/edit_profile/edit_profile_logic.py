@@ -92,7 +92,7 @@ class EditProfileLogic(QObject):
         def toggle_other_buttons(state):
             if hasattr(self, 'key_rows'):
                 for key_row in self.key_rows:
-                    (_, _, orig_button, remap_button, _, _, _) = key_row
+                    (_, _, orig_button, remap_button, _, _, _, _) = key_row
 
                     if orig_button != button and orig_button is not None:
                         orig_button.setEnabled(state)
@@ -121,7 +121,7 @@ class EditProfileLogic(QObject):
             self.use_scan_code = False
             if hasattr(self, 'key_rows'):
                 for key_row in self.key_rows:
-                    (orig_entry, remap_entry, orig_button, _, _, _,
+                    (orig_entry, remap_entry, orig_button, _, _, _, _,
                      hold_interval_entry) = key_row
 
                     if button == orig_button:
@@ -148,7 +148,7 @@ class EditProfileLogic(QObject):
             if hasattr(self, 'key_rows'):
                 for key_row in self.key_rows:
                     (
-                        orig_entry, remap_entry, _, _, _, _,
+                        orig_entry, remap_entry, _, _, _, _, _,
                         hold_interval_entry
                     ) = key_row
                     entries_to_disable.append((orig_entry, None))
@@ -206,7 +206,7 @@ class EditProfileLogic(QObject):
             if hasattr(self, 'key_rows'):
                 for key_row in self.key_rows:
                     (
-                        orig_entry, remap_entry, _, _, _, _,
+                        orig_entry, remap_entry, _, _, _, _, _,
                         hold_interval_entry
                     ) = key_row
                     entries_to_enable.append((orig_entry, None))

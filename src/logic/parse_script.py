@@ -112,6 +112,7 @@ class ParseScript:
                     not in line):
                 self.parse_remap_key(line, key_map, remaps)
 
+        print(remaps)
         return shortcuts, remaps
 
     def parse_default_key(self, default_key, key_map):
@@ -130,6 +131,7 @@ class ParseScript:
         remap_or_action = parts[1].strip() if len(parts) > 1 else ""
 
         defaults_key = self.parse_default_key(default_key, key_map)
+        print(default_key)
 
         if remap_or_action:
             is_text_format = False
@@ -139,13 +141,15 @@ class ParseScript:
             remap_key = ""
             hold_interval = "10"
 
+            if not default_key.startswith('~') and '&' in default_key:
+                is_first_key = True
+
+            if default_key.startswith('SC') or default_key.startswith('~SC'):
+                is_sc = True
+
             if remap_or_action.startswith('SendText'):
                 remap_key = self.parse_text_format(remap_or_action)
                 is_text_format = True
-            if not default_key.startswith('~') and '&' in default_key:
-                is_first_key = True
-            if default_key.startswith('SC') or default_key.startswith('~SC'):
-                is_sc = True
             elif 'SetTimer' in remap_or_action:
                 remap_key, hold_interval = self.parse_hold_format(
                     remap_or_action, default_key)

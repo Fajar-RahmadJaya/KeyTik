@@ -16,7 +16,7 @@ from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import QFont, QFontDatabase
 from pynput.keyboard import Controller, Key
-from utility.constant import (icon_path, exit_keys_file)
+from utility.constant import (icon_path, exit_keys_file, ahi_dir)
 from utility.utils import (load_pinned_profiles, active_dir, store_dir,
                            save_pinned_profiles, read_running_scripts_temp,
                            add_script_to_temp, remove_script_from_temp,
@@ -102,6 +102,7 @@ class MainApp(QMainWindow, MainLogic, RemapRow, EditProfileMain,
         self.setCentralWidget(self.central_widget)
         self.announcement_condition = self.load_announcement_condition()
         self.font_fallback()
+        self.check_ahi_dir()
 
         # Diff initialization
 
@@ -611,6 +612,31 @@ class MainApp(QMainWindow, MainLogic, RemapRow, EditProfileMain,
                                                  font_name)
 
         QApplication.setFont(fallback_font)
+
+    def check_ahi_dir(self):
+        target_folder = os.path.join(active_dir, 'AutoHotkey Interception')
+
+        def get_all_relative_paths(base_dir):
+            rel_paths = set()
+            for root, dirs, files in os.walk(base_dir):
+                for name in files:
+                    rel_path = os.path.relpath(os.path.join(root, name),
+                                               base_dir)
+                    rel_paths.add(rel_path)
+                for name in dirs:
+                    rel_path = os.path.relpath(os.path.join(root, name),
+                                               base_dir)
+                    rel_paths.add(rel_path)
+            return rel_paths
+
+        ahi_paths = get_all_relative_paths(ahi_dir)
+        target_paths = get_all_relative_paths(target_folder)
+
+        if (not ahi_paths.issubset(target_paths) or
+                not os.path.isdir(target_folder)):
+            if os.path.exists(target_folder):
+                shutil.rmtree(target_folder)
+            shutil.copytree(ahi_dir, target_folder)
 
 
 def main():

@@ -99,14 +99,14 @@ class Setting(Diff):
             new_store_dir = os.path.join(new_path, 'Store')
 
             if os.path.exists(active_dir):
-                shutil.move(active_dir, new_active_dir)
-                print(f"Moved Active folder to {new_active_dir}")
+                shutil.move(active_dir, new_path)
+                print(f"Moved Active folder to {new_path}")
             else:
                 print(f"Active folder does not exist at {active_dir}")
 
             if os.path.exists(store_dir):
-                shutil.move(store_dir, new_store_dir)
-                print(f"Moved Store folder to {new_store_dir}")
+                shutil.move(store_dir, new_path)
+                print(f"Moved Store folder to {new_path}")
             else:
                 print(f"Store folder does not exist at {store_dir}")
 

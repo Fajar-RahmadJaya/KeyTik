@@ -17,7 +17,7 @@ from utility.constant import (icon_path, exit_keys_file, ahi_dir)
 from utility.utils import (load_pinned_profiles, active_dir, store_dir,
                            save_pinned_profiles, read_running_scripts_temp,
                            add_script_to_temp, remove_script_from_temp,
-                           theme, ahkv2_dir)
+                           ahkv2_dir)
 from utility.icon import (get_icon, icon_pin, icon_pin_fill,
                           icon_rocket, icon_rocket_fill, icon_exit, icon_run,
                           icon_copy, icon_delete, icon_store, icon_plus,

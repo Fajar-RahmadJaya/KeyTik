@@ -34,16 +34,11 @@ from setting.setting import Setting
 from setting.announcement import Announcement
 
 from edit_profile.edit_profile_main import EditProfileMain
-from edit_profile.select_program import SelectProgram
-from edit_profile.select_device import SelectDevice
-from edit_profile.remap_row import RemapRow
-from edit_profile.edit_profile_logic import EditProfileLogic
-from edit_profile.choose_key import ChooseKey
 
 
-class MainApp(QMainWindow, MainLogic, RemapRow, EditProfileMain,
-              Setting, Announcement, SelectProgram, SelectDevice,
-              EditProfileLogic, WriteScript, ParseScript, ChooseKey):
+
+class MainApp(QMainWindow, MainLogic, EditProfileMain,
+              Setting, Announcement, WriteScript, ParseScript):
     def __init__(self):
         super().__init__()
         # Key Listening

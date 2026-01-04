@@ -5,11 +5,17 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
+
 from utility.constant import (icon_path)
 from utility.diff import (Diff, mode_item, mode_map)
+from edit_profile.select_program import SelectProgram
+from edit_profile.select_device import SelectDevice
+from edit_profile.remap_row import RemapRow
+from edit_profile.edit_profile_logic import EditProfileLogic
+from edit_profile.choose_key import ChooseKey
 
 
-class EditProfileMain(Diff):
+class EditProfileMain(Diff, RemapRow, SelectProgram, SelectDevice, EditProfileLogic, ChooseKey):
     def edit_script(self, script_name):
         self.shortcut_row_widgets = []
         self.mapping_row_widgets = []

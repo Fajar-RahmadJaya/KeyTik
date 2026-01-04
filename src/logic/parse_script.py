@@ -112,7 +112,6 @@ class ParseScript:
                     not in line):
                 self.parse_remap_key(line, key_map, remaps)
 
-        print(remaps)
         return shortcuts, remaps
 
     def parse_default_key(self, default_key, key_map):
@@ -131,7 +130,6 @@ class ParseScript:
         remap_or_action = parts[1].strip() if len(parts) > 1 else ""
 
         defaults_key = self.parse_default_key(default_key, key_map)
-        print(default_key)
 
         if remap_or_action:
             is_text_format = False

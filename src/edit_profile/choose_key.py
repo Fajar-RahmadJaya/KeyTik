@@ -88,7 +88,7 @@ class ChooseKey:
         main_layout.addLayout(choose_search_layout)
 
         filter_button = QPushButton()
-        filter_button.setIcon(icons.get_icon(icons.icon_filter))
+        filter_button.setIcon(icons.get_icon(icons.filter))
         choose_search_layout.addWidget(filter_button)
 
         search_entry = QLineEdit()
@@ -302,7 +302,7 @@ class ChooseKey:
                             child_item.setCheckState(0, Qt.Unchecked)
                         description = child_info.get("description", "")
                         if description:
-                            child_item.setIcon(1, QIcon(icons.icon_question))
+                            child_item.setIcon(1, QIcon(icons.question))
                             child_item.setToolTip(1, description)
                         parent_item.addChild(child_item)
                     parent_item.setExpanded(True)
@@ -364,7 +364,7 @@ class ChooseKey:
                         child_item.setCheckState(0, Qt.Unchecked)
                     description = info.get("description", "")
                     if description:
-                        child_item.setIcon(1, QIcon(icons.icon_question))
+                        child_item.setIcon(1, QIcon(icons.question))
                         child_item.setToolTip(1, description)
                     parent_item.addChild(child_item)
                 parent_item.setExpanded(True)
@@ -399,7 +399,7 @@ class ChooseKey:
                         child_item.setCheckState(0, Qt.Unchecked)
                     description = info.get("description", "")
                     if description:
-                        child_item.setIcon(1, QIcon(icons.icon_question))
+                        child_item.setIcon(1, QIcon(icons.question))
                         child_item.setToolTip(1, description)
                     item.addChild(child_item)
             item.setExpanded(True)

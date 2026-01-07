@@ -3,14 +3,13 @@ import json
 import tempfile
 import sys
 import winreg
-from utility.constant import (appdata_dir, pinned_file, condition_path,
-                              theme_path)
+import utility.constant as constant
 
 
 def load_condition():
     try:
-        if os.path.exists(condition_path):
-            with open(condition_path, "r") as f:
+        if os.path.exists(constant.condition_path):
+            with open(constant.condition_path, "r") as f:
                 content = f.read().strip()
                 if content:
                     data = json.loads(content)
@@ -33,8 +32,8 @@ if path_from_condition:
     store_dir = os.path.join(path_from_condition, 'Store')
 else:
 
-    active_dir = os.path.join(appdata_dir, 'Active')
-    store_dir = os.path.join(appdata_dir, 'Store')
+    active_dir = os.path.join(constant.appdata_dir, 'Active')
+    store_dir = os.path.join(constant.appdata_dir, 'Store')
 
 
 if not os.path.exists(active_dir):
@@ -49,8 +48,8 @@ SCRIPT_DIR = active_dir
 
 def load_pinned_profiles():
     try:
-        if os.path.exists(pinned_file):
-            with open(pinned_file, "r") as f:
+        if os.path.exists(constant.pinned_file):
+            with open(constant.pinned_file, "r") as f:
                 content = f.read().strip()
                 if content:
                     data = json.loads(content)
@@ -66,21 +65,21 @@ def load_pinned_profiles():
 
 
 def save_pinned_profiles(pinned_profiles):
-    with open(pinned_file, "w") as f:
+    with open(constant.pinned_file, "w") as f:
         json.dump(pinned_profiles, f)
 
 
-if not os.path.exists(appdata_dir):
-    os.makedirs(appdata_dir)
+if not os.path.exists(constant.appdata_dir):
+    os.makedirs(constant.appdata_dir)
 
 
-if not os.path.exists(condition_path):
-    with open(condition_path, "w") as f:
+if not os.path.exists(constant.condition_path):
+    with open(constant.condition_path, "w") as f:
         json.dump({"path": ""}, f)
 
 
-if not os.path.exists(pinned_file):
-    with open(pinned_file, "w") as f:
+if not os.path.exists(constant.pinned_file):
+    with open(constant.pinned_file, "w") as f:
         json.dump([
             "Multiple Files Opener.ahk",
             "Take Coordinate And Copy It For Screen Clicker.ahk",
@@ -145,8 +144,8 @@ def detect_system_theme():
 
 def get_theme():
     try:
-        if os.path.exists(theme_path):
-            with open(theme_path, 'r') as f:
+        if os.path.exists(constant.theme_path):
+            with open(constant.theme_path, 'r') as f:
                 theme = f.read().strip().lower()
             if theme in ("dark", "light"):
                 return theme

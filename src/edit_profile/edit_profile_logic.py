@@ -4,7 +4,7 @@ import ctypes
 from pynput import mouse
 from PySide6.QtWidgets import (QMessageBox, QPushButton)
 from PySide6.QtCore import QTimer, Signal, QObject, QEvent
-from utility.constant import (interception_install_path, changes_key)
+import utility.constant as constant
 
 
 class InputBlocker(QObject):
@@ -42,16 +42,16 @@ class EditProfileLogic(QObject):
 
             if reply == QMessageBox.StandardButton.Yes:
                 try:
-                    if os.path.exists(interception_install_path):
+                    if os.path.exists(constant.interception_install_path):
 
                         install_dir = (os.path.dirname
-                                       (interception_install_path))
+                                       (constant.interception_install_path))
 
                         ctypes.windll.shell32.ShellExecuteW(
                             None,
                             "runas",
                             "cmd.exe",
-                            f"/k cd /d {install_dir} && {os.path.basename(interception_install_path)}", # noqa
+                            f"/k cd /d {install_dir} && {os.path.basename(constant.interception_install_path)}", # noqa
                             None,
                             1
                         )
@@ -245,8 +245,8 @@ class EditProfileLogic(QObject):
             key = event.name
 
         key_lower = key.lower()
-        if key_lower in changes_key:
-            key = changes_key[key_lower]
+        if key_lower in constant.changes_key:
+            key = constant.changes_key[key_lower]
 
         if (len(key) == 1 and key.isupper() and key.isalpha()):
             key = key.lower()

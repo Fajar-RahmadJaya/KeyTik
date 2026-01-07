@@ -5,8 +5,8 @@ import traceback
 import re
 from PySide6.QtWidgets import (QMessageBox)
 from PySide6.QtGui import QIcon
-from utility.constant import (exit_keys_file, icon_path)
-from utility.utils import (active_dir, store_dir)
+import utility.constant as constant
+import utility.utils as utils
 from utility.diff import Diff
 
 
@@ -16,9 +16,9 @@ class WriteScript(Diff):
                         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] # noqa
 
         try:
-            if os.path.exists(exit_keys_file):
+            if os.path.exists(constant.exit_keys_file):
                 try:
-                    with open(exit_keys_file, 'r', encoding='utf-8') as f:
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
                         exit_keys = json.load(f)
                 except json.JSONDecodeError:
                     exit_keys = {}
@@ -34,7 +34,7 @@ class WriteScript(Diff):
             exit_combo = f"^!{random.choice(available_keys)}"
 
             exit_keys[script_name] = exit_combo
-            with open(exit_keys_file, 'w', encoding='utf-8') as f:
+            with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
                 json.dump(exit_keys, f)
 
             if file is not None:
@@ -51,16 +51,16 @@ class WriteScript(Diff):
     def initialize_exit_keys(self):
         try:
             ahk_files = set()
-            for dir_path in [active_dir, store_dir]:
+            for dir_path in [utils.active_dir, utils.store_dir]:
                 if os.path.exists(dir_path):
                     ahk_files.update(
                         f for f in os.listdir(dir_path) if f.endswith('.ahk')
                     )
 
             exit_keys = {}
-            if os.path.exists(exit_keys_file):
+            if os.path.exists(constant.exit_keys_file):
                 try:
-                    with open(exit_keys_file, 'r', encoding='utf-8') as f:
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
                         exit_keys = json.load(f)
                 except Exception:
                     exit_keys = {}
@@ -106,7 +106,7 @@ class WriteScript(Diff):
                     exit_keys[script_name] = f"^!{new_key}"
                 exit_combo = exit_keys[script_name]
 
-                for dir_path in [active_dir, store_dir]:
+                for dir_path in [utils.active_dir, utils.store_dir]:
                     script_path = os.path.join(dir_path, script_name)
                     if os.path.exists(script_path):
                         try:
@@ -122,7 +122,7 @@ class WriteScript(Diff):
                             continue
 
             try:
-                with open(exit_keys_file, 'w', encoding='utf-8') as f:
+                with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
                     json.dump(exit_keys, f)
             except Exception as e:
                 print(f"Error saving exit_keys.json: {e}")
@@ -135,30 +135,30 @@ class WriteScript(Diff):
             msg = (QMessageBox(self.edit_window
                                if hasattr(self, "edit_window")
                                else None))
-            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText("You cannot use 'CapsLock On' or 'CapsLock Off' or 'NumLock On' or 'Numlock Off' together with normal keys as shortcuts. Please use only one type (either normal keys or CapsLock NumLock ON/OFF) for all shortcuts.") # noqa
-            msg.setWindowIcon(QIcon(icon_path))
+            msg.setWindowIcon(QIcon(constant.icon_path))
             msg.exec()
             return False
         if caps_on_present and caps_off_present:
             msg = (QMessageBox(self.edit_window
                                if hasattr(self, "edit_window")
                                else None))
-            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText("You cannot use both 'CapsLock ON' and 'CapsLock OFF' at the same time. Please use only one of of them. If you need both, just use 'Caps Lock'.") # noqa
-            msg.setWindowIcon(QIcon(icon_path))
+            msg.setWindowIcon(QIcon(constant.icon_path))
             msg.exec()
             return False
         if num_on_present and num_off_present:
             msg = (QMessageBox(self.edit_window
                                if hasattr(self, "edit_window")
                                else None))
-            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText("You cannot use both 'NumLock ON' and 'NumLock OFF' at the same time. Please use only one of of them. If you need both, just use 'Caps Lock'.") # noqa
-            msg.setWindowIcon(QIcon(icon_path))
+            msg.setWindowIcon(QIcon(constant.icon_path))
             msg.exec()
             return False
         return True

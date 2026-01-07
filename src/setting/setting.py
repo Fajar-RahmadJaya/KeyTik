@@ -10,11 +10,8 @@ import webbrowser
 import json
 import subprocess
 import ctypes
-from utility.constant import (icon_path, condition_path, theme_path,
-                              driver_path, interception_install_path,
-                              interception_uninstall_path)
-from utility.utils import (active_dir, store_dir, ahkv2_dir, # noqa
-                           ahk_uninstall_path)
+import utility.constant as constant
+import utility.utils as utils
 from utility.diff import Diff
 
 
@@ -23,7 +20,7 @@ class Setting(Diff):
         settings_window = QDialog(self)
         settings_window.setWindowTitle("Settings")
         settings_window.setFixedSize(400, 250)
-        settings_window.setWindowIcon(QIcon(icon_path))
+        settings_window.setWindowIcon(QIcon(constant.icon_path))
         settings_window.setModal(True)
         settings_window.setWindowFlag(
             Qt.WindowType.WindowStaysOnTopHint,
@@ -111,7 +108,7 @@ class Setting(Diff):
                 print(f"Store folder does not exist at {store_dir}")
 
             new_condition_data = {"path": new_path}
-            with open(condition_path, 'w') as f:
+            with open(constant.condition_path, 'w') as f:
                 json.dump(new_condition_data, f)
             print(f"Updated condition.json with the new path: {new_path}")
 
@@ -153,8 +150,8 @@ class Setting(Diff):
 
     def read_theme(self):
         try:
-            if os.path.exists(theme_path):
-                with open(theme_path, 'r') as f:
+            if os.path.exists(constant.theme_path):
+                with open(constant.theme_path, 'r') as f:
                     theme = f.read().strip().lower()
                 if theme in ("dark", "light"):
                     return theme
@@ -164,7 +161,7 @@ class Setting(Diff):
 
     def save_theme(self, theme):
         try:
-            with open(theme_path, 'w') as f:
+            with open(constant.theme_path, 'w') as f:
                 if theme == "system":
                     f.write("")
                 else:
@@ -175,7 +172,7 @@ class Setting(Diff):
     def show_installation_dialog(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Installation Manager")
-        dialog.setWindowIcon(QIcon(icon_path))
+        dialog.setWindowIcon(QIcon(constant.icon_path))
         dialog.setFixedSize(380, 180)
         layout = QVBoxLayout(dialog)
         layout.setContentsMargins(20, 20, 20, 20)
@@ -186,7 +183,7 @@ class Setting(Diff):
 
         ahk_vbox = QVBoxLayout()
         ahk_checkbox = QCheckBox("AutoHotkey", dialog)
-        ahk_installed = os.path.exists(ahkv2_dir)
+        ahk_installed = os.path.exists(utils.ahkv2_dir)
         ahk_checkbox.setChecked(ahk_installed)
         ahk_checkbox.setEnabled(False)
         ahk_button = QPushButton(dialog)
@@ -200,7 +197,7 @@ class Setting(Diff):
 
         driver_vbox = QVBoxLayout()
         driver_checkbox = QCheckBox("Interception Driver", dialog)
-        driver_installed = os.path.exists(driver_path)
+        driver_installed = os.path.exists(constant.driver_path)
         driver_checkbox.setChecked(driver_installed)
         driver_checkbox.setEnabled(False)
         driver_button = QPushButton(dialog)
@@ -220,7 +217,7 @@ class Setting(Diff):
         def ahk_action():
             if ahk_installed:
                 try:
-                    subprocess.Popen(ahk_uninstall_path, shell=True)
+                    subprocess.Popen(utils.ahk_uninstall_path, shell=True)
                 except Exception as e:
                     QMessageBox.critical(dialog, "Error", f"Failed to start uninstall: {e}") # noqa
             else:
@@ -231,11 +228,11 @@ class Setting(Diff):
                 if driver_installed:
                     ctypes.windll.shell32.ShellExecuteW(
                         None, "runas",
-                        interception_uninstall_path, None, None, 1
+                        constant.interception_uninstall_path, None, None, 1
                     )
                 else:
                     ctypes.windll.shell32.ShellExecuteW(
-                        None, "runas", interception_install_path, None, None, 1
+                        None, "runas", constant.interception_install_path, None, None, 1
                     )
             except Exception as e:
                 QMessageBox.critical(dialog, "Error", f"Failed to run driver installer/uninstaller: {e}") # noqa

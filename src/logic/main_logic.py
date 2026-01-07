@@ -4,7 +4,7 @@ from win32com.client import Dispatch
 import win32gui
 import win32process
 import json
-from utility.constant import (script_dir, keylist_path)
+import utility.constant as constant
 
 
 class MainLogic:
@@ -81,7 +81,7 @@ class MainLogic:
             return False
 
     def run_monitor(self):
-        script_path = os.path.join(script_dir, "_internal", "Data", "Active",
+        script_path = os.path.join(constant.script_dir, "_internal", "Data", "Active",
                                    "AutoHotkey Interception", "Monitor.ahk")
         if os.path.exists(script_path):
             os.startfile(script_path)
@@ -91,7 +91,7 @@ class MainLogic:
     def load_key_translations(self):
         key_translations = {}
         try:
-            with open(keylist_path, 'r', encoding='utf-8') as file:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 for category_dict in data:
                     for _, keys in category_dict.items():
@@ -119,7 +119,7 @@ class MainLogic:
     def load_key_list(self):
         key_map = {}
         try:
-            with open(keylist_path, 'r', encoding='utf-8') as file:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 for category_dict in data:
                     for _, keys in category_dict.items():
@@ -135,7 +135,7 @@ class MainLogic:
     def load_key_values(self):
         key_values = []
         try:
-            with open(keylist_path, 'r', encoding='utf-8') as file:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 for category_dict in data:
                     for _, keys in category_dict.items():

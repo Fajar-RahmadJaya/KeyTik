@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 
-from utility.constant import (icon_path)
+import utility.constant as constant
 from utility.diff import (Diff, mode_item, mode_map)
 from edit_profile.select_program import SelectProgram
 from edit_profile.select_device import SelectDevice
@@ -42,7 +42,7 @@ class EditProfileMain(Diff, RemapRow, SelectProgram, SelectDevice, EditProfileLo
             self.edit_window.setWindowTitle("Create New Profile")
         else:
             self.edit_window.setWindowTitle("Edit Profile")
-        self.edit_window.setWindowIcon(QIcon(icon_path))
+        self.edit_window.setWindowIcon(QIcon(constant.icon_path))
         self.edit_window.setFixedSize(600, 460)
 
         edit_layout = QGridLayout(self.edit_window)

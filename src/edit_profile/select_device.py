@@ -6,8 +6,8 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from utility.constant import (icon_path)
-from utility.utils import (device_list_path, device_finder_path)
+import utility.constant as constant
+import utility.utils as utils
 
 
 class SelectDevice:
@@ -35,7 +35,7 @@ class SelectDevice:
 
         self.device_selection_window = QDialog(self.edit_window)
         self.device_selection_window.setWindowTitle("Select Device")
-        self.device_selection_window.setWindowIcon(QIcon(icon_path))
+        self.device_selection_window.setWindowIcon(QIcon(constant.icon_path))
         self.device_selection_window.setFixedSize(600, 300)
         self.device_selection_window.setModal(True)
         self.device_selection_window.setAttribute(
@@ -66,10 +66,10 @@ class SelectDevice:
 
         refresh_button = QPushButton("Refresh", self.device_selection_window)
         refresh_button.clicked.connect(lambda: self.update_treeview(
-                self.refresh_device_list(device_list_path), self.device_tree))
+                self.refresh_device_list(utils.device_list_path), self.device_tree))
         button_layout.addWidget(refresh_button)
 
-        devices = self.refresh_device_list(device_list_path)
+        devices = self.refresh_device_list(utils.device_list_path)
         self.update_treeview(devices, self.device_tree)
 
         self.device_selection_window.exec()
@@ -91,7 +91,7 @@ class SelectDevice:
                 tree.addTopLevelItem(item)
 
     def refresh_device_list(self, file_path):
-        os.startfile(device_finder_path)
+        os.startfile(utils.device_finder_path)
         time.sleep(1)
         devices = self.parse_device_info(file_path)
         return devices

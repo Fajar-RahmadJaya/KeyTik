@@ -4,8 +4,8 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtSvgWidgets import QSvgWidget
-from utility.utils import theme
-from utility.icon import (get_icon, icon_search, icon_arrow)
+import utility.utils as utils
+import utility.icon as icons
 
 
 class RemapRow:
@@ -52,7 +52,7 @@ class RemapRow:
 
         default_key_choose = QPushButton(default_key_widget)
         default_key_choose.setFixedWidth(28)
-        default_key_choose.setIcon(get_icon(icon_search))
+        default_key_choose.setIcon(icons.get_icon(icons.icon_search))
         default_key_choose.setToolTip("Choose Default/Original key")
         default_key_choose.clicked.connect(
             lambda: self.choose_key(default_key_entry, context="default"))
@@ -61,7 +61,7 @@ class RemapRow:
         row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
 
         # Arrow Widget
-        arrow_icon = QSvgWidget(icon_arrow)
+        arrow_icon = QSvgWidget(icons.icon_arrow)
         arrow_icon.setFixedSize(32, 24)
         row_layout.addWidget(arrow_icon, 0, 2, 2, 1)
 
@@ -90,7 +90,7 @@ class RemapRow:
 
         remap_key_choose = QPushButton(remap_key_widget)
         remap_key_choose.setFixedWidth(28)
-        remap_key_choose.setIcon(get_icon(icon_search))
+        remap_key_choose.setIcon(icons.get_icon(icons.icon_search))
         remap_key_choose.setToolTip("Choose Remap key")
         remap_key_choose.clicked.connect(
             lambda: self.choose_key(remap_key_entry, context="remap"))
@@ -151,7 +151,7 @@ class RemapRow:
 
         card_frame = QFrame(self.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
-        if theme == "dark":
+        if utils.theme == "dark":
             card_frame.setStyleSheet("""
             QFrame {
                 background: #313131;
@@ -340,7 +340,7 @@ class RemapRow:
 
         shortcut_choose = QPushButton(shortcut_widget)
         shortcut_choose.setFixedWidth(28)
-        shortcut_choose.setIcon(get_icon(icon_search))
+        shortcut_choose.setIcon(icons.get_icon(icons.icon_search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
             lambda: self.choose_key(shortcut_entry, context="shortcut"))
@@ -350,7 +350,7 @@ class RemapRow:
 
         card_frame = QFrame(self.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
-        if theme == "dark":
+        if utils.theme == "dark":
             card_frame.setStyleSheet("""
             QFrame {
                 background: #313131;

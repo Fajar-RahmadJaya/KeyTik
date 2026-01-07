@@ -5,7 +5,7 @@ import webbrowser
 from PySide6.QtWidgets import (QMessageBox, QTextEdit, QSizePolicy,
                                QSpacerItem)
 
-from utility.constant import (current_version)
+import utility.constant as constant
 
 
 mode_item = [
@@ -30,7 +30,7 @@ class Diff():
             if response.status_code == 200:
                 release_data = response.json()
                 latest_version = release_data.get("tag_name")
-                if current_version != latest_version:
+                if constant.current_version != latest_version:
                     return latest_version
         except Exception:
             pass

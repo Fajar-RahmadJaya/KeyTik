@@ -8,15 +8,15 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
-from utility.constant import (icon_path, dont_show_path, announcement_cache)
+import utility.constant as constant
 from utility.diff import Diff
 
 
 class Announcement(Diff):
     def load_announcement_condition(self):
         try:
-            if os.path.exists(dont_show_path):
-                with open(dont_show_path, "r") as f:
+            if os.path.exists(constant.dont_show_path):
+                with open(constant.dont_show_path, "r") as f:
                     config = json.load(f)
                     return config.get("welcome_condition", True)
         except Exception as e:
@@ -25,7 +25,7 @@ class Announcement(Diff):
 
     def save_announcement_condition(self):
         try:
-            with open(dont_show_path, "w") as f:
+            with open(constant.dont_show_path, "w") as f:
                 json.dump({"welcome_condition":
                            self.announcement_condition}, f)
         except Exception as e:
@@ -40,7 +40,7 @@ class Announcement(Diff):
             announcement_dialog = QDialog(self)
             announcement_dialog.setWindowTitle("Announcement")
             announcement_dialog.setFixedSize(525, 290)
-            announcement_dialog.setWindowIcon(QIcon(icon_path))
+            announcement_dialog.setWindowIcon(QIcon(constant.icon_path))
             announcement_dialog.setModal(True)
             announcement_dialog.setWindowModality(
                 Qt.WindowModality.WindowModal)
@@ -102,13 +102,13 @@ class Announcement(Diff):
             def load_content(index):
                 try:
                     url = self.announcement_files[index]
-                    if url in announcement_cache:
-                        md_content = announcement_cache[url]
+                    if url in constant.announcement_cache:
+                        md_content = constant.announcement_cache[url]
                     else:
                         response = requests.get(url, timeout=5)
                         response.raise_for_status()
                         md_content = response.text
-                        announcement_cache[url] = md_content
+                        constant.announcement_cache[url] = md_content
                     html_content = markdown(md_content)
                     styling = """
                     <style>

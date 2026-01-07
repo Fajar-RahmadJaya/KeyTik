@@ -1,6 +1,6 @@
 import os
-from utility.utils import theme
-from utility.constant import script_dir
+import utility.utils as utils
+import utility.constant as constant
 from PySide6.QtGui import QIcon
 
 icon_cache = {}
@@ -12,11 +12,11 @@ def get_icon(path):
     return icon_cache[path]
 
 
-icon_dir = os.path.join(script_dir, '_internal', 'Data', 'icon')
-if theme == "dark":
-    icon_dir = os.path.join(script_dir, '_internal', 'Data', 'icon', 'dark')
+icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon')
+if utils.theme == "dark":
+    icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon', 'dark')
 else:
-    icon_dir = os.path.join(script_dir, '_internal', 'Data', 'icon', 'light')
+    icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon', 'light')
 
 # Profile Icon
 icon_run = os.path.join(icon_dir, "run.svg")

@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
-from utility.constant import (icon_path)
+import utility.constant as constant
 
 
 class SelectProgram:
@@ -39,7 +39,7 @@ class SelectProgram:
 
         self.select_program_window = QDialog(parent_window)
         self.select_program_window.setWindowTitle("Select Programs")
-        self.select_program_window.setWindowIcon(QIcon(icon_path))
+        self.select_program_window.setWindowIcon(QIcon(constant.icon_path))
         self.select_program_window.setFixedSize(600, 300)
         self.select_program_window.setModal(True)
         self.select_program_window.setAttribute(

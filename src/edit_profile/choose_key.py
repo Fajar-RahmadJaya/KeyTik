@@ -7,13 +7,13 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt, QPoint, QEvent
-from utility.constant import (icon_path, keylist_path, unicode_blocks)
-from utility.icon import (get_icon, icon_question, icon_filter)
+import utility.constant as constant
+import utility.icon as icons
 
 
 class ChooseKey:
     def get_unicode_block_range(self, block_name):
-        for start, end, name in unicode_blocks:
+        for start, end, name in constant.unicode_blocks:
             if name == block_name:
                 return start, end
         return None, None
@@ -39,7 +39,7 @@ class ChooseKey:
 
     def load_keylist(self):
         try:
-            with open(keylist_path, "r", encoding="utf-8") as f:
+            with open(constant.keylist_path, "r", encoding="utf-8") as f:
                 key_data = json.loads(f.read())
             if key_data and isinstance(key_data, list):
                 key_data = key_data[0]
@@ -55,9 +55,9 @@ class ChooseKey:
         self.expanded_unicode_blocks = []
 
         context_hide = {
-            "shortcut": {"ANSI Keys"} | set([b[2] for b in unicode_blocks]),
+            "shortcut": {"ANSI Keys"} | set([b[2] for b in constant.unicode_blocks]),
             "default": {"Shortcut Special", "ANSI Keys"}
-            | set([b[2] for b in unicode_blocks]),
+            | set([b[2] for b in constant.unicode_blocks]),
             "remap": {"Shortcut Special"}
         }
         hide_parents = set()
@@ -78,7 +78,7 @@ class ChooseKey:
 
         choose_key_window = QDialog(parent_window)
         choose_key_window.setWindowTitle("Choose Key")
-        choose_key_window.setWindowIcon(QIcon(icon_path))
+        choose_key_window.setWindowIcon(QIcon(constant.icon_path))
         choose_key_window.setFixedSize(400, 425)
 
         main_layout = QVBoxLayout(choose_key_window)
@@ -88,7 +88,7 @@ class ChooseKey:
         main_layout.addLayout(choose_search_layout)
 
         filter_button = QPushButton()
-        filter_button.setIcon(get_icon(icon_filter))
+        filter_button.setIcon(icons.get_icon(icons.icon_filter))
         choose_search_layout.addWidget(filter_button)
 
         search_entry = QLineEdit()
@@ -268,7 +268,7 @@ class ChooseKey:
                 continue
             parent_match = filter_text and filter_text in parent_name.lower()
             matching_children = []
-            if parent_name in [b[2] for b in unicode_blocks] and not children:
+            if parent_name in [b[2] for b in constant.unicode_blocks] and not children:
                 if not filter_text or parent_match:
                     parent_item = QTreeWidgetItem([parent_name, ""])
                     tree_widget.addTopLevelItem(parent_item)
@@ -302,7 +302,7 @@ class ChooseKey:
                             child_item.setCheckState(0, Qt.Unchecked)
                         description = child_info.get("description", "")
                         if description:
-                            child_item.setIcon(1, QIcon(icon_question))
+                            child_item.setIcon(1, QIcon(icons.icon_question))
                             child_item.setToolTip(1, description)
                         parent_item.addChild(child_item)
                     parent_item.setExpanded(True)
@@ -321,7 +321,7 @@ class ChooseKey:
 
         if unicode_search_enabled:
             unicode_matches = {}
-            for start, end, block_name in unicode_blocks:
+            for start, end, block_name in constant.unicode_blocks:
                 if block_name in hide_parents:
                     continue
                 for codepoint in range(start, end + 1):
@@ -364,7 +364,7 @@ class ChooseKey:
                         child_item.setCheckState(0, Qt.Unchecked)
                     description = info.get("description", "")
                     if description:
-                        child_item.setIcon(1, QIcon(icon_question))
+                        child_item.setIcon(1, QIcon(icons.icon_question))
                         child_item.setToolTip(1, description)
                     parent_item.addChild(child_item)
                 parent_item.setExpanded(True)
@@ -399,7 +399,7 @@ class ChooseKey:
                         child_item.setCheckState(0, Qt.Unchecked)
                     description = info.get("description", "")
                     if description:
-                        child_item.setIcon(1, QIcon(icon_question))
+                        child_item.setIcon(1, QIcon(icons.icon_question))
                         child_item.setToolTip(1, description)
                     item.addChild(child_item)
             item.setExpanded(True)

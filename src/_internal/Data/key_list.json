@@ -109,6 +109,10 @@
                 "translate": "Alt",
                 "description": ""
             }, 
+            "Alt gr":{
+                "translate": "<^>!",
+                "description": "AltGr (alternate graph, or alternate graphic)"
+            }, 
             "Left Alt":{
                 "translate": "LAlt",
                 "description": "Left Alt"

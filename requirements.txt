@@ -6,4 +6,4 @@ PySide6
 pywin32; platform_system == "Windows"
 requests
 winshell
-
+urllib3>=2.6.3

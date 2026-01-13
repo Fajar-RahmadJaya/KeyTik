@@ -24,14 +24,20 @@ class SelectDevice:
             window.accept()
 
     def open_device_selection(self):
+        # Make sure interception driver installed
         if not self.check_interception_driver():
             return
         self.device_selection_window = None
 
+        # Make device selection window on top of root
         if (self.device_selection_window
                 and self.device_selection_window.isVisible()):
             self.device_selection_window.raise_()
             return
+        
+        # Run device finder first
+        os.startfile(utils.device_finder_path)
+        time.sleep(1)
 
         self.device_selection_window = QDialog(self.edit_window)
         self.device_selection_window.setWindowTitle("Select Device")

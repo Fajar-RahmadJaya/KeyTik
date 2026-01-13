@@ -18,7 +18,7 @@ icon_path = os.path.join(data_dir, "icon.ico")
 keylist_path = os.path.join(data_dir, "key_list.json")
 interception_install_path = os.path.join(data_dir, "inter_install.bat")
 interception_uninstall_path = os.path.join(data_dir, "inter_uninstall.bat")
-driver_path = os.path.join(os.getenv('SystemRoot'), "System32", "drivers", "interception.sys") # noqa
+driver_path = r"C:\Windows\System32\drivers\keyboard.sys" # noqa
 
 # Cache
 announcement_cache = {}

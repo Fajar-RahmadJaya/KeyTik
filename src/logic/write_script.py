@@ -264,7 +264,7 @@ class WriteScript(Diff):
             file.write("Persistent\n")
             file.write("#include AutoHotkey Interception\\Lib\\AutoHotInterception.ahk\n\n") # noqa
             file.write("AHI := AutoHotInterception()\n")
-            file.write(f"id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, {vid_pid_or_handle})\n") # noqa
+            file.write(f'id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, "{vid_pid_or_handle}")\n') # noqa
             file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
             device_condition = "cm1.IsActive"
 

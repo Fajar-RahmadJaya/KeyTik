@@ -27,9 +27,7 @@ class EditProfileLogic(QObject):
         self.request_timer_start.connect(self.release_timer)
 
     def check_interception_driver(self):
-        driver_path = r"C:\Windows\System32\drivers\keyboard.sys"
-
-        if os.path.exists(driver_path):
+        if os.path.exists(constant.driver_path):
             return True
         else:
             reply = QMessageBox.question(

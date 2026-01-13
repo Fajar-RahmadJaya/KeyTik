@@ -23,6 +23,9 @@ mode_map = {
 program_name = "KeyTik"
 
 
+current_version = "v2.3.4"
+
+
 class Diff():
     def check_for_update(self):
         try:
@@ -30,7 +33,7 @@ class Diff():
             if response.status_code == 200:
                 release_data = response.json()
                 latest_version = release_data.get("tag_name")
-                if constant.current_version != latest_version:
+                if current_version != latest_version:
                     return latest_version
         except Exception:
             pass

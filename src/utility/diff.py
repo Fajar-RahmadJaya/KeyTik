@@ -23,7 +23,7 @@ mode_map = {
 program_name = "KeyTik"
 
 
-current_version = "v2.3.4"
+current_version = "v2.3.5"
 
 
 class Diff():

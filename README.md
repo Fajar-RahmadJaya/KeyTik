@@ -52,11 +52,6 @@ Pro version has additional features compared to the normal version while not ove
 <br>
 <details>
   <summary><b>Click to see more</b></div></summary>
-  
-  ## KeyTik Pro v4.3.3 Update
-  **Changelog**:
-  - Bug fixes
-  - Add disable first key feature
 
   ## What You Get With the Pro Version
   On KeyTik Pro, you will get every feature on the normal version (see [Normal Version Features](/docs/introduction/features) for more) plus additional features. Below are the additional features on KeyTik Pro:

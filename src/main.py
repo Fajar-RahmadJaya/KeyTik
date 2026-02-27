@@ -3,9 +3,8 @@ import sys
 from PySide6.QtWidgets import (QApplication)
 
 import utility.utils as utils
-from logic.main_app import MainApp
+from ui.main_ui import MainUI
 import utility.thread as thread
-
 
 
 def main():
@@ -15,7 +14,7 @@ def main():
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
 
     app = QApplication(sys.argv)
-    main_window = MainApp()
+    main_window = MainUI()
     main_window.show()
 
     main_window.startup_worker = thread.Thread(main_window)

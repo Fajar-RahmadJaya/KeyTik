@@ -17,14 +17,14 @@ from logic.main_logic import MainLogic
 from logic.write_script import WriteScript
 from logic.parse_script import ParseScript
 
-from setting.setting import Setting
+from ui.setting_ui import SettingUI
 from setting.announcement import Announcement
 
 from edit_profile.edit_profile_main import EditProfileMain
 
 
 class MainUI(QMainWindow, MainLogic, EditProfileMain,
-             Setting, Announcement, WriteScript, ParseScript):
+             SettingUI, Announcement, WriteScript, ParseScript):
     def __init__(self):
         super().__init__()
         # Key Listening

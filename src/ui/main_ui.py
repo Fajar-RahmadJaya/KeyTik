@@ -18,7 +18,7 @@ from logic.write_script import WriteScript
 from logic.parse_script import ParseScript
 
 from ui.setting_ui import SettingUI
-from setting.announcement import Announcement
+from ui.announcement import Announcement
 
 from edit_profile.edit_profile_main import EditProfileMain
 

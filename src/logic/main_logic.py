@@ -19,7 +19,7 @@ from pynput.keyboard import Controller, Key
 import utility.utils as utils
 import utility.icon as icons
 
-from setting.announcement import Announcement
+from ui.announcement import Announcement
 
 
 class MainLogic:

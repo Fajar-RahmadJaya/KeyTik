@@ -13,9 +13,9 @@ import utility.utils as utils
 import utility.icon as icons
 import utility.diff as diff
 
-from logic.main_logic import MainLogic
-from logic.write_script import WriteScript
-from logic.parse_script import ParseScript
+from component.main_logic import MainLogic
+from component.write_script import WriteScript
+from component.parse_script import ParseScript
 
 from ui.setting_ui import SettingUI
 from ui.announcement import Announcement

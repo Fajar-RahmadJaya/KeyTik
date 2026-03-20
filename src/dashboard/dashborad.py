@@ -13,17 +13,17 @@ import utility.utils as utils
 import utility.icon as icons
 import utility.diff as diff
 
-from component.main_logic import MainLogic
-from component.write_script import WriteScript
-from component.parse_script import ParseScript
+from core.main_logic import MainLogic
+from core.write_script import WriteScript
+from core.parse_script import ParseScript
 
-from ui.setting_ui import SettingUI
-from ui.announcement import Announcement
+from setting.setting_ui import SettingUI
+from announcement.announcement import Announcement
 
 from edit_profile.edit_profile_main import EditProfileMain
 
 
-class MainUI(QMainWindow, MainLogic, EditProfileMain,
+class Dashboard(QMainWindow, MainLogic, EditProfileMain,
              SettingUI, Announcement, WriteScript, ParseScript):
     def __init__(self):
         super().__init__()

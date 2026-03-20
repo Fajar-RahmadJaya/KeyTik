@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 import utility.constant as constant
 
-from component.select_program_comp import SelectProgramComponent
+from select_program.select_program_comp import SelectProgramComponent
 
 
 class SelectProgramUI(SelectProgramComponent):

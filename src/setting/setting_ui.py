@@ -9,7 +9,7 @@ import webbrowser
 import utility.constant as constant
 import utility.utils as utils
 
-from component.setting_comp import SettingComponent
+from setting.setting_comp import SettingComponent
 
 
 class SettingUI(SettingComponent):

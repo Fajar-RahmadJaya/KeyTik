@@ -20,11 +20,11 @@ from core.parse_script import ParseScript
 from setting.setting_ui import SettingUI
 from announcement.announcement import Announcement
 
-from edit_profile.edit_profile_main import EditProfileMain
+from script_profile.profile_ui import ProfileUI
 
 
-class Dashboard(QMainWindow, MainLogic, EditProfileMain,
-             SettingUI, Announcement, WriteScript, ParseScript):
+class Dashboard(QMainWindow, MainLogic, ProfileUI,
+                SettingUI, Announcement, WriteScript, ParseScript):
     def __init__(self):
         super().__init__()
         # Key Listening

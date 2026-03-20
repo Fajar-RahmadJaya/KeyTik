@@ -18,7 +18,7 @@ class WriteScript(Diff):
         try:
             if os.path.exists(constant.exit_keys_file):
                 try:
-                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f: # noqa
                         exit_keys = json.load(f)
                 except json.JSONDecodeError:
                     exit_keys = {}
@@ -60,7 +60,7 @@ class WriteScript(Diff):
             exit_keys = {}
             if os.path.exists(constant.exit_keys_file):
                 try:
-                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f: # noqa
                         exit_keys = json.load(f)
                 except Exception:
                     exit_keys = {}

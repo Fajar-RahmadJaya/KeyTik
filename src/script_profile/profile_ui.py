@@ -8,14 +8,17 @@ from PySide6.QtGui import QIcon
 
 import utility.constant as constant
 from utility.diff import (Diff, mode_item, mode_map)
-from edit_profile.select_program import SelectProgram
-from edit_profile.select_device import SelectDevice
-from edit_profile.remap_row import RemapRow
-from edit_profile.edit_profile_logic import EditProfileLogic
-from edit_profile.choose_key import ChooseKey
+
+from select_program.select_program_ui import SelectProgramUI
+
+from select_device.select_device_ui import SelectDeviceUI
+from core.remap_row import RemapRow
+from script_profile.profile_comp import ProfileComponent
+from select_key.select_key_ui import SelectKeyUI
 
 
-class EditProfileMain(Diff, RemapRow, SelectProgram, SelectDevice, EditProfileLogic, ChooseKey):
+class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
+                ProfileComponent, SelectKeyUI):
     def edit_script(self, script_name):
         self.shortcut_row_widgets = []
         self.mapping_row_widgets = []

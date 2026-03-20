@@ -55,7 +55,7 @@ class RemapRow:
         default_key_choose.setIcon(icons.get_icon(icons.search))
         default_key_choose.setToolTip("Choose Default/Original key")
         default_key_choose.clicked.connect(
-            lambda: self.choose_key(default_key_entry, context="default"))
+            lambda: self.select_key(default_key_entry, context="default"))
         default_key_layout.addWidget(default_key_choose)
 
         row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
@@ -93,7 +93,7 @@ class RemapRow:
         remap_key_choose.setIcon(icons.get_icon(icons.search))
         remap_key_choose.setToolTip("Choose Remap key")
         remap_key_choose.clicked.connect(
-            lambda: self.choose_key(remap_key_entry, context="remap"))
+            lambda: self.select_key(remap_key_entry, context="remap"))
         remap_key_layout.addWidget(remap_key_choose)
 
         row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
@@ -332,7 +332,7 @@ class RemapRow:
         if shortcut:
             shortcut_entry.setText(shortcut)
         shortcut_entry.setFixedWidth(252)
-        shortcut_entry.setToolTip("Shortcut can be a single key, multiple keys, or shortcut specials (See choose key)") # noqa
+        shortcut_entry.setToolTip("Shortcut can be a single key, multiple keys, or shortcut specials (See select key)") # noqa
         shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.shortcut_entry = shortcut_entry
         self.shortcut_rows.append((shortcut_entry, shortcut_key_select))
@@ -343,7 +343,7 @@ class RemapRow:
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: self.choose_key(shortcut_entry, context="shortcut"))
+            lambda: self.select_key(shortcut_entry, context="shortcut"))
         shortcut_layout.addWidget(shortcut_choose)
 
         row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)

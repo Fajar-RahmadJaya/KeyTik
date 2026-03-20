@@ -19,7 +19,7 @@ class InputBlocker(QObject):
         return False
 
 
-class EditProfileLogic(QObject):
+class ProfileComponent(QObject):
     request_timer_start = Signal(object)
 
     def __init__(self):

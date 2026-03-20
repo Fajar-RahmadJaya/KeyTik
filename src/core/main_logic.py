@@ -1,273 +1,28 @@
 import os
+import winshell
+from win32com.client import Dispatch
+import win32gui
+import win32process
+import json
+import utility.constant as constant
+
 import shutil
 import webbrowser
-import winshell
-import json
 from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QGridLayout,
-    QFrame, QPushButton, QGroupBox, QFileDialog, QMessageBox,
-    QInputDialog, QLabel
+    QApplication, QFileDialog, QMessageBox,
+    QInputDialog
 )
-from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
-from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import QFont, QFontDatabase
 from pynput.keyboard import Controller, Key
 
-import utility.constant as constant
 import utility.utils as utils
 import utility.icon as icons
-import utility.diff as diff
 
-from logic.main_logic import MainLogic
-from logic.write_script import WriteScript
-from logic.parse_script import ParseScript
-
-from setting.setting import Setting
-from setting.announcement import Announcement
-
-from edit_profile.edit_profile_main import EditProfileMain
+from announcement.announcement import Announcement
 
 
-
-class MainApp(QMainWindow, MainLogic, EditProfileMain,
-              Setting, Announcement, WriteScript, ParseScript):
-    def __init__(self):
-        super().__init__()
-        # Key Listening
-        self.is_listening = False
-        self.active_entry = None
-        self.pressed_keys = []
-        # Variable
-        self.row_num = 0
-
-        # UI initialization
-        self.check_ahk_installation(show_installed_message=False)
-        self.central_widget = QWidget()
-        self.main_layout = QVBoxLayout(self.central_widget)
-        self.current_page = 0
-        self.SCRIPT_DIR = utils.active_dir
-        self.pinned_profiles = utils.load_pinned_profiles()
-        self.scripts = self.list_scripts()
-        self.create_ui()
-        self.update_script_list()
-        self.setWindowTitle(diff.program_name)
-        self.setFixedSize(650, 492)
-        self.setWindowIcon(QIcon(constant.icon_path))
-        self.setCentralWidget(self.central_widget)
-        self.announcement_condition = self.load_announcement_condition()
-        self.font_fallback()
-        self.check_ahi_dir()
-
-        # Diff initialization
-
-    def create_ui(self):
-        self.frame = QFrame()
-        self.main_layout.addWidget(self.frame)
-        self.frame_layout = QVBoxLayout(self.frame)
-
-        self.profile_frame = QFrame()
-        self.profile_layout = QGridLayout(self.profile_frame)
-        self.profile_layout.setContentsMargins(0, 0, 0, 10)
-        self.profile_frame.setFixedHeight(400)
-        self.profile_layout.setHorizontalSpacing(15)
-        self.profile_layout.setVerticalSpacing(10)
-        self.frame_layout.addWidget(self.profile_frame)
-
-        button_frame = QFrame()
-        button_layout = QGridLayout(button_frame)
-        button_layout.setContentsMargins(40, 20, 40, 10)
-
-        self.prev_button = QPushButton()
-        self.prev_button.setFixedWidth(80)
-        self.prev_button.setIcon(icons.get_icon(icons.prev))
-        self.prev_button.setToolTip("Previous Profile")
-        self.prev_button.clicked.connect(self.prev_page)
-        button_layout.addWidget(self.prev_button, 0, 0)
-
-        self.show_stored = QPushButton()
-        self.show_stored.setFixedWidth(30)
-        self.show_stored.setIcon(icons.get_icon(icons.show_stored))
-        self.show_stored.setToolTip("Show Stored Profile")
-        self.show_stored.clicked.connect(self.toggle_script_dir)
-        button_layout.addWidget(self.show_stored, 0, 1)
-
-        self.import_button = QPushButton()
-        self.import_button.setFixedWidth(30)
-        self.import_button.setIcon(icons.get_icon(icons.icon_import))
-        self.import_button.setToolTip("Import AutoHotkey Script")
-        self.import_button.clicked.connect(self.import_button_clicked)
-        button_layout.addWidget(self.import_button, 0, 2)
-
-        dummy_left = QLabel()
-        dummy_left.setFixedWidth(10)
-        button_layout.addWidget(dummy_left, 0, 3)
-
-        self.create_button = QPushButton(" Create New Profile")
-        self.create_button.setIcon(icons.get_icon(icons.plus))
-        self.create_button.setFixedWidth(150)
-        self.create_button.setFixedHeight(30)
-        self.create_button.clicked.connect(lambda: self.edit_script(None))
-        button_layout.addWidget(self.create_button, 0, 4)
-
-        dummy_right = QLabel()
-        dummy_right.setFixedWidth(10)
-        button_layout.addWidget(dummy_right, 0, 5)
-
-        self.always_top = QPushButton()
-        self.always_top.setFixedWidth(30)
-        self.always_top.setIcon(icons.get_icon(icons.on_top))
-        self.always_top.setToolTip("Enable  Window Always on Top")
-        self.always_top.clicked.connect(self.toggle_on_top)
-        button_layout.addWidget(self.always_top, 0, 6)
-
-        self.setting_button = QPushButton()
-        self.setting_button.setFixedWidth(30)
-        self.setting_button.setIcon(icons.get_icon(icons.setting))
-        self.setting_button.setToolTip("Setting")
-        self.setting_button.clicked.connect(self.open_settings_window)
-        button_layout.addWidget(self.setting_button, 0, 7)
-
-        self.next_button = QPushButton()
-        self.next_button.setFixedWidth(80)
-        self.next_button.setIcon(icons.get_icon(icons.next))
-        self.next_button.setToolTip("Next Profile")
-        self.next_button.clicked.connect(self.next_page)
-        button_layout.addWidget(self.next_button, 0, 8)
-
-        self.frame_layout.addWidget(button_frame)
-
-    def update_script_list(self):
-        for i in reversed(range(self.profile_layout.count())):
-            widget = self.profile_layout.itemAt(i).widget()
-            if widget:
-                widget.setParent(None)
-
-        start_index = self.current_page * 6
-        end_index = start_index + 6
-        scripts_to_display = self.scripts[start_index:end_index]
-
-        running_scripts = utils.read_running_scripts_temp()
-
-        for index, script in enumerate(scripts_to_display):
-            row = index // 2
-            column = index % 2
-            icon = (icons.pin_fill
-                    if script in self.pinned_profiles
-                    else icons.pin)
-
-            group_box = QGroupBox(os.path.splitext(script)[0])
-            group_layout = QGridLayout(group_box)
-
-            icon_label = QSvgWidget(icon, group_box)
-            icon_label.setFixedSize(17, 17)
-            icon_label.setToolTip(f'Pin "{os.path.splitext(script)[0]}"')
-            icon_label.setCursor(Qt.CursorShape.PointingHandCursor)
-            icon_label.mousePressEvent = (lambda event, s=script,
-                                          i=icon_label: self.toggle_pin(s, i))
-            icon_label.move(285, 3)
-
-            run_button = QPushButton()
-            run_button.setFixedWidth(80)
-
-            shortcut_name = os.path.splitext(script)[0] + ".lnk"
-            startup_folder = winshell.startup()
-            shortcut_path = os.path.join(startup_folder, shortcut_name)
-            is_startup = os.path.exists(shortcut_path)
-
-            if is_startup or script in running_scripts:
-                run_button.setText(" Exit")
-                run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
-                run_button.setIcon(icons.get_icon(icons.exit))
-            else:
-                run_button.setText(" Run")
-                run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
-                run_button.setIcon(icons.get_icon(icons.run))
-            run_button.clicked.connect(lambda checked, s=script, b=run_button:
-                                       self.toggle_run_exit(s, b))
-            group_layout.addWidget(run_button, 0, 0)
-
-            edit_button = QPushButton(" Edit")
-            edit_button.setIcon(icons.get_icon(icons.edit))
-            edit_button.setFixedWidth(80)
-            edit_button.setToolTip(f'Adjust "{os.path.splitext(script)[0]}"')
-
-            def handle_edit(checked=False, s=script, rb=run_button):
-                was_running = rb.text() == " Exit"
-                if was_running:
-                    self.exit_script(s, rb)
-                self.edit_script(s)
-                if was_running:
-                    for i in range(self.profile_layout.count()):
-                        group_box = self.profile_layout.itemAt(i).widget()
-                        if (isinstance(group_box, QGroupBox) and
-                                group_box.title() == os.path.splitext(s)[0]):
-                            layout = group_box.layout()
-                            if layout:
-                                btn = layout.itemAtPosition(0, 0)
-                                if btn:
-                                    run_btn = btn.widget()
-                                    if isinstance(run_btn, QPushButton):
-                                        self.activate_script(s, run_btn)
-                                        break
-
-            edit_button.clicked.connect(handle_edit)
-            group_layout.addWidget(edit_button, 0, 1)
-
-            copy_button = QPushButton(" Copy")
-            copy_button.setFixedWidth(80)
-            copy_button.setIcon(icons.get_icon(icons.copy))
-            copy_button.setToolTip(f'Copy "{os.path.splitext(script)[0]}"')
-            copy_button.clicked.connect(lambda checked,
-                                        s=script: self.copy_script(s))
-            group_layout.addWidget(copy_button, 1, 0)
-
-            delete_button = QPushButton(" Delete")
-            delete_button.setFixedWidth(80)
-            delete_button.setIcon(icons.get_icon(icons.delete))
-            delete_button.setToolTip(f'Remove "{os.path.splitext(script)[0]}"')
-            delete_button.clicked.connect(lambda checked,
-                                          s=script: self.delete_script(s))
-            group_layout.addWidget(delete_button, 1, 2)
-
-            store_button = QPushButton(" Store" if
-                                       self.SCRIPT_DIR == utils.active_dir
-                                       else " Restore")
-            store_button.setFixedWidth(80)
-            store_button.setIcon(icons.get_icon(icons.store))
-            if self.SCRIPT_DIR == utils.active_dir:
-                store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"') # noqa
-            else:
-                store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"') # noqa
-            store_button.clicked.connect(lambda checked,
-                                         s=script: self.store_script(s))
-            group_layout.addWidget(store_button, 1, 1)
-
-            if is_startup:
-                startup_button = QPushButton(" Unstartup")
-                startup_button.setIcon(icons.get_icon(icons.rocket_fill))
-                startup_button.setToolTip(
-                    f'Remove from startup: Dont run"{os.path.splitext(script)[0]}" automatically when computer starts') # noqa
-                startup_button.clicked.connect(lambda checked, s=script:
-                                               self.remove_ahk_from_startup(s))
-            else:
-                startup_button = QPushButton(" Startup")
-                startup_button.setIcon(icons.get_icon(icons.rocket))
-                startup_button.setToolTip(
-                    f'Add to startup: Run "{os.path.splitext(script)[0]}" automatically when computer starts') # noqa
-                startup_button.clicked.connect(lambda checked, s=script:
-                                               self.add_ahk_to_startup(s))
-            startup_button.setFixedWidth(80)
-            group_layout.addWidget(startup_button, 0, 2)
-
-            self.profile_layout.addWidget(group_box, row, column)
-
-        self.profile_layout.setColumnStretch(0, 1)
-        self.profile_layout.setColumnStretch(1, 1)
-        self.profile_layout.setRowStretch(0, 1)
-        self.profile_layout.setRowStretch(1, 1)
-        self.profile_layout.setRowStretch(2, 1)
-
+class MainLogic:
     def import_button_clicked(self):
         file_dialog = QFileDialog(self)
         file_dialog.setNameFilter("AHK Scripts (*.ahk)")
@@ -569,7 +324,8 @@ class MainApp(QMainWindow, MainLogic, EditProfileMain,
         QApplication.setFont(fallback_font)
 
     def check_ahi_dir(self):
-        target_folder = os.path.join(utils.active_dir, 'AutoHotkey Interception')
+        target_folder = os.path.join(utils.active_dir,
+                                     'AutoHotkey Interception')
 
         def get_all_relative_paths(base_dir):
             rel_paths = set()
@@ -592,3 +348,141 @@ class MainApp(QMainWindow, MainLogic, EditProfileMain,
             if os.path.exists(target_folder):
                 shutil.rmtree(target_folder)
             shutil.copytree(constant.ahi_dir, target_folder)
+
+    def list_scripts(self):
+        all_scripts = [f for f in os.listdir(self.SCRIPT_DIR)
+                       if f.endswith('.ahk') or f.endswith('.py')]
+
+        pinned = [script for script in all_scripts
+                  if script in self.pinned_profiles]
+        unpinned = [script for script in all_scripts
+                    if script not in self.pinned_profiles]
+
+        self.scripts = pinned + unpinned
+        return self.scripts
+
+    def prev_page(self):
+        if self.current_page > 0:
+            self.current_page -= 1
+            self.update_script_list()
+
+    def next_page(self):
+        if (self.current_page + 1) * 6 < len(self.scripts):
+            self.current_page += 1
+            self.update_script_list()
+
+    def add_ahk_to_startup(self, script_name):
+        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+
+        startup_folder = winshell.startup()
+
+        shortcut_name = os.path.splitext(script_name)[0]
+        shortcut_path = os.path.join(startup_folder, f"{shortcut_name}.lnk")
+
+        shell = Dispatch("WScript.Shell")
+        shortcut = shell.CreateShortcut(shortcut_path)
+        shortcut.TargetPath = script_path
+        shortcut.WorkingDirectory = os.path.dirname(script_path)
+        shortcut.IconLocation = script_path
+        shortcut.save()
+
+        del shell
+
+        self.update_script_list()
+        return shortcut_path
+
+    def remove_ahk_from_startup(self, script_name):
+        shortcut_name = os.path.splitext(script_name)[0]
+        startup_folder = winshell.startup()
+        shortcut_path = os.path.join(startup_folder, f"{shortcut_name}.lnk")
+
+        try:
+            if os.path.exists(shortcut_path):
+                os.remove(shortcut_path)
+                print(f"Removed {shortcut_path} from startup.")
+            else:
+                print(f"{shortcut_path} does not exist in startup.")
+
+            self.update_script_list()
+
+        except Exception as e:
+            print(f"Error removing {shortcut_path}: {e}")
+
+    def is_visible_application(self, pid):
+        try:
+            def callback(hwnd, pid_list):
+                _, process_pid = win32process.GetWindowThreadProcessId(hwnd)
+                if process_pid == pid and win32gui.IsWindowVisible(hwnd):
+                    pid_list.append(pid)
+
+            visible_pids = []
+            win32gui.EnumWindows(callback, visible_pids)
+            return len(visible_pids) > 0
+        except Exception:
+            return False
+
+    def run_monitor(self):
+        script_path = os.path.join(constant.script_dir,
+                                   "_internal", "Data", "Active",
+                                   "AutoHotkey Interception", "Monitor.ahk")
+        if os.path.exists(script_path):
+            os.startfile(script_path)
+        else:
+            print(f"Error: The script at {script_path} does not exist.")
+
+    def load_key_translations(self):
+        key_translations = {}
+        try:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                for category_dict in data:
+                    for _, keys in category_dict.items():
+                        for key, info in keys.items():
+                            readable_key = key.strip().lower()
+                            translation = info.get("translate", "").strip()
+                            if translation:
+                                key_translations[readable_key] = translation
+
+        except Exception as e:
+            print(f"Error reading key translations: {e}")
+        return key_translations
+
+    def translate_key(self, key, key_translations):
+        keys = key.split('+')
+        translated_keys = []
+
+        for single_key in keys:
+            translated_key = key_translations.get(single_key.strip().lower(),
+                                                  single_key.strip())
+            translated_keys.append(translated_key)
+
+        return " & ".join(translated_keys)
+
+    def load_key_list(self):
+        key_map = {}
+        try:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                for category_dict in data:
+                    for _, keys in category_dict.items():
+                        for key, info in keys.items():
+                            readable = key
+                            raw = info.get("translate", "")
+                            if raw:
+                                key_map[raw] = readable
+        except Exception as e:
+            print(f"Error reading key list: {e}")
+        return key_map
+
+    def load_key_values(self):
+        key_values = []
+        try:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                for category_dict in data:
+                    for _, keys in category_dict.items():
+                        for key in keys.keys():
+                            key_values.append(key)
+        except Exception as e:
+            print(f"Error reading key_list.json: {e}")
+        return key_values

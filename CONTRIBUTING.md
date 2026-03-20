@@ -11,27 +11,38 @@ We welcome contributions of all kinds, including bug fixes, features, improvemen
 ## Folder Structures
 All code is stored inside the src folder.
 ```
-src/    ; Source Floder
-    ├── _internal/    ; Data Folder
-    ├── logic/
-        └── logic.py
-    ├── ui/
-        ├── edit_script/
-            ├── choose_key.py
-            ├── edit_frame_row.py
-            ├── edit_script_logic.py
-            ├── edit_script_main.py
-            ├── parse_script.py
-            ├── select_device.py
-            ├── select_program.py
-            └── write_script.py
-        ├── setting.py
-        └── welcome.py
-    ├── utility/ 
+└── src
+    └── announcement
+        ├── announcement.py
+    └── core
+        ├── main_logic.py
+        ├── parse_script.py
+        ├── remap_row.py
+        ├── write_script.py
+    └── dashboard
+        ├── dashborad.py
+    └── script_profile
+        ├── profile_comp.py
+        ├── profile_ui.py
+    └── select_device
+        ├── select_device_comp.py
+        ├── select_device_ui.py
+    └── select_key
+        ├── select_key_comp.py
+        ├── select_key_ui.py
+    └── select_program
+        ├── select_program_comp.py
+        ├── select_program_ui.py
+    └── setting
+        ├── setting_comp.py
+        ├── setting_ui.py
+    └── utility
         ├── constant.py
+        ├── diff.py
         ├── icon.py
-        └── utils.py
-    └── main.py    ; Initialization Code
+        ├── thread.py
+        ├── utils.py
+    └── main.py
 ```
 
 ## License

@@ -232,8 +232,8 @@ class SelectKeyComponent:
             item.setExpanded(not item.isExpanded())
 
     def insert_choose_entry(self, _):
-        if getattr(self, 'choose_key_entry', None) is not None:
-            self.choose_key_entry.setText(
+        if getattr(self, 'select_key_entry', None) is not None:
+            self.select_key_entry.setText(
                 ' + '.join([child for _, child in self.checked_keys_list]))
 
     def is_unicode_key(self, key):
@@ -250,20 +250,20 @@ class SelectKeyComponent:
                 self.filter_popup.hide()
         return False
 
-    def apply_filter(self, choose_key_tree, search_entry, item):
+    def apply_filter(self, select_key_tree, search_entry, item):
         checked_parents = self.get_checked_filter(self.filter_dropdown)
         self.populate_tree(
-            choose_key_tree,
+            select_key_tree,
             self.key_data,
             search_entry.text(),
             checked_parents
         )
 
-    def on_save_keys(self, choose_key_window):
-        if self.choose_key_target_entry is not None:
-            self.choose_key_target_entry.setText(
-                self.choose_key_entry.text())
-        choose_key_window.accept()
+    def on_save_keys(self, select_key_window):
+        if self.select_key_target_entry is not None:
+            self.select_key_target_entry.setText(
+                self.select_key_entry.text())
+        select_key_window.accept()
 
     def show_filter_popup(self, search_entry):
         if self.filter_popup.isVisible():

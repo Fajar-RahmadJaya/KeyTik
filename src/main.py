@@ -1,13 +1,15 @@
+"Main initialization"
 import os
 import sys
-from PySide6.QtWidgets import (QApplication)
+from PySide6.QtWidgets import (QApplication) # pylint: disable=E0611
 
 import utility.utils as utils
-from dashboard.dashborad import Dashboard
 import utility.thread as thread
+from dashboard.dashborad import Dashboard
 
 
 def main():
+    "Main function"
     if utils.theme == "dark":
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
     elif utils.theme == "light":

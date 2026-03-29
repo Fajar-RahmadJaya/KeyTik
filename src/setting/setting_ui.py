@@ -1,19 +1,31 @@
+"Setting UI code"
+
 import os
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton,
-    QHBoxLayout, QCheckBox
-)
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt
 import webbrowser
-import utility.constant as constant
-import utility.utils as utils
 
-from setting.setting_comp import SettingComponent
+from PySide6.QtWidgets import ( # pylint: disable=E0611
+    QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton,
+    QHBoxLayout, QCheckBox, QInputDialog, QMessageBox
+)
+from PySide6.QtGui import QIcon # pylint: disable=E0611
+from PySide6.QtCore import Qt # pylint: disable=E0611
+
+from utility import constant
+from utility import utils
+
+from setting.setting_core import SettingCore
+
+from core.main_logic import MainLogic
 
 
-class SettingUI(SettingComponent):
+class SettingUI(SettingCore):
+    "Setting UI"
+    def __init__(self):
+        super().__init__()
+        self.main_logic = MainLogic()
+
     def open_settings_window(self):
+        "Setting window"
         settings_window = QDialog(self)
         settings_window.setWindowTitle("Settings")
         settings_window.setFixedSize(400, 250)
@@ -61,7 +73,7 @@ class SettingUI(SettingComponent):
 
         readme_button = QPushButton("Announcement")
         readme_button.setFixedHeight(40)
-        readme_button.clicked.connect(self.show_announcement_window)
+        readme_button.clicked.connect(self.main_logic.show_announcement_window)
         group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
         group_layout.setRowStretch(0, 1)
@@ -74,6 +86,7 @@ class SettingUI(SettingComponent):
         settings_window.exec()
 
     def show_installation_dialog(self):
+        "Setting to check, install, uninstall AutoHotkey and Interception driver installation"
         dialog = QDialog(self)
         dialog.setWindowTitle("Installation Manager")
         dialog.setWindowIcon(QIcon(constant.icon_path))
@@ -101,7 +114,7 @@ class SettingUI(SettingComponent):
 
         driver_vbox = QVBoxLayout()
         driver_checkbox = QCheckBox("Interception Driver", dialog)
-        driver_installed = os.path.exists(constant.driver_path)
+        driver_installed = os.path.exists(constant.DRIVER_PATH)
         driver_checkbox.setChecked(driver_installed)
         driver_checkbox.setEnabled(False)
         driver_button = QPushButton(dialog)
@@ -124,3 +137,22 @@ class SettingUI(SettingComponent):
             driver_installed, dialog))
 
         dialog.exec()
+
+    def change_theme_dialog(self):
+        "Setting to change program theme"
+        options = ["Light", "Dark", "System"]
+        current_theme = self.read_theme()
+        if current_theme == "dark":
+            current_index = 1
+        elif current_theme == "light":
+            current_index = 0
+        else:
+            current_index = 2
+        theme, ok = QInputDialog.getItem(
+            self, "Change Theme", "Select theme:",
+            options, current_index, False)
+        if ok:
+            self.save_theme(theme.lower())
+            QMessageBox.information(self,
+                                    "Theme Changed", 
+                                    "Theme will be applied after restarting the app.") # noqa

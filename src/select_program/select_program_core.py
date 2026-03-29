@@ -115,9 +115,9 @@ class SelectProgramCore():
                         if windows:
                             class_name, window_title = windows[0]
                         else:
-                            class_name, window_title = "N/A", "N/A"
+                            class_name, window_title = "Unknown", "Unknown"
                     except IndexError:
-                        class_name, window_title = "N/A", "N/A"
+                        class_name, window_title = "Unknown", "Unknown"
                     processes.append(
                         (window_title, class_name,
                          exe_name, process_type))

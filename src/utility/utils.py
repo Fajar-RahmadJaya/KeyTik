@@ -45,7 +45,7 @@ if not os.path.exists(store_dir):
     os.makedirs(store_dir)
 
 
-SCRIPT_DIR = active_dir
+script_dir = active_dir
 
 
 def load_pinned_profiles():

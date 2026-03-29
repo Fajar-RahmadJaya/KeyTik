@@ -1,15 +1,24 @@
+"Logic for program selection"
+
 import os
+import ctypes
+from ctypes import wintypes
 import win32gui
 import win32process
 import psutil
-import ctypes
-from ctypes import wintypes
-from PySide6.QtWidgets import (QTreeWidgetItem)
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QTreeWidgetItem) # pylint: disable=E0611
+from PySide6.QtCore import Qt # pylint: disable=E0611
+
+from core.main_logic import MainLogic
 
 
 class SelectProgramCore():
+    "Select program Non UI"
+    def __init__(self):
+        self.main_logic = MainLogic()
+
     def multi_check(self, texts):
+        "Get multiple item from selected/checked checkbox"
         item = QTreeWidgetItem(texts)
 
         for col in range(3):
@@ -18,9 +27,10 @@ class SelectProgramCore():
         return item
 
     def get_application_type(self):
-        DWMWA_CLOAKED = 14
-        WS_EX_TOOLWINDOW = 0x00000080
-        WS_EX_APPWINDOW = 0x00040000
+        "Check whether the process is a application or not"
+        dwmwa_cloaked = 14
+        ws_ex_toolwindow = 0x00000080
+        ws_ex_appwindow = 0x00040000
 
         def is_window_cloaked(hwnd):
             try:
@@ -28,12 +38,12 @@ class SelectProgramCore():
                 cloaked = wintypes.DWORD()
                 dwmapi.DwmGetWindowAttribute(
                     wintypes.HWND(hwnd),
-                    wintypes.DWORD(DWMWA_CLOAKED),
+                    wintypes.DWORD(dwmwa_cloaked),
                     ctypes.byref(cloaked),
                     ctypes.sizeof(cloaked)
                 )
                 return cloaked.value != 0
-            except Exception:
+            except (AttributeError, OSError, ValueError):
                 return False
 
         pid_name_map = {}
@@ -44,32 +54,33 @@ class SelectProgramCore():
         seen = set()
 
         def callback(hwnd, _):
-            if not win32gui.IsWindowVisible(hwnd):
+            if not win32gui.IsWindowVisible(hwnd): # pylint: disable=I1101
                 return
-            if win32gui.GetWindowText(hwnd) == "":
+            if win32gui.GetWindowText(hwnd) == "": # pylint: disable=I1101
                 return
-            exstyle = win32gui.GetWindowLong(hwnd, -20)
-            if exstyle & WS_EX_TOOLWINDOW:
+            exstyle = win32gui.GetWindowLong(hwnd, -20) # pylint: disable=I1101
+            if exstyle & ws_ex_toolwindow:
                 return
-            if (not (exstyle & WS_EX_APPWINDOW)
-                    and win32gui.GetWindow(hwnd, 4) != 0):
+            if (not (exstyle & ws_ex_appwindow)
+                    and win32gui.GetWindow(hwnd, 4) != 0): # pylint: disable=I1101
                 return
-            if win32gui.GetParent(hwnd) != 0:
+            if win32gui.GetParent(hwnd) != 0: # pylint: disable=I1101
                 return
             if is_window_cloaked(hwnd):
                 return
-            title = win32gui.GetWindowText(hwnd)
-            class_name = win32gui.GetClassName(hwnd)
-            _, pid = win32process.GetWindowThreadProcessId(hwnd)
+            title = win32gui.GetWindowText(hwnd) # pylint: disable=I1101
+            class_name = win32gui.GetClassName(hwnd) # pylint: disable=I1101
+            _, pid = win32process.GetWindowThreadProcessId(hwnd) # pylint: disable=I1101
             key = (pid, title, class_name)
             if key not in seen:
                 seen.add(key)
                 proc_name = pid_name_map.get(pid, "")
                 windows.append((title, class_name, proc_name, "Application"))
-        win32gui.EnumWindows(callback, None)
+        win32gui.EnumWindows(callback, None) # pylint: disable=I1101
         return windows
 
     def get_running_processes(self, app_only=True):
+        "Get running process"
         if app_only:
             return self.get_application_type()
         else:
@@ -88,24 +99,24 @@ class SelectProgramCore():
                                 if exe_name
                                 else proc.info['name'])
                     process_type = ("Application"
-                                    if self.is_visible_application(pid)
+                                    if self.main_logic.is_visible_application(pid)
                                     else "System")
                     try:
-                        def window_callback(hwnd, windows):
+                        def window_callback(hwnd, windows, pid=pid):
                             _, process_pid = (
-                                win32process.GetWindowThreadProcessId(hwnd))
+                                win32process.GetWindowThreadProcessId(hwnd)) # pylint: disable=I1101
                             if (process_pid == pid
-                                    and win32gui.IsWindowVisible(hwnd)):
+                                    and win32gui.IsWindowVisible(hwnd)): # pylint: disable=I1101
                                 windows.append(
-                                    (win32gui.GetClassName(hwnd),
-                                     win32gui.GetWindowText(hwnd)))
+                                    (win32gui.GetClassName(hwnd), # pylint: disable=I1101
+                                     win32gui.GetWindowText(hwnd))) # pylint: disable=I1101
                         windows = []
-                        win32gui.EnumWindows(window_callback, windows)
+                        win32gui.EnumWindows(window_callback, windows) # pylint: disable=I1101
                         if windows:
                             class_name, window_title = windows[0]
                         else:
                             class_name, window_title = "N/A", "N/A"
-                    except Exception:
+                    except IndexError:
                         class_name, window_title = "N/A", "N/A"
                     processes.append(
                         (window_title, class_name,
@@ -113,52 +124,3 @@ class SelectProgramCore():
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
             return processes
-
-    def update_program_treeview(self, show_all_processes=None):
-        if show_all_processes is None:
-            show_all_processes = (
-                self.show_all_button.text()) == "Show All Processes"
-        self.program_tree.clear()
-
-        processes = self.get_running_processes(app_only=not show_all_processes)
-        for proc in processes:
-            window_title, class_name, proc_name = proc[:3]
-            p_type = proc[3] if len(proc) > 3 else "Application"
-            if show_all_processes or p_type == "Application":
-                item = self.multi_check([window_title, class_name, proc_name])
-                self.program_tree.addTopLevelItem(item)
-
-        if hasattr(self, "fit_sorted_column"):
-            self.fit_sorted_column()
-
-    def toggle_show_all_processes(self):
-        current_text = self.show_all_button.text()
-        if current_text == "Show All Processes":
-            self.show_all_button.setText("Show App Only")
-            self.update_program_treeview(show_all_processes=True)
-        else:
-            self.show_all_button.setText("Show All Processes")
-            self.update_program_treeview(show_all_processes=False)
-
-    def search_programs(self, query):
-        for index in range(self.program_tree.topLevelItemCount()):
-            item = self.program_tree.topLevelItem(index)
-            item.setHidden(query.lower() not in item.text(0).lower())
-
-    def save_selected_programs(self, entry_widget):
-        name_checked = []
-        class_checked = []
-        process_checked = []
-        for index in range(self.program_tree.topLevelItemCount()):
-            item = self.program_tree.topLevelItem(index)
-            if item.checkState(0) == Qt.Checked:
-                name_checked.append(f"[Tittle, {item.text(0)}]")
-            if item.checkState(1) == Qt.Checked:
-                class_checked.append(f"[Class, {item.text(1)}]")
-            if item.checkState(2) == Qt.Checked:
-                process_checked.append(f"[Process, {item.text(2)}]")
-        selected_programs = name_checked + class_checked + process_checked
-
-        if selected_programs:
-            entry_widget.setText(" ".join(selected_programs))
-        self.select_program_window.accept()

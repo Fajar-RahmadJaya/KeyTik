@@ -6,10 +6,10 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 import utility.constant as constant
 
-from select_program.select_program_comp import SelectProgramComponent
+from select_program.select_program_core import SelectProgramCore
 
 
-class SelectProgramUI(SelectProgramComponent):
+class SelectProgramUI(SelectProgramCore):
     def program_window(self, entry_widget):
         self.select_program_window = None
 

@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (QTreeWidgetItem)
 from PySide6.QtCore import Qt
 
 
-class SelectProgramComponent():
+class SelectProgramCore():
     def multi_check(self, texts):
         item = QTreeWidgetItem(texts)
 

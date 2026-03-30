@@ -7,7 +7,7 @@ import json
 import subprocess
 import ctypes
 
-from PySide6.QtWidgets import ( # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMessageBox, QFileDialog
 )
 

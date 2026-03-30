@@ -3,12 +3,12 @@
 import os
 import webbrowser
 
-from PySide6.QtWidgets import ( # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton,
     QHBoxLayout, QCheckBox, QInputDialog, QMessageBox
 )
-from PySide6.QtGui import QIcon # pylint: disable=E0611
-from PySide6.QtCore import Qt # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils

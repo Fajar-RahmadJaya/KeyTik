@@ -2,7 +2,7 @@
 
 import keyboard
 import pynput
-from PySide6.QtCore import QThread, Signal # pylint: disable=E0611
+from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
 from utility.diff import (Diff)
 

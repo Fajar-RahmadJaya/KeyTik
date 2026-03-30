@@ -6,8 +6,8 @@ from ctypes import wintypes
 import win32gui
 import win32process
 import psutil
-from PySide6.QtWidgets import (QTreeWidgetItem) # pylint: disable=E0611
-from PySide6.QtCore import Qt # pylint: disable=E0611
+from PySide6.QtWidgets import (QTreeWidgetItem)  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
 
 from core.main_logic import MainLogic
 
@@ -54,29 +54,29 @@ class SelectProgramCore():
         seen = set()
 
         def callback(hwnd, _):
-            if not win32gui.IsWindowVisible(hwnd): # pylint: disable=I1101
+            if not win32gui.IsWindowVisible(hwnd):  # pylint: disable=I1101
                 return
-            if win32gui.GetWindowText(hwnd) == "": # pylint: disable=I1101
+            if win32gui.GetWindowText(hwnd) == "":  # pylint: disable=I1101
                 return
-            exstyle = win32gui.GetWindowLong(hwnd, -20) # pylint: disable=I1101
+            exstyle = win32gui.GetWindowLong(hwnd, -20)  # pylint: disable=I1101
             if exstyle & ws_ex_toolwindow:
                 return
             if (not (exstyle & ws_ex_appwindow)
-                    and win32gui.GetWindow(hwnd, 4) != 0): # pylint: disable=I1101
+                    and win32gui.GetWindow(hwnd, 4) != 0):  # pylint: disable=I1101
                 return
-            if win32gui.GetParent(hwnd) != 0: # pylint: disable=I1101
+            if win32gui.GetParent(hwnd) != 0:  # pylint: disable=I1101
                 return
             if is_window_cloaked(hwnd):
                 return
-            title = win32gui.GetWindowText(hwnd) # pylint: disable=I1101
+            title = win32gui.GetWindowText(hwnd)  # pylint: disable=I1101
             class_name = win32gui.GetClassName(hwnd) # pylint: disable=I1101
-            _, pid = win32process.GetWindowThreadProcessId(hwnd) # pylint: disable=I1101
+            _, pid = win32process.GetWindowThreadProcessId(hwnd)  # pylint: disable=I1101
             key = (pid, title, class_name)
             if key not in seen:
                 seen.add(key)
                 proc_name = pid_name_map.get(pid, "")
                 windows.append((title, class_name, proc_name, "Application"))
-        win32gui.EnumWindows(callback, None) # pylint: disable=I1101
+        win32gui.EnumWindows(callback, None)  # pylint: disable=I1101
         return windows
 
     def get_running_processes(self, app_only=True):
@@ -104,14 +104,14 @@ class SelectProgramCore():
                     try:
                         def window_callback(hwnd, windows, pid=pid):
                             _, process_pid = (
-                                win32process.GetWindowThreadProcessId(hwnd)) # pylint: disable=I1101
+                                win32process.GetWindowThreadProcessId(hwnd))  # pylint: disable=I1101
                             if (process_pid == pid
-                                    and win32gui.IsWindowVisible(hwnd)): # pylint: disable=I1101
+                                    and win32gui.IsWindowVisible(hwnd)):  # pylint: disable=I1101
                                 windows.append(
-                                    (win32gui.GetClassName(hwnd), # pylint: disable=I1101
-                                     win32gui.GetWindowText(hwnd))) # pylint: disable=I1101
+                                    (win32gui.GetClassName(hwnd),  # pylint: disable=I1101
+                                     win32gui.GetWindowText(hwnd)))  # pylint: disable=I1101
                         windows = []
-                        win32gui.EnumWindows(window_callback, windows) # pylint: disable=I1101
+                        win32gui.EnumWindows(window_callback, windows)  # pylint: disable=I1101
                         if windows:
                             class_name, window_title = windows[0]
                         else:

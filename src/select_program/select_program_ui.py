@@ -1,11 +1,11 @@
 "UI for program selection"
 
-from PySide6.QtWidgets import ( # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QLabel, QLineEdit, QPushButton, QTreeWidget,
     QVBoxLayout, QHBoxLayout
 )
-from PySide6.QtCore import Qt, QTimer # pylint: disable=E0611
-from PySide6.QtGui import QIcon # pylint: disable=E0611
+from PySide6.QtCore import Qt, QTimer  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
 

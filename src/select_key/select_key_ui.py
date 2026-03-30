@@ -43,7 +43,7 @@ class SelectKeyUI(SelectKeyCore):
         self.expanded_unicode_blocks = []
 
         context_hide = {
-            "shortcut": {"ANSI Keys"} | set([b[2] for b in constant.unicode_blocks]), # noqa
+            "shortcut": {"ANSI Keys"} | set([b[2] for b in constant.unicode_blocks]),
             "default": {"Shortcut Special", "ANSI Keys"}
             | set([b[2] for b in constant.unicode_blocks]),
             "remap": {"Shortcut Special"}
@@ -171,7 +171,8 @@ class SelectKeyUI(SelectKeyCore):
                                            self.filter_popup.hide())
 
         self.filter_dropdown.itemChanged.connect(
-            lambda: self.apply_filter(select_key_tree, search_entry))
+            lambda: self.apply_filter(select_key_tree, search_entry,
+                                      hide_parents))
 
         select_key_layout = QHBoxLayout()
         select_key_layout.setContentsMargins(25, 10, 25, 10)
@@ -225,14 +226,16 @@ class SelectKeyUI(SelectKeyCore):
                 self.filter_popup.hide()
         return False
 
-    def apply_filter(self, select_key_tree, search_entry):
+    def apply_filter(self, select_key_tree, search_entry, hide_parents):
         "Apply filter on treeview"
         checked_parents = self.get_checked_filter(self.filter_dropdown)
         self.populate_tree(
             select_key_tree,
             self.key_data,
             search_entry.text(),
-            checked_parents
+            checked_parents,
+            self.search_unicode_checkbox.isChecked(),
+            hide_parents=hide_parents
         )
 
     def on_save_keys(self, select_key_window):

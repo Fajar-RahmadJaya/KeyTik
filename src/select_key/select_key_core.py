@@ -22,7 +22,7 @@ class SelectKeyCore:
         return None, None
 
     def get_unicode_block_data(self, block_name):
-        "Get and assign unicode name and code from the range"
+        "Get the unicode from unicodedata library"
         start, end = self.get_unicode_block_range(block_name)
         if start is None:
             return {}
@@ -86,6 +86,8 @@ class SelectKeyCore:
         for parent_name, children in key_data.items():
             if parent_name in hide_parents:
                 continue
+            if filter_parents and parent_name not in filter_parents:
+                continue
             parent_match = filter_text and filter_text in parent_name.lower()
             matching_children = []
             if (parent_name in [b[2] for b in constant.unicode_blocks]
@@ -144,6 +146,8 @@ class SelectKeyCore:
             unicode_matches = {}
             for start, end, block_name in constant.unicode_blocks:
                 if block_name in hide_parents:
+                    continue
+                if filter_parents and block_name not in filter_parents:
                     continue
                 for codepoint in range(start, end + 1):
                     try:

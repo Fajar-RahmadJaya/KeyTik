@@ -7,7 +7,7 @@ import utility.constant as constant
 import utility.icon as icons
 
 
-class SelectKeyComponent:
+class SelectKeyCore:
     def get_unicode_block_range(self, block_name):
         for start, end, name in constant.unicode_blocks:
             if name == block_name:

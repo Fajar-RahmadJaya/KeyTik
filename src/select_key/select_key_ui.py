@@ -1,18 +1,41 @@
-from PySide6.QtWidgets import (
+"UI for key selection"
+
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QTreeWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QHeaderView,
     QListWidget, QListWidgetItem, QCheckBox
 )
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt
-import utility.constant as constant
-import utility.icon as icons
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtCore import Qt, QEvent, QPoint  # pylint: disable=E0611
 
-from select_key.select_key_comp import SelectKeyComponent
+from utility import constant
+from utility import icon
+
+from select_key.select_key_core import SelectKeyCore
 
 
-class SelectKeyUI(SelectKeyComponent):
+class SelectKeyUI(SelectKeyCore):
+    "Select Key UI"
+    def __init__(self, edit_window=None):
+        super().__init__()
+        self.edit_window = edit_window
+
+        self.select_key_entry = None
+        self.select_key_target_entry = None
+        self.checked_keys_list = []
+        self.expanded_unicode_blocks = []
+
+        self.search_unicode_checkbox = QCheckBox("Search Unicode")
+        self.filter_popup = None
+        self.filter_dropdown = QListWidget()
+
+        self.parent_names = None
+        self.key_data = None
+        self.filter_parents = None
+
+
     def select_key(self, target_entry=None, context=None):
+        "Select Key"
         self.select_key_entry = None
         self.select_key_target_entry = target_entry
         select_key_window = None
@@ -53,7 +76,7 @@ class SelectKeyUI(SelectKeyComponent):
         main_layout.addLayout(choose_search_layout)
 
         filter_button = QPushButton()
-        filter_button.setIcon(icons.get_icon(icons.filter))
+        filter_button.setIcon(icon.get_icon(icon.icon_filter))
         choose_search_layout.addWidget(filter_button)
 
         search_entry = QLineEdit()
@@ -61,15 +84,14 @@ class SelectKeyUI(SelectKeyComponent):
         search_entry.setFixedWidth(170)
         choose_search_layout.addWidget(search_entry)
 
-        search_unicode_checkbox = QCheckBox("Search Unicode")
-        search_unicode_checkbox.setChecked(False)
-        search_unicode_checkbox.setToolTip(
+        self.search_unicode_checkbox = QCheckBox("Search Unicode")
+        self.search_unicode_checkbox.setChecked(False)
+        self.search_unicode_checkbox.setToolTip(
             "Search key by name and description.\n"
             "Unicode search may be slow. Enable only if needed.\n"
             "Letter search needs at least 3 letters."
         )
-        choose_search_layout.addWidget(search_unicode_checkbox)
-        self.search_unicode_checkbox = search_unicode_checkbox
+        choose_search_layout.addWidget(self.search_unicode_checkbox)
 
         self.filter_popup = QDialog(select_key_window, Qt.Popup)
         self.filter_popup.setWindowFlags(Qt.Popup)
@@ -113,8 +135,8 @@ class SelectKeyUI(SelectKeyComponent):
             self.populate_tree(select_key_tree, key_data,
                                filter_parents=self.filter_parents,
                                hide_parents=hide_parents)
-        except Exception as e:
-            print(f"Failed to load key list: {e}")
+        except FileNotFoundError:
+            print("key_list not found")
 
         select_key_tree.itemClicked.connect(self.click_checkbox)
 
@@ -149,7 +171,7 @@ class SelectKeyUI(SelectKeyComponent):
                                            self.filter_popup.hide())
 
         self.filter_dropdown.itemChanged.connect(
-            lambda: self.apply_filter(select_key_tree, search_entry, item))
+            lambda: self.apply_filter(select_key_tree, search_entry))
 
         select_key_layout = QHBoxLayout()
         select_key_layout.setContentsMargins(25, 10, 25, 10)
@@ -170,3 +192,66 @@ class SelectKeyUI(SelectKeyComponent):
             lambda: self.on_save_keys(select_key_window))
 
         select_key_window.exec()
+
+    def click_checkbox(self, item, _):
+        "Save checked item to keep the checked state when treeview updated"
+        if item.parent() is not None:
+            parent_name = item.parent().text(0)
+            child_name = item.text(0).strip()
+            key_tuple = (parent_name, child_name)
+            if item.checkState(0) == Qt.Checked:
+                if key_tuple not in self.checked_keys_list:
+                    self.checked_keys_list.append(key_tuple)
+            else:
+                if key_tuple in self.checked_keys_list:
+                    self.checked_keys_list.remove(key_tuple)
+            tree_widget = item.treeWidget()
+            self.insert_choose_entry(tree_widget)
+
+        if item.parent() is None:
+            item.setExpanded(not item.isExpanded())
+
+    def insert_choose_entry(self, _):
+        "Add selected item into the selected key entry"
+        if getattr(self, 'select_key_entry', None) is not None:
+            self.select_key_entry.setText(
+                ' + '.join([child for _, child in self.checked_keys_list]))
+
+    def event_filter(self, event):
+        "Hide filter pop up when there is mouse click outside the pop up"
+        if event.type() == QEvent.Type.MouseButtonPress:
+            if not (self.filter_popup.geometry().
+                    contains(event.globalPos())):
+                self.filter_popup.hide()
+        return False
+
+    def apply_filter(self, select_key_tree, search_entry):
+        "Apply filter on treeview"
+        checked_parents = self.get_checked_filter(self.filter_dropdown)
+        self.populate_tree(
+            select_key_tree,
+            self.key_data,
+            search_entry.text(),
+            checked_parents
+        )
+
+    def on_save_keys(self, select_key_window):
+        "Insert the selected key on target_entry (default/remap entry)"
+        if self.select_key_target_entry is not None:
+            self.select_key_target_entry.setText(
+                self.select_key_entry.text())
+        select_key_window.accept()
+
+    def show_filter_popup(self, search_entry):
+        "Select key filter pop up"
+        if self.filter_popup.isVisible():
+            self.filter_popup.hide()
+        else:
+            global_pos = search_entry.mapToGlobal(
+                QPoint(0, search_entry.height()))
+            self.filter_popup.setFixedWidth(search_entry.width())
+            self.filter_popup.move(global_pos)
+            self.filter_popup.show()
+            self.filter_popup.raise_()
+            self.filter_popup.activateWindow()
+            self.filter_dropdown.setFocus()

@@ -9,14 +9,9 @@ import psutil
 from PySide6.QtWidgets import (QTreeWidgetItem)  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 
-from core.main_logic import MainLogic
-
 
 class SelectProgramCore():
     "Select program Non UI"
-    def __init__(self):
-        self.main_logic = MainLogic()
-
     def multi_check(self, texts):
         "Get multiple item from selected/checked checkbox"
         item = QTreeWidgetItem(texts)
@@ -99,7 +94,7 @@ class SelectProgramCore():
                                 if exe_name
                                 else proc.info['name'])
                     process_type = ("Application"
-                                    if self.main_logic.is_visible_application(pid)
+                                    if self.is_visible_application(pid)
                                     else "System")
                     try:
                         def window_callback(hwnd, windows, pid=pid):
@@ -124,3 +119,17 @@ class SelectProgramCore():
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
             return processes
+
+    def is_visible_application(self, pid):
+        "Check whether the process is an application by checking whether it has window or not"
+        try:
+            def callback(hwnd, pid_list):
+                _, process_pid = win32process.GetWindowThreadProcessId(hwnd)  # pylint: disable=I1101
+                if process_pid == pid and win32gui.IsWindowVisible(hwnd):  # pylint: disable=I1101
+                    pid_list.append(pid)
+
+            visible_pids = []
+            win32gui.EnumWindows(callback, visible_pids)  # pylint: disable=I1101
+            return len(visible_pids) > 0
+        except win32gui.error: # pylint: disable=I1101
+            return False

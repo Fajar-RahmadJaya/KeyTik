@@ -49,19 +49,19 @@ class Announcement(Diff):
             self.loop_announcefile()
             self.current_announcement_index = 0
 
-            announcement_dialog = QDialog(self)
-            announcement_dialog.setWindowTitle("Announcement")
-            announcement_dialog.setFixedSize(525, 290)
-            announcement_dialog.setWindowIcon(QIcon(constant.icon_path))
-            announcement_dialog.setModal(True)
-            announcement_dialog.setWindowModality(
+            self.announcement_dialog = QDialog()
+            self.announcement_dialog.setWindowTitle("Announcement")
+            self.announcement_dialog.setFixedSize(525, 290)
+            self.announcement_dialog.setWindowIcon(QIcon(constant.icon_path))
+            self.announcement_dialog.setModal(True)
+            self.announcement_dialog.setWindowModality(
                 Qt.WindowModality.WindowModal)
-            announcement_dialog.setFixedSize(525, 290)
+            self.announcement_dialog.setFixedSize(525, 290)
 
-            main_layout = QVBoxLayout(announcement_dialog)
+            main_layout = QVBoxLayout(self.announcement_dialog)
             main_layout.setContentsMargins(10, 10, 10, 10)
 
-            app_palette = announcement_dialog.palette()
+            app_palette = self.announcement_dialog.palette()
             bg_color = app_palette.window().color().name()
             text_color = app_palette.windowText().color().name()
 
@@ -104,7 +104,7 @@ class Announcement(Diff):
             next_button.setFixedWidth(100)
 
             dont_show_checkbox = QCheckBox("Don't show again")
-            dont_show_checkbox.setChecked(not self.announcement_condition)
+            dont_show_checkbox.setChecked(not self.load_announcement_condition())
             button_layout.addWidget(prev_button)
             button_layout.addWidget(next_button)
             button_layout.addWidget(dont_show_checkbox)
@@ -168,7 +168,7 @@ class Announcement(Diff):
                     not dont_show_checkbox.isChecked())
                 self.save_announcement_condition()
                 event.accept()
-            announcement_dialog.closeEvent = on_dialog_close
+            self.announcement_dialog.closeEvent = on_dialog_close
 
             internet_error_string = "Unable to load announcements. " \
             "Please check your internet connection."
@@ -181,9 +181,9 @@ class Announcement(Diff):
                     f"<p>{internet_error_string}</p>"
                 )
 
-            announcement_dialog.raise_()
-            announcement_dialog.activateWindow()
-            announcement_dialog.exec()
+            self.announcement_dialog.raise_()
+            self.announcement_dialog.activateWindow()
+            self.announcement_dialog.exec()
 
         except requests.HTTPError as e:
             print(f"Error displaying announcement window: {e}")

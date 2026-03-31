@@ -8,7 +8,7 @@ import utility.constant as constant
 
 
 class InputBlocker(QObject):
-    def eventFilter(self, obj, event):
+    def event_filter(self, obj, event):
         if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
                             QEvent.KeyPress, QEvent.KeyRelease,
                             QEvent.FocusIn, QEvent.FocusOut):
@@ -19,7 +19,7 @@ class InputBlocker(QObject):
         return False
 
 
-class ProfileComponent(QObject):
+class ProfileCore(QObject):
     request_timer_start = Signal(object)
 
     def __init__(self):
@@ -27,7 +27,7 @@ class ProfileComponent(QObject):
         self.request_timer_start.connect(self.release_timer)
 
     def check_interception_driver(self):
-        if os.path.exists(constant.driver_path):
+        if os.path.exists(constant.DRIVER_PATH):
             return True
         else:
             reply = QMessageBox.question(

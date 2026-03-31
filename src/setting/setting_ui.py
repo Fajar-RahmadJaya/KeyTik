@@ -19,6 +19,10 @@ from setting.announcement import Announcement
 
 class SettingUI(SettingCore, Announcement):
     "Setting UI"
+    def __init__(self):
+        super().__init__()
+        self.settings_window = QDialog()
+
     def open_settings_window(self):
         "Setting window"
         self.settings_window = QDialog()

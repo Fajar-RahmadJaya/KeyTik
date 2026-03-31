@@ -22,6 +22,8 @@ class Announcement(Diff):
         self.current_announcement_index = 0
         self.announcement_condition = None
 
+        self.announcement_dialog = QDialog()
+
     def load_announcement_condition(self):
         "Load user preference from file, whether to show announcement or not"
         try:

@@ -6,6 +6,8 @@ from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
 from utility.diff import (Diff)
 
+from setting.announcement import Announcement
+
 
 class Thread(QThread, Diff):
     "Thread at initializaion"
@@ -16,6 +18,7 @@ class Thread(QThread, Diff):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
+        self.announcement = Announcement()
 
     def run(self):
         "Run check update on thread to increase dashborad initialization time"
@@ -26,7 +29,7 @@ class Thread(QThread, Diff):
             self.update_found.emit(latest_version)
         self.finished.emit()
 
-        if self.main_window.announcement_condition:
+        if self.announcement.load_announcement_condition():
             self.show_announcement.emit()
 
         if not hasattr(self.main_window, "keyboard_hook_initialized"):

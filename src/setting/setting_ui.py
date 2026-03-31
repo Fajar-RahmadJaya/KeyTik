@@ -14,16 +14,11 @@ from utility import constant
 from utility import utils
 
 from setting.setting_core import SettingCore
+from announcement.announcement import Announcement
 
-from core.main_logic import MainLogic
 
-
-class SettingUI(SettingCore):
+class SettingUI(SettingCore, Announcement):
     "Setting UI"
-    def __init__(self):
-        super().__init__()
-        self.main_logic = MainLogic()
-
     def open_settings_window(self):
         "Setting window"
         settings_window = QDialog(self)
@@ -73,7 +68,7 @@ class SettingUI(SettingCore):
 
         readme_button = QPushButton("Announcement")
         readme_button.setFixedHeight(40)
-        readme_button.clicked.connect(self.main_logic.show_announcement_window)
+        readme_button.clicked.connect(self.show_announcement_window)
         group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
         group_layout.setRowStretch(0, 1)
@@ -156,3 +151,4 @@ class SettingUI(SettingCore):
             QMessageBox.information(self,
                                     "Theme Changed", 
                                     "Theme will be applied after restarting the app.") # noqa
+

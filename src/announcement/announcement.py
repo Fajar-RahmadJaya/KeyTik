@@ -1,37 +1,49 @@
+"Load online announcement from KeyTik Website"
+
 import os
 import json
 import requests
 from markdown import markdown
-from PySide6.QtWidgets import (
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QHBoxLayout, QCheckBox, QPushButton,
     QTextBrowser, QWidget, QFrame
 )
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
 import utility.constant as constant
 from utility.diff import Diff
 
 
 class Announcement(Diff):
+    "Announcement"
+    def __init__(self):
+        super().__init__()
+        self.announcement_files = []
+        self.current_announcement_index = 0
+        self.announcement_condition = None
+
     def load_announcement_condition(self):
+        "Load user preference from file, whether to show announcement or not"
         try:
             if os.path.exists(constant.dont_show_path):
-                with open(constant.dont_show_path, "r") as f:
+                with open(constant.dont_show_path, "r", encoding='utf-8') as f:
                     config = json.load(f)
                     return config.get("welcome_condition", True)
-        except Exception as e:
+        except FileNotFoundError as e:
             print(f"Error loading condition file: {e}")
         return True
 
     def save_announcement_condition(self):
+        "Save user preference on file when don't show announcement checkbox is checked"
         try:
-            with open(constant.dont_show_path, "w") as f:
+            with open(constant.dont_show_path, "w", encoding='utf-8') as f:
                 json.dump({"welcome_condition":
                            self.announcement_condition}, f)
-        except Exception as e:
+        except FileNotFoundError as e:
             print(f"Error saving condition file: {e}")
 
     def show_announcement_window(self):
+        "Announcement window"
         try:
             self.announcement_files = []
             self.loop_announcefile()
@@ -119,7 +131,7 @@ class Announcement(Diff):
                     html_label.setHtml(styling + html_content)
                 except requests.HTTPError:
                     html_label.setHtml(
-                        f"<p>File not found.</p>" # noqa
+                        "<p>File not found.</p>" # noqa
                     )
 
             def update_buttons():
@@ -158,17 +170,20 @@ class Announcement(Diff):
                 event.accept()
             announcement_dialog.closeEvent = on_dialog_close
 
+            internet_error_string = "Unable to load announcements. " \
+            "Please check your internet connection."
+
             if self.announcement_files:
                 load_content(self.current_announcement_index)
                 update_buttons()
             else:
                 html_label.setHtml(
-                    "<p>Unable to load announcements. Please check your internet connection.</p>" # noqa
+                    f"<p>{internet_error_string}</p>"
                 )
 
             announcement_dialog.raise_()
             announcement_dialog.activateWindow()
             announcement_dialog.exec()
 
-        except Exception as e:
+        except requests.HTTPError as e:
             print(f"Error displaying announcement window: {e}")

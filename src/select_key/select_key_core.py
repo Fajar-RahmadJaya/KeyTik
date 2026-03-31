@@ -9,7 +9,7 @@ import utility.constant as constant
 import utility.icon as icons
 
 
-class SelectKeyCore:
+class SelectKeyCore():
     "Key selection non UI"
     def __init__(self):
         self.expanded_unicode_blocks = []

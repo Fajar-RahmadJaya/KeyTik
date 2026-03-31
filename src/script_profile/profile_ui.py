@@ -12,7 +12,7 @@ from utility.diff import (Diff, mode_item, mode_map)
 from select_program.select_program_ui import SelectProgramUI
 
 from select_device.select_device_ui import SelectDeviceUI
-from core.remap_row import RemapRow
+from script_profile.remap_row import RemapRow
 from script_profile.profile_core import ProfileCore
 from select_key.select_key_ui import SelectKeyUI
 

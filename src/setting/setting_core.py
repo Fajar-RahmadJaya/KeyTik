@@ -20,6 +20,7 @@ from core.main_logic import MainLogic
 class SettingCore(Diff):
     "Setting logic"
     def __init__(self):
+        super().__init__()
         self.main_logic = MainLogic()
 
         self.script_dir = utils.active_dir

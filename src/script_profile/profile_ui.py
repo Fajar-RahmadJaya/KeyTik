@@ -13,12 +13,12 @@ from select_program.select_program_ui import SelectProgramUI
 
 from select_device.select_device_ui import SelectDeviceUI
 from core.remap_row import RemapRow
-from script_profile.profile_comp import ProfileComponent
+from script_profile.profile_core import ProfileCore
 from select_key.select_key_ui import SelectKeyUI
 
 
 class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
-                ProfileComponent, SelectKeyUI):
+                ProfileCore, SelectKeyUI):
     def edit_script(self, script_name):
         self.shortcut_row_widgets = []
         self.mapping_row_widgets = []

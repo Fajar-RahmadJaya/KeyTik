@@ -7,6 +7,7 @@ import utility.utils as utils
 import utility.thread as thread
 from dashboard.dashborad import Dashboard
 from setting.announcement import Announcement
+from utility.diff import Diff
 
 def main():
     "Main function"
@@ -18,11 +19,13 @@ def main():
     app = QApplication(sys.argv)
     main_window = Dashboard()
     announcement = Announcement()
+    diff = Diff()
+
     main_window.show()
 
     main_window.startup_worker = thread.Thread(main_window)
     main_window.startup_worker.update_found.connect(
-        main_window.show_update_messagebox)
+        diff.show_update_messagebox)
     main_window.startup_worker.show_announcement.connect(
         announcement.show_announcement_window)
     main_window.startup_worker.start()

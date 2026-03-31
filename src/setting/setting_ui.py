@@ -21,16 +21,16 @@ class SettingUI(SettingCore, Announcement):
     "Setting UI"
     def open_settings_window(self):
         "Setting window"
-        settings_window = QDialog(self)
-        settings_window.setWindowTitle("Settings")
-        settings_window.setFixedSize(400, 250)
-        settings_window.setWindowIcon(QIcon(constant.icon_path))
-        settings_window.setModal(True)
-        settings_window.setWindowFlag(
+        self.settings_window = QDialog()
+        self.settings_window.setWindowTitle("Settings")
+        self.settings_window.setFixedSize(400, 250)
+        self.settings_window.setWindowIcon(QIcon(constant.icon_path))
+        self.settings_window.setModal(True)
+        self.settings_window.setWindowFlag(
             Qt.WindowType.WindowStaysOnTopHint,
             getattr(self, "is_on_top", False))
 
-        main_layout = QVBoxLayout(settings_window)
+        main_layout = QVBoxLayout(self.settings_window)
         main_layout.setContentsMargins(10, 10, 10, 10)
 
         group_box = QGroupBox()
@@ -78,7 +78,7 @@ class SettingUI(SettingCore, Announcement):
         group_layout.setColumnStretch(1, 1)
 
         main_layout.addWidget(group_box)
-        settings_window.exec()
+        self.settings_window.exec()
 
     def show_installation_dialog(self):
         "Setting to check, install, uninstall AutoHotkey and Interception driver installation"
@@ -151,4 +151,3 @@ class SettingUI(SettingCore, Announcement):
             QMessageBox.information(self,
                                     "Theme Changed", 
                                     "Theme will be applied after restarting the app.") # noqa
-

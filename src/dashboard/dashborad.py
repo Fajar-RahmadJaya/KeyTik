@@ -14,11 +14,11 @@ import utility.icon as icons
 import utility.diff as diff
 
 from core.main_logic import MainLogic
-from core.write_script import WriteScript
-from core.parse_script import ParseScript
+from script_profile.write_script import WriteScript
+from script_profile.parse_script import ParseScript
 
 from setting.setting_ui import SettingUI
-from announcement.announcement import Announcement
+from setting.announcement import Announcement
 
 from script_profile.profile_ui import ProfileUI
 
@@ -121,39 +121,12 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
 
         self.next_button = QPushButton()
         self.next_button.setFixedWidth(80)
-        self.next_button.setIcon(icons.get_icon(icons.next))
+        self.next_button.setIcon(icons.get_icon(icons.icon_next))
         self.next_button.setToolTip("Next Profile")
         self.next_button.clicked.connect(self.next_page)
         button_layout.addWidget(self.next_button, 0, 8)
 
         self.frame_layout.addWidget(button_frame)
-
-    def update_script_list(self):
-        for i in reversed(range(self.profile_layout.count())):
-            widget = self.profile_layout.itemAt(i).widget()
-            if widget:
-                widget.setParent(None)
-
-        start_index = self.current_page * 6
-        end_index = start_index + 6
-        scripts_to_display = self.scripts[start_index:end_index]
-
-        running_scripts = utils.read_running_scripts_temp()
-
-        for index, script in enumerate(scripts_to_display):
-            row = index // 2
-            column = index % 2
-            icon = (icons.pin_fill
-                    if script in self.pinned_profiles
-                    else icons.pin)
-
-            self.profile_card(script, icon, running_scripts, row, column)
-
-        self.profile_layout.setColumnStretch(0, 1)
-        self.profile_layout.setColumnStretch(1, 1)
-        self.profile_layout.setRowStretch(0, 1)
-        self.profile_layout.setRowStretch(1, 1)
-        self.profile_layout.setRowStretch(2, 1)
 
     def profile_card(self, script, icon, running_scripts, row, column):
         group_box = QGroupBox(os.path.splitext(script)[0])
@@ -178,7 +151,7 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
         if is_startup or script in running_scripts:
             run_button.setText(" Exit")
             run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
-            run_button.setIcon(icons.get_icon(icons.exit))
+            run_button.setIcon(icons.get_icon(icons.icon_exit))
         else:
             run_button.setText(" Run")
             run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
@@ -269,3 +242,4 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
             Announcement.show_announcement_window(self)
         except Exception as e:
             print(f"Error displaying announcement window: {e}")
+

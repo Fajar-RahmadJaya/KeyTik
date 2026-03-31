@@ -1,4 +1,5 @@
 import os
+import json
 import keyboard
 import ctypes
 from pynput import mouse
@@ -25,6 +26,8 @@ class ProfileCore(QObject):
     def __init__(self):
         super().__init__()
         self.request_timer_start.connect(self.release_timer)
+
+        self.is_listening = False
 
     def check_interception_driver(self):
         if os.path.exists(constant.DRIVER_PATH):
@@ -341,3 +344,19 @@ class ProfileCore(QObject):
                 entry = entry_tuple[0]
                 if entry is not None:
                     entry.removeEventFilter(self._input_blocker)
+
+    def load_key_list(self):
+        key_map = {}
+        try:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                for category_dict in data:
+                    for _, keys in category_dict.items():
+                        for key, info in keys.items():
+                            readable = key
+                            raw = info.get("translate", "")
+                            if raw:
+                                key_map[raw] = readable
+        except Exception as e:
+            print(f"Error reading key list: {e}")
+        return key_map

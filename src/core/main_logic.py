@@ -19,10 +19,12 @@ from pynput.keyboard import Controller, Key
 import utility.utils as utils
 import utility.icon as icons
 
-from announcement.announcement import Announcement
-
-
 class MainLogic:
+    def __init__(self):
+        # UI initialization
+        self.script_dir = utils.active_dir
+        self.pinned_profiles = utils.load_pinned_profiles()
+
     def import_button_clicked(self):
         file_dialog = QFileDialog(self)
         file_dialog.setNameFilter("AHK Scripts (*.ahk)")
@@ -35,7 +37,7 @@ class MainLogic:
                                         "Only .ahk files are allowed.")
                     return
                 file_name = os.path.basename(selected_file)
-                destination_path = os.path.join(self.SCRIPT_DIR, file_name)
+                destination_path = os.path.join(self.script_dir, file_name)
                 try:
                     shutil.move(selected_file, destination_path)
                 except Exception as e:
@@ -112,8 +114,8 @@ class MainLogic:
             return
         if not new_name.lower().endswith('.ahk'):
             new_name += '.ahk'
-        source_path = os.path.join(self.SCRIPT_DIR, script)
-        destination_path = os.path.join(self.SCRIPT_DIR, new_name)
+        source_path = os.path.join(self.script_dir, script)
+        destination_path = os.path.join(self.script_dir, new_name)
         try:
             shutil.copy(source_path, destination_path)
             self.scripts = self.list_scripts()
@@ -122,7 +124,7 @@ class MainLogic:
             QMessageBox.warning(self, "Error", f"Error copying script: {e}")
 
     def delete_script(self, script_name):
-        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+        script_path = os.path.join(self.script_dir, script_name)
         if os.path.isfile(script_path):
             reply = QMessageBox.question(
                 self,
@@ -158,7 +160,7 @@ class MainLogic:
             self.always_top.setIcon(icons.get_icon(icons.on_top))
 
     def activate_script(self, script_name, button):
-        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+        script_path = os.path.join(self.script_dir, script_name)
 
         if os.path.isfile(script_path):
 
@@ -166,7 +168,7 @@ class MainLogic:
 
             button.setText(" Exit")
             button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"') # noqa
-            button.setIcon(icons.get_icon(icons.exit))
+            button.setIcon(icons.get_icon(icons.icon_exit))
             button.clicked.disconnect()
             button.clicked.connect(lambda: self.exit_script(script_name,
                                                             button))
@@ -174,7 +176,7 @@ class MainLogic:
             QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
 
     def exit_script(self, script_name, button):
-        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+        script_path = os.path.join(self.script_dir, script_name)
 
         if os.path.isfile(script_path):
             try:
@@ -215,9 +217,9 @@ class MainLogic:
             QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
 
     def store_script(self, script_name):
-        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+        script_path = os.path.join(self.script_dir, script_name)
 
-        if self.SCRIPT_DIR == utils.active_dir:
+        if self.script_dir == utils.active_dir:
             target_dir = utils.store_dir
         else:
             target_dir = utils.active_dir
@@ -255,12 +257,12 @@ class MainLogic:
                 script_name, button))
 
     def toggle_script_dir(self):
-        if self.SCRIPT_DIR == utils.active_dir:
-            self.SCRIPT_DIR = utils.store_dir
+        if self.script_dir == utils.active_dir:
+            self.script_dir = utils.store_dir
             self.show_stored.setToolTip("Show Active Profile")
             self.show_stored.setIcon(icons.get_icon(icons.show_stored_fill))
         else:
-            self.SCRIPT_DIR = utils.active_dir
+            self.script_dir = utils.active_dir
             self.show_stored.setToolTip("Show Stored Profile")
             self.show_stored.setIcon(icons.get_icon(icons.show_stored))
 
@@ -280,12 +282,6 @@ class MainLogic:
         utils.save_pinned_profiles(self.pinned_profiles)
         self.list_scripts()
         self.update_script_list()
-
-    def show_announcement_window(self):
-        try:
-            Announcement.show_announcement_window(self)
-        except Exception as e:
-            print(f"Error displaying announcement window: {e}")
 
     def check_ahk_installation(self, show_installed_message=False):
         if os.path.exists(utils.ahkv2_dir):
@@ -350,7 +346,7 @@ class MainLogic:
             shutil.copytree(constant.ahi_dir, target_folder)
 
     def list_scripts(self):
-        all_scripts = [f for f in os.listdir(self.SCRIPT_DIR)
+        all_scripts = [f for f in os.listdir(self.script_dir)
                        if f.endswith('.ahk') or f.endswith('.py')]
 
         pinned = [script for script in all_scripts
@@ -372,7 +368,7 @@ class MainLogic:
             self.update_script_list()
 
     def add_ahk_to_startup(self, script_name):
-        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+        script_path = os.path.join(self.script_dir, script_name)
 
         startup_folder = winshell.startup()
 
@@ -407,19 +403,6 @@ class MainLogic:
 
         except Exception as e:
             print(f"Error removing {shortcut_path}: {e}")
-
-    def is_visible_application(self, pid):
-        try:
-            def callback(hwnd, pid_list):
-                _, process_pid = win32process.GetWindowThreadProcessId(hwnd)
-                if process_pid == pid and win32gui.IsWindowVisible(hwnd):
-                    pid_list.append(pid)
-
-            visible_pids = []
-            win32gui.EnumWindows(callback, visible_pids)
-            return len(visible_pids) > 0
-        except Exception:
-            return False
 
     def run_monitor(self):
         script_path = os.path.join(constant.script_dir,
@@ -458,22 +441,6 @@ class MainLogic:
 
         return " & ".join(translated_keys)
 
-    def load_key_list(self):
-        key_map = {}
-        try:
-            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-                for category_dict in data:
-                    for _, keys in category_dict.items():
-                        for key, info in keys.items():
-                            readable = key
-                            raw = info.get("translate", "")
-                            if raw:
-                                key_map[raw] = readable
-        except Exception as e:
-            print(f"Error reading key list: {e}")
-        return key_map
-
     def load_key_values(self):
         key_values = []
         try:
@@ -486,3 +453,31 @@ class MainLogic:
         except Exception as e:
             print(f"Error reading key_list.json: {e}")
         return key_values
+    
+    def update_script_list(self):
+        "! From dashboard"
+        for i in reversed(range(self.profile_layout.count())):
+            widget = self.profile_layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
+
+        start_index = self.current_page * 6
+        end_index = start_index + 6
+        scripts_to_display = self.scripts[start_index:end_index]
+
+        running_scripts = utils.read_running_scripts_temp()
+
+        for index, script in enumerate(scripts_to_display):
+            row = index // 2
+            column = index % 2
+            icon = (icons.pin_fill
+                    if script in self.pinned_profiles
+                    else icons.pin)
+
+            self.profile_card(script, icon, running_scripts, row, column)
+
+        self.profile_layout.setColumnStretch(0, 1)
+        self.profile_layout.setColumnStretch(1, 1)
+        self.profile_layout.setRowStretch(0, 1)
+        self.profile_layout.setRowStretch(1, 1)
+        self.profile_layout.setRowStretch(2, 1)

@@ -8,6 +8,9 @@ from utility.diff import (Diff)
 
 from setting.announcement import Announcement
 
+from script_profile.write_script import WriteScript
+from script_profile.profile_core import ProfileCore
+
 
 class Thread(QThread, Diff):
     "Thread at initializaion"
@@ -19,12 +22,14 @@ class Thread(QThread, Diff):
         super().__init__()
         self.main_window = main_window
         self.announcement = Announcement()
+        self.write_script = WriteScript()
+        self.profile_core = ProfileCore()
 
     def run(self):
         "Run check update on thread to increase dashborad initialization time"
-        self.main_window.initialize_exit_keys()
+        self.write_script.initialize_exit_keys()
 
-        latest_version = self.main_window.check_for_update()
+        latest_version = self.check_for_update()
         if latest_version:
             self.update_found.emit(latest_version)
         self.finished.emit()
@@ -33,10 +38,10 @@ class Thread(QThread, Diff):
             self.show_announcement.emit()
 
         if not hasattr(self.main_window, "keyboard_hook_initialized"):
-            keyboard.hook(lambda event: self.main_window.multi_key_event(
+            keyboard.hook(lambda event: self.profile_core.multi_key_event(
                 event, self.main_window.active_entry, None))
             self.main_window.mouse_listener = pynput.mouse.Listener(
-                 on_click=self.main_window.mouse_listening
+                 on_click=self.profile_core.mouse_listening
             )
             self.main_window.mouse_listener.start()
             self.main_window.keyboard_hook_initialized = True

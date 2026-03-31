@@ -14,7 +14,7 @@ from utility import constant
 from utility import utils
 
 from setting.setting_core import SettingCore
-from announcement.announcement import Announcement
+from setting.announcement import Announcement
 
 
 class SettingUI(SettingCore, Announcement):

@@ -1,13 +1,13 @@
-import os
-import winshell
-from win32com.client import Dispatch
-import win32gui
-import win32process
-import json
-import utility.constant as constant
+"Main Core (Might be changed to shared later)"
 
+import os
+import json
+import winshell
 import shutil
 import webbrowser
+
+from win32com.client import Dispatch
+
 from PySide6.QtWidgets import (
     QApplication, QFileDialog, QMessageBox,
     QInputDialog
@@ -16,10 +16,12 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from pynput.keyboard import Controller, Key
 
+from utility import constant
 from utility import utils
-import utility.icon as icons
 
-class MainLogic:
+from utility import icon
+
+class MainCore():
     def __init__(self):
         # UI initialization
         self.script_dir = utils.active_dir

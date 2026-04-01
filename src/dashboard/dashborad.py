@@ -1,12 +1,14 @@
+"Main Window"
+
 import os
 import winshell
-from PySide6.QtWidgets import (
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMainWindow, QWidget, QVBoxLayout, QGridLayout,
     QFrame, QPushButton, QGroupBox, QLabel
 )
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt
-from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 
 import utility.constant as constant
 from utility import utils
@@ -16,15 +18,15 @@ import utility.diff as diff
 from core.main_logic import MainLogic
 from script_profile.write_script import WriteScript
 from script_profile.parse_script import ParseScript
+from script_profile.profile_ui import ProfileUI
 
 from setting.setting_ui import SettingUI
 from setting.announcement import Announcement
 
-from script_profile.profile_ui import ProfileUI
-
 
 class Dashboard(QMainWindow, MainLogic, ProfileUI,
                 SettingUI, Announcement, WriteScript, ParseScript):
+    "Main Window"
     def __init__(self):
         super().__init__()
         # Key Listening
@@ -39,7 +41,7 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
         self.central_widget = QWidget()
         self.main_layout = QVBoxLayout(self.central_widget)
         self.current_page = 0
-        self.SCRIPT_DIR = utils.active_dir
+        self.script_dir = utils.active_dir
         self.pinned_profiles = utils.load_pinned_profiles()
         self.scripts = self.list_scripts()
         self.create_ui()
@@ -53,6 +55,7 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
         self.check_ahi_dir()
 
     def create_ui(self):
+        "Dashboard Window"
         self.frame = QFrame()
         self.main_layout.addWidget(self.frame)
         self.frame_layout = QVBoxLayout(self.frame)
@@ -129,6 +132,7 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
         self.frame_layout.addWidget(button_frame)
 
     def profile_card(self, script, icon, running_scripts, row, column):
+        "Profile action"
         group_box = QGroupBox(os.path.splitext(script)[0])
         group_layout = QGridLayout(group_box)
 
@@ -165,7 +169,7 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
         edit_button.setFixedWidth(80)
         edit_button.setToolTip(f'Adjust "{os.path.splitext(script)[0]}"')
 
-        def handle_edit(checked=False, s=script, rb=run_button):
+        def handle_edit(s=script, rb=run_button):
             was_running = rb.text() == " Exit"
             if was_running:
                 self.exit_script(s, rb)
@@ -204,12 +208,12 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
         group_layout.addWidget(delete_button, 1, 2)
 
         store_button = QPushButton(" Store" if
-                                   self.SCRIPT_DIR == utils.active_dir
+                                   self.script_dir == utils.active_dir
                                    else " Restore")
         store_button.setFixedWidth(80)
         store_button.setIcon(icons.get_icon(icons.store))
 
-        if self.SCRIPT_DIR == utils.active_dir:
+        if self.script_dir == utils.active_dir:
             store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"') # noqa
         else:
             store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"') # noqa
@@ -222,14 +226,22 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
             startup_button = QPushButton(" Unstartup")
             startup_button.setIcon(icons.get_icon(icons.rocket_fill))
             startup_button.setToolTip(
-                f'Remove from startup: Dont run"{os.path.splitext(script)[0]}" automatically when computer starts') # noqa
+                (
+                f'Remove from startup: Dont run"{os.path.splitext(script)[0]}" '
+                'automatically when computer starts'
+                )
+            )
             startup_button.clicked.connect(lambda checked, s=script:
                                            self.remove_ahk_from_startup(s))
         else:
             startup_button = QPushButton(" Startup")
             startup_button.setIcon(icons.get_icon(icons.rocket))
             startup_button.setToolTip(
-                f'Add to startup: Run "{os.path.splitext(script)[0]}" automatically when computer starts') # noqa
+                (
+                f'Add to startup: Run "{os.path.splitext(script)[0]}" '
+                'automatically when computer starts'
+                )
+            )
             startup_button.clicked.connect(lambda checked, s=script:
                                            self.add_ahk_to_startup(s))
         startup_button.setFixedWidth(80)
@@ -240,6 +252,5 @@ class Dashboard(QMainWindow, MainLogic, ProfileUI,
     def show_announcement_window(self):
         try:
             Announcement.show_announcement_window(self)
-        except Exception as e:
+        except RuntimeError as e:
             print(f"Error displaying announcement window: {e}")
-

@@ -31,7 +31,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
             script_path = None
             lines = ["; default\n"]
         else:
-            script_path = os.path.join(self.SCRIPT_DIR, script_name)
+            script_path = os.path.join(self.script_dir, script_name)
             with open(script_path, 'r', encoding='utf-8') as file:
                 lines = file.readlines()
                 first_line = file.readline().strip()

@@ -146,7 +146,7 @@ class Diff():
                                            QSizePolicy.Expanding))
 
     def handle_write(self, script_name, mode):
-        output_path = os.path.join(self.SCRIPT_DIR, script_name)
+        output_path = os.path.join(self.script_dir, script_name)
         key_translations = self.load_key_translations()
 
         with open(output_path, 'w', encoding='utf-8') as file:

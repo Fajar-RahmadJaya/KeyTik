@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from utility import utils
-import utility.icon as icons
+from utility import icons
 
 
 class RemapRow():

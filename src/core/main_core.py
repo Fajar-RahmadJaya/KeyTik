@@ -18,9 +18,7 @@ from pynput.keyboard import Controller, Key
 
 from utility import constant
 from utility import utils
-
-import utility.icon as icons
-
+from utility import icons
 
 class MainCore():
     "Main Logic"

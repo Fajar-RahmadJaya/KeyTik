@@ -9,7 +9,7 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt, QEvent, QPoint  # pylint: disable=E0611
 
 from utility import constant
-from utility import icon
+from utility import icons
 
 from select_key.select_key_core import SelectKeyCore
 
@@ -76,7 +76,7 @@ class SelectKeyUI(SelectKeyCore):
         main_layout.addLayout(choose_search_layout)
 
         filter_button = QPushButton()
-        filter_button.setIcon(icon.get_icon(icon.icon_filter))
+        filter_button.setIcon(icons.get_icon(icons.icon_filter))
         choose_search_layout.addWidget(filter_button)
 
         search_entry = QLineEdit()

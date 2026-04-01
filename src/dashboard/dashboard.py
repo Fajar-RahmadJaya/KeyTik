@@ -13,7 +13,7 @@ from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from utility import constant
 
 from utility import utils
-import utility.icon as icons
+from utility import icons
 import utility.diff as diff
 
 from core.main_core import MainCore

@@ -3,7 +3,7 @@ import os
 import sys
 from PySide6.QtWidgets import (QApplication) # pylint: disable=E0611
 
-import utility.utils as utils
+from utility import utils
 import utility.thread as thread
 from dashboard.dashborad import Dashboard
 from setting.announcement import Announcement

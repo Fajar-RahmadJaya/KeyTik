@@ -16,7 +16,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from pynput.keyboard import Controller, Key
 
-import utility.utils as utils
+from utility import utils
 import utility.icon as icons
 
 class MainLogic:

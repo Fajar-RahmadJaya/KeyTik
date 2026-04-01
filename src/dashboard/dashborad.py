@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtSvgWidgets import QSvgWidget
 
 import utility.constant as constant
-import utility.utils as utils
+from utility import utils
 import utility.icon as icons
 import utility.diff as diff
 

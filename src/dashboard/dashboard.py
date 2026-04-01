@@ -47,7 +47,7 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         self.scripts = self.list_scripts()
         self.create_ui()
         self.update_script_list()
-        self.setWindowTitle(diff.program_name)
+        self.setWindowTitle(diff.PROGRAM_NAME)
         self.setFixedSize(650, 492)
         self.setWindowIcon(QIcon(constant.icon_path))
         self.setCentralWidget(self.central_widget)

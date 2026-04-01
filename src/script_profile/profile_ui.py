@@ -133,7 +133,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.key_rows = []
         self.shortcut_rows = []
 
-        self.handle_parser(lines, first_line)
+        self.handle_parser(lines)
 
         self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum,
                                                    QSizePolicy.Expanding))

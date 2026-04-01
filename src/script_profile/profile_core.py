@@ -5,7 +5,8 @@ import ctypes
 from pynput import mouse
 from PySide6.QtWidgets import (QMessageBox, QPushButton)
 from PySide6.QtCore import QTimer, Signal, QObject, QEvent
-import utility.constant as constant
+from utility import constant
+
 
 
 class InputBlocker(QObject):

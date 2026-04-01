@@ -6,7 +6,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 
-import utility.constant as constant
+from utility import constant
+
 from utility.diff import (Diff, mode_item, mode_map)
 
 from select_program.select_program_ui import SelectProgramUI

@@ -5,7 +5,8 @@ import webbrowser
 from PySide6.QtWidgets import (QMessageBox, QTextEdit, QSizePolicy,
                                QSpacerItem)
 
-import utility.constant as constant
+from utility import constant
+
 
 
 mode_item = [

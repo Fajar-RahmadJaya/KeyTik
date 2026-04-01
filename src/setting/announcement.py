@@ -10,7 +10,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
-import utility.constant as constant
+from utility import constant
+
 from utility.diff import Diff
 
 

@@ -15,16 +15,16 @@ from utility import constant
 from utility import utils
 from utility.diff import Diff
 
-from core.main_logic import MainLogic
+from core.main_core import MainCore
 
 class SettingCore(Diff):
     "Setting logic"
     def __init__(self):
         super().__init__()
-        self.main_logic = MainLogic()
+        self.main_core = MainCore()
 
         self.script_dir = utils.active_dir
-        self.scripts = self.main_logic.list_scripts()
+        self.scripts = self.main_core.list_scripts()
 
     def change_data_location(self):
         "Change active and stored profile directory for 'change profile location'"
@@ -67,8 +67,8 @@ class SettingCore(Diff):
             print(f"Global store_dir updated to: {utils.store_dir}")
 
             self.script_dir = utils.active_dir
-            self.scripts = self.main_logic.list_scripts()
-            self.main_logic.update_script_list()
+            self.scripts = self.main_core.list_scripts()
+            self.main_core.update_script_list()
 
             QMessageBox.information(
                 self, "Change Profile Location",

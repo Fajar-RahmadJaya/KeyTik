@@ -10,12 +10,13 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 
-import utility.constant as constant
+from utility import constant
+
 from utility import utils
 import utility.icon as icons
 import utility.diff as diff
 
-from core.main_logic import MainLogic
+from core.main_core import MainCore
 from script_profile.write_script import WriteScript
 from script_profile.parse_script import ParseScript
 from script_profile.profile_ui import ProfileUI
@@ -24,7 +25,7 @@ from setting.setting_ui import SettingUI
 from setting.announcement import Announcement
 
 
-class Dashboard(QMainWindow, MainLogic, ProfileUI,
+class Dashboard(QMainWindow, MainCore, ProfileUI,
                 SettingUI, Announcement, WriteScript, ParseScript):
     "Main Window"
     def __init__(self):

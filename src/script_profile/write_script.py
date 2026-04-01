@@ -5,7 +5,8 @@ import traceback
 import re
 from PySide6.QtWidgets import (QMessageBox)
 from PySide6.QtGui import QIcon
-import utility.constant as constant
+from utility import constant
+
 from utility import utils
 from utility.diff import Diff
 

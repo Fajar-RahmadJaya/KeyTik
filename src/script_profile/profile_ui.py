@@ -1,25 +1,44 @@
+"UI for create/edit profile"
+
 import os
-from PySide6.QtWidgets import (
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
     QVBoxLayout, QSpacerItem, QSizePolicy, QComboBox, QGridLayout
 )
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
-import utility.constant as constant
+from utility import constant
+
 from utility.diff import (Diff, mode_item, mode_map)
 
 from select_program.select_program_ui import SelectProgramUI
 
 from select_device.select_device_ui import SelectDeviceUI
-from core.remap_row import RemapRow
-from script_profile.profile_comp import ProfileComponent
+from script_profile.remap_row import RemapRow
+from script_profile.profile_core import ProfileCore
 from select_key.select_key_ui import SelectKeyUI
 
 
 class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
-                ProfileComponent, SelectKeyUI):
+                ProfileCore, SelectKeyUI):
+    "Create/edit profile UI"
+    def __init__(self):
+        super().__init__()
+        self.copas_rows = []
+        self.key_rows = []
+        self.shortcut_rows = []
+        self.is_text_mode = False
+
+        self.script_name_entry = None
+        self.program_entry = None
+        self.keyboard_entry = None
+        self.edit_scroll = None
+        self.edit_frame = None
+        self.mode_combobox = None
+
     def edit_script(self, script_name):
+        "Create/edit profile window"
         self.shortcut_row_widgets = []
         self.mapping_row_widgets = []
         self.copas_rows = []
@@ -31,7 +50,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
             script_path = None
             lines = ["; default\n"]
         else:
-            script_path = os.path.join(self.SCRIPT_DIR, script_name)
+            script_path = os.path.join(self.script_dir, script_name)
             with open(script_path, 'r', encoding='utf-8') as file:
                 lines = file.readlines()
                 first_line = file.readline().strip()
@@ -57,48 +76,45 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
 
         script_name_label = QLabel("Profile Name", top_widget)
         script_name_label.setFixedWidth(90)
-        script_name_entry = QLineEdit(top_widget)
+        self.script_name_entry = QLineEdit(top_widget)
         if script_name:
             script_name_without_extension = script_name.replace('.ahk', '')
-            script_name_entry.setText(script_name_without_extension)
-            script_name_entry.setReadOnly(True)
+            self.script_name_entry.setText(script_name_without_extension)
+            self.script_name_entry.setReadOnly(True)
         else:
-            script_name_entry.setText("")
-            script_name_entry.setReadOnly(False)
-        self.script_name_entry = script_name_entry
+            self.script_name_entry.setText("")
+            self.script_name_entry.setReadOnly(False)
         top_layout.addWidget(script_name_label, 0, 0, 1, 1)
-        top_layout.addWidget(script_name_entry, 0, 1, 1, 3)
+        top_layout.addWidget(self.script_name_entry, 0, 1, 1, 3)
 
         program_label = QLabel("Program", top_widget)
         program_label.setFixedWidth(90)
-        program_entry = QLineEdit(top_widget)
+        self.program_entry = QLineEdit(top_widget)
         program_select_button = QPushButton("Select Program", top_widget)
         program_select_button.setToolTip("Choose program and bind profile to it") # noqa
         program_select_button.clicked.connect(lambda: self.program_window(
             self.program_entry))
-        self.program_entry = program_entry
         top_layout.addWidget(program_label, 1, 0, 1, 1)
-        top_layout.addWidget(program_entry, 1, 1, 1, 2)
+        top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
         keyboard_label = QLabel("Device ID", top_widget)
         keyboard_label.setFixedWidth(90)
-        keyboard_entry = QLineEdit(top_widget)
+        self.keyboard_entry = QLineEdit(top_widget)
         keyboard_select_button = QPushButton("Select Device", top_widget)
         keyboard_select_button.setToolTip("Choose device and bind profile to it") # noqa
         keyboard_select_button.clicked.connect(self.open_device_selection)
-        self.keyboard_entry = keyboard_entry
         top_layout.addWidget(keyboard_label, 2, 0, 1, 1)
-        top_layout.addWidget(keyboard_entry, 2, 1, 1, 2)
+        top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
         device_id = self.parse_device(lines)
         if device_id:
-            keyboard_entry.setText(device_id)
+            self.keyboard_entry.setText(device_id)
 
         program_entry_value = self.parse_program(lines)
         if program_entry_value:
-            program_entry.setText(program_entry_value)
+            self.program_entry.setText(program_entry_value)
 
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
@@ -117,7 +133,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.key_rows = []
         self.shortcut_rows = []
 
-        self.handle_parser(lines, first_line)
+        self.handle_parser(lines)
 
         self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum,
                                                    QSizePolicy.Expanding))
@@ -131,24 +147,23 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         save_button.clicked.connect(lambda: self.save_changes(script_name))
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
-        mode_combobox = QComboBox(self.edit_window)
-        mode_combobox.addItems(mode_item)
-        mode_combobox.setEditable(True)
-        mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
-        mode_combobox.lineEdit().setReadOnly(True)
-        mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.mode_combobox = mode_combobox
-        bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
+        self.mode_combobox = QComboBox(self.edit_window)
+        self.mode_combobox.addItems(mode_item)
+        self.mode_combobox.setEditable(True)
+        self.mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.mode_combobox.lineEdit().setReadOnly(True)
+        self.mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        bottom_layout.addWidget(self.mode_combobox, 0, 3, 1, 1)
 
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
         first_line_lower = first_line.lower()
 
         default_index = mode_map.get(first_line_lower, 0)
-        mode_combobox.setCurrentIndex(default_index)
+        self.mode_combobox.setCurrentIndex(default_index)
 
         on_mode_changed = self.handle_mode_changed
-        mode_combobox.currentIndexChanged.connect(on_mode_changed)
+        self.mode_combobox.currentIndexChanged.connect(on_mode_changed)
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()

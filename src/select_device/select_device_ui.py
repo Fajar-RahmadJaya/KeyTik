@@ -1,19 +1,28 @@
+"UI for device selection"
+
 import os
 import time
-from PySide6.QtWidgets import (
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QPushButton,
     QVBoxLayout, QHBoxLayout, QTreeWidget
 )
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
-import utility.constant as constant
-import utility.utils as utils
+from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from utility import constant
+from utility import utils
 
-from select_device.select_device_comp import selectDeviceComponent
+from select_device.select_device_core import SelectDeviceCore
 
 
-class SelectDeviceUI(selectDeviceComponent):
+class SelectDeviceUI(SelectDeviceCore):
+    "Device selecition UI for device binding"
+    def __init__(self):
+        super().__init__()
+        self.device_selection_window = None
+        self.device_tree = None
+
     def open_device_selection(self):
+        "Device selection window"
         # Make sure interception driver installed
         if not self.check_interception_driver():
             return

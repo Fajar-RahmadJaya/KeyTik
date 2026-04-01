@@ -1,17 +1,27 @@
+"Write AutoHotkey script"
+
 import os
 import json
 import random
 import traceback
 import re
-from PySide6.QtWidgets import (QMessageBox)
-from PySide6.QtGui import QIcon
-import utility.constant as constant
-import utility.utils as utils
+from PySide6.QtWidgets import (QMessageBox)  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from utility import constant
+
+from utility import utils
 from utility.diff import Diff
 
 
 class WriteScript(Diff):
+    "Write script based on profile input"
+    def __init__(self):
+        super().__init__()
+        self.is_text_mode = None
+        self.scripts = None
+
     def generate_exit_key(self, script_name, file=None):
+        "Generate key for profile exit"
         possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', # noqa
                         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] # noqa
 
@@ -42,13 +52,14 @@ class WriteScript(Diff):
 
             return exit_combo
 
-        except Exception as e:
+        except FileNotFoundError as e:
             print(f"Error handling exit key: {e}")
             if file is not None:
                 file.write("^!p::ExitApp\n\n")
             return "^!p"
 
     def initialize_exit_keys(self):
+        "Make sure there is no duplicate exit key usage on each script"
         try:
             ahk_files = set()
             for dir_path in [utils.active_dir, utils.store_dir]:
@@ -62,7 +73,7 @@ class WriteScript(Diff):
                 try:
                     with open(constant.exit_keys_file, 'r', encoding='utf-8') as f: # noqa
                         exit_keys = json.load(f)
-                except Exception:
+                except FileNotFoundError:
                     exit_keys = {}
 
             combo_to_scripts = {}
@@ -117,27 +128,32 @@ class WriteScript(Diff):
                             lines[1] = f"{exit_combo}::ExitApp\n"
                             with open(script_path, 'w', encoding='utf-8') as f:
                                 f.writelines(lines)
-                        except Exception as e:
+                        except FileNotFoundError as e:
                             print(f"Error processing {script_name} in {dir_path}: {e}") # noqa
                             continue
 
             try:
                 with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
                     json.dump(exit_keys, f)
-            except Exception as e:
+            except FileNotFoundError as e:
                 print(f"Error saving exit_keys.json: {e}")
 
-        except Exception as e:
+        except FileNotFoundError as e:
             print(f"Error in initialize_exit_keys: {e}")
 
-    def check_key_integrity(self, shortcut_types, caps_on_present, caps_off_present, num_on_present, num_off_present): # noqa
+    def check_key_integrity(self, shortcut_types, caps_on_present, caps_off_present,
+                            num_on_present, num_off_present):
+        "Make sure there is no conflict on profile input"
         if shortcut_types["normal"] and shortcut_types["caps"]:
             msg = (QMessageBox(self.edit_window
                                if hasattr(self, "edit_window")
                                else None))
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
-            msg.setText("You cannot use 'CapsLock On' or 'CapsLock Off' or 'NumLock On' or 'Numlock Off' together with normal keys as shortcuts. Please use only one type (either normal keys or CapsLock NumLock ON/OFF) for all shortcuts.") # noqa
+            msg.setText("You cannot use 'CapsLock On' or 'CapsLock Off' "
+                        "or 'NumLock On' or 'Numlock Off' together with normal keys as shortcuts. "
+                        "Please use only one type "
+                        "(either normal keys or CapsLock NumLock ON/OFF) for all shortcuts.")
             msg.setWindowIcon(QIcon(constant.icon_path))
             msg.exec()
             return False
@@ -147,7 +163,8 @@ class WriteScript(Diff):
                                else None))
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
-            msg.setText("You cannot use both 'CapsLock ON' and 'CapsLock OFF' at the same time. Please use only one of of them. If you need both, just use 'Caps Lock'.") # noqa
+            msg.setText("You cannot use both 'CapsLock ON' and 'CapsLock OFF' at the same time. "
+                        "Please use only one of of them. If you need both, just use 'Caps Lock'.")
             msg.setWindowIcon(QIcon(constant.icon_path))
             msg.exec()
             return False
@@ -157,13 +174,15 @@ class WriteScript(Diff):
                                else None))
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
-            msg.setText("You cannot use both 'NumLock ON' and 'NumLock OFF' at the same time. Please use only one of of them. If you need both, just use 'Caps Lock'.") # noqa
+            msg.setText("You cannot use both 'NumLock ON' and 'NumLock OFF' at the same time. "
+                        "Please use only one of of them. If you need both, just use 'Caps Lock'.")
             msg.setWindowIcon(QIcon(constant.icon_path))
             msg.exec()
             return False
         return True
 
     def save_changes(self, script_name):
+        "Write script"
         script_name = self.get_script_name()
         if not script_name:
             return
@@ -200,17 +219,18 @@ class WriteScript(Diff):
             mode = None
             if hasattr(self, "mode_combobox"):
                 mode = self.mode_combobox.currentText().strip().lower()
-            self.is_text_mode = (mode == "text mode")
+            self.is_text_mode = mode == "text mode"
             self.handle_write(script_name, mode)
             self.scripts = self.list_scripts()
             self.update_script_list()
             self.edit_window.destroy()
 
-        except Exception as e:
+        except ValueError as e:
             print(f"Error writing script: {e}")
             traceback.print_exc()
 
     def get_program_condition(self):
+        "Get program binding value from entry"
         program_entry = self.program_entry.text().strip()
         program_condition = ""
 
@@ -231,6 +251,7 @@ class WriteScript(Diff):
         return program_condition
 
     def get_device_condition(self):
+        "Get device binding value from entry"
         device_condition = ""
         device_name = self.keyboard_entry.text().strip()
         if device_name:
@@ -239,6 +260,7 @@ class WriteScript(Diff):
 
     def write_condition(self, file, key_translations, write_shortcuts=True,
                         write_program=True, write_device=True):
+        "Write shortcuts, program, device binding"
         device = self.keyboard_entry.text().strip() if write_device else None
         program = self.get_program_condition() if write_program else None
         shortcuts = None
@@ -264,7 +286,12 @@ class WriteScript(Diff):
             file.write("Persistent\n")
             file.write("#include AutoHotkey Interception\\Lib\\AutoHotInterception.ahk\n\n") # noqa
             file.write("AHI := AutoHotInterception()\n")
-            file.write(f'id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, "{vid_pid_or_handle}")\n') # noqa
+            file.write(
+                (
+                f'id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, '
+                f'"{vid_pid_or_handle}")\n'
+                )
+            )
             file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
             device_condition = "cm1.IsActive"
 
@@ -309,6 +336,7 @@ class WriteScript(Diff):
         return False
 
     def handle_default_mode(self, file, key_translations):
+        "Write default mode"
         file.write("; default\n")
         self.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
@@ -325,6 +353,7 @@ class WriteScript(Diff):
             file.write("#HotIf\n")
 
     def handle_text_mode(self, file, key_translations):
+        "Write text mode"
         file.write("; text\n")
         self.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
@@ -345,15 +374,12 @@ class WriteScript(Diff):
             file.write("#HotIf\n")
 
     def process_key_remaps(self, file, key_translations):
+        "Handle key remap write"
         for row in self.key_rows:
-            if len(row) >= 8:
-                (default_key_entry, remap_key_entry, _,
-                 _, text_format_var, hold_format_var,
-                 hold_interval_entry, first_key_checkbox) = row
-            else:
-                (default_key_entry, remap_key_entry, _,
-                 _, text_format_var, hold_format_var,
-                 hold_interval_entry) = row
+            (default_key_entry, remap_key_entry, _,
+            _, text_format_var, hold_format_var,
+            hold_interval_entry, first_key_checkbox) = row
+
             try:
                 default_key = default_key_entry.text().strip()
                 remap_key = remap_key_entry.text().strip()
@@ -375,36 +401,33 @@ class WriteScript(Diff):
                         )
                         continue
                     default_translated = self.write_multiple_key_default(
-                        file, default_key, key_translations,
-                        first_key_checkbox)
+                        default_key, key_translations, first_key_checkbox)
 
                 else:
                     default_translated = self.write_single_key_default(
-                        file, default_key, key_translations)
+                        default_key, key_translations)
 
                 self.handle_remap_type(
                     file, default_translated, remap_key, key_translations,
                     text_format_var.isChecked(),
                     hold_format_var.isChecked(),
                     hold_format_var,
-                    hold_interval_entry,
-                    has_multiple_keys
-                )
+                    hold_interval_entry)
 
-            except Exception:
+            except ValueError:
                 continue
 
     def handle_remap_type(self, file, default_translated, remap_key,
                           key_translations, is_text_mode, is_hold_mode,
-                          hold_format_var, hold_interval_entry,
-                          has_multiple_keys):
+                          hold_format_var, hold_interval_entry,):
+        "Handle text, hold, single, multiple key mode"
         if is_text_mode:
             self.write_text_format(file, default_translated, remap_key)
         elif is_hold_mode:
             self.write_hold_format(
                 file, default_translated, remap_key,
                 key_translations, hold_format_var,
-                hold_interval_entry, has_multiple_keys
+                hold_interval_entry
             )
         elif "+" in remap_key:
             self.write_multiple_key_remap(file, default_translated,
@@ -413,20 +436,23 @@ class WriteScript(Diff):
             self.write_single_key_remap(file, default_translated,
                                         remap_key, key_translations)
 
-    def write_single_key_default(self, file, default_key, key_translations):
+    def write_single_key_default(self, default_key, key_translations):
+        "Write single key case on default key"
         translated_key = self.translate_key(default_key, key_translations)
         return translated_key
 
     def write_single_key_remap(self, file, default_translated, remap_key,
                                key_translations):
+        "Write single key case on remap key"
         if hasattr(self, "is_unicode_key") and self.is_unicode_key(remap_key):
             file.write(f'{default_translated}::SendInput Chr({ord(remap_key)})\n') # noqa
         else:
             remap_key_tr = self.translate_key(remap_key, key_translations)
             file.write(f'{default_translated}::{remap_key_tr}\n')
 
-    def write_multiple_key_default(self, file, default_key, key_translations,
+    def write_multiple_key_default(self, default_key, key_translations,
                                    first_key_checkbox=None):
+        "Write multiple key case on default key"
         if first_key_checkbox is not None and first_key_checkbox.isChecked():
             translated_key = self.translate_key(default_key, key_translations)
         else:
@@ -436,6 +462,7 @@ class WriteScript(Diff):
 
     def write_multiple_key_remap(self, file, default_translated, remap_key,
                                  key_translations):
+        "Write multiple key case on remap key"
         keys = [key.strip() for key in remap_key.split("+")]
         send_parts_down = []
         send_parts_up = []
@@ -455,10 +482,15 @@ class WriteScript(Diff):
     def write_double_click(self, file, single_key, remap_key,
                            key_translations, is_text_mode, is_hold_mode,
                            hold_format_var, hold_interval_entry):
+        "Write double click (same key twice) on default key"
         translated_key = self.translate_key(single_key, key_translations)
 
         file.write(f'*{translated_key}::{{\n')
-        file.write(f'    if (A_PriorHotkey = "*{translated_key}") and (A_TimeSincePriorHotkey < 400) {{\n') # noqa
+        file.write(
+            (f'    if (A_PriorHotkey = "*{translated_key}") '
+             'and (A_TimeSincePriorHotkey < 400) {{\n'
+            )
+        )
 
         if is_text_mode:
             file.write(f'        SendText("{remap_key}")\n')
@@ -489,7 +521,11 @@ class WriteScript(Diff):
             down_sequence = "".join(down_parts)
             up_sequence = "".join(up_parts)
 
-            file.write(f'        (SendInput("{down_sequence}"), SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n') # noqa
+            file.write(
+                (f'        (SendInput("{down_sequence}"), '
+                 f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
+                )
+            )
 
         else:
             if "+" in remap_key:
@@ -522,11 +558,13 @@ class WriteScript(Diff):
         file.write('}\n')
 
     def write_text_format(self, file, default_translated, remap_key):
+        "write text format (Send literal string)"
         file.write(f'{default_translated}::SendText("{remap_key}")\n')
 
     def write_hold_format(self, file, default_translated, remap_key,
                           key_translations, hold_format_var,
-                          hold_interval_entry, is_multiple_keys):
+                          hold_interval_entry):
+        "Write hold format"
         hold_interval_ms = "10000"
         if hold_format_var.isChecked() and hold_interval_entry is not None:
             hold_interval = "10"
@@ -553,6 +591,15 @@ class WriteScript(Diff):
         up_sequence = "".join(up_parts)
 
         if "&" in default_translated:
-            file.write(f'{default_translated}::(SendInput("{down_sequence}"), SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n') # noqa
+            file.write(
+                (
+                f'{default_translated}::(SendInput("{down_sequence}"), '
+                f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
+                )
+            )
         else:
-            file.write(f'*{default_translated}::(SendInput("{down_sequence}"), SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n') # noqa
+            file.write(
+                (f'*{default_translated}::(SendInput("{down_sequence}"), '
+                 f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
+                )
+            )

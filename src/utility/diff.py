@@ -1,11 +1,9 @@
-"""Containing code for pro version and normal version to make migration easier""" # noqa
-import requests
+"Containing code for pro version and normal version to make migration easier"
 import os
 import webbrowser
-from PySide6.QtWidgets import (QMessageBox, QTextEdit, QSizePolicy,
-                               QSpacerItem)
+import requests
 
-import utility.constant as constant
+from PySide6.QtWidgets import (QMessageBox, QTextEdit, QSizePolicy, QSpacerItem)  # pylint: disable=E0611
 
 
 mode_item = [
@@ -20,35 +18,52 @@ mode_map = {
 }
 
 
-program_name = "KeyTik"
+PROGRAM_NAME = "KeyTik"
 
 
-current_version = "v2.3.5"
+CURRENT_VERSION = "v2.3.5"
 
 
 class Diff():
+    "Code difference between normal version and pro version to make migration easier"
+    def __init__(self):
+        self.is_text_mode = True
+        self.key_rows = []
+        self.shortcut_rows = []
+        self.files_opener_rows = []
+        self.files_opener_row_widgets = []
+
+        self.text_block = None
+
     def check_for_update(self):
+        "Check for update comparing current version and latest version from GitHub API"
+        github_api_link = "https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest"
         try:
-            response = requests.get("https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest", timeout=5) # noqa
+            response = requests.get(github_api_link, timeout=5) # noqa
             if response.status_code == 200:
                 release_data = response.json()
                 latest_version = release_data.get("tag_name")
-                if current_version != latest_version:
+                if CURRENT_VERSION != latest_version:
                     return latest_version
-        except Exception:
+        except requests.exceptions.ConnectionError:
             pass
         return None
 
     def show_update_messagebox(self, latest_version):
+        "Show message when there is update avaliable"
         reply = QMessageBox.question(
             self, "Update Available",
-            f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?", # noqa
+            (
+            f"New update available: KeyTik {latest_version}\n\n"
+            "Would you like to go to the update page?"
+            ),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply == QMessageBox.StandardButton.Yes:
-            webbrowser.open("https://github.com/Fajar-RahmadJaya/KeyTik/releases") # noqa
+            webbrowser.open("https://github.com/Fajar-RahmadJaya/KeyTik/releases")
 
-    def handle_parser(self, lines, first_line):
+    def handle_parser(self, lines):
+        "Action when editing profile"
         key_map = self.load_key_list()
         mode_line = lines[0].strip() if lines else "; default"
 
@@ -111,6 +126,7 @@ class Diff():
             self.update_plus_visibility('shortcut')
 
     def handle_mode_changed(self, index):
+        "Action when mode changed from combobox"
         while self.edit_frame_layout.count():
             item = self.edit_frame_layout.takeAt(0)
             widget = item.widget()
@@ -146,7 +162,8 @@ class Diff():
                                            QSizePolicy.Expanding))
 
     def handle_write(self, script_name, mode):
-        output_path = os.path.join(self.SCRIPT_DIR, script_name)
+        "Action when saving profile"
+        output_path = os.path.join(self.script_dir, script_name)
         key_translations = self.load_key_translations()
 
         with open(output_path, 'w', encoding='utf-8') as file:
@@ -158,6 +175,7 @@ class Diff():
                 self.handle_default_mode(file, key_translations)
 
     def loop_announcefile(self):
+        "Loop through announcement file url in order"
         i = 1
         while True:
             url = f"https://keytik.com/normal-md/{i}.txt"
@@ -168,14 +186,18 @@ class Diff():
                 response.raise_for_status()
                 self.announcement_files.append(url)
                 i += 1
-            except Exception:
+            except requests.exceptions.RequestException:
                 break
 
     def update_messagebox(self, latest_version, show_no_update_message=False):
+        "Message when there is update avalible"
         if latest_version:
             reply = QMessageBox.question(
                 self, "Update Available",
-                f"New update available: KeyTik {latest_version}\n\nWould you like to go to the update page?", # noqa
+                (
+                f"New update available: KeyTik {latest_version}\n\"n"
+                "Would you like to go to the update page?"
+                ),
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
             )
             if reply == QMessageBox.StandardButton.Yes:

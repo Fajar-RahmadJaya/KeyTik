@@ -1,8 +1,12 @@
+"Parse profile from AHK script"
+
 import re
 
 
-class ParseScript:
+class ParseScript():
+    "Parse AutoHotkey script"
     def parse_device(self, lines):
+        "Parse device type for device binding"
         device_id = None
         device_type = "Keyboard"
         for line in lines:
@@ -22,7 +26,46 @@ class ParseScript:
                 break
         return device_id
 
+    def parse_device_info(self, file_path):
+        "Parse device VID/PID or handle for device binding"
+        devices = []
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+
+            lines = [line.strip() for line in lines if line.strip()]
+
+            device_info = {}
+            for line in lines:
+                line = line.strip()
+                if line.startswith("Device ID"):
+                    if device_info:
+                        if (device_info.get('VID') and
+                                device_info.get('PID') and
+                                device_info.get('Handle')):
+                            devices.append(device_info)
+                    device_info = {'Device ID': line.split(":")[1].strip()}
+                elif line.startswith("VID:"):
+                    device_info['VID'] = line.split(":")[1].strip()
+                elif line.startswith("PID:"):
+                    device_info['PID'] = line.split(":")[1].strip()
+                elif line.startswith("Handle:"):
+                    device_info['Handle'] = line.split(":")[1].strip()
+                elif line.startswith("Is Mouse:"):
+                    device_info['Is Mouse'] = line.split(":")[1].strip()
+
+            if (device_info.get('VID') and
+                    device_info.get('PID') and
+                    device_info.get('Handle')):
+                devices.append(device_info)
+
+        except (ValueError, FileNotFoundError) as e:
+            print(f"Error reading device info: {e}")
+
+        return devices
+
     def parse_program(self, lines):
+        "parse program binding"
         programs = []
         for line in lines:
             line = line.strip()
@@ -44,6 +87,7 @@ class ParseScript:
         return " ".join(programs)
 
     def parse_shortcuts(self, lines, key_map):
+        "Parse shortcuts"
         shortcuts = []
         in_hotif_block = False
         for line in lines[3:]:
@@ -76,6 +120,7 @@ class ParseScript:
         return shortcuts
 
     def parse_default_mode(self, lines, key_map):
+        "Parse default mode"
         shortcuts = self.parse_shortcuts(lines, key_map)
         remaps = []
         in_block = False
@@ -115,6 +160,7 @@ class ParseScript:
         return shortcuts, remaps
 
     def parse_default_key(self, default_key, key_map):
+        "Parse default key line"
         key = default_key.replace("~", "").replace("*", "")
         if " & " in key:
             keys = [k.strip() for k in key.split(" & ")]
@@ -125,6 +171,7 @@ class ParseScript:
         return key
 
     def parse_remap_key(self, line, key_map, remaps):
+        "Parse remap key line"
         parts = line.split("::")
         default_key = parts[0].strip()
         remap_or_action = parts[1].strip() if len(parts) > 1 else ""
@@ -149,13 +196,12 @@ class ParseScript:
                 remap_key = self.parse_text_format(remap_or_action)
                 is_text_format = True
             elif 'SetTimer' in remap_or_action:
-                remap_key, hold_interval = self.parse_hold_format(
-                    remap_or_action, default_key)
+                remap_key, hold_interval = self.parse_hold_format(remap_or_action)
                 is_hold_format = True
             elif (remap_or_action.startswith('Send') or
                   remap_or_action.startswith('SendInput')):
                 remap_key = self.parse_send_remap(
-                    remap_or_action, default_key, key_map)
+                    remap_or_action, key_map)
             else:
                 remap_key = remap_or_action
 
@@ -165,6 +211,7 @@ class ParseScript:
                            is_hold_format, hold_interval, is_first_key, is_sc))
 
     def get_unicode(self, text):
+        'Parse Unicode fron SendInput'
         def chr_replacer(match):
             code = int(match.group(1))
             return chr(code)
@@ -173,7 +220,8 @@ class ParseScript:
         text = re.sub(r'Chr\((\d+)\)', chr_replacer, text)
         return text
 
-    def parse_hold_format(self, remap_or_action, default_key):
+    def parse_hold_format(self, remap_or_action):
+        "Parse hold format key and interval from SendInput"
         remap_key = ""
         hold_interval = "10"
 
@@ -190,7 +238,8 @@ class ParseScript:
 
         return remap_key, hold_interval
 
-    def parse_send_remap(self, remap_or_action, default_key, key_map):
+    def parse_send_remap(self, remap_or_action, key_map):
+        "Parse SendInput line"
         if remap_or_action.startswith("SendInput("):
             key_sequence = remap_or_action[len("SendInput("):-1]
         elif remap_or_action.startswith("Send("):
@@ -216,6 +265,7 @@ class ParseScript:
         return remap_key
 
     def parse_text_format(self, block_text):
+        "Parse text format from SendText line"
         text_match = re.search(r'SendText\("(.+?)"\)', block_text)
         remap_key = ""
         if text_match:
@@ -223,6 +273,7 @@ class ParseScript:
         return remap_key
 
     def parse_double_click(self, default_key, block_text, remaps, key_map):
+        "Parse double click mode from default key"
         is_text_format = False
         is_hold_format = False
         hold_interval = "10"
@@ -235,16 +286,13 @@ class ParseScript:
                 remap_key = self.parse_text_format(block_text)
                 is_text_format = True
             elif 'SetTimer' in block_text:
-                remap_key, hold_interval = self.parse_hold_format(
-                    block_text, default_key)
+                remap_key, hold_interval = self.parse_hold_format(block_text)
                 is_hold_format = True
             else:
                 send_match = re.search(
                     r'Send(?:Input)?\("(.+?)"\)', block_text)
                 if send_match:
-                    remap_key = self.parse_send_remap(
-                        send_match.group(0), default_key,
-                        key_map)
+                    remap_key = self.parse_send_remap(send_match.group(0), key_map)
                 else:
                     remap_key = ""
 
@@ -253,41 +301,5 @@ class ParseScript:
                        is_hold_format, hold_interval))
 
     def replace_raw_keys(self, key, key_map):
+        "Translate raw key into readable key"
         return key_map.get(key, key)
-
-    def parse_device_info(self, file_path):
-        devices = []
-        try:
-            with open(file_path, 'r') as file:
-                lines = file.readlines()
-
-            lines = [line.strip() for line in lines if line.strip()]
-
-            device_info = {}
-            for line in lines:
-                line = line.strip()
-                if line.startswith("Device ID"):
-                    if device_info:
-                        if (device_info.get('VID') and
-                                device_info.get('PID') and
-                                device_info.get('Handle')):
-                            devices.append(device_info)
-                    device_info = {'Device ID': line.split(":")[1].strip()}
-                elif line.startswith("VID:"):
-                    device_info['VID'] = line.split(":")[1].strip()
-                elif line.startswith("PID:"):
-                    device_info['PID'] = line.split(":")[1].strip()
-                elif line.startswith("Handle:"):
-                    device_info['Handle'] = line.split(":")[1].strip()
-                elif line.startswith("Is Mouse:"):
-                    device_info['Is Mouse'] = line.split(":")[1].strip()
-
-            if (device_info.get('VID') and
-                    device_info.get('PID') and
-                    device_info.get('Handle')):
-                devices.append(device_info)
-
-        except Exception as e:
-            print(f"Error reading device info: {e}")
-
-        return devices

@@ -1,29 +1,40 @@
+"Setting UI code"
+
 import os
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton,
-    QHBoxLayout, QCheckBox
-)
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt
 import webbrowser
-import utility.constant as constant
-import utility.utils as utils
 
-from setting.setting_comp import SettingComponent
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton,
+    QHBoxLayout, QCheckBox, QInputDialog, QMessageBox
+)
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
+
+from utility import constant
+from utility import utils
+
+from setting.setting_core import SettingCore
+from setting.announcement import Announcement
 
 
-class SettingUI(SettingComponent):
+class SettingUI(SettingCore, Announcement):
+    "Setting UI"
+    def __init__(self):
+        super().__init__()
+        self.settings_window = QDialog()
+
     def open_settings_window(self):
-        settings_window = QDialog(self)
-        settings_window.setWindowTitle("Settings")
-        settings_window.setFixedSize(400, 250)
-        settings_window.setWindowIcon(QIcon(constant.icon_path))
-        settings_window.setModal(True)
-        settings_window.setWindowFlag(
+        "Setting window"
+        self.settings_window = QDialog()
+        self.settings_window.setWindowTitle("Settings")
+        self.settings_window.setFixedSize(400, 250)
+        self.settings_window.setWindowIcon(QIcon(constant.icon_path))
+        self.settings_window.setModal(True)
+        self.settings_window.setWindowFlag(
             Qt.WindowType.WindowStaysOnTopHint,
             getattr(self, "is_on_top", False))
 
-        main_layout = QVBoxLayout(settings_window)
+        main_layout = QVBoxLayout(self.settings_window)
         main_layout.setContentsMargins(10, 10, 10, 10)
 
         group_box = QGroupBox()
@@ -71,9 +82,10 @@ class SettingUI(SettingComponent):
         group_layout.setColumnStretch(1, 1)
 
         main_layout.addWidget(group_box)
-        settings_window.exec()
+        self.settings_window.exec()
 
     def show_installation_dialog(self):
+        "Setting to check, install, uninstall AutoHotkey and Interception driver installation"
         dialog = QDialog(self)
         dialog.setWindowTitle("Installation Manager")
         dialog.setWindowIcon(QIcon(constant.icon_path))
@@ -101,7 +113,7 @@ class SettingUI(SettingComponent):
 
         driver_vbox = QVBoxLayout()
         driver_checkbox = QCheckBox("Interception Driver", dialog)
-        driver_installed = os.path.exists(constant.driver_path)
+        driver_installed = os.path.exists(constant.DRIVER_PATH)
         driver_checkbox.setChecked(driver_installed)
         driver_checkbox.setEnabled(False)
         driver_button = QPushButton(dialog)
@@ -124,3 +136,22 @@ class SettingUI(SettingComponent):
             driver_installed, dialog))
 
         dialog.exec()
+
+    def change_theme_dialog(self):
+        "Setting to change program theme"
+        options = ["Light", "Dark", "System"]
+        current_theme = self.read_theme()
+        if current_theme == "dark":
+            current_index = 1
+        elif current_theme == "light":
+            current_index = 0
+        else:
+            current_index = 2
+        theme, ok = QInputDialog.getItem(
+            self, "Change Theme", "Select theme:",
+            options, current_index, False)
+        if ok:
+            self.save_theme(theme.lower())
+            QMessageBox.information(self,
+                                    "Theme Changed", 
+                                    "Theme will be applied after restarting the app.") # noqa

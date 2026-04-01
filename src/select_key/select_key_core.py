@@ -1,20 +1,29 @@
+"Logic for key selection"
+
 import json
 import unicodedata
-from PySide6.QtWidgets import (QTreeWidgetItem)
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt, QEvent, QPoint
-import utility.constant as constant
-import utility.icon as icons
+from PySide6.QtWidgets import (QTreeWidgetItem) # pylint: disable=E0611
+from PySide6.QtGui import QIcon # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
+from utility import constant
+
+from utility import icons
 
 
-class SelectKeyComponent:
+class SelectKeyCore():
+    "Key selection non UI"
+    def __init__(self):
+        self.expanded_unicode_blocks = []
+
     def get_unicode_block_range(self, block_name):
+        "Get unicode blocks (category) range (eg. 0x0000, 0x007F)"
         for start, end, name in constant.unicode_blocks:
             if name == block_name:
                 return start, end
         return None, None
 
     def get_unicode_block_data(self, block_name):
+        "Get the unicode from unicodedata library"
         start, end = self.get_unicode_block_range(block_name)
         if start is None:
             return {}
@@ -34,16 +43,18 @@ class SelectKeyComponent:
         return block_dict
 
     def load_keylist(self):
+        "Get the hardcoded key list"
         try:
             with open(constant.keylist_path, "r", encoding="utf-8") as f:
                 key_data = json.loads(f.read())
             if key_data and isinstance(key_data, list):
                 key_data = key_data[0]
             return key_data
-        except Exception:
+        except FileNotFoundError:
             return {}
 
     def get_checked_filter(self, filter_dropdown):
+        "Get the checked/selected item on the checkbox"
         return [
             filter_dropdown.item(i).text()
             for i in range(filter_dropdown.count())
@@ -53,6 +64,7 @@ class SelectKeyComponent:
     def populate_tree(self, tree_widget, key_data,
                       filter_text="", filter_parents=None,
                       search_unicode=True, hide_parents=None):
+        "Insert item on the treeview"
         if hide_parents is None:
             hide_parents = set()
         if not hasattr(self, 'expanded_unicode_blocks'):
@@ -74,6 +86,8 @@ class SelectKeyComponent:
             filter_parents = getattr(self, 'parent_names', [])
         for parent_name, children in key_data.items():
             if parent_name in hide_parents:
+                continue
+            if filter_parents and parent_name not in filter_parents:
                 continue
             parent_match = filter_text and filter_text in parent_name.lower()
             matching_children = []
@@ -134,6 +148,8 @@ class SelectKeyComponent:
             for start, end, block_name in constant.unicode_blocks:
                 if block_name in hide_parents:
                     continue
+                if filter_parents and block_name not in filter_parents:
+                    continue
                 for codepoint in range(start, end + 1):
                     try:
                         char = chr(codepoint)
@@ -157,7 +173,7 @@ class SelectKeyComponent:
                                     "description": char_name
                                 })
                             )
-                    except Exception:
+                    except ValueError:
                         continue
             for block_name, chars in unicode_matches.items():
                 parent_item = QTreeWidgetItem([block_name, ""])
@@ -179,8 +195,6 @@ class SelectKeyComponent:
                     parent_item.addChild(child_item)
                 parent_item.setExpanded(True)
 
-        self.insert_choose_entry(tree_widget)
-
         tree_widget.itemExpanded.connect(self.load_unicode)
 
         for i in range(tree_widget.topLevelItemCount()):
@@ -192,6 +206,7 @@ class SelectKeyComponent:
                     item.setExpanded(True)
 
     def load_unicode(self, item):
+        "Only populate unicode when expanded to reduce strain"
         if item.data(0, Qt.UserRole) == "unicode_block":
             if item.childCount() == 1 and item.child(0).text(0) == "":
                 item.removeChild(item.child(0))
@@ -214,66 +229,10 @@ class SelectKeyComponent:
                     item.addChild(child_item)
             item.setExpanded(True)
 
-    def click_checkbox(self, item, _):
-        if item.parent() is not None:
-            parent_name = item.parent().text(0)
-            child_name = item.text(0).strip()
-            key_tuple = (parent_name, child_name)
-            if item.checkState(0) == Qt.Checked:
-                if key_tuple not in self.checked_keys_list:
-                    self.checked_keys_list.append(key_tuple)
-            else:
-                if key_tuple in self.checked_keys_list:
-                    self.checked_keys_list.remove(key_tuple)
-            tree_widget = item.treeWidget()
-            self.insert_choose_entry(tree_widget)
-
-        if item.parent() is None:
-            item.setExpanded(not item.isExpanded())
-
-    def insert_choose_entry(self, _):
-        if getattr(self, 'select_key_entry', None) is not None:
-            self.select_key_entry.setText(
-                ' + '.join([child for _, child in self.checked_keys_list]))
-
     def is_unicode_key(self, key):
+        "Determine whether it's unicode or hard coded key"
         key_data = self.load_keylist()
-        for parent, children in key_data.items():
+        for children in key_data.items():
             if key in children:
                 return False
         return True
-
-    def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.MouseButtonPress:
-            if not (self.filter_popup.geometry().
-                    contains(event.globalPos())):
-                self.filter_popup.hide()
-        return False
-
-    def apply_filter(self, select_key_tree, search_entry, item):
-        checked_parents = self.get_checked_filter(self.filter_dropdown)
-        self.populate_tree(
-            select_key_tree,
-            self.key_data,
-            search_entry.text(),
-            checked_parents
-        )
-
-    def on_save_keys(self, select_key_window):
-        if self.select_key_target_entry is not None:
-            self.select_key_target_entry.setText(
-                self.select_key_entry.text())
-        select_key_window.accept()
-
-    def show_filter_popup(self, search_entry):
-        if self.filter_popup.isVisible():
-            self.filter_popup.hide()
-        else:
-            global_pos = search_entry.mapToGlobal(
-                QPoint(0, search_entry.height()))
-            self.filter_popup.setFixedWidth(search_entry.width())
-            self.filter_popup.move(global_pos)
-            self.filter_popup.show()
-            self.filter_popup.raise_()
-            self.filter_popup.activateWindow()
-            self.filter_dropdown.setFocus()

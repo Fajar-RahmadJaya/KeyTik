@@ -1,12 +1,16 @@
+"Centralize all icon initialization"
+
 import os
-import utility.utils as utils
-import utility.constant as constant
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+
+from utility import utils
+from utility import constant
 
 icon_cache = {}
 
 
 def get_icon(path):
+    "Cache icon"
     if path not in icon_cache:
         icon_cache[path] = QIcon(path)
     return icon_cache[path]
@@ -20,7 +24,7 @@ else:
 
 # Profile Icon
 run = os.path.join(icon_dir, "run.svg")
-exit = os.path.join(icon_dir, "exit.svg")
+icon_exit = os.path.join(icon_dir, "exit.svg")
 edit = os.path.join(icon_dir, "edit.svg")
 rocket = os.path.join(icon_dir, "rocket.svg")
 rocket_fill = os.path.join(icon_dir, "rocket_fill.svg")
@@ -32,7 +36,7 @@ pin_fill = os.path.join(icon_dir, "thumbtack_fill.svg")
 
 # Main Window Icon
 plus = os.path.join(icon_dir, "plus.svg")
-next = os.path.join(icon_dir, "next.svg")
+icon_next = os.path.join(icon_dir, "next.svg")
 prev = os.path.join(icon_dir, "prev.svg")
 setting = os.path.join(icon_dir, "setting.svg")
 icon_import = os.path.join(icon_dir, "import.svg")
@@ -43,7 +47,7 @@ show_stored_fill = os.path.join(icon_dir, "show_stored_fill.svg")
 
 # Edit Window Icon
 arrow = os.path.join(icon_dir, "arrow.svg")
-filter = os.path.join(icon_dir, "filter.svg")
+icon_filter = os.path.join(icon_dir, "filter.svg")
 search = os.path.join(icon_dir, "search.svg")
 file_search = os.path.join(icon_dir, "file_search.svg")
 question = os.path.join(icon_dir, "question.svg")

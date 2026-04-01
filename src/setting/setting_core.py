@@ -1,0 +1,139 @@
+"Setting non UI code"
+
+import os
+import shutil
+import webbrowser
+import json
+import subprocess
+import ctypes
+
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QMessageBox, QFileDialog
+)
+
+from utility import constant
+from utility import utils
+from utility.diff import Diff
+
+from core.main_core import MainCore
+
+class SettingCore(Diff):
+    "Setting logic"
+    def __init__(self):
+        super().__init__()
+        self.main_core = MainCore()
+
+        self.script_dir = utils.active_dir
+        self.scripts = self.main_core.list_scripts()
+
+    def change_data_location(self):
+        "Change active and stored profile directory for 'change profile location'"
+        new_path = QFileDialog.getExistingDirectory(
+            self, "Select a New Path for Active and Store Folders"
+        )
+
+        if not new_path:
+            print("No directory selected. Operation canceled.")
+            return
+
+        try:
+            if not os.path.exists(new_path):
+                print(f"The selected path does not exist: {new_path}")
+                return
+
+            new_active_dir = os.path.join(new_path, 'Active')
+            new_store_dir = os.path.join(new_path, 'Store')
+
+            if os.path.exists(utils.active_dir):
+                shutil.move(utils.active_dir, new_path)
+                print(f"Moved Active folder to {new_path}")
+            else:
+                print(f"Active folder does not exist at {utils.active_dir}")
+
+            if os.path.exists(utils.store_dir):
+                shutil.move(utils.store_dir, new_path)
+                print(f"Moved Store folder to {new_path}")
+            else:
+                print(f"Store folder does not exist at {utils.store_dir}")
+
+            new_condition_data = {"path": new_path}
+            with open(constant.condition_path, 'w', encoding='utf-8') as f:
+                json.dump(new_condition_data, f)
+            print(f"Updated condition.json with the new path: {new_path}")
+
+            utils.active_dir = new_active_dir
+            utils.store_dir = new_store_dir
+            print(f"Global active_dir updated to: {utils.active_dir}")
+            print(f"Global store_dir updated to: {utils.store_dir}")
+
+            self.script_dir = utils.active_dir
+            self.scripts = self.main_core.list_scripts()
+            self.main_core.update_script_list()
+
+            QMessageBox.information(
+                self, "Change Profile Location",
+                "Profile location changed successfully!")
+        except PermissionError as e:
+            print(f"An error occurred: {e}")
+            QMessageBox.critical(self, "Error", f"An error occurred: {e}")
+
+    def check_update_and_show_messagebox(self):
+        "Call the check for update function to use at 'check for update' setting button"
+        latest_version = self.check_for_update()
+        self.update_messagebox(latest_version, show_no_update_message=True)
+
+    def save_theme(self, theme):
+        "Write theme preference to theme file"
+        try:
+            with open(constant.theme_path, 'w', encoding='utf-8') as f:
+                if theme == "system":
+                    f.write("")
+                else:
+                    f.write(theme)
+        except FileNotFoundError:
+            print("Error: theme_path file not found")
+
+    def read_theme(self):
+        "Read saved theme preference from theme file"
+        try:
+            if os.path.exists(constant.theme_path):
+                with open(constant.theme_path, 'r', encoding= 'utf-8') as f:
+                    theme = f.read().strip().lower()
+                if theme in ("dark", "light"):
+                    return theme
+            return "system"
+        except FileNotFoundError:
+            print("Error: theme_path file not found")
+            return "system"
+
+    def ahk_action(self, ahk_installed, dialog):
+        "Uninstall AutoHotkey"
+        if ahk_installed:
+            try:
+                subprocess.Popen(utils.ahk_uninstall_path, shell=True)
+            except FileNotFoundError:
+                QMessageBox.critical(
+                    dialog,
+                    "Error", 
+                    "Failed to uninstall: AutoHotkey installation path not found") # noqa
+        else:
+            webbrowser.open("https://www.autohotkey.com")
+
+    def driver_action(self, driver_installed, dialog):
+        "Uninstall interception driver"
+        try:
+            if driver_installed:
+                ctypes.windll.shell32.ShellExecuteW(
+                    None, "runas",
+                    constant.interception_uninstall_path, None, None, 1
+                )
+            else:
+                ctypes.windll.shell32.ShellExecuteW(
+                    None, "runas", constant.interception_install_path,
+                    None, None, 1
+                )
+        except FileNotFoundError:
+            QMessageBox.critical(
+                dialog,
+                "Error", 
+                "Failed to uninstall: inter_uninstall.bat not found") # noqa

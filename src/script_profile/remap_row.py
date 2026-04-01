@@ -1,17 +1,29 @@
-from PySide6.QtWidgets import (
+"Remap and shortctu row"
+
+from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLabel, QPushButton, QCheckBox, QLineEdit, QFrame, QHBoxLayout,
     QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit
 )
-from PySide6.QtCore import Qt
-from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from utility import utils
 import utility.icon as icons
 
 
-class RemapRow:
+class RemapRow():
+    "Remap & shortcut row on profile creation"
+    def __init__(self):
+        self.mapping_row_widgets = []
+        self.shortcut_row_widgets = []
+
+        self.edit_frame_layout = None
+        self.text_block = None
+        self.shortcut_entry = None
+
     def remap_row(self, default_key='', remap_key='', insert_after=None,
                   is_text_format=False, is_hold_format=False,
                   hold_interval="", is_first_key=False, is_sc=False):
+        "Remap row"
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
             self.edit_frame.setLayout(self.edit_frame_layout)
@@ -30,7 +42,8 @@ class RemapRow:
         # Default Key Widget
         default_key_select = QPushButton("Select", row_widget)
         default_key_select.setFixedWidth(140)
-        default_key_select.setToolTip("Press any key or shortcut to capture it automatically") # noqa
+        default_key_select.setToolTip("Press any key or shortcut "
+                                      "to capture it automatically")
         default_key_select.clicked.connect(lambda:
                                            self.key_listening(
                                                 default_key_entry,
@@ -47,7 +60,8 @@ class RemapRow:
             default_key_entry.setText(default_key)
         default_key_entry.setFixedWidth(112)
         default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        default_key_entry.setToolTip("Default key can be a single key, multiple keys, or a double key (eg. double-click)") # noqa
+        default_key_entry.setToolTip("Default key can be a single key, "
+                                     "multiple keys, or a double key (eg. double-click)")
         default_key_layout.addWidget(default_key_entry)
 
         default_key_choose = QPushButton(default_key_widget)
@@ -84,7 +98,8 @@ class RemapRow:
         if remap_key:
             remap_key_entry.setText(remap_key)
         remap_key_entry.setFixedWidth(112)
-        remap_key_entry.setToolTip("Remap key can be a single key, multiple keys, text, or hold") # noqa
+        remap_key_entry.setToolTip("Remap key can be "
+                                   "a single key, multiple keys, text, or hold")
         remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         remap_key_layout.addWidget(remap_key_entry)
 
@@ -105,7 +120,8 @@ class RemapRow:
 
         first_key_checkbox = QCheckBox("Disable First Key", options_widget)
         first_key_checkbox.setToolTip(
-            "Default Key Only: Check this to disable the first key when using multiple keys.\n"  # noqa
+            "Default Key Only: "
+            "Check this to disable the first key when using multiple keys.\n"
         )
         first_key_checkbox.setChecked(is_first_key)
         options_layout.addWidget(first_key_checkbox)
@@ -113,26 +129,31 @@ class RemapRow:
         sc_checkbox = QCheckBox("Use Scan Code", options_widget)
         sc_checkbox.setObjectName("sc_checkbox")
         sc_checkbox.setToolTip(
-            "Default Key Only: Check this to make the Select button use Scan Code (SC) instead.\n" # noqa
-            "Scan Code is the hardware coordinate of the key, use this if the key is not detected or missing from the list." # noqa
+            "Default Key Only: "
+            "Check this to make the Select button use Scan Code (SC) instead.\n"
+            "Scan Code is the hardware coordinate of the key, "
+            "use this if the key is not detected or missing from the list."
         )
         sc_checkbox.setChecked(is_sc)
         options_layout.addWidget(sc_checkbox)
 
         text_format_checkbox = QCheckBox("Text Format", options_widget)
         text_format_checkbox.setChecked(is_text_format)
-        text_format_checkbox.setToolTip("Remap Key Only: Check this to send the actual text instead of a key") # noqa
+        text_format_checkbox.setToolTip("Remap Key Only: "
+                                        "Check this to send the actual text instead of a key")
         options_layout.addWidget(text_format_checkbox)
 
         hold_format_checkbox = QCheckBox("Hold Format", options_widget)
         hold_format_checkbox.setChecked(is_hold_format)
-        hold_format_checkbox.setToolTip("Remap Key Only: Simulate holding the key for a set interval") # noqa
+        hold_format_checkbox.setToolTip("Remap Key Only: "
+                                        "Simulate holding the key for a set interval")
         options_layout.addWidget(hold_format_checkbox)
 
         hold_interval_entry = QLineEdit(options_widget)
         hold_interval_entry.setPlaceholderText("Int")
         hold_interval_entry.setFixedWidth(40)
-        hold_interval_entry.setToolTip("Remap Key Only: Enter the hold interval in seconds (Default is 10 second)") # noqa
+        hold_interval_entry.setToolTip("Remap Key Only: "
+                                       "Enter the hold interval in seconds (Default is 10 second)")
         hold_interval_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if is_hold_format and hold_interval:
             hold_interval_float = float(hold_interval)
@@ -205,7 +226,7 @@ class RemapRow:
         right_sep.setFrameShadow(QFrame.Shadow.Sunken)
         separator_layout.addWidget(right_sep)
 
-        def on_plus_click(event):
+        def on_plus_click(_):
             plus_label.setVisible(False)
             right_sep.setVisible(False)
             left_sep.setVisible(False)
@@ -264,7 +285,7 @@ class RemapRow:
             if idx == len(self.key_rows) - 2:
                 if (not default_key_entry.text().strip() and
                         not remap_key_entry.text().strip()):
-                    for i, (rw, sw) in enumerate(self.mapping_row_widgets):
+                    for i, (sw) in enumerate(self.mapping_row_widgets):
                         plus = sw.findChild(QLabel, None)
                         frames = sw.findChildren(QFrame)
                         left_sep = frames[0] if len(frames) > 0 else None
@@ -288,6 +309,7 @@ class RemapRow:
 
     def shortcut_row(self, shortcut='', insert_after=None,
                      show_plus_label=True):
+        "Shortcut row"
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
             self.edit_frame.setLayout(self.edit_frame_layout)
@@ -316,10 +338,10 @@ class RemapRow:
         # Shortcut Widget
         shortcut_key_select = QPushButton("Select", row_widget)
         shortcut_key_select.setFixedWidth(280)
-        shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically") # noqa
+        shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         shortcut_key_select.clicked.connect(lambda:
                                             self.key_listening(
-                                                shortcut_entry,
+                                                self.shortcut_entry,
                                                 shortcut_key_select))
         row_layout.addWidget(shortcut_key_select, 0, 0, 1, 4, Qt.AlignCenter)
 
@@ -328,22 +350,23 @@ class RemapRow:
         shortcut_layout.setContentsMargins(0, 0, 0, 0)
         shortcut_layout.setSpacing(2)
 
-        shortcut_entry = QLineEdit(shortcut_widget)
+        self.shortcut_entry = QLineEdit(shortcut_widget)
         if shortcut:
-            shortcut_entry.setText(shortcut)
-        shortcut_entry.setFixedWidth(252)
-        shortcut_entry.setToolTip("Shortcut can be a single key, multiple keys, or shortcut specials (See select key)") # noqa
-        shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.shortcut_entry = shortcut_entry
-        self.shortcut_rows.append((shortcut_entry, shortcut_key_select))
-        shortcut_layout.addWidget(shortcut_entry)
+            self.shortcut_entry.setText(shortcut)
+        self.shortcut_entry.setFixedWidth(252)
+        self.shortcut_entry.setToolTip("Shortcut can be "
+                                       "a single key, multiple keys, or shortcut specials "
+                                       "(See select key)")
+        self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
+        shortcut_layout.addWidget(self.shortcut_entry)
 
         shortcut_choose = QPushButton(shortcut_widget)
         shortcut_choose.setFixedWidth(28)
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: self.select_key(shortcut_entry, context="shortcut"))
+            lambda: self.select_key(self.shortcut_entry, context="shortcut"))
         shortcut_layout.addWidget(shortcut_choose)
 
         row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
@@ -407,7 +430,7 @@ class RemapRow:
         right_sep.setFrameShadow(QFrame.Shadow.Sunken)
         separator_layout.addWidget(right_sep)
 
-        def on_plus_click(event):
+        def on_plus_click(_):
             plus_label.setVisible(False)
             right_sep.setVisible(False)
             left_sep.setVisible(False)
@@ -445,6 +468,7 @@ class RemapRow:
         self.edit_frame.adjustSize()
 
     def extract_and_filter_content(self, lines):
+        "Get text block value from the marker"
         inside = False
         result_lines = []
         for line in lines:
@@ -460,6 +484,7 @@ class RemapRow:
         return ''.join(result_lines)
 
     def shortcut_title(self):
+        "Shortcuts row tittle label"
         shortcut_label = QLabel("Shortcut", self.edit_frame)
         shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         shortcut_label.setStyleSheet("""
@@ -470,6 +495,7 @@ class RemapRow:
         return shortcut_label
 
     def remap_title(self):
+        "Key remap row tittle label"
         remap_label_layout = QGridLayout()
         remap_label_layout.setContentsMargins(0, 0, 0, 0)
         default_key_label = QLabel("Default Key", self.edit_frame)
@@ -492,6 +518,7 @@ class RemapRow:
         return remap_label_widget
 
     def update_plus_visibility(self, row_type):
+        "Make sure + only showed up only on the last row"
         if row_type == 'remap':
             widgets = getattr(self, "mapping_row_widgets", [])
         elif row_type == 'shortcut':

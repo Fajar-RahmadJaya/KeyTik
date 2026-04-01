@@ -1,16 +1,23 @@
+"Logic for create/edit profile"
+
 import os
 import json
-import keyboard
 import ctypes
+
+import keyboard
 from pynput import mouse
-from PySide6.QtWidgets import (QMessageBox, QPushButton)
-from PySide6.QtCore import QTimer, Signal, QObject, QEvent
+
+from PySide6.QtWidgets import (QMessageBox, QPushButton)  # pylint: disable=E0611
+from PySide6.QtCore import QTimer, Signal, QObject, QEvent  # pylint: disable=E0611
+
 from utility import constant
 
 
 
 class InputBlocker(QObject):
-    def event_filter(self, obj, event):
+    "Input blocker"
+    def event_filter(self, _, event):
+        "Filter event by key press and window"
         if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
                             QEvent.KeyPress, QEvent.KeyRelease,
                             QEvent.FocusIn, QEvent.FocusOut):
@@ -22,6 +29,7 @@ class InputBlocker(QObject):
 
 
 class ProfileCore(QObject):
+    "Create/edit profile logic"
     request_timer_start = Signal(object)
 
     def __init__(self):
@@ -29,15 +37,28 @@ class ProfileCore(QObject):
         self.request_timer_start.connect(self.release_timer)
 
         self.is_listening = False
+        self.use_scan_code = False
+        self._window_blocker = InputBlocker()
+        self._input_blocker = InputBlocker()
+        self.pressed_keys = []
+        self.pressed_keys = []
+        self.last_combination = ""
+
+        self.active_entry = None
+        self.previous_button_text = None
+        self.set_timer = None
 
     def check_interception_driver(self):
+        "Check whether interception driver is installed"
         if os.path.exists(constant.DRIVER_PATH):
             return True
         else:
             reply = QMessageBox.question(
                 None,
                 "Driver Not Found",
-                "Interception driver is not installed. This driver is required to use assign on specific device feature.\n \n \nNote: Restart your device after installation.\n" # noqa
+                "Interception driver is not installed. "
+                "This driver is required to use assign on specific device feature.\n \n \n"
+                "Note: Restart your device after installation.\n"
                 "Would you like to install it now?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
             )
@@ -53,7 +74,10 @@ class ProfileCore(QObject):
                             None,
                             "runas",
                             "cmd.exe",
-                            f"/k cd /d {install_dir} && {os.path.basename(constant.interception_install_path)}", # noqa
+                            (
+                            f"/k cd /d {install_dir} && "
+                            f"{os.path.basename(constant.interception_install_path)}"
+                            ),
                             None,
                             1
                         )
@@ -61,18 +85,22 @@ class ProfileCore(QObject):
                         QMessageBox.critical(
                             None,
                             "Installation Failed",
-                            "Installation script not found. Please check your installation." # noqa
+                            "Installation script not found. Please check your installation."
                         )
-                except Exception as e:
-                    QMessageBox.critical(None, "Error", f"An error occurred during installation: {str(e)}") # noqa
+                except FileNotFoundError as e:
+                    QMessageBox.critical(None,
+                                         "Error", 
+                                         f"An error occurred during installation: {str(e)}")
             return False
 
     def update_entry(self):
+        "Add + on multi key press"
         shortcut_combination = '+'.join(self.pressed_keys)
         if hasattr(self, "active_entry") and self.active_entry is not None:
             self.active_entry.setText(shortcut_combination)
 
     def get_script_name(self):
+        "Get profile name from entry"
         script_name = self.script_name_entry.text().strip()
         if not script_name:
             QMessageBox.warning(None, "Input Error", "Please enter a Profile name.") # noqa
@@ -84,13 +112,15 @@ class ProfileCore(QObject):
         return script_name
 
     def is_widget_valid(self, widget_tuple):
+        "Check whether the row is valid"
         try:
             entry_widget, button_widget = widget_tuple
             return entry_widget is not None and button_widget is not None
-        except Exception:
+        except ValueError:
             return False
 
     def key_listening(self, entry_widget, button):
+        "Get and Listen to key press"
         def toggle_other_buttons(state):
             if hasattr(self, 'key_rows'):
                 for key_row in self.key_rows:
@@ -182,9 +212,9 @@ class ProfileCore(QObject):
 
             self.pressed_keys = []
             self.last_combination = ""
-            self.release_timer = QTimer()
-            self.release_timer.setSingleShot(True)
-            self.release_timer.timeout.connect(lambda:
+            self.set_timer = QTimer()
+            self.set_timer.setSingleShot(True)
+            self.set_timer.timeout.connect(lambda:
                                                self.finalize_combination
                                                (entry_widget))
             keyboard.hook(lambda event: self.multi_key_event
@@ -238,6 +268,7 @@ class ProfileCore(QObject):
                                        (entry_widget, button))
 
     def multi_key_event(self, event, entry_widget, button):
+        "Action when multiple key is pressed, set timer before saving the key"
         if not self.is_listening or self.active_entry != entry_widget:
             return
 
@@ -258,8 +289,8 @@ class ProfileCore(QObject):
                 self.pressed_keys.append(key)
                 self.update_widget(entry_widget)
             if (hasattr(self, "release_timer")
-                    and self.release_timer.isActive()):
-                self.release_timer.stop()
+                    and self.set_timer.isActive()):
+                self.set_timer.stop()
 
         elif event.event_type == "up":
             if key in self.pressed_keys:
@@ -272,7 +303,8 @@ class ProfileCore(QObject):
                     if hasattr(self, "release_timer"):
                         self.request_timer_start.emit(entry_widget)
 
-    def mouse_listening(self, x, y, button, pressed, injected=None):
+    def mouse_listening(self, button, pressed):
+        "Get and listen to mouse key press"
         if not (self.is_listening and self.active_entry):
             return
 
@@ -306,11 +338,13 @@ class ProfileCore(QObject):
                 elif hasattr(self, "release_timer"):
                     self.request_timer_start.emit(self.active_entry)
 
-    def release_timer(self, entry_widget):
+    def release_timer(self):
+        "Start the timer"
         if hasattr(self, "release_timer"):
-            self.release_timer.start(400)
+            self.set_timer.start(400)
 
     def format_key_combo(self, keys):
+        "Format for multiple key press"
         def format_key(k):
             if len(k) == 1 and k.islower():
                 return k
@@ -323,15 +357,18 @@ class ProfileCore(QObject):
         return ' + '.join(format_key(k) for k in keys)
 
     def update_widget(self, entry_widget):
+        "Insert saved key into entry"
         combo = self.format_key_combo(self.pressed_keys)
         entry_widget.setText(combo)
         self.last_combination = combo
 
     def finalize_combination(self, entry_widget):
+        "Save the combination"
         entry_widget.setText(self.last_combination)
         self.pressed_keys = []
 
     def disable_input(self, entry_rows):
+        "Disable input. Used on key listening"
         if not hasattr(self, "_input_blocker"):
             self._input_blocker = InputBlocker()
         for entry_tuple in entry_rows:
@@ -340,6 +377,7 @@ class ProfileCore(QObject):
                 entry.installEventFilter(self._input_blocker)
 
     def enable_input(self, entry_rows):
+        "Enable input. Used on key listening"
         if hasattr(self, "_input_blocker"):
             for entry_tuple in entry_rows:
                 entry = entry_tuple[0]
@@ -347,6 +385,7 @@ class ProfileCore(QObject):
                     entry.removeEventFilter(self._input_blocker)
 
     def load_key_list(self):
+        "Load list of hard coded key from json file"
         key_map = {}
         try:
             with open(constant.keylist_path, 'r', encoding='utf-8') as file:
@@ -358,6 +397,6 @@ class ProfileCore(QObject):
                             raw = info.get("translate", "")
                             if raw:
                                 key_map[raw] = readable
-        except Exception as e:
+        except FileNotFoundError as e:
             print(f"Error reading key list: {e}")
         return key_map

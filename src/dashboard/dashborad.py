@@ -189,7 +189,7 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
                                     self.activate_script(s, run_btn)
                                     break
 
-        edit_button.clicked.connect(handle_edit)
+        edit_button.clicked.connect(lambda checked, s=script, rb=run_button: handle_edit(s, rb))
         group_layout.addWidget(edit_button, 0, 1)
 
         copy_button = QPushButton(" Copy")

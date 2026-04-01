@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QTreeWidgetItem  # pylint: disable=E0611
 from utility import utils
 
 
-class SelectDeviceComponent():
+class SelectDeviceCore():
     "Device selection logic for device binding"
     def select_device(self, tree, entry, window):
         "Pressing device row will select device"

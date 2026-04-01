@@ -11,10 +11,10 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from utility import constant
 from utility import utils
 
-from select_device.select_device_comp import selectDeviceComponent
+from select_device.select_device_core import SelectDeviceCore
 
 
-class SelectDeviceUI(selectDeviceComponent):
+class SelectDeviceUI(SelectDeviceCore):
     "Device selecition UI for device binding"
     def __init__(self):
         super().__init__()

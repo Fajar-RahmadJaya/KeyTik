@@ -6,6 +6,7 @@ import webbrowser
 import json
 import subprocess
 import ctypes
+import requests
 
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMessageBox, QFileDialog
@@ -13,7 +14,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils
-from utility.diff import Diff
+from utility.diff import Diff, CHECK_UPDATE_LINK
 
 from core.main_core import MainCore
 
@@ -77,11 +78,6 @@ class SettingCore(Diff):
             print(f"An error occurred: {e}")
             QMessageBox.critical(self, "Error", f"An error occurred: {e}")
 
-    def check_update_and_show_messagebox(self):
-        "Call the check for update function to use at 'check for update' setting button"
-        latest_version = self.check_for_update()
-        self.update_messagebox(latest_version, show_no_update_message=True)
-
     def save_theme(self, theme):
         "Write theme preference to theme file"
         try:
@@ -137,3 +133,13 @@ class SettingCore(Diff):
                 dialog,
                 "Error", 
                 "Failed to uninstall: inter_uninstall.bat not found") # noqa
+
+    def check_for_update(self):
+        "Check for update comparing current version and latest version from GitHub API"
+        try:
+            response = requests.get(CHECK_UPDATE_LINK, timeout=5) # noqa
+            if response.status_code == 200:
+                return self.parse_update_response(response)
+        except requests.exceptions.ConnectionError:
+            pass
+        return None

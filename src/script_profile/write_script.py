@@ -10,10 +10,9 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from utility import constant
 
 from utility import utils
-from utility.diff import Diff
 
 
-class WriteScript(Diff):
+class WriteScript():
     "Write script based on profile input"
     def __init__(self):
         super().__init__()
@@ -603,3 +602,16 @@ class WriteScript(Diff):
                  f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
                 )
             )
+
+    def handle_write(self, script_name, mode):
+        "Action when saving profile (Can be moved)"
+        output_path = os.path.join(self.script_dir, script_name)
+        key_translations = self.load_key_translations()
+
+        with open(output_path, 'w', encoding='utf-8') as file:
+            if mode == "text mode":
+                self.handle_text_mode(file, key_translations)
+            elif mode == "default mode":
+                self.handle_default_mode(file, key_translations)
+            else:
+                self.pro_write(file, mode, key_translations)

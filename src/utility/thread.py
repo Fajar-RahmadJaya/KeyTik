@@ -10,12 +10,12 @@ from setting.announcement import Announcement
 
 from script_profile.write_script import WriteScript
 from script_profile.profile_core import ProfileCore
-
+from setting.setting_core import SettingCore
 
 class Thread(QThread, Diff):
     "Thread at initializaion"
     finished = Signal()
-    update_found = Signal(str)
+    update_found = Signal()
     show_announcement = Signal()
 
     def __init__(self, main_window):
@@ -24,14 +24,17 @@ class Thread(QThread, Diff):
         self.announcement = Announcement()
         self.write_script = WriteScript()
         self.profile_core = ProfileCore()
+        self.setting_core = SettingCore()
 
     def run(self):
         "Run check update on thread to increase dashborad initialization time"
         self.write_script.initialize_exit_keys()
 
-        latest_version = self.check_for_update()
+        latest_version = self.setting_core.check_for_update()
+
         if latest_version:
             self.update_found.emit(latest_version)
+
         self.finished.emit()
 
         if self.announcement.load_announcement_condition():

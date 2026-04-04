@@ -25,17 +25,22 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
     "Create/edit profile UI"
     def __init__(self):
         super().__init__()
+        # Variables
         self.copas_rows = []
         self.key_rows = []
         self.shortcut_rows = []
         self.is_text_mode = False
+        self.files_opener_rows = []
+        self.files_opener_row_widgets = []
 
+        # UI
         self.script_name_entry = None
         self.program_entry = None
         self.keyboard_entry = None
         self.edit_scroll = None
         self.edit_frame = None
         self.mode_combobox = None
+        self.text_block = None
 
     def edit_script(self, script_name):
         "Create/edit profile window"
@@ -133,7 +138,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.key_rows = []
         self.shortcut_rows = []
 
-        self.handle_parser(lines)
+        self.handle_parser(lines, first_line)
 
         self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum,
                                                    QSizePolicy.Expanding))
@@ -167,3 +172,42 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()
+
+    def handle_mode_changed(self, index):
+        "Action when mode changed from combobox (can be moved)"
+        while self.edit_frame_layout.count():
+            item = self.edit_frame_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)
+
+        self.key_rows = []
+        self.shortcut_rows = []
+        if hasattr(self, "files_opener_rows"):
+            self.files_opener_rows = []
+        if hasattr(self, "files_opener_row_widgets"):
+            self.files_opener_row_widgets = []
+        if hasattr(self, "text_block"):
+            self.text_block = None
+        self.is_text_mode = False
+
+        if index == 0:
+            self.is_text_mode = False
+            self.shortcut_title()
+            self.shortcut_row()
+            self.remap_title()
+            self.remap_row()
+            self.edit_frame_layout.addItem(QSpacerItem(20, 40,
+                                            QSizePolicy.Minimum,
+                                            QSizePolicy.Expanding))
+
+        elif index == 1:
+            self.is_text_mode = True
+            self.shortcut_title()
+            self.shortcut_row()
+            self.edit_frame_layout.addItem(QSpacerItem(20, 40,
+                                            QSizePolicy.Minimum,
+                                            QSizePolicy.Expanding))
+
+        else:
+            self.pro_mode(index)

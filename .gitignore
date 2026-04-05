@@ -22,11 +22,3 @@ eggs/
 # Operating System Files
 .DS_Store
 Thumbs.db
-
-# Files
-exit_keys.json
-dont_show.json
-build.bat
-
-# Folder
-backup/

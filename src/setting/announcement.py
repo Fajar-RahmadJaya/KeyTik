@@ -11,11 +11,10 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from utility import constant
+from utility import diff
 
-from utility.diff import Diff
 
-
-class Announcement(Diff):
+class Announcement():
     "Announcement"
     def __init__(self):
         super().__init__()
@@ -190,3 +189,18 @@ class Announcement(Diff):
 
         except requests.HTTPError as e:
             print(f"Error displaying announcement window: {e}")
+
+    def loop_announcefile(self):
+        "Loop through announcement file url in order"
+        i = 1
+        while True:
+            url = f"{diff.ANNOUNCEMENT_LINK}/{i}.txt"
+            try:
+                response = requests.get(url, timeout=5)
+                if response.status_code == 404:
+                    break
+                response.raise_for_status()
+                self.announcement_files.append(url)
+                i += 1
+            except requests.exceptions.RequestException:
+                break

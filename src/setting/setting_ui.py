@@ -12,6 +12,7 @@ from PySide6.QtCore import Qt  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils
+from utility import diff
 
 from setting.setting_core import SettingCore
 from setting.announcement import Announcement
@@ -60,7 +61,7 @@ class SettingUI(SettingCore, Announcement):
         check_update_button = QPushButton("Check For Update")
         check_update_button.setFixedHeight(40)
         check_update_button.clicked.connect(
-            self.check_update_and_show_messagebox)
+            lambda: self.update_messagebox(show_no_update_message=True))
         group_layout.addWidget(check_update_button, 1, 1, 1, 1)
 
         pro_upgrade_button = QPushButton("Get KeyTik Pro")
@@ -155,3 +156,23 @@ class SettingUI(SettingCore, Announcement):
             QMessageBox.information(self,
                                     "Theme Changed", 
                                     "Theme will be applied after restarting the app.") # noqa
+
+    def update_messagebox(self, show_no_update_message=False):
+        "Message when there is update avalible"
+        latest_version = self.check_for_update()
+        if latest_version:
+            reply = QMessageBox.question(
+                self, "Update Available",
+                (
+                f"New update available: {diff.PROGRAM_NAME} {latest_version}\n\n"
+                "Would you like to go to the update page?"
+                ),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                webbrowser.open(diff.RELEASE_LINK)
+        else:
+            if show_no_update_message:
+                QMessageBox.information(
+                    self, "Check For Update",
+                    "You are using the latest version of KeyTik.")

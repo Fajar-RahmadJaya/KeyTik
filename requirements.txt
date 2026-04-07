@@ -1,8 +1,0 @@
-﻿keyboard==0.13.5
-requests==2.33.1
-Markdown==3.10.2
-PySide6==6.9.0
-psutil==7.2.2
-pynput==1.8.1
-pywin32==311; sys_platform == "win32"
-winshell==0.6

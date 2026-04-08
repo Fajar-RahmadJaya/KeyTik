@@ -78,47 +78,46 @@ class SelectProgramCore():
         "Get running process"
         if app_only:
             return self.get_application_type()
-        else:
 
-            processes = []
-            for proc in psutil.process_iter(['pid', 'name', 'exe', 'status']):
-                try:
-                    if (proc.info['name'].lower() in
-                        ["system", "system idle process",
-                         "svchost.exe", "taskhostw.exe",
-                         "explorer.exe"]):
-                        continue
-                    pid = proc.info['pid']
-                    exe_name = proc.info['exe'] if 'exe' in proc.info else None
-                    exe_name = (os.path.basename(exe_name)
-                                if exe_name
-                                else proc.info['name'])
-                    process_type = ("Application"
-                                    if self.is_visible_application(pid)
-                                    else "System")
-                    try:
-                        def window_callback(hwnd, windows, pid=pid):
-                            _, process_pid = (
-                                win32process.GetWindowThreadProcessId(hwnd))  # pylint: disable=I1101
-                            if (process_pid == pid
-                                    and win32gui.IsWindowVisible(hwnd)):  # pylint: disable=I1101
-                                windows.append(
-                                    (win32gui.GetClassName(hwnd),  # pylint: disable=I1101
-                                     win32gui.GetWindowText(hwnd)))  # pylint: disable=I1101
-                        windows = []
-                        win32gui.EnumWindows(window_callback, windows)  # pylint: disable=I1101
-                        if windows:
-                            class_name, window_title = windows[0]
-                        else:
-                            class_name, window_title = "Unknown", "Unknown"
-                    except IndexError:
-                        class_name, window_title = "Unknown", "Unknown"
-                    processes.append(
-                        (window_title, class_name,
-                         exe_name, process_type))
-                except (psutil.NoSuchProcess, psutil.AccessDenied):
+        processes = []
+        for proc in psutil.process_iter(['pid', 'name', 'exe', 'status']):
+            try:
+                if (proc.info['name'].lower() in
+                    ["system", "system idle process",
+                        "svchost.exe", "taskhostw.exe",
+                        "explorer.exe"]):
                     continue
-            return processes
+                pid = proc.info['pid']
+                exe_name = proc.info['exe'] if 'exe' in proc.info else None
+                exe_name = (os.path.basename(exe_name)
+                            if exe_name
+                            else proc.info['name'])
+                process_type = ("Application"
+                                if self.is_visible_application(pid)
+                                else "System")
+                try:
+                    def window_callback(hwnd, windows, pid=pid):
+                        _, process_pid = (
+                            win32process.GetWindowThreadProcessId(hwnd))  # pylint: disable=I1101
+                        if (process_pid == pid
+                                and win32gui.IsWindowVisible(hwnd)):  # pylint: disable=I1101
+                            windows.append(
+                                (win32gui.GetClassName(hwnd),  # pylint: disable=I1101
+                                    win32gui.GetWindowText(hwnd)))  # pylint: disable=I1101
+                    windows = []
+                    win32gui.EnumWindows(window_callback, windows)  # pylint: disable=I1101
+                    if windows:
+                        class_name, window_title = windows[0]
+                    else:
+                        class_name, window_title = "Unknown", "Unknown"
+                except IndexError:
+                    class_name, window_title = "Unknown", "Unknown"
+                processes.append(
+                    (window_title, class_name,
+                        exe_name, process_type))
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+        return processes
 
     def is_visible_application(self, pid):
         "Check whether the process is an application by checking whether it has window or not"

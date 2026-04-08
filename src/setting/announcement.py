@@ -35,20 +35,26 @@ class Announcement():
             print(f"Error loading condition file: {e}")
         return True
 
-    def save_announcement_condition(self):
-        "Save user preference on file when don't show announcement checkbox is checked"
-        try:
-            with open(constant.dont_show_path, "w", encoding='utf-8') as f:
-                json.dump({"welcome_condition":
-                           self.announcement_condition}, f)
-        except FileNotFoundError as e:
-            print(f"Error saving condition file: {e}")
+    def get_announcement_url(self):
+        "Loop through announcement file url in order and stop when url invalid"
+        self.announcement_files = []
+        i = 1
+        while True:
+            url = f"{diff.ANNOUNCEMENT_LINK}/{i}.txt"
+            try:
+                response = requests.get(url, timeout=5)
+                if response.status_code == 404:
+                    break
+                response.raise_for_status()
+                self.announcement_files.append(url)
+                i += 1
+            except requests.exceptions.RequestException:
+                break
 
     def show_announcement_window(self):
         "Announcement window"
         try:
-            self.announcement_files = []
-            self.loop_announcefile()
+            self.get_announcement_url()
             self.current_announcement_index = 0
 
             self.announcement_dialog = QDialog()
@@ -78,6 +84,7 @@ class Announcement():
                     background-color: {bg_color};
                 }}
             """)
+
             html_layout = QVBoxLayout(html_frame)
             html_layout.setContentsMargins(5, 5, 5, 5)
 
@@ -92,96 +99,23 @@ class Announcement():
                     padding: 2px;
                 }}
             """)
+
+            if self.announcement_files:
+                # Set html_label text
+                self.load_content(self.current_announcement_index, html_label)
+            else:
+                html_label.setHtml(
+                    "<p>Unable to load announcements.</p>"
+                )
+
             html_layout.addWidget(html_label)
             main_layout.addWidget(
                 html_frame, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-            button_frame = QWidget()
-            button_layout = QHBoxLayout(button_frame)
-            button_layout.setContentsMargins(0, 0, 0, 0)
+            button_frame = self.announcement_button_frame(html_label)
 
-            prev_button = QPushButton("Previous")
-            prev_button.setFixedWidth(100)
-            next_button = QPushButton("Next")
-            next_button.setFixedWidth(100)
-
-            dont_show_checkbox = QCheckBox("Don't show again")
-            dont_show_checkbox.setChecked(not self.load_announcement_condition())
-            button_layout.addWidget(prev_button)
-            button_layout.addWidget(next_button)
-            button_layout.addWidget(dont_show_checkbox)
             main_layout.addWidget(
                 button_frame, alignment=Qt.AlignmentFlag.AlignHCenter)
-
-            def load_content(index):
-                try:
-                    url = self.announcement_files[index]
-                    if url in constant.announcement_cache:
-                        md_content = constant.announcement_cache[url]
-                    else:
-                        response = requests.get(url, timeout=5)
-                        response.raise_for_status()
-                        md_content = response.text
-                        constant.announcement_cache[url] = md_content
-                    html_content = markdown(md_content)
-                    styling = """
-                    <style>
-                    ol { -qt-list-indent: 1; margin-left: -20px; padding-left: 0px; } # noqa
-                    ol li { margin-left: -5px; padding-left: 0px; }
-                    </style>
-                    """
-                    html_label.setHtml(styling + html_content)
-                except requests.HTTPError:
-                    html_label.setHtml(
-                        "<p>File not found.</p>" # noqa
-                    )
-
-            def update_buttons():
-                prev_button.setEnabled(self.current_announcement_index > 0)
-                next_button.setEnabled(
-                    self.current_announcement_index < len(
-                        self.announcement_files) - 1)
-
-            def next_doc():
-                if self.current_announcement_index < len(
-                       self.announcement_files) - 1:
-                    self.current_announcement_index += 1
-                    load_content(self.current_announcement_index)
-                    update_buttons()
-
-            def prev_doc():
-                if self.current_announcement_index > 0:
-                    self.current_announcement_index -= 1
-                    load_content(self.current_announcement_index)
-                    update_buttons()
-
-            prev_button.clicked.connect(prev_doc)
-            next_button.clicked.connect(next_doc)
-
-            def toggle_dont_show():
-                self.announcement_condition = (
-                    not dont_show_checkbox.isChecked())
-                self.save_announcement_condition()
-
-            dont_show_checkbox.stateChanged.connect(toggle_dont_show)
-
-            def on_dialog_close(event):
-                self.announcement_condition = (
-                    not dont_show_checkbox.isChecked())
-                self.save_announcement_condition()
-                event.accept()
-            self.announcement_dialog.closeEvent = on_dialog_close
-
-            internet_error_string = "Unable to load announcements. " \
-            "Please check your internet connection."
-
-            if self.announcement_files:
-                load_content(self.current_announcement_index)
-                update_buttons()
-            else:
-                html_label.setHtml(
-                    f"<p>{internet_error_string}</p>"
-                )
 
             self.announcement_dialog.raise_()
             self.announcement_dialog.activateWindow()
@@ -190,17 +124,87 @@ class Announcement():
         except requests.HTTPError as e:
             print(f"Error displaying announcement window: {e}")
 
-    def loop_announcefile(self):
-        "Loop through announcement file url in order"
-        i = 1
-        while True:
-            url = f"{diff.ANNOUNCEMENT_LINK}/{i}.txt"
-            try:
+    def announcement_content_frame(self):
+        "Frame that hold announcement content"
+
+    def load_content(self, index, html_label):
+        "Get announcement content from official website"
+        try:
+            url = self.announcement_files[index]
+            if url in constant.announcement_cache:
+                md_content = constant.announcement_cache[url]
+            else:
                 response = requests.get(url, timeout=5)
-                if response.status_code == 404:
-                    break
                 response.raise_for_status()
-                self.announcement_files.append(url)
-                i += 1
-            except requests.exceptions.RequestException:
-                break
+                md_content = response.text
+                constant.announcement_cache[url] = md_content
+            html_content = markdown(md_content)
+            styling = """
+            <style>
+            ol { -qt-list-indent: 1; margin-left: -20px; padding-left: 0px; } # noqa
+            ol li { margin-left: -5px; padding-left: 0px; }
+            </style>
+            """
+            html_label.setHtml(styling + html_content)
+        except requests.HTTPError:
+            html_label.setHtml(
+                "<p>File not found.</p>" # noqa
+            )
+
+    def announcement_button_frame(self, html_label):
+        "Button and checkbox"
+        button_frame = QWidget()
+        button_layout = QHBoxLayout(button_frame)
+        button_layout.setContentsMargins(0, 0, 0, 0)
+
+        prev_button = QPushButton("Previous")
+        prev_button.setFixedWidth(100)
+        prev_button.setEnabled(self.current_announcement_index > 0)
+        prev_button.clicked.connect(lambda: self.prev_doc(html_label, prev_button, next_button))
+        button_layout.addWidget(prev_button)
+
+        next_button = QPushButton("Next")
+        next_button.setFixedWidth(100)
+        next_button.clicked.connect(lambda: self.next_doc(html_label, prev_button, next_button))
+        button_layout.addWidget(next_button)
+
+        dont_show_checkbox = QCheckBox("Don't show again")
+        dont_show_checkbox.setChecked(not self.load_announcement_condition())
+        dont_show_checkbox.stateChanged.connect(
+            lambda: self.save_announcement_condition(dont_show_checkbox))
+        button_layout.addWidget(dont_show_checkbox)
+        return button_frame
+
+    def save_announcement_condition(self, dont_show_checkbox):
+        "Save user preference on file when don't show announcement checkbox is checked"
+        self.announcement_condition = (
+            not dont_show_checkbox.isChecked())
+
+        try:
+            with open(constant.dont_show_path, "w", encoding='utf-8') as f:
+                json.dump({"welcome_condition":
+                            self.announcement_condition}, f)
+        except FileNotFoundError as e:
+            print(f"Error saving condition file: {e}")
+
+    def update_buttons(self, prev_button, next_button):
+        "Update button enable/disable state"
+        prev_button.setEnabled(self.current_announcement_index > 0)
+        next_button.setEnabled(
+            self.current_announcement_index < len(
+                self.announcement_files) - 1)
+
+    def next_doc(self, html_label, prev_button, next_button):
+        "Next announcement"
+        if self.current_announcement_index < len(
+                self.announcement_files) - 1:
+            self.current_announcement_index += 1
+            self.load_content(self.current_announcement_index, html_label)
+            self.update_buttons(prev_button, next_button)
+
+    def prev_doc(self, html_label, prev_button, next_button):
+        "previous announcement"
+        if self.current_announcement_index > 0:
+            self.current_announcement_index -= 1
+            self.load_content(self.current_announcement_index, html_label)
+            self.update_buttons(prev_button, next_button)

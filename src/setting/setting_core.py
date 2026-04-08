@@ -106,7 +106,9 @@ class SettingCore(Diff):
         "Uninstall AutoHotkey"
         if ahk_installed:
             try:
-                subprocess.Popen(utils.ahk_uninstall_path, shell=True)
+                with subprocess.Popen(utils.ahk_uninstall_path, shell=True) as proc:
+                    proc.wait()
+
             except FileNotFoundError:
                 QMessageBox.critical(
                     dialog,

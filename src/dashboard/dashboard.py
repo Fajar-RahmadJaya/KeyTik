@@ -17,7 +17,6 @@ from utility import icons
 import utility.diff as diff
 
 from core.main_core import MainCore
-from script_profile.write_script import WriteScript
 from script_profile.parse_script import ParseScript
 from script_profile.profile_ui import ProfileUI
 
@@ -26,7 +25,7 @@ from setting.announcement import Announcement
 
 
 class Dashboard(QMainWindow, MainCore, ProfileUI,
-                SettingUI, Announcement, WriteScript, ParseScript):
+                SettingUI, Announcement, ParseScript):
     "Main Window"
     def __init__(self):
         super().__init__()

@@ -9,22 +9,22 @@ from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
-
 from utility.diff import (Diff, mode_item, mode_map)
+from utility import utils
 
 from select_program.select_program_ui import SelectProgramUI
 
 from select_device.select_device_ui import SelectDeviceUI
 from script_profile.remap_row import RemapRow
-from script_profile.profile_core import ProfileCore
+from script_profile.write_script import WriteScript
 from select_key.select_key_ui import SelectKeyUI
 
 
 class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
-                ProfileCore, SelectKeyUI):
+                SelectKeyUI, WriteScript):
     "Create/edit profile UI"
     def __init__(self):
-        super().__init__()
+        super().__init__(self.edit_frame)
         # Variables
         self.copas_rows = []
         self.key_rows = []
@@ -32,6 +32,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.is_text_mode = False
         self.files_opener_rows = []
         self.files_opener_row_widgets = []
+        self.script_dir = utils.active_dir
 
         # UI
         self.script_name_entry = None

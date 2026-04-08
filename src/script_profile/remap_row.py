@@ -9,11 +9,13 @@ from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from utility import utils
 from utility import icons
 from script_profile.parse_script import ParseScript
+from script_profile.profile_core import ProfileCore
 
 
-class RemapRow(ParseScript):
+class RemapRow(ParseScript, ProfileCore):
     "Remap & shortcut row on profile creation"
-    def __init__(self):
+    def __init__(self, edit_frame):
+        self.edit_frame = edit_frame
         self.mapping_row_widgets = []
         self.shortcut_row_widgets = []
         self.row_num = 0

@@ -12,7 +12,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication, QFileDialog, QMessageBox,
     QInputDialog
 )
-from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QFont, QFontDatabase  # pylint: disable=E0611
 from pynput.keyboard import Controller, Key
 
@@ -151,21 +150,6 @@ class MainCore():
         else:
             QMessageBox.warning(self, "Error",
                                 f"{script_name} does not exist.")
-
-    def toggle_on_top(self):
-        "Toggle window always on top"
-        is_on_top = bool(self.windowFlags() &
-                         Qt.WindowType.WindowStaysOnTopHint)
-        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, not is_on_top)
-        self.show()
-        on_top_text = (f"KeyTik{' (Always on Top)' if not is_on_top else ''}")
-        self.setWindowTitle(on_top_text)
-        if not is_on_top:
-            self.always_top.setToolTip("Disable Window Always on Top")
-            self.always_top.setIcon(icons.get_icon(icons.on_top_fill))
-        else:
-            self.always_top.setToolTip("Enable  Window Always on Top")
-            self.always_top.setIcon(icons.get_icon(icons.on_top))
 
     def activate_script(self, script_name, button):
         "Run profile"
@@ -308,18 +292,18 @@ class MainCore():
                     "AHK Installation",
                     "AutoHotkey v2 is installed on your system.")
             return True
-        else:
-            reply = QMessageBox.question(
-                None,
-                "AHK Installation",
-                "AutoHotkey v2 is not installed on your system. "
-                "AutoHotkey is required for KeyTik to work.\n\n"
-                "Would you like to download it now?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-            if reply == QMessageBox.StandardButton.Yes:
-                webbrowser.open("https://www.autohotkey.com/")
-            return False
+
+        reply = QMessageBox.question(
+            None,
+            "AHK Installation",
+            "AutoHotkey v2 is not installed on your system. "
+            "AutoHotkey is required for KeyTik to work.\n\n"
+            "Would you like to download it now?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            webbrowser.open("https://www.autohotkey.com/")
+        return False
 
     def font_fallback(self):
         "Fallback font (Might still not work as expected)"
@@ -341,33 +325,6 @@ class MainCore():
                                                  font_name)
 
         QApplication.setFont(fallback_font)
-
-    def check_ahi_dir(self):
-        "Make sure AutoHotkey Interception directory is valid"
-        target_folder = os.path.join(utils.active_dir,
-                                     'AutoHotkey Interception')
-
-        def get_all_relative_paths(base_dir):
-            rel_paths = set()
-            for root, dirs, files in os.walk(base_dir):
-                for name in files:
-                    rel_path = os.path.relpath(os.path.join(root, name),
-                                               base_dir)
-                    rel_paths.add(rel_path)
-                for name in dirs:
-                    rel_path = os.path.relpath(os.path.join(root, name),
-                                               base_dir)
-                    rel_paths.add(rel_path)
-            return rel_paths
-
-        ahi_paths = get_all_relative_paths(constant.ahi_dir)
-        target_paths = get_all_relative_paths(target_folder)
-
-        if (not ahi_paths.issubset(target_paths) or
-                not os.path.isdir(target_folder)):
-            if os.path.exists(target_folder):
-                shutil.rmtree(target_folder)
-            shutil.copytree(constant.ahi_dir, target_folder)
 
     def list_scripts(self):
         "List profile, with listing all AHK script on active directory"
@@ -432,60 +389,6 @@ class MainCore():
 
         except NotADirectoryError as e:
             print(f"Error removing {shortcut_path}: {e}")
-
-    def run_monitor(self):
-        "Run AutoHotkey Interception built in device monitor"
-        script_path = os.path.join(constant.script_dir,
-                                   "_internal", "Data", "Active",
-                                   "AutoHotkey Interception", "Monitor.ahk")
-        if os.path.exists(script_path):
-            os.startfile(script_path)
-        else:
-            print(f"Error: The script at {script_path} does not exist.")
-
-    def load_key_translations(self):
-        "Load translation from raw key to readable key"
-        key_translations = {}
-        try:
-            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-                for category_dict in data:
-                    for _, keys in category_dict.items():
-                        for key, info in keys.items():
-                            readable_key = key.strip().lower()
-                            translation = info.get("translate", "").strip()
-                            if translation:
-                                key_translations[readable_key] = translation
-
-        except FileNotFoundError as e:
-            print(f"Error reading key translations: {e}")
-        return key_translations
-
-    def translate_key(self, key, key_translations):
-        "Translate raw key into readable key"
-        keys = key.split('+')
-        translated_keys = []
-
-        for single_key in keys:
-            translated_key = key_translations.get(single_key.strip().lower(),
-                                                  single_key.strip())
-            translated_keys.append(translated_key)
-
-        return " & ".join(translated_keys)
-
-    def load_key_values(self):
-        "Load hard coded key list"
-        key_values = []
-        try:
-            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-                for category_dict in data:
-                    for _, keys in category_dict.items():
-                        for key in keys.keys():
-                            key_values.append(key)
-        except FileNotFoundError as e:
-            print(f"Error reading key_list.json: {e}")
-        return key_values
 
     def update_script_list(self):
         "! From dashboard"

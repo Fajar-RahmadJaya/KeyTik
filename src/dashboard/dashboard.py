@@ -255,3 +255,18 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
             Announcement.show_announcement_window(self)
         except RuntimeError as e:
             print(f"Error displaying announcement window: {e}")
+
+    def toggle_on_top(self):
+        "Toggle window always on top"
+        is_on_top = bool(self.windowFlags() &
+                            Qt.WindowType.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, not is_on_top)
+        self.show()
+        on_top_text = (f"KeyTik{' (Always on Top)' if not is_on_top else ''}")
+        self.setWindowTitle(on_top_text)
+        if not is_on_top:
+            self.always_top.setToolTip("Disable Window Always on Top")
+            self.always_top.setIcon(icons.get_icon(icons.on_top_fill))
+        else:
+            self.always_top.setToolTip("Enable  Window Always on Top")
+            self.always_top.setIcon(icons.get_icon(icons.on_top))

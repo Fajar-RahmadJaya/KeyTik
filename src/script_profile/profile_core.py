@@ -400,3 +400,33 @@ class ProfileCore(QObject):
         except FileNotFoundError as e:
             print(f"Error reading key list: {e}")
         return key_map
+    
+    def load_key_translations(self):
+        "Load translation from raw key to readable key"
+        key_translations = {}
+        try:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                for category_dict in data:
+                    for _, keys in category_dict.items():
+                        for key, info in keys.items():
+                            readable_key = key.strip().lower()
+                            translation = info.get("translate", "").strip()
+                            if translation:
+                                key_translations[readable_key] = translation
+
+        except FileNotFoundError as e:
+            print(f"Error reading key translations: {e}")
+        return key_translations
+
+    def translate_key(self, key, key_translations):
+        "Translate raw key into readable key"
+        keys = key.split('+')
+        translated_keys = []
+
+        for single_key in keys:
+            translated_key = key_translations.get(single_key.strip().lower(),
+                                                    single_key.strip())
+            translated_keys.append(translated_key)
+
+        return " & ".join(translated_keys)

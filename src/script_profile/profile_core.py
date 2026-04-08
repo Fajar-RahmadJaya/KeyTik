@@ -1,9 +1,6 @@
 "Logic for create/edit profile"
 
-import os
 import json
-import ctypes
-
 import keyboard
 from pynput import mouse
 
@@ -47,51 +44,6 @@ class ProfileCore(QObject):
         self.active_entry = None
         self.previous_button_text = None
         self.set_timer = None
-
-    def check_interception_driver(self):
-        "Check whether interception driver is installed"
-        if os.path.exists(constant.DRIVER_PATH):
-            return True
-        else:
-            reply = QMessageBox.question(
-                None,
-                "Driver Not Found",
-                "Interception driver is not installed. "
-                "This driver is required to use assign on specific device feature.\n \n \n"
-                "Note: Restart your device after installation.\n"
-                "Would you like to install it now?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-
-            if reply == QMessageBox.StandardButton.Yes:
-                try:
-                    if os.path.exists(constant.interception_install_path):
-
-                        install_dir = (os.path.dirname
-                                       (constant.interception_install_path))
-
-                        ctypes.windll.shell32.ShellExecuteW(
-                            None,
-                            "runas",
-                            "cmd.exe",
-                            (
-                            f"/k cd /d {install_dir} && "
-                            f"{os.path.basename(constant.interception_install_path)}"
-                            ),
-                            None,
-                            1
-                        )
-                    else:
-                        QMessageBox.critical(
-                            None,
-                            "Installation Failed",
-                            "Installation script not found. Please check your installation."
-                        )
-                except FileNotFoundError as e:
-                    QMessageBox.critical(None,
-                                         "Error", 
-                                         f"An error occurred during installation: {str(e)}")
-            return False
 
     def update_entry(self):
         "Add + on multi key press"

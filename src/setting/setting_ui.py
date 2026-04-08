@@ -26,7 +26,7 @@ class SettingUI(SettingCore, Announcement):
 
     def open_settings_window(self):
         "Setting window"
-        self.settings_window = QDialog()
+        self.settings_window = QDialog(self)
         self.settings_window.setWindowTitle("Settings")
         self.settings_window.setFixedSize(400, 250)
         self.settings_window.setWindowIcon(QIcon(constant.icon_path))

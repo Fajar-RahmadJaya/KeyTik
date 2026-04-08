@@ -57,7 +57,7 @@ class Announcement():
             self.get_announcement_url()
             self.current_announcement_index = 0
 
-            self.announcement_dialog = QDialog()
+            self.announcement_dialog = QDialog(self)
             self.announcement_dialog.setWindowTitle("Announcement")
             self.announcement_dialog.setFixedSize(525, 290)
             self.announcement_dialog.setWindowIcon(QIcon(constant.icon_path))

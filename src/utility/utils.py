@@ -4,8 +4,8 @@ import json
 import tempfile
 import sys
 import winreg
-from utility import constant
 
+from utility import constant
 
 
 def load_condition():

@@ -26,44 +26,6 @@ class ParseScript():
                 break
         return device_id
 
-    def parse_device_info(self, file_path):
-        "Parse device VID/PID or handle for device binding"
-        devices = []
-        try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                lines = file.readlines()
-
-            lines = [line.strip() for line in lines if line.strip()]
-
-            device_info = {}
-            for line in lines:
-                line = line.strip()
-                if line.startswith("Device ID"):
-                    if device_info:
-                        if (device_info.get('VID') and
-                                device_info.get('PID') and
-                                device_info.get('Handle')):
-                            devices.append(device_info)
-                    device_info = {'Device ID': line.split(":")[1].strip()}
-                elif line.startswith("VID:"):
-                    device_info['VID'] = line.split(":")[1].strip()
-                elif line.startswith("PID:"):
-                    device_info['PID'] = line.split(":")[1].strip()
-                elif line.startswith("Handle:"):
-                    device_info['Handle'] = line.split(":")[1].strip()
-                elif line.startswith("Is Mouse:"):
-                    device_info['Is Mouse'] = line.split(":")[1].strip()
-
-            if (device_info.get('VID') and
-                    device_info.get('PID') and
-                    device_info.get('Handle')):
-                devices.append(device_info)
-
-        except (ValueError, FileNotFoundError) as e:
-            print(f"Error reading device info: {e}")
-
-        return devices
-
     def parse_program(self, lines):
         "parse program binding"
         programs = []

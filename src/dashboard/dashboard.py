@@ -11,15 +11,12 @@ from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 
 from utility import constant
-
 from utility import utils
 from utility import icons
-import utility.diff as diff
-
+from utility import diff
 from core.main_core import MainCore
 from script_profile.parse_script import ParseScript
 from script_profile.profile_ui import ProfileUI
-
 from setting.setting_ui import SettingUI
 from setting.announcement import Announcement
 

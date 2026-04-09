@@ -160,13 +160,13 @@ class MainCore():
             os.startfile(script_path)
 
             button.setText(" Exit")
-            button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"') # noqa
+            button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"') 
             button.setIcon(icons.get_icon(icons.icon_exit))
             button.clicked.disconnect()
             button.clicked.connect(lambda: self.exit_script(script_name,
                                                             button))
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") 
 
     def exit_script(self, script_name, button):
         "Exit profile"
@@ -201,16 +201,16 @@ class MainCore():
                     keyboard.release(Key.ctrl)
 
                 button.setText(" Run")
-                button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"') # noqa
+                button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"') 
                 button.setIcon(icons.get_icon(icons.run))
                 button.clicked.disconnect()
                 button.clicked.connect(lambda: self.activate_script(
                     script_name, button))
 
             except FileNotFoundError as e:
-                QMessageBox.critical(self, "Error", f"Failed to exit script: {e}") # noqa
+                QMessageBox.critical(self, "Error", f"Failed to exit script: {e}") 
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") 
 
     def store_script(self, script_name):
         "Move profile to store directory"
@@ -231,9 +231,9 @@ class MainCore():
                 self.scripts = self.list_scripts()
                 self.update_script_list()
             except NotADirectoryError as e:
-                QMessageBox.critical(self, "Error", f"Failed to move the script: {e}") # noqa
+                QMessageBox.critical(self, "Error", f"Failed to move the script: {e}") 
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") 
 
     def toggle_run_exit(self, script_name, button):
         "Switch between run/exit on profile"

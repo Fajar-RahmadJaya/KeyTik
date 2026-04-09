@@ -141,14 +141,14 @@ class Announcement():
             html_content = markdown(md_content)
             styling = """
             <style>
-            ol { -qt-list-indent: 1; margin-left: -20px; padding-left: 0px; } # noqa
+            ol { -qt-list-indent: 1; margin-left: -20px; padding-left: 0px; } 
             ol li { margin-left: -5px; padding-left: 0px; }
             </style>
             """
             html_label.setHtml(styling + html_content)
         except requests.HTTPError:
             html_label.setHtml(
-                "<p>File not found.</p>" # noqa
+                "<p>File not found.</p>" 
             )
 
     def announcement_button_frame(self, html_label):

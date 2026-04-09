@@ -15,6 +15,7 @@ from script_profile.profile_core import ProfileCore
 class RemapRow(ParseScript, ProfileCore):
     "Remap & shortcut row on profile creation"
     def __init__(self, edit_frame):
+        super().__init__()
         self.edit_frame = edit_frame
         self.mapping_row_widgets = []
         self.shortcut_row_widgets = []
@@ -23,6 +24,7 @@ class RemapRow(ParseScript, ProfileCore):
         self.edit_frame_layout = None
         self.text_block = None
         self.shortcut_entry = None
+        self.is_text_mode = None
 
     def remap_row(self, default_key='', remap_key='', insert_after=None,
                   is_text_format=False, is_hold_format=False,
@@ -86,7 +88,7 @@ class RemapRow(ParseScript, ProfileCore):
         # Remap Key Widget
         remap_key_select = QPushButton("Select", row_widget)
         remap_key_select.setFixedWidth(140)
-        remap_key_select.setToolTip("Press any key or shortcut to capture it automatically") # noqa
+        remap_key_select.setToolTip("Press any key or shortcut to capture it automatically") 
         remap_key_select.clicked.connect(lambda:
                                          self.key_listening(
                                             remap_key_entry,

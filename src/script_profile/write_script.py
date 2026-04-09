@@ -21,13 +21,13 @@ class WriteScript():
 
     def generate_exit_key(self, script_name, file=None):
         "Generate key for profile exit"
-        possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', # noqa
-                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] # noqa
+        possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
+                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] 
 
         try:
             if os.path.exists(constant.exit_keys_file):
                 try:
-                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f: # noqa
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f: 
                         exit_keys = json.load(f)
                 except json.JSONDecodeError:
                     exit_keys = {}
@@ -70,7 +70,7 @@ class WriteScript():
             exit_keys = {}
             if os.path.exists(constant.exit_keys_file):
                 try:
-                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f: # noqa
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f: 
                         exit_keys = json.load(f)
                 except FileNotFoundError:
                     exit_keys = {}
@@ -128,7 +128,7 @@ class WriteScript():
                             with open(script_path, 'w', encoding='utf-8') as f:
                                 f.writelines(lines)
                         except FileNotFoundError as e:
-                            print(f"Error processing {script_name} in {dir_path}: {e}") # noqa
+                            print(f"Error processing {script_name} in {dir_path}: {e}") 
                             continue
 
             try:
@@ -283,7 +283,7 @@ class WriteScript():
             else:
                 raise ValueError(f"Unknown device type: {device_type}")
             file.write("Persistent\n")
-            file.write("#include AutoHotkey Interception\\Lib\\AutoHotInterception.ahk\n\n") # noqa
+            file.write("#include AutoHotkey Interception\\Lib\\AutoHotInterception.ahk\n\n") 
             file.write("AHI := AutoHotInterception()\n")
             file.write(
                 (
@@ -317,7 +317,7 @@ class WriteScript():
                         translated_shortcut = self.translate_key(
                             shortcut, key_translations)
                         file.write(f"~{translated_shortcut}:: ; Shortcuts\n")
-                        file.write("{\n    global toggle\n    toggle := !toggle\n}\n\n") # noqa
+                        file.write("{\n    global toggle\n    toggle := !toggle\n}\n\n") 
                     hotif_conditions.append("toggle")
                 elif caps_shortcuts:
                     hotif_conditions.append(" || ".join(caps_shortcuts))
@@ -444,7 +444,7 @@ class WriteScript():
                                key_translations):
         "Write single key case on remap key"
         if hasattr(self, "is_unicode_key") and self.is_unicode_key(remap_key):
-            file.write(f'{default_translated}::SendInput Chr({ord(remap_key)})\n') # noqa
+            file.write(f'{default_translated}::SendInput Chr({ord(remap_key)})\n') 
         else:
             remap_key_tr = self.translate_key(remap_key, key_translations)
             file.write(f'{default_translated}::{remap_key_tr}\n')

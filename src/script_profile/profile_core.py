@@ -55,7 +55,7 @@ class ProfileCore(QObject):
         "Get profile name from entry"
         script_name = self.script_name_entry.text().strip()
         if not script_name:
-            QMessageBox.warning(None, "Input Error", "Please enter a Profile name.") # noqa
+            QMessageBox.warning(None, "Input Error", "Please enter a Profile name.") 
             return None
 
         if not script_name.endswith('.ahk'):

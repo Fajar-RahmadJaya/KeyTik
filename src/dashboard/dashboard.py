@@ -212,9 +212,9 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         store_button.setIcon(icons.get_icon(icons.store))
 
         if self.script_dir == utils.active_dir:
-            store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"') # noqa
+            store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"') 
         else:
-            store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"') # noqa
+            store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"') 
 
         store_button.clicked.connect(lambda checked,
                                      s=script: self.store_script(s))

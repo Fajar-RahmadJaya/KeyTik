@@ -53,6 +53,7 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         self.announcement_condition = self.load_announcement_condition()
         self.font_fallback()
         self.check_ahi_dir()
+        self.checked_keys_list = []
 
     def create_ui(self):
         "Dashboard Window"

@@ -21,7 +21,7 @@ class SelectDeviceUI(SelectDeviceCore):
         self.device_selection_window = None
         self.device_tree = None
 
-    def open_device_selection(self):
+    def open_device_selection(self, edit_window, keyboard_entry):
         "Device selection window"
         # Make sure interception driver installed
         if not self.check_interception_driver():
@@ -38,7 +38,7 @@ class SelectDeviceUI(SelectDeviceCore):
         os.startfile(utils.device_finder_path)
         time.sleep(1)
 
-        self.device_selection_window = QDialog(self.edit_window)
+        self.device_selection_window = QDialog(edit_window)
         self.device_selection_window.setWindowTitle("Select Device")
         self.device_selection_window.setWindowIcon(QIcon(constant.icon_path))
         self.device_selection_window.setFixedSize(600, 300)
@@ -60,7 +60,7 @@ class SelectDeviceUI(SelectDeviceCore):
         select_button.clicked.connect(
             lambda: self.select_device(
                 self.device_tree,
-                self.keyboard_entry,
+                keyboard_entry,
                 self.device_selection_window))
         button_layout.addWidget(select_button)
 

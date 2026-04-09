@@ -109,7 +109,8 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.keyboard_entry = QLineEdit(top_widget)
         keyboard_select_button = QPushButton("Select Device", top_widget)
         keyboard_select_button.setToolTip("Choose device and bind profile to it") # noqa
-        keyboard_select_button.clicked.connect(self.open_device_selection)
+        keyboard_select_button.clicked.connect(
+            lambda: self.open_device_selection(self.edit_window, self.keyboard_entry))
         top_layout.addWidget(keyboard_label, 2, 0, 1, 1)
         top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)

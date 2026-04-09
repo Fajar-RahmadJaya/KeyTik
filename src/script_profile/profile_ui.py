@@ -29,28 +29,30 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.copas_rows = []
         self.key_rows = []
         self.shortcut_rows = []
-        self.is_text_mode = False
         self.files_opener_rows = []
         self.files_opener_row_widgets = []
+        self.is_text_mode = False
         self.script_dir = utils.active_dir
 
         # UI
         self.script_name_entry = None
         self.program_entry = None
         self.keyboard_entry = None
-        self.edit_scroll = None
         self.edit_frame = None
         self.mode_combobox = None
         self.text_block = None
 
     def edit_script(self, script_name):
         "Create/edit profile window"
+        # Clear row
         self.shortcut_row_widgets = []
         self.mapping_row_widgets = []
         self.copas_rows = []
-
+        self.key_rows = []
+        self.shortcut_rows = []
         self.is_text_mode = False
 
+        # Handle create new profile
         is_new_profile = not script_name
         if is_new_profile:
             script_path = None
@@ -65,6 +67,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
 
         first_line = lines[0].strip()
 
+        # Edit window
         self.edit_window = QDialog(self)
         if is_new_profile:
             self.edit_window.setWindowTitle("Create New Profile")
@@ -76,12 +79,31 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         edit_layout = QGridLayout(self.edit_window)
         edit_layout.setContentsMargins(30, 10, 30, 10)
 
+        # Top part of profile manager
+        top_widget = self.edit_top(script_name, lines)
+        edit_layout.addWidget(top_widget, 0, 0, 1, 4)
+
+        # Middle part of profile manager
+        edit_scroll = self.edit_middle(lines, first_line)
+        edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
+
+        # Bottom part of profile manager
+        bottom_widget = self.edit_bottom(script_name, first_line)
+        edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
+
+        self.edit_window.setLayout(edit_layout)
+        self.edit_window.exec()
+
+    def edit_top(self, script_name, lines):
+        "Top part of profile manager"
         top_widget = QWidget(self.edit_window)
         top_layout = QGridLayout(top_widget)
         top_layout.setContentsMargins(40, 0, 40, 5)
 
         script_name_label = QLabel("Profile Name", top_widget)
         script_name_label.setFixedWidth(90)
+        top_layout.addWidget(script_name_label, 0, 0, 1, 1)
+
         self.script_name_entry = QLineEdit(top_widget)
         if script_name:
             script_name_without_extension = script_name.replace('.ahk', '')
@@ -90,61 +112,63 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         else:
             self.script_name_entry.setText("")
             self.script_name_entry.setReadOnly(False)
-        top_layout.addWidget(script_name_label, 0, 0, 1, 1)
         top_layout.addWidget(self.script_name_entry, 0, 1, 1, 3)
 
         program_label = QLabel("Program", top_widget)
         program_label.setFixedWidth(90)
-        self.program_entry = QLineEdit(top_widget)
-        program_select_button = QPushButton("Select Program", top_widget)
-        program_select_button.setToolTip("Choose program and bind profile to it") # noqa
-        program_select_button.clicked.connect(lambda: self.program_window(
-            self.program_entry))
         top_layout.addWidget(program_label, 1, 0, 1, 1)
+
+        self.program_entry = QLineEdit(top_widget)
+        program_entry_value = self.parse_program(lines)
+        if program_entry_value:
+            self.program_entry.setText(program_entry_value)
         top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
+
+        program_select_button = QPushButton("Select Program", top_widget)
+        program_select_button.setToolTip("Choose program and bind profile to it")
+        program_select_button.clicked.connect(lambda: self.program_window(self.program_entry))
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
         keyboard_label = QLabel("Device ID", top_widget)
         keyboard_label.setFixedWidth(90)
-        self.keyboard_entry = QLineEdit(top_widget)
-        keyboard_select_button = QPushButton("Select Device", top_widget)
-        keyboard_select_button.setToolTip("Choose device and bind profile to it") # noqa
-        keyboard_select_button.clicked.connect(
-            lambda: self.open_device_selection(self.edit_window, self.keyboard_entry))
         top_layout.addWidget(keyboard_label, 2, 0, 1, 1)
-        top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
-        top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
+        self.keyboard_entry = QLineEdit(top_widget)
         device_id = self.parse_device(lines)
         if device_id:
             self.keyboard_entry.setText(device_id)
+        top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
 
-        program_entry_value = self.parse_program(lines)
-        if program_entry_value:
-            self.program_entry.setText(program_entry_value)
+        keyboard_select_button = QPushButton("Select Device", top_widget)
+        keyboard_select_button.setToolTip("Choose device and bind profile to it")
+        keyboard_select_button.clicked.connect(
+            lambda: self.open_device_selection(self.edit_window, self.keyboard_entry))
+        top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
-        edit_layout.addWidget(top_widget, 0, 0, 1, 4)
+        return top_widget
 
-        self.edit_scroll = QScrollArea(self.edit_window)
-        self.edit_scroll.setFixedSize(535, 305)
-        self.edit_scroll.setWidgetResizable(True)
-        self.edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        edit_layout.addWidget(self.edit_scroll, 1, 0, 1, 4)
+    def edit_middle(self, lines, first_line):
+        "Middle part of profile manager"
+        edit_scroll = QScrollArea(self.edit_window)
+        edit_scroll.setFixedSize(535, 305)
+        edit_scroll.setWidgetResizable(True)
+        edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         self.edit_frame = QWidget()
-        self.edit_scroll.setWidget(self.edit_frame)
+        edit_scroll.setWidget(self.edit_frame)
 
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.edit_frame.setLayout(self.edit_frame_layout)
 
-        self.key_rows = []
-        self.shortcut_rows = []
-
         self.handle_parser(lines, first_line)
 
         self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum,
-                                                   QSizePolicy.Expanding))
+                                                    QSizePolicy.Expanding))
 
+        return edit_scroll
+
+    def edit_bottom(self, script_name, first_line):
+        "Bottom part of profile manager"
         bottom_widget = QWidget(self.edit_window)
         bottom_layout = QGridLayout(bottom_widget)
         bottom_layout.setContentsMargins(0, 5, 0, 0)
@@ -160,20 +184,12 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.mode_combobox.lineEdit().setReadOnly(True)
         self.mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.mode_combobox.currentIndexChanged.connect(self.handle_mode_changed)
+        default_index = mode_map.get(first_line.lower(), 0)
+        self.mode_combobox.setCurrentIndex(default_index)
         bottom_layout.addWidget(self.mode_combobox, 0, 3, 1, 1)
 
-        edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
-
-        first_line_lower = first_line.lower()
-
-        default_index = mode_map.get(first_line_lower, 0)
-        self.mode_combobox.setCurrentIndex(default_index)
-
-        on_mode_changed = self.handle_mode_changed
-        self.mode_combobox.currentIndexChanged.connect(on_mode_changed)
-
-        self.edit_window.setLayout(edit_layout)
-        self.edit_window.exec()
+        return bottom_widget
 
     def handle_mode_changed(self, index):
         "Action when mode changed from combobox (can be moved)"

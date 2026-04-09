@@ -180,7 +180,7 @@ class WriteScript():
             return False
         return True
 
-    def save_changes(self, script_name):
+    def save_changes(self, script_name, mode_combobox):
         "Write script"
         script_name = self.get_script_name()
         if not script_name:
@@ -215,9 +215,7 @@ class WriteScript():
             return
 
         try:
-            mode = None
-            if hasattr(self, "mode_combobox"):
-                mode = self.mode_combobox.currentText().strip().lower()
+            mode = mode_combobox.currentText().strip().lower()
             self.is_text_mode = mode == "text mode"
             self.handle_write(script_name, mode)
             self.scripts = self.list_scripts()

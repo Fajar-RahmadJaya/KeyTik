@@ -39,17 +39,15 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.program_entry = None
         self.keyboard_entry = None
         self.edit_frame = None
-        self.mode_combobox = None
-        self.text_block = None
 
     def edit_script(self, script_name):
         "Create/edit profile window"
         # Clear row
-        self.shortcut_row_widgets = []
-        self.mapping_row_widgets = []
         self.copas_rows = []
         self.key_rows = []
         self.shortcut_rows = []
+        self.shortcut_row_widgets = []
+        self.mapping_row_widgets = []
         self.is_text_mode = False
 
         # Handle create new profile
@@ -175,19 +173,19 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         bottom_layout.setHorizontalSpacing(225)
 
         save_button = QPushButton("Save Changes", self.edit_window)
-        save_button.clicked.connect(lambda: self.save_changes(script_name))
+        save_button.clicked.connect(lambda: self.save_changes(script_name, mode_combobox))
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
-        self.mode_combobox = QComboBox(self.edit_window)
-        self.mode_combobox.addItems(mode_item)
-        self.mode_combobox.setEditable(True)
-        self.mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.mode_combobox.lineEdit().setReadOnly(True)
-        self.mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.mode_combobox.currentIndexChanged.connect(self.handle_mode_changed)
+        mode_combobox = QComboBox(self.edit_window)
+        mode_combobox.addItems(mode_item)
+        mode_combobox.setEditable(True)
+        mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+        mode_combobox.lineEdit().setReadOnly(True)
+        mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        mode_combobox.currentIndexChanged.connect(self.handle_mode_changed)
         default_index = mode_map.get(first_line.lower(), 0)
-        self.mode_combobox.setCurrentIndex(default_index)
-        bottom_layout.addWidget(self.mode_combobox, 0, 3, 1, 1)
+        mode_combobox.setCurrentIndex(default_index)
+        bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
 
         return bottom_widget
 

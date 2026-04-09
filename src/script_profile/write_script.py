@@ -485,7 +485,7 @@ class WriteScript():
         file.write(f'*{translated_key}::{{\n')
         file.write(
             (f'    if (A_PriorHotkey = "*{translated_key}") '
-             'and (A_TimeSincePriorHotkey < 400) {{\n'
+             'and (A_TimeSincePriorHotkey < 400)\n'
             )
         )
 
@@ -552,7 +552,6 @@ class WriteScript():
                     file.write(f'        SendInput("{remap_key_tr}")\n')
 
         file.write('    }\n')
-        file.write('}\n')
 
     def write_text_format(self, file, default_translated, remap_key):
         "write text format (Send literal string)"

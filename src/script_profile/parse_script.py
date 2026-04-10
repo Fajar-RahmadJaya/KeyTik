@@ -83,7 +83,6 @@ class ParseScript():
 
     def parse_default_mode(self, lines, key_map):
         "Parse default mode"
-        shortcuts = self.parse_shortcuts(lines, key_map)
         remaps = []
         in_block = False
         current_block = []
@@ -119,7 +118,7 @@ class ParseScript():
                     not in line):
                 self.parse_remap_key(line, key_map, remaps)
 
-        return shortcuts, remaps
+        return remaps
 
     def parse_default_key(self, default_key, key_map):
         "Parse default key line"

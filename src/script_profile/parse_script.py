@@ -116,10 +116,10 @@ class ParseScript():
                 continue
 
             # Remap row parse
-            self.parse_remap_row(line, key_map, parsed_remaps)
+            self.remap_row_parse(line, key_map, parsed_remaps)
         return parsed_remaps
 
-    def parse_remap_row(self, line, key_map, parsed_remaps):
+    def remap_row_parse(self, line, key_map, parsed_remaps):
         "Parse remap key"
         if ("::" in line and "::{" not in line and ":: ; Shortcuts"
         not in line):

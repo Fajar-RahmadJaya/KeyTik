@@ -113,30 +113,54 @@ class RemapRow(ParseScript, ProfileCore):
             self.update_plus_visibility('remap')
 
         elif mode_line == "; text":
-            self.is_text_mode = True
-            self.text_block = QTextEdit(self.edit_frame)
-            self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
-            self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
-            self.text_block.setFontPointSize(10)
-            self.edit_frame_layout.addWidget(self.text_block)
-
-            shortcuts = self.parse_shortcuts(lines, key_map)
-
-            self.row_num += 1
-
-            text_content = self.extract_and_filter_content(lines)
-            self.text_block.setPlainText(text_content.strip())
-
-            if not shortcuts:
-                self.shortcut_row()
-            else:
-                for shortcut in shortcuts:
-                    self.shortcut_row(shortcut)
-
-            self.update_plus_visibility('shortcut')
+            self.parse_text_mode(lines, key_map)
 
         else:
             self.pro_parser(lines, first_line)
+
+    def parse_text_mode(self, lines, key_map):
+        "Parse text mode(to do: fix)"
+        shortcuts = self.parse_shortcuts(lines, key_map)
+
+        if not shortcuts:
+            self.shortcut_row()
+        else:
+            for shortcut in shortcuts:
+                self.shortcut_row(shortcut)
+
+        self.row_num += 1
+
+        self.text_block = QTextEdit(self.edit_frame)
+        self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
+        self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
+        self.text_block.setFontPointSize(10)
+        self.text_block.setReadOnly(False)
+        self.text_block.setStyleSheet(
+        "font-family: Consolas; "
+        "font-size: 10pt;"
+        )
+        text_content = self.extract_and_filter_content(lines)
+        print(text_content)
+        self.text_block.setPlainText(text_content.strip())
+        self.edit_frame_layout.addWidget(self.text_block)
+
+        self.update_plus_visibility('shortcut')
+
+    def extract_and_filter_content(self, lines):
+        "Get text block value from the marker"
+        inside = False
+        result_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped == "; Text mode start":
+                inside = True
+                continue
+            if stripped == "; Text mode end":
+                inside = False
+                continue
+            if inside:
+                result_lines.append(line)
+        return ''.join(result_lines)
 
     def remap_row(self, default_key='', remap_key='', insert_after=None,
                   is_text_format=False, is_hold_format=False,
@@ -435,12 +459,12 @@ class RemapRow(ParseScript, ProfileCore):
             self.edit_frame_layout = self.edit_frame.layout()
 
         if self.is_text_mode and (not hasattr(self, 'text_block') or
-                                  self.text_block is None):
+        self.text_block is None):
             self.text_block = QTextEdit(self.edit_frame)
             self.text_block.setReadOnly(False)
             self.text_block.setStyleSheet(
-                "font-family: Consolas; "
-                "font-size: 10pt;"
+            "font-family: Consolas; "
+            "font-size: 10pt;"
             )
             self.edit_frame_layout.addWidget(self.text_block)
 
@@ -577,29 +601,14 @@ class RemapRow(ParseScript, ProfileCore):
             self.shortcut_row_widgets.append((card_frame, separator_widget))
 
         if (self.is_text_mode and
-                hasattr(self, 'text_block') and
-                self.text_block is not None):
+            hasattr(self, 'text_block') and
+            self.text_block is not None):
+
             self.edit_frame_layout.addWidget(self.text_block)
 
         self.edit_frame.setUpdatesEnabled(True)
         self.edit_frame.update()
         self.edit_frame.adjustSize()
-
-    def extract_and_filter_content(self, lines):
-        "Get text block value from the marker"
-        inside = False
-        result_lines = []
-        for line in lines:
-            stripped = line.strip()
-            if stripped == "; Text mode start":
-                inside = True
-                continue
-            if stripped == "; Text mode end":
-                inside = False
-                continue
-            if inside:
-                result_lines.append(line)
-        return ''.join(result_lines)
 
     def shortcut_title(self):
         "Shortcuts row tittle label"

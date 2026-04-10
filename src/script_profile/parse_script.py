@@ -81,12 +81,13 @@ class ParseScript():
 
         return shortcuts
 
-    def parse_remap_key(self, lines, key_map):
-        "Parse remap key line"
-        current_block = []
-        parsed_remaps = []
+    def parse_default_mode(self, lines, key_map):
+        "Parse default mode"
+        shortcuts = self.parse_shortcuts(lines, key_map)
+        remaps = []
         in_block = False
-        default_key = None
+        current_block = []
+        default_key = ""
 
         for line in lines[3:]:
             line = line.strip()
@@ -96,106 +97,29 @@ class ParseScript():
             if line.startswith("#HotIf"):
                 continue
 
-            # Double click parse
-            if line.startswith("*") and "::{" in line:
-                default_key = line[1:line.index("::{")]
-                in_block = True
-                current_block = []
-                continue
-
             if in_block:
                 if line == "}":
                     in_block = False
                     block_text = " ".join(current_block)
                     self.parse_double_click(default_key, block_text,
-                                            parsed_remaps, key_map)
+                                            remaps, key_map)
                     current_block = []
                     continue
 
                 current_block.append(line)
                 continue
 
-            # Remap row parse
-            self.remap_row_parse(line, key_map, parsed_remaps)
-        return parsed_remaps
+            if line.startswith("*") and "::{" in line:
+                default_key = line[1:line.index("::{")]
+                in_block = True
+                current_block = []
+                continue
 
-    def remap_row_parse(self, line, key_map, parsed_remaps):
-        "Parse remap key"
-        if ("::" in line and "::{" not in line and ":: ; Shortcuts"
-        not in line):
-            parts = line.split("::")
-            default_key = parts[0].strip()
-            remap_or_action = parts[1].strip() if len(parts) > 1 else ""
+            if ("::" in line and "::{" not in line and ":: ; Shortcuts"
+                    not in line):
+                self.parse_remap_key(line, key_map, remaps)
 
-            defaults_key = self.parse_default_key(default_key, key_map)
-
-            if remap_or_action:
-                is_text_format = False
-                is_hold_format = False
-                is_first_key = False
-                is_sc = False
-                remap_key = ""
-                hold_interval = "10"
-
-                if not default_key.startswith('~') and '&' in default_key:
-                    is_first_key = True
-
-                if default_key.startswith('SC') or default_key.startswith('~SC'):
-                    is_sc = True
-
-                if remap_or_action.startswith('SendText'):
-                    remap_key = self.parse_text_format(remap_or_action)
-                    is_text_format = True
-                elif 'SetTimer' in remap_or_action:
-                    remap_key, hold_interval = self.parse_hold_format(remap_or_action)
-                    is_hold_format = True
-                elif (remap_or_action.startswith('Send') or
-                        remap_or_action.startswith('SendInput')):
-                    remap_key = self.parse_send_remap(
-                        remap_or_action, key_map)
-                else:
-                    remap_key = remap_or_action
-
-                remap_key = self.replace_raw_keys(remap_key, key_map)
-
-                parsed_remaps.append((defaults_key, remap_key, is_text_format,
-                                is_hold_format, hold_interval, is_first_key, is_sc))
-
-    def parse_double_click(self, default_key, block_text, remaps, key_map):
-        "Parse double click mode from default key"
-        is_text_format = False
-        is_hold_format = False
-        hold_interval = "10"
-        remap_key = ""
-        is_first_key = False
-        is_sc = False
-
-        if not default_key.startswith('~') and '&' in default_key:
-            is_first_key = True
-
-        if default_key.startswith('SC') or default_key.startswith('~SC'):
-            is_sc = True
-
-        if ('A_PriorHotkey' in block_text and
-                'A_TimeSincePriorHotkey < 400' in block_text):
-
-            if 'SendText' in block_text:
-                remap_key = self.parse_text_format(block_text)
-                is_text_format = True
-            elif 'SetTimer' in block_text:
-                remap_key, hold_interval = self.parse_hold_format(block_text)
-                is_hold_format = True
-            else:
-                send_match = re.search(
-                    r'Send(?:Input)?\("(.+?)"\)', block_text)
-                if send_match:
-                    remap_key = self.parse_send_remap(send_match.group(0), key_map)
-                else:
-                    remap_key = ""
-
-        remaps.append((f"{default_key} + {default_key}",
-                        remap_key, is_text_format,
-                        is_hold_format, hold_interval, is_first_key, is_sc))
+        return shortcuts, remaps
 
     def parse_default_key(self, default_key, key_map):
         "Parse default key line"
@@ -207,6 +131,46 @@ class ParseScript():
         else:
             key = self.replace_raw_keys(key, key_map)
         return key
+
+    def parse_remap_key(self, line, key_map, remaps):
+        "Parse remap key line"
+        parts = line.split("::")
+        default_key = parts[0].strip()
+        remap_or_action = parts[1].strip() if len(parts) > 1 else ""
+
+        defaults_key = self.parse_default_key(default_key, key_map)
+
+        if remap_or_action:
+            is_text_format = False
+            is_hold_format = False
+            is_first_key = False
+            is_sc = False
+            remap_key = ""
+            hold_interval = "10"
+
+            if not default_key.startswith('~') and '&' in default_key:
+                is_first_key = True
+
+            if default_key.startswith('SC') or default_key.startswith('~SC'):
+                is_sc = True
+
+            if remap_or_action.startswith('SendText'):
+                remap_key = self.parse_text_format(remap_or_action)
+                is_text_format = True
+            elif 'SetTimer' in remap_or_action:
+                remap_key, hold_interval = self.parse_hold_format(remap_or_action)
+                is_hold_format = True
+            elif (remap_or_action.startswith('Send') or
+                  remap_or_action.startswith('SendInput')):
+                remap_key = self.parse_send_remap(
+                    remap_or_action, key_map)
+            else:
+                remap_key = remap_or_action
+
+            remap_key = self.replace_raw_keys(remap_key, key_map)
+
+            remaps.append((defaults_key, remap_key, is_text_format,
+                           is_hold_format, hold_interval, is_first_key, is_sc))
 
     def get_unicode(self, text):
         'Parse Unicode fron SendInput'
@@ -269,6 +233,34 @@ class ParseScript():
         if text_match:
             remap_key = text_match.group(1)
         return remap_key
+
+    def parse_double_click(self, default_key, block_text, remaps, key_map):
+        "Parse double click mode from default key"
+        is_text_format = False
+        is_hold_format = False
+        hold_interval = "10"
+        remap_key = ""
+
+        if ('A_PriorHotkey' in block_text and
+                'A_TimeSincePriorHotkey < 400' in block_text):
+
+            if 'SendText' in block_text:
+                remap_key = self.parse_text_format(block_text)
+                is_text_format = True
+            elif 'SetTimer' in block_text:
+                remap_key, hold_interval = self.parse_hold_format(block_text)
+                is_hold_format = True
+            else:
+                send_match = re.search(
+                    r'Send(?:Input)?\("(.+?)"\)', block_text)
+                if send_match:
+                    remap_key = self.parse_send_remap(send_match.group(0), key_map)
+                else:
+                    remap_key = ""
+
+        remaps.append((f"{default_key} + {default_key}",
+                       remap_key, is_text_format,
+                       is_hold_format, hold_interval))
 
     def replace_raw_keys(self, key, key_map):
         "Translate raw key into readable key"

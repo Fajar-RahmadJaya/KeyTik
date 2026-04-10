@@ -39,17 +39,6 @@ class SelectKeyCore():
                 continue
         return block_dict
 
-    def load_keylist(self):
-        "Get the hardcoded key list"
-        try:
-            with open(constant.keylist_path, "r", encoding="utf-8") as f:
-                key_data = json.loads(f.read())
-            if key_data and isinstance(key_data, list):
-                key_data = key_data[0]
-            return key_data
-        except FileNotFoundError:
-            return {}
-
     def get_checked_filter(self, filter_dropdown):
         "Get the checked/selected item on the checkbox"
         return [
@@ -82,10 +71,21 @@ class SelectKeyCore():
                     item.addChild(child_item)
             item.setExpanded(True)
 
+    def load_keylist(self):
+        "Get the hardcoded key list"
+        try:
+            with open(constant.keylist_path, "r", encoding="utf-8") as f:
+                key_data = json.loads(f.read())
+            if key_data and isinstance(key_data, list):
+                key_data = key_data[0]
+            return key_data
+        except FileNotFoundError:
+            return {}
+
     def is_unicode_key(self, key):
         "Determine whether it's unicode or hard coded key"
         key_data = self.load_keylist()
-        for children in key_data.items():
-            if key in children:
+        for child_item in key_data.values():
+            if key in child_item:
                 return False
         return True

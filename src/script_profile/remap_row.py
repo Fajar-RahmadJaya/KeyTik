@@ -105,7 +105,8 @@ class RemapRow(ParseScript, ProfileCore):
 
         self.remap_title()
 
-        self.remap_row(parsed_remaps)
+        for remap in parsed_remaps:
+            self.remap_row([remap])
 
         self.update_plus_visibility('shortcut')
         self.update_plus_visibility('remap')
@@ -375,6 +376,7 @@ class RemapRow(ParseScript, ProfileCore):
         self.edit_frame.update()
         self.edit_frame.adjustSize()
 
+        # Add or remove row when entry changed
         def auto_add_row():
             try:
                 idx = self.key_rows.index((
@@ -429,20 +431,25 @@ class RemapRow(ParseScript, ProfileCore):
         for (default_key, remap_key, is_text_format,
              is_hold_format, hold_interval, is_first_key,
              is_sc) in parsed_remaps:
-
             if default_key:
                 default_key_entry.setText(default_key)
+
             sc_checkbox.setChecked(is_sc)
+
             text_format_checkbox.setChecked(is_text_format)
+
             hold_format_checkbox.setChecked(is_hold_format)
+
             if is_hold_format and hold_interval:
                 hold_interval_float = float(hold_interval)
                 hold_interval_str = (str(int(hold_interval_float))
                                         if hold_interval_float.is_integer()
                                         else str(hold_interval_float))
                 hold_interval_entry.setText(hold_interval_str)
+
             if remap_key:
                 remap_key_entry.setText(remap_key)
+
             first_key_checkbox.setChecked(is_first_key)
 
     def shortcut_row(self, shortcut='', insert_after=None,

@@ -88,7 +88,7 @@ class RemapRow(ParseScript, ProfileCore):
         # Remap Key Widget
         remap_key_select = QPushButton("Select", row_widget)
         remap_key_select.setFixedWidth(140)
-        remap_key_select.setToolTip("Press any key or shortcut to capture it automatically") 
+        remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(lambda:
                                          self.key_listening(
                                             remap_key_entry,

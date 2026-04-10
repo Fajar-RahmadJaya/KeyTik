@@ -21,7 +21,7 @@ def load_condition():
                 else:
                     print("Condition file is empty. Returning None.")
     except json.JSONDecodeError:
-        print("Error: Condition file is not in valid JSON format.") 
+        print("Error: Condition file is not in valid JSON format.")
     except FileNotFoundError as e:
         print(f"Error: {e}")
     return None
@@ -60,9 +60,9 @@ def load_pinned_profiles():
                     if isinstance(data, list):
                         return data
                 else:
-                    print("Pinned profiles file is empty. Returning an empty list.") 
+                    print("Pinned profiles file is empty. Returning an empty list.")
     except json.JSONDecodeError:
-        print("Error: Pinned profiles file is not in valid JSON format.") 
+        print("Error: Pinned profiles file is not in valid JSON format.")
     except FileNotFoundError as e:
         print(f"Error: {e}")
     return []
@@ -144,7 +144,7 @@ def detect_system_theme():
         try:
             registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
             theme_registry = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-            key = winreg.OpenKey(registry, theme_registry) 
+            key = winreg.OpenKey(registry, theme_registry)
             value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
             winreg.CloseKey(key)
             return "dark" if value == 0 else "light"
@@ -184,4 +184,4 @@ def get_ahk_install_dir():
     return None
 
 ahk_uninstall_path = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk", "UX", "ui-uninstall.ahk")  # pylint: disable=C0301,E0401
-ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2") 
+ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")

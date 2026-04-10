@@ -28,7 +28,7 @@ class Thread(QThread, Diff):
     def run(self):
         "Run check update on thread to increase dashborad initialization time"
         self.write_script.initialize_exit_keys()
-        # To do: load all announcement file content on thread 
+        # To do: load all announcement file content on thread
         # when "show announcement" is true
 
         latest_version = self.setting_core.check_for_update()

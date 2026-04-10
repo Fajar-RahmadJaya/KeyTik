@@ -139,7 +139,7 @@ class SettingCore(Diff):
     def check_for_update(self):
         "Check for update comparing current version and latest version from GitHub API"
         try:
-            response = requests.get(CHECK_UPDATE_LINK, timeout=5) 
+            response = requests.get(CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == 200:
                 return self.parse_update_response(response)
         except requests.exceptions.ConnectionError:

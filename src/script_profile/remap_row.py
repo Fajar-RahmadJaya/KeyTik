@@ -56,7 +56,7 @@ class RemapRow(ParseScript, ProfileCore):
             self.shortcut_title()
             self.shortcut_row()
             self.remap_title()
-            self.remap_row()
+            self.remap_row(parsed_remaps="")
             self.edit_frame_layout.addItem(QSpacerItem(20, 40,
                                             QSizePolicy.Minimum,
                                             QSizePolicy.Expanding))
@@ -77,49 +77,41 @@ class RemapRow(ParseScript, ProfileCore):
         key_map = self.load_key_list()
         mode_line = lines[0].strip() if lines else "; default"
 
-        shortcuts = []
-        remaps = []
-
         if mode_line == "; default":
-            shortcuts, remaps = self.parse_default_mode(lines, key_map)
-
-            self.shortcut_title()
-
-            if not shortcuts:
-                self.shortcut_row()
-            else:
-                for shortcut in shortcuts:
-                    self.shortcut_row(shortcut)
-
-            self.remap_title()
-
-            if not remaps:
-                self.remap_row()
-            else:
-                for (default_key, remap_key, is_text_format,
-                        is_hold_format, hold_interval, is_first_key,
-                        is_sc) in remaps:
-                    self.remap_row(
-                        default_key,
-                        remap_key,
-                        is_text_format=is_text_format,
-                        is_hold_format=is_hold_format,
-                        hold_interval=hold_interval,
-                        is_first_key=is_first_key,
-                        is_sc=is_sc
-                    )
-
-            self.update_plus_visibility('shortcut')
-            self.update_plus_visibility('remap')
+            self.default_mode_widget(lines, key_map)
 
         elif mode_line == "; text":
-            self.parse_text_mode(lines, key_map)
+            self.text_mode_widget(lines, key_map)
 
         else:
             self.pro_parser(lines, first_line)
 
-    def parse_text_mode(self, lines, key_map):
-        "Parse text mode(to do: fix)"
+    def default_mode_widget(self, lines, key_map):
+        "Default mode frame"
+        shortcuts = []
+        parsed_remaps = []
+
+        shortcuts = self.parse_shortcuts(lines, key_map)
+
+        parsed_remaps = self.parse_default_mode(lines, key_map)
+
+        self.shortcut_title()
+
+        if not shortcuts:
+            self.shortcut_row()
+        else:
+            for shortcut in shortcuts:
+                self.shortcut_row(shortcut)
+
+        self.remap_title()
+
+        self.remap_row(parsed_remaps)
+
+        self.update_plus_visibility('shortcut')
+        self.update_plus_visibility('remap')
+
+    def text_mode_widget(self, lines, key_map):
+        "Text mode frame(to do: fix)"
         shortcuts = self.parse_shortcuts(lines, key_map)
 
         if not shortcuts:
@@ -162,9 +154,7 @@ class RemapRow(ParseScript, ProfileCore):
                 result_lines.append(line)
         return ''.join(result_lines)
 
-    def remap_row(self, default_key='', remap_key='', insert_after=None,
-                  is_text_format=False, is_hold_format=False,
-                  hold_interval="", is_first_key=False, is_sc=False):
+    def remap_row(self, parsed_remaps, insert_after=None):
         "Remap row"
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -198,8 +188,6 @@ class RemapRow(ParseScript, ProfileCore):
         default_key_layout.setSpacing(2)
 
         default_key_entry = QLineEdit(default_key_widget)
-        if default_key:
-            default_key_entry.setText(default_key)
         default_key_entry.setFixedWidth(112)
         default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         default_key_entry.setToolTip("Default key can be a single key, "
@@ -237,8 +225,6 @@ class RemapRow(ParseScript, ProfileCore):
         remap_key_layout.setSpacing(2)
 
         remap_key_entry = QLineEdit(remap_key_widget)
-        if remap_key:
-            remap_key_entry.setText(remap_key)
         remap_key_entry.setFixedWidth(112)
         remap_key_entry.setToolTip("Remap key can be "
                                    "a single key, multiple keys, text, or hold")
@@ -265,7 +251,6 @@ class RemapRow(ParseScript, ProfileCore):
             "Default Key Only: "
             "Check this to disable the first key when using multiple keys.\n"
         )
-        first_key_checkbox.setChecked(is_first_key)
         options_layout.addWidget(first_key_checkbox)
 
         sc_checkbox = QCheckBox("Use Scan Code", options_widget)
@@ -276,17 +261,14 @@ class RemapRow(ParseScript, ProfileCore):
             "Scan Code is the hardware coordinate of the key, "
             "use this if the key is not detected or missing from the list."
         )
-        sc_checkbox.setChecked(is_sc)
         options_layout.addWidget(sc_checkbox)
 
         text_format_checkbox = QCheckBox("Text Format", options_widget)
-        text_format_checkbox.setChecked(is_text_format)
         text_format_checkbox.setToolTip("Remap Key Only: "
                                         "Check this to send the actual text instead of a key")
         options_layout.addWidget(text_format_checkbox)
 
         hold_format_checkbox = QCheckBox("Hold Format", options_widget)
-        hold_format_checkbox.setChecked(is_hold_format)
         hold_format_checkbox.setToolTip("Remap Key Only: "
                                         "Simulate holding the key for a set interval")
         options_layout.addWidget(hold_format_checkbox)
@@ -297,12 +279,6 @@ class RemapRow(ParseScript, ProfileCore):
         hold_interval_entry.setToolTip("Remap Key Only: "
                                        "Enter the hold interval in seconds (Default is 10 second)")
         hold_interval_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        if is_hold_format and hold_interval:
-            hold_interval_float = float(hold_interval)
-            hold_interval_str = (str(int(hold_interval_float))
-                                 if hold_interval_float.is_integer()
-                                 else str(hold_interval_float))
-            hold_interval_entry.setText(hold_interval_str)
         options_layout.addWidget(hold_interval_entry)
 
         row_layout.addWidget(options_widget, 2, 0, 1, 5, Qt.AlignCenter)
@@ -372,7 +348,7 @@ class RemapRow(ParseScript, ProfileCore):
             plus_label.setVisible(False)
             right_sep.setVisible(False)
             left_sep.setVisible(False)
-            self.remap_row(insert_after=(row_widget, separator_widget))
+            self.remap_row(parsed_remaps="", insert_after=(row_widget, separator_widget))
 
         plus_label.mousePressEvent = on_plus_click
 
@@ -448,6 +424,26 @@ class RemapRow(ParseScript, ProfileCore):
             auto_remove_row)
         remap_key_entry.textChanged.connect(
             auto_remove_row)
+
+        # Add parsed value to remap widget
+        for (default_key, remap_key, is_text_format,
+             is_hold_format, hold_interval, is_first_key,
+             is_sc) in parsed_remaps:
+
+            if default_key:
+                default_key_entry.setText(default_key)
+            sc_checkbox.setChecked(is_sc)
+            text_format_checkbox.setChecked(is_text_format)
+            hold_format_checkbox.setChecked(is_hold_format)
+            if is_hold_format and hold_interval:
+                hold_interval_float = float(hold_interval)
+                hold_interval_str = (str(int(hold_interval_float))
+                                        if hold_interval_float.is_integer()
+                                        else str(hold_interval_float))
+                hold_interval_entry.setText(hold_interval_str)
+            if remap_key:
+                remap_key_entry.setText(remap_key)
+            first_key_checkbox.setChecked(is_first_key)
 
     def shortcut_row(self, shortcut='', insert_after=None,
                      show_plus_label=True):

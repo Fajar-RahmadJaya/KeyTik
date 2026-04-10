@@ -441,7 +441,9 @@ class WriteScript():
     def write_single_key_remap(self, file, default_translated, remap_key,
                                key_translations):
         "Write single key case on remap key"
-        if hasattr(self, "is_unicode_key") and self.is_unicode_key(remap_key):
+        print(remap_key)
+        print(self.is_unicode_key(remap_key))
+        if self.is_unicode_key(remap_key):
             file.write(f'{default_translated}::SendInput Chr({ord(remap_key)})\n') 
         else:
             remap_key_tr = self.translate_key(remap_key, key_translations)

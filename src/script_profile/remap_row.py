@@ -56,7 +56,7 @@ class RemapRow(ParseScript, ProfileCore):
             self.shortcut_title()
             self.shortcut_row()
             self.remap_title()
-            self.remap_row(parsed_remaps="")
+            self.remap_row()
             self.edit_frame_layout.addItem(QSpacerItem(20, 40,
                                             QSizePolicy.Minimum,
                                             QSizePolicy.Expanding))
@@ -93,7 +93,6 @@ class RemapRow(ParseScript, ProfileCore):
 
         shortcuts = self.parse_shortcuts(lines, key_map)
 
-        parsed_remaps = self.parse_default_mode(lines, key_map)
 
         self.shortcut_title()
 
@@ -105,8 +104,15 @@ class RemapRow(ParseScript, ProfileCore):
 
         self.remap_title()
 
-        for remap in parsed_remaps:
-            self.remap_row([remap])
+        parsed_remaps = self.parse_default_mode(lines, key_map)
+
+        if parsed_remaps:
+            # For edit profile
+            for remap in parsed_remaps:
+                self.remap_row([remap])
+        else:
+            # For create new profile
+            self.remap_row()
 
         self.update_plus_visibility('shortcut')
         self.update_plus_visibility('remap')
@@ -155,7 +161,7 @@ class RemapRow(ParseScript, ProfileCore):
                 result_lines.append(line)
         return ''.join(result_lines)
 
-    def remap_row(self, parsed_remaps, insert_after=None):
+    def remap_row(self, parsed_remaps="", insert_after=None):
         "Remap row"
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -173,36 +179,9 @@ class RemapRow(ParseScript, ProfileCore):
         row_layout.setVerticalSpacing(5)
 
         # Default Key Widget
-        default_key_select = QPushButton("Select", row_widget)
-        default_key_select.setFixedWidth(140)
-        default_key_select.setToolTip("Press any key or shortcut "
-                                      "to capture it automatically")
-        default_key_select.clicked.connect(lambda:
-                                           self.key_listening(
-                                                default_key_entry,
-                                                default_key_select))
+        (default_key_entry, default_key_select,
+         default_key_widget) = self.default_key_widget(row_widget)
         row_layout.addWidget(default_key_select, 0, 0, 1, 2, Qt.AlignCenter)
-
-        default_key_widget = QWidget(row_widget)
-        default_key_layout = QHBoxLayout(default_key_widget)
-        default_key_layout.setContentsMargins(0, 0, 0, 0)
-        default_key_layout.setSpacing(2)
-
-        default_key_entry = QLineEdit(default_key_widget)
-        default_key_entry.setFixedWidth(112)
-        default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        default_key_entry.setToolTip("Default key can be a single key, "
-                                     "multiple keys, or a double key (eg. double-click)")
-        default_key_layout.addWidget(default_key_entry)
-
-        default_key_choose = QPushButton(default_key_widget)
-        default_key_choose.setFixedWidth(28)
-        default_key_choose.setIcon(icons.get_icon(icons.search))
-        default_key_choose.setToolTip("Choose Default/Original key")
-        default_key_choose.clicked.connect(
-            lambda: self.select_key(default_key_entry, context="default"))
-        default_key_layout.addWidget(default_key_choose)
-
         row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
 
         # Arrow Widget
@@ -211,77 +190,15 @@ class RemapRow(ParseScript, ProfileCore):
         row_layout.addWidget(arrow_icon, 0, 2, 2, 1)
 
         # Remap Key Widget
-        remap_key_select = QPushButton("Select", row_widget)
-        remap_key_select.setFixedWidth(140)
-        remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
-        remap_key_select.clicked.connect(lambda:
-                                         self.key_listening(
-                                            remap_key_entry,
-                                            remap_key_select))
+        (remap_key_entry, remap_key_select,
+         remap_key_widget) = self.remap_key_widget(row_widget)
         row_layout.addWidget(remap_key_select, 0, 3, 1, 2, Qt.AlignCenter)
-
-        remap_key_widget = QWidget(row_widget)
-        remap_key_layout = QHBoxLayout(remap_key_widget)
-        remap_key_layout.setContentsMargins(0, 0, 0, 0)
-        remap_key_layout.setSpacing(2)
-
-        remap_key_entry = QLineEdit(remap_key_widget)
-        remap_key_entry.setFixedWidth(112)
-        remap_key_entry.setToolTip("Remap key can be "
-                                   "a single key, multiple keys, text, or hold")
-        remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        remap_key_layout.addWidget(remap_key_entry)
-
-        remap_key_choose = QPushButton(remap_key_widget)
-        remap_key_choose.setFixedWidth(28)
-        remap_key_choose.setIcon(icons.get_icon(icons.search))
-        remap_key_choose.setToolTip("Choose Remap key")
-        remap_key_choose.clicked.connect(
-            lambda: self.select_key(remap_key_entry, context="remap"))
-        remap_key_layout.addWidget(remap_key_choose)
-
         row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
 
         # Option Widget
-        options_widget = QWidget(remap_key_widget)
-        options_layout = QHBoxLayout(options_widget)
-        options_layout.setContentsMargins(0, 5, 0, 0)
-
-        first_key_checkbox = QCheckBox("Disable First Key", options_widget)
-        first_key_checkbox.setToolTip(
-            "Default Key Only: "
-            "Check this to disable the first key when using multiple keys.\n"
-        )
-        options_layout.addWidget(first_key_checkbox)
-
-        sc_checkbox = QCheckBox("Use Scan Code", options_widget)
-        sc_checkbox.setObjectName("sc_checkbox")
-        sc_checkbox.setToolTip(
-            "Default Key Only: "
-            "Check this to make the Select button use Scan Code (SC) instead.\n"
-            "Scan Code is the hardware coordinate of the key, "
-            "use this if the key is not detected or missing from the list."
-        )
-        options_layout.addWidget(sc_checkbox)
-
-        text_format_checkbox = QCheckBox("Text Format", options_widget)
-        text_format_checkbox.setToolTip("Remap Key Only: "
-                                        "Check this to send the actual text instead of a key")
-        options_layout.addWidget(text_format_checkbox)
-
-        hold_format_checkbox = QCheckBox("Hold Format", options_widget)
-        hold_format_checkbox.setToolTip("Remap Key Only: "
-                                        "Simulate holding the key for a set interval")
-        options_layout.addWidget(hold_format_checkbox)
-
-        hold_interval_entry = QLineEdit(options_widget)
-        hold_interval_entry.setPlaceholderText("Int")
-        hold_interval_entry.setFixedWidth(40)
-        hold_interval_entry.setToolTip("Remap Key Only: "
-                                       "Enter the hold interval in seconds (Default is 10 second)")
-        hold_interval_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        options_layout.addWidget(hold_interval_entry)
-
+        (text_format_checkbox, hold_format_checkbox,
+         hold_interval_entry, first_key_checkbox,
+         sc_checkbox, options_widget) = self.option_widget(row_widget)
         row_layout.addWidget(options_widget, 2, 0, 1, 5, Qt.AlignCenter)
 
         self.key_rows.append((default_key_entry, remap_key_entry,
@@ -349,7 +266,7 @@ class RemapRow(ParseScript, ProfileCore):
             plus_label.setVisible(False)
             right_sep.setVisible(False)
             left_sep.setVisible(False)
-            self.remap_row(parsed_remaps="", insert_after=(row_widget, separator_widget))
+            self.remap_row(insert_after=(row_widget, separator_widget))
 
         plus_label.mousePressEvent = on_plus_click
 
@@ -451,6 +368,116 @@ class RemapRow(ParseScript, ProfileCore):
                 remap_key_entry.setText(remap_key)
 
             first_key_checkbox.setChecked(is_first_key)
+
+    def default_key_widget(self, row_widget):
+        "Default key widget on remap row"
+        default_key_select = QPushButton("Select", row_widget)
+        default_key_select.setFixedWidth(140)
+        default_key_select.setToolTip("Press any key or shortcut "
+                                        "to capture it automatically")
+        default_key_select.clicked.connect(lambda:
+                                            self.key_listening(
+                                                    default_key_entry,
+                                                    default_key_select))
+
+        default_key_widget = QWidget(row_widget)
+        default_key_layout = QHBoxLayout(default_key_widget)
+        default_key_layout.setContentsMargins(0, 0, 0, 0)
+        default_key_layout.setSpacing(2)
+
+        default_key_entry = QLineEdit(default_key_widget)
+        default_key_entry.setFixedWidth(112)
+        default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        default_key_entry.setToolTip("Default key can be a single key, "
+                                        "multiple keys, or a double key (eg. double-click)")
+        default_key_layout.addWidget(default_key_entry)
+
+        default_key_choose = QPushButton(default_key_widget)
+        default_key_choose.setFixedWidth(28)
+        default_key_choose.setIcon(icons.get_icon(icons.search))
+        default_key_choose.setToolTip("Choose Default/Original key")
+        default_key_choose.clicked.connect(
+            lambda: self.select_key(default_key_entry, context="default"))
+        default_key_layout.addWidget(default_key_choose)
+
+        return default_key_entry, default_key_select, default_key_widget
+
+    def remap_key_widget(self, row_widget):
+        "Remap key widget on remap row"
+        remap_key_select = QPushButton("Select", row_widget)
+        remap_key_select.setFixedWidth(140)
+        remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
+        remap_key_select.clicked.connect(lambda:
+                                            self.key_listening(
+                                                remap_key_entry,
+                                                remap_key_select))
+
+        remap_key_widget = QWidget(row_widget)
+        remap_key_layout = QHBoxLayout(remap_key_widget)
+        remap_key_layout.setContentsMargins(0, 0, 0, 0)
+        remap_key_layout.setSpacing(2)
+
+        remap_key_entry = QLineEdit(remap_key_widget)
+        remap_key_entry.setFixedWidth(112)
+        remap_key_entry.setToolTip("Remap key can be "
+                                    "a single key, multiple keys, text, or hold")
+        remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        remap_key_layout.addWidget(remap_key_entry)
+
+        remap_key_choose = QPushButton(remap_key_widget)
+        remap_key_choose.setFixedWidth(28)
+        remap_key_choose.setIcon(icons.get_icon(icons.search))
+        remap_key_choose.setToolTip("Choose Remap key")
+        remap_key_choose.clicked.connect(
+            lambda: self.select_key(remap_key_entry, context="remap"))
+        remap_key_layout.addWidget(remap_key_choose)
+
+        return remap_key_entry, remap_key_select, remap_key_widget
+
+    def option_widget(self, row_widget):
+        "Remap option widget on remap row"
+        options_widget = QWidget(row_widget)
+        options_layout = QHBoxLayout(options_widget)
+        options_layout.setContentsMargins(0, 5, 0, 0)
+
+        first_key_checkbox = QCheckBox("Disable First Key", options_widget)
+        first_key_checkbox.setToolTip(
+            "Default Key Only: "
+            "Check this to disable the first key when using multiple keys.\n"
+        )
+        options_layout.addWidget(first_key_checkbox)
+
+        sc_checkbox = QCheckBox("Use Scan Code", options_widget)
+        sc_checkbox.setObjectName("sc_checkbox")
+        sc_checkbox.setToolTip(
+            "Default Key Only: "
+            "Check this to make the Select button use Scan Code (SC) instead.\n"
+            "Scan Code is the hardware coordinate of the key, "
+            "use this if the key is not detected or missing from the list."
+        )
+        options_layout.addWidget(sc_checkbox)
+
+        text_format_checkbox = QCheckBox("Text Format", options_widget)
+        text_format_checkbox.setToolTip("Remap Key Only: "
+                                        "Check this to send the actual text instead of a key")
+        options_layout.addWidget(text_format_checkbox)
+
+        hold_format_checkbox = QCheckBox("Hold Format", options_widget)
+        hold_format_checkbox.setToolTip("Remap Key Only: "
+                                        "Simulate holding the key for a set interval")
+        options_layout.addWidget(hold_format_checkbox)
+
+        hold_interval_entry = QLineEdit(options_widget)
+        hold_interval_entry.setPlaceholderText("Int")
+        hold_interval_entry.setFixedWidth(40)
+        hold_interval_entry.setToolTip("Remap Key Only: "
+                                        "Enter the hold interval in seconds (Default is 10 second)")
+        hold_interval_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        options_layout.addWidget(hold_interval_entry)
+
+        return (text_format_checkbox, hold_format_checkbox,
+                hold_interval_entry, first_key_checkbox, sc_checkbox,
+                options_widget)
 
     def shortcut_row(self, shortcut='', insert_after=None,
                      show_plus_label=True):

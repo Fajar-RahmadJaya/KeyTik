@@ -110,7 +110,7 @@ class ProfileCore(QObject):
     def toggle_other_buttons(self, state, button):
         "Change the state of non selected button"
         for key_row in self.key_rows:
-            (_, _, orig_button, remap_button, _, _, _, _) = key_row
+            (_, _, orig_button, remap_button, _, _, _, _, _) = key_row
 
             if orig_button != button and orig_button is not None:
                 orig_button.setEnabled(state)
@@ -169,7 +169,7 @@ class ProfileCore(QObject):
     def handle_sc_listening(self, button):
         "Check whether to use scan code listening or not"
         for key_row in self.key_rows:
-            (_, _, orig_button, _, _, _, _,_) = key_row
+            (_, _, orig_button, _, _, _, _,_, _) = key_row
 
             if button == orig_button:
                 parent_widget = button.parent()
@@ -258,11 +258,18 @@ class ProfileCore(QObject):
         entries_to_disable.append((self.program_entry, None))
 
         for key_row in self.key_rows:
-            (orig_entry, remap_entry,
-                _, _, _, _, _,hold_interval_entry) = key_row
-            entries_to_disable.append((orig_entry, None))
-            entries_to_disable.append((remap_entry, None))
+            (default_key_entry, remap_key_entry,
+             _, _,
+             text_format_checkbox, hold_format_checkbox,
+             hold_interval_entry, first_key_checkbox,
+             sc_checkbox) = key_row
+            entries_to_disable.append((default_key_entry, None))
+            entries_to_disable.append((remap_key_entry, None))
+            entries_to_disable.append((text_format_checkbox, None))
+            entries_to_disable.append((hold_format_checkbox, None))
             entries_to_disable.append((hold_interval_entry, None))
+            entries_to_disable.append((first_key_checkbox, None))
+            entries_to_disable.append((sc_checkbox, None))
 
         for shortcut_entry, _ in self.shortcut_rows:
             entries_to_disable.append((shortcut_entry, None))
@@ -287,13 +294,19 @@ class ProfileCore(QObject):
         entries_to_enable.append((self.program_entry, None))
 
         for key_row in self.key_rows:
-            (
-                orig_entry, remap_entry, _, _, _, _, _,
-                hold_interval_entry
-            ) = key_row
-            entries_to_enable.append((orig_entry, None))
-            entries_to_enable.append((remap_entry, None))
+            (default_key_entry, remap_key_entry,
+            _, _,
+            text_format_checkbox, hold_format_checkbox,
+            hold_interval_entry, first_key_checkbox,
+            sc_checkbox) = key_row
+
+            entries_to_enable.append((default_key_entry, None))
+            entries_to_enable.append((remap_key_entry, None))
+            entries_to_enable.append((text_format_checkbox, None))
+            entries_to_enable.append((hold_format_checkbox, None))
             entries_to_enable.append((hold_interval_entry, None))
+            entries_to_enable.append((first_key_checkbox, None))
+            entries_to_enable.append((sc_checkbox, None))
 
         for shortcut_entry, _ in self.shortcut_rows:
             entries_to_enable.append((shortcut_entry, None))

@@ -169,9 +169,35 @@ class RemapRow(ParseScript, ProfileCore):
         else:
             self.edit_frame_layout = self.edit_frame.layout()
 
+        # Remap row card
+        card_frame = QFrame(self.edit_frame)
+        card_frame.setFrameShape(QFrame.NoFrame)
+        if utils.theme == "dark":
+            card_frame.setStyleSheet("""
+            QFrame {
+                background: #313131;
+                border: 1px solid #404040;
+                border-radius: 10px;
+            }
+            """)
+        else:
+            card_frame.setStyleSheet("""
+            QFrame {
+                background: #f8f8f8;
+                border: 1px solid #c9c9c9;
+                border-radius: 10px;
+            }
+            """)
+        card_layout = QVBoxLayout(card_frame)
+        card_layout.setContentsMargins(8, 8, 8, 8)
+        card_layout.setSpacing(0)
+
+        # Remap row layout
         row_widget = QWidget(self.edit_frame)
         row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
                                  QSizePolicy.Policy.Fixed)
+        card_layout.addWidget(row_widget)
+
         row_layout = QGridLayout(row_widget)
         row_widget.setLayout(row_layout)
         row_layout.setContentsMargins(10, 5, 10, 5)
@@ -206,34 +232,111 @@ class RemapRow(ParseScript, ProfileCore):
                               text_format_checkbox, hold_format_checkbox,
                               hold_interval_entry, first_key_checkbox))
 
-        card_frame = QFrame(self.edit_frame)
-        card_frame.setFrameShape(QFrame.NoFrame)
-        if utils.theme == "dark":
-            card_frame.setStyleSheet("""
-            QFrame {
-                background: #313131;
-                border: 1px solid #404040;
-                border-radius: 10px;
-            }
-            """)
-        else:
-            card_frame.setStyleSheet("""
-            QFrame {
-                background: #f8f8f8;
-                border: 1px solid #c9c9c9;
-                border-radius: 10px;
-            }
-            """)
-        card_layout = QVBoxLayout(card_frame)
-        card_layout.setContentsMargins(8, 8, 8, 8)
-        card_layout.setSpacing(0)
-        card_layout.addWidget(row_widget)
+        # Add parsed value to remap widget
+        for (default_key, remap_key, is_text_format,
+                is_hold_format, hold_interval, is_first_key,
+                is_sc) in parsed_remaps:
+            if default_key:
+                default_key_entry.setText(default_key)
 
+            sc_checkbox.setChecked(is_sc)
+
+            text_format_checkbox.setChecked(is_text_format)
+
+            hold_format_checkbox.setChecked(is_hold_format)
+
+            if is_hold_format and hold_interval:
+                hold_interval_float = float(hold_interval)
+                hold_interval_str = (str(int(hold_interval_float))
+                                        if hold_interval_float.is_integer()
+                                        else str(hold_interval_float))
+                hold_interval_entry.setText(hold_interval_str)
+
+            if remap_key:
+                remap_key_entry.setText(remap_key)
+
+            first_key_checkbox.setChecked(is_first_key)
+
+        # Separator widget
+        (plus_label, right_sep,
+         left_sep, separator_widget) = self.separator_widget()
+
+        def on_plus_click(_):
+            "Pressing tow will add a new row below via insert after"
+            plus_label.setVisible(False)
+            right_sep.setVisible(False)
+            left_sep.setVisible(False)
+            self.remap_row(insert_after=(row_widget, separator_widget))
+
+        plus_label.mousePressEvent = on_plus_click
+
+        # Set the order of widget insert
+        if insert_after is not None:
+            idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
+            self.edit_frame_layout.insertWidget(idx, card_frame)
+            self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
+            # self.mapping_row_widgets.insert(idx // 2, (card_frame,
+            #                                             separator_widget))
+        else:
+            self.edit_frame_layout.addWidget(card_frame)
+            self.edit_frame_layout.addWidget(separator_widget)
+            # self.mapping_row_widgets.append((card_frame, separator_widget))
+
+        # Add or remove row when entry changed
+        try:
+            idx = self.key_rows.index((
+                default_key_entry, remap_key_entry,
+                default_key_select, remap_key_select,
+                text_format_checkbox, hold_format_checkbox,
+                hold_interval_entry, first_key_checkbox
+            ))
+        except ValueError:
+            return
+
+        def auto_add_row():
+            "Auto add row if all entry have text"
+            if idx == len(self.key_rows) - 1:
+                if (default_key_entry.text().strip()
+                    and remap_key_entry.text().strip()):
+                    on_plus_click(None)
+
+        default_key_entry.textChanged.connect(auto_add_row)
+        remap_key_entry.textChanged.connect(auto_add_row)
+
+        # Unused for now
+        # def auto_remove_row():
+        #     "Auto remove row if all entry don't have text"
+        #     if idx == len(self.key_rows) - 2:
+        #         if (not default_key_entry.text().strip() and
+        #                 not remap_key_entry.text().strip()):
+        #             for i, (sw) in enumerate(self.mapping_row_widgets):
+        #                 # plus = sw.findChild(QLabel, None)
+        #                 # frames = sw.findChildren(QFrame)
+        #                 # left_sep = frames[0] if len(frames) > 0 else None
+        #                 # right_sep = frames[2] if len(frames) > 1 else None
+        #                 # is_last = i == len(self.mapping_row_widgets) - 1
+        #                 # if plus:
+        #                 #     plus.setVisible(is_last)
+        #                 # if left_sep:
+        #                 #     left_sep.setVisible(is_last)
+        #                 # if right_sep:
+        #                 #     right_sep.setVisible(is_last)
+        # default_key_entry.textChanged.connect(
+        #     auto_remove_row)
+        # remap_key_entry.textChanged.connect(
+        #     auto_remove_row)
+
+        self.edit_frame.setUpdatesEnabled(True)
+        self.edit_frame.update()
+        self.edit_frame.adjustSize()
+
+    def separator_widget(self):
+        "Remap row separator widget"
         separator_widget = QWidget(self.edit_frame)
         separator_layout = QHBoxLayout(separator_widget)
         separator_widget.setLayout(separator_layout)
         separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
-                                       QSizePolicy.Policy.Fixed)
+                                        QSizePolicy.Policy.Fixed)
         separator_layout.setContentsMargins(0, 0, 0, 0)
         separator_layout.setSpacing(0)
 
@@ -262,112 +365,7 @@ class RemapRow(ParseScript, ProfileCore):
         right_sep.setFrameShadow(QFrame.Shadow.Sunken)
         separator_layout.addWidget(right_sep)
 
-        def on_plus_click(_):
-            plus_label.setVisible(False)
-            right_sep.setVisible(False)
-            left_sep.setVisible(False)
-            self.remap_row(insert_after=(row_widget, separator_widget))
-
-        plus_label.mousePressEvent = on_plus_click
-
-        if not hasattr(self, "mapping_row_widgets"):
-            self.mapping_row_widgets = []
-
-        if self.mapping_row_widgets:
-            prev_plus = self.mapping_row_widgets[-1][1].findChild(QLabel, None)
-            if prev_plus:
-                prev_plus.setVisible(False)
-
-        if insert_after is not None:
-            idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
-            self.edit_frame_layout.insertWidget(idx, card_frame)
-            self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
-            self.mapping_row_widgets.insert(idx // 2, (card_frame,
-                                                       separator_widget))
-        else:
-            self.edit_frame_layout.addWidget(card_frame)
-            self.edit_frame_layout.addWidget(separator_widget)
-            self.mapping_row_widgets.append((card_frame, separator_widget))
-
-        self.edit_frame.setUpdatesEnabled(True)
-        self.edit_frame.update()
-        self.edit_frame.adjustSize()
-
-        # Add or remove row when entry changed
-        def auto_add_row():
-            try:
-                idx = self.key_rows.index((
-                    default_key_entry, remap_key_entry,
-                    default_key_select, remap_key_select,
-                    text_format_checkbox, hold_format_checkbox,
-                    hold_interval_entry
-                ))
-            except ValueError:
-                return
-            if idx == len(self.key_rows) - 1:
-                if (default_key_entry.text().strip()
-                        and remap_key_entry.text().strip()):
-                    on_plus_click(None)
-
-        def auto_remove_row():
-            try:
-                idx = self.key_rows.index((default_key_entry, remap_key_entry,
-                                           default_key_select,
-                                           remap_key_select,
-                                           text_format_checkbox,
-                                           hold_format_checkbox,
-                                           hold_interval_entry))
-            except ValueError:
-                return
-            if idx == len(self.key_rows) - 2:
-                if (not default_key_entry.text().strip() and
-                        not remap_key_entry.text().strip()):
-                    for i, (sw) in enumerate(self.mapping_row_widgets):
-                        plus = sw.findChild(QLabel, None)
-                        frames = sw.findChildren(QFrame)
-                        left_sep = frames[0] if len(frames) > 0 else None
-                        right_sep = frames[2] if len(frames) > 1 else None
-                        is_last = i == len(self.mapping_row_widgets) - 1
-                        if plus:
-                            plus.setVisible(is_last)
-                        if left_sep:
-                            left_sep.setVisible(is_last)
-                        if right_sep:
-                            right_sep.setVisible(is_last)
-
-        default_key_entry.textChanged.connect(
-            auto_add_row)
-        remap_key_entry.textChanged.connect(
-            auto_add_row)
-        default_key_entry.textChanged.connect(
-            auto_remove_row)
-        remap_key_entry.textChanged.connect(
-            auto_remove_row)
-
-        # Add parsed value to remap widget
-        for (default_key, remap_key, is_text_format,
-             is_hold_format, hold_interval, is_first_key,
-             is_sc) in parsed_remaps:
-            if default_key:
-                default_key_entry.setText(default_key)
-
-            sc_checkbox.setChecked(is_sc)
-
-            text_format_checkbox.setChecked(is_text_format)
-
-            hold_format_checkbox.setChecked(is_hold_format)
-
-            if is_hold_format and hold_interval:
-                hold_interval_float = float(hold_interval)
-                hold_interval_str = (str(int(hold_interval_float))
-                                        if hold_interval_float.is_integer()
-                                        else str(hold_interval_float))
-                hold_interval_entry.setText(hold_interval_str)
-
-            if remap_key:
-                remap_key_entry.setText(remap_key)
-
-            first_key_checkbox.setChecked(is_first_key)
+        return plus_label, right_sep, left_sep, separator_widget
 
     def default_key_widget(self, row_widget):
         "Default key widget on remap row"

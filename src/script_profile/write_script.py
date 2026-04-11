@@ -375,7 +375,7 @@ class WriteScript():
         for row in self.key_rows:
             (default_key_entry, remap_key_entry, _,
             _, text_format_var, hold_format_var,
-            hold_interval_entry, first_key_checkbox) = row
+            hold_interval_entry, first_key_checkbox, _) = row
 
             try:
                 default_key = default_key_entry.text().strip()

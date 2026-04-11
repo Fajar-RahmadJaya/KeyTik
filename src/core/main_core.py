@@ -32,80 +32,89 @@ class MainCore():
         "Select AHK script and add necessary line"
         file_dialog = QFileDialog(self)
         file_dialog.setNameFilter("AHK Scripts (*.ahk)")
+
         if file_dialog.exec():
             selected_files = file_dialog.selectedFiles()
+
             if selected_files:
                 selected_file = selected_files[0]
+
                 if not selected_file.endswith('.ahk'):
                     QMessageBox.warning(self, "Error",
                                         "Only .ahk files are allowed.")
                     return
+
                 file_name = os.path.basename(selected_file)
                 destination_path = os.path.join(self.script_dir, file_name)
+
                 try:
                     shutil.move(selected_file, destination_path)
                 except NotADirectoryError as e:
                     QMessageBox.warning(self, "Error",
                                         f"Failed to move file: {e}")
                     return
-                try:
-                    exit_key = self.generate_exit_key(file_name)
-                    with open(destination_path, 'r', encoding='utf-8') as file:
-                        lines = file.readlines()
 
-                    lines = [line for line in lines if "::ExitApp" not in line]
+                self.validate_imported_files(destination_path, file_name)
 
-                    first_line = lines[0].strip() if lines else ""
-                    has_text_or_default = (first_line.startswith("; text") or
-                                           first_line.startswith("; default"))
-                    new_lines = []
-                    if not has_text_or_default:
-
-                        if first_line and '::' in first_line:
-                            new_lines = [
-                                "; default\n",
-                                f"{exit_key}::ExitApp\n",
-                                "\n"
-                            ] + [first_line + '\n'] + lines[1:]
-                        else:
-                            new_lines = [
-                                "; text\n",
-                                f"{exit_key}::ExitApp\n",
-                                "\n"
-                            ] + lines
-                    else:
-
-                        new_lines = [lines[0] + f"{exit_key}::ExitApp\n",
-                                     "\n"] + lines[1:]
-
-                    content = ''.join(new_lines)
-                    content_lines = content.splitlines()
-                    content_lines = [line for line in content_lines if
-                                     line.strip() not in ["; Text mode start",
-                                                          "; Text mode end"]]
-
-                    header = content_lines[:3]
-                    body = content_lines[3:]
-                    result_lines = (header + ["; Text mode start"]
-                                    + body + ["; Text mode end"])
-
-                    with open(destination_path, 'w', encoding='utf-8') as file:
-                        file.write('\n'.join(result_lines) + '\n')
-                except FileNotFoundError as e:
-                    print(f"Error modifying script: {e}")
-                    try:
-                        if os.path.exists(constant.exit_keys_file):
-                            with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
-                                exit_keys = json.load(f)
-                            if file_name in exit_keys:
-                                del exit_keys[file_name]
-                            with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
-                                json.dump(exit_keys, f)
-                    except FileNotFoundError:
-                        pass
-                    return
                 self.scripts.append(file_name)
                 self.update_script_list()
+
+    def validate_imported_files(self, destination_path, file_name):
+        "Add necessary line on imported files"
+        try:
+            exit_key = self.generate_exit_key(file_name)
+
+            with open(destination_path, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+
+            lines = [line for line in lines if "::ExitApp" not in line]
+
+            first_line = lines[0].strip() if lines else ""
+            has_text_or_default = (first_line.startswith("; text") or
+                                    first_line.startswith("; default"))
+            new_lines = []
+            if not has_text_or_default:
+
+                if first_line and '::' in first_line:
+                    new_lines = [
+                        "; default\n",
+                        f"{exit_key}::ExitApp\n",
+                        "\n"
+                    ] + [first_line + '\n'] + lines[1:]
+                else:
+                    new_lines = [
+                        "; text\n",
+                        f"{exit_key}::ExitApp\n",
+                        "\n"
+                    ] + lines
+            else:
+
+                new_lines = [lines[0] + f"{exit_key}::ExitApp\n",
+                                "\n"] + lines[1:]
+
+            content = ''.join(new_lines)
+            content_lines = content.splitlines()
+            content_lines = [line for line in content_lines if
+                                line.strip() not in ["; Text mode start",
+                                                        "; Text mode end"]]
+
+            result_lines = (content_lines[:3] + ["; Text mode start"]
+                            + content_lines[3:] + ["; Text mode end"])
+
+            with open(destination_path, 'w', encoding='utf-8') as file:
+                file.write('\n'.join(result_lines) + '\n')
+        except FileNotFoundError as e:
+            print(f"Error modifying script: {e}")
+            try:
+                if os.path.exists(constant.exit_keys_file):
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
+                        exit_keys = json.load(f)
+                    if file_name in exit_keys:
+                        del exit_keys[file_name]
+                    with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
+                        json.dump(exit_keys, f)
+            except FileNotFoundError:
+                pass
 
     def copy_script(self, script):
         "Copy profile"

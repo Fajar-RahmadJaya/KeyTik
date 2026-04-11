@@ -1,5 +1,6 @@
 "Remap and shortctu row"
 
+from dataclasses import dataclass
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLabel, QPushButton, QCheckBox, QLineEdit, QFrame, QHBoxLayout,
     QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit, QSpacerItem
@@ -10,6 +11,18 @@ from utility import utils
 from utility import icons
 from script_profile.parse_script import ParseScript
 from script_profile.profile_core import ProfileCore
+
+
+@dataclass
+class ParsedRemap:
+    "Data class containing parsed remap"
+    default_key: str
+    remap_key: str
+    hold_interval: int
+    is_hold_format: bool
+    is_first_key: bool
+    is_sc: bool
+    is_text_format: bool
 
 
 class RemapRow(ParseScript, ProfileCore):
@@ -104,15 +117,35 @@ class RemapRow(ParseScript, ProfileCore):
 
         self.remap_title()
 
-        parsed_remaps = self.parse_default_mode(lines, key_map)
+        parsed_remap_tuple = self.parse_default_mode(lines, key_map)
 
-        if parsed_remaps:
-            # For edit profile
-            for remap in parsed_remaps:
-                self.remap_row([remap])
+        if parsed_remap_tuple:
+            # Unpack tuple
+            for (default_key, remap_key, is_text_format,
+                 is_hold_format, hold_interval, is_first_key,
+                 is_sc) in parsed_remap_tuple:
+
+                # Add unpacked tople to dataclass
+                parsed_remap = ParsedRemap(
+                    default_key = default_key,
+                    remap_key = remap_key,
+                    is_text_format = is_text_format,
+                    is_hold_format = is_hold_format,
+                    hold_interval = hold_interval,
+                    is_first_key = is_first_key,
+                    is_sc = is_sc
+                    )
+                self.remap_row(parsed_remap)
         else:
-            # For create new profile
             self.remap_row()
+
+
+        # if parsed_remap_tuple:
+        #     # For edit profile
+        #     self.remap_row(parsed_remap)
+        # else:
+        #     # For create new profile
+        #     self.remap_row()
 
         self.update_plus_visibility('shortcut')
         self.update_plus_visibility('remap')
@@ -161,7 +194,7 @@ class RemapRow(ParseScript, ProfileCore):
                 result_lines.append(line)
         return ''.join(result_lines)
 
-    def remap_row(self, parsed_remaps="", insert_after=None):
+    def remap_row(self, parsed_remap=None, insert_after=None):
         "Remap row"
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -205,10 +238,8 @@ class RemapRow(ParseScript, ProfileCore):
         row_layout.setVerticalSpacing(5)
 
         # Default Key Widget
-        (default_key_entry, default_key_select,
-         default_key_widget) = self.default_key_widget(row_widget)
-        row_layout.addWidget(default_key_select, 0, 0, 1, 2, Qt.AlignCenter)
-        row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
+        (default_key_entry, default_key_select
+         ) = self.default_key_widget(row_widget, row_layout, parsed_remap)
 
         # Arrow Widget
         arrow_icon = QSvgWidget(icons.arrow)
@@ -216,92 +247,73 @@ class RemapRow(ParseScript, ProfileCore):
         row_layout.addWidget(arrow_icon, 0, 2, 2, 1)
 
         # Remap Key Widget
-        (remap_key_entry, remap_key_select,
-         remap_key_widget) = self.remap_key_widget(row_widget)
-        row_layout.addWidget(remap_key_select, 0, 3, 1, 2, Qt.AlignCenter)
-        row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
+        (remap_key_entry, remap_key_select
+         ) = self.remap_key_widget(row_widget, row_layout, parsed_remap)
 
         # Option Widget
         (text_format_checkbox, hold_format_checkbox,
          hold_interval_entry, first_key_checkbox,
-         sc_checkbox, options_widget) = self.option_widget(row_widget)
-        row_layout.addWidget(options_widget, 2, 0, 1, 5, Qt.AlignCenter)
+         sc_checkbox) = self.option_widget(row_widget, row_layout, parsed_remap)
 
         self.key_rows.append((default_key_entry, remap_key_entry,
                               default_key_select, remap_key_select,
                               text_format_checkbox, hold_format_checkbox,
-                              hold_interval_entry, first_key_checkbox))
+                              hold_interval_entry, first_key_checkbox,
+                              sc_checkbox))
 
         # Add parsed value to remap widget
-        for (default_key, remap_key, is_text_format,
-                is_hold_format, hold_interval, is_first_key,
-                is_sc) in parsed_remaps:
-            if default_key:
-                default_key_entry.setText(default_key)
+        # for (default_key, remap_key, is_text_format,
+        #      is_hold_format, hold_interval, is_first_key,
+        #      is_sc) in parsed_remaps:
 
-            sc_checkbox.setChecked(is_sc)
+            # default_key_entry.setText(default_key)
 
-            text_format_checkbox.setChecked(is_text_format)
+            # remap_key_entry.setText(remap_key)
 
-            hold_format_checkbox.setChecked(is_hold_format)
+            # sc_checkbox.setChecked(is_sc)
 
-            if is_hold_format and hold_interval:
-                hold_interval_float = float(hold_interval)
-                hold_interval_str = (str(int(hold_interval_float))
-                                        if hold_interval_float.is_integer()
-                                        else str(hold_interval_float))
-                hold_interval_entry.setText(hold_interval_str)
+            # text_format_checkbox.setChecked(is_text_format)
 
-            if remap_key:
-                remap_key_entry.setText(remap_key)
+            # hold_format_checkbox.setChecked(is_hold_format)
 
-            first_key_checkbox.setChecked(is_first_key)
+            # first_key_checkbox.setChecked(is_first_key)
+
+            # hold_interval_float = float(hold_interval)
+            # hold_interval_str = (str(int(hold_interval_float))
+            #                         if hold_interval_float.is_integer()
+            #                         else str(hold_interval_float))
+            # hold_interval_entry.setText(hold_interval_str)
+
+            # default_key_entry.setText(key[0])
+
+            # remap_key_entry.setText(key[1])
+
+            # text_format_checkbox.setChecked(key[2])
+
+            # hold_format_checkbox.setChecked(key[3])
+
+            # hold_interval_entry.setText(str(int(float(key[4])))
+            #                             if float(key[4]).is_integer()
+            #                             else str(float(key[4])))
+
+            # first_key_checkbox.setChecked(key[5])
+
+            # sc_checkbox.setChecked(key[6])
 
         # Separator widget
-        (plus_label, right_sep,
-         left_sep, separator_widget) = self.separator_widget()
+        separator_widget = self.separator_widget(row_widget, default_key_entry, remap_key_entry)
 
-        def on_plus_click(_):
-            "Pressing tow will add a new row below via insert after"
-            plus_label.setVisible(False)
-            right_sep.setVisible(False)
-            left_sep.setVisible(False)
-            self.remap_row(insert_after=(row_widget, separator_widget))
-
-        plus_label.mousePressEvent = on_plus_click
-
-        # Set the order of widget insert
+        # The order where the widget will be added
         if insert_after is not None:
             idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
             self.edit_frame_layout.insertWidget(idx, card_frame)
             self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
-            # self.mapping_row_widgets.insert(idx // 2, (card_frame,
-            #                                             separator_widget))
+            self.mapping_row_widgets.insert(idx // 2, (card_frame,
+                                                        separator_widget))
         else:
             self.edit_frame_layout.addWidget(card_frame)
             self.edit_frame_layout.addWidget(separator_widget)
-            # self.mapping_row_widgets.append((card_frame, separator_widget))
-
-        # Add or remove row when entry changed
-        try:
-            idx = self.key_rows.index((
-                default_key_entry, remap_key_entry,
-                default_key_select, remap_key_select,
-                text_format_checkbox, hold_format_checkbox,
-                hold_interval_entry, first_key_checkbox
-            ))
-        except ValueError:
-            return
-
-        def auto_add_row():
-            "Auto add row if all entry have text"
-            if idx == len(self.key_rows) - 1:
-                if (default_key_entry.text().strip()
-                    and remap_key_entry.text().strip()):
-                    on_plus_click(None)
-
-        default_key_entry.textChanged.connect(auto_add_row)
-        remap_key_entry.textChanged.connect(auto_add_row)
+            self.mapping_row_widgets.append((card_frame, separator_widget))
 
         # Unused for now
         # def auto_remove_row():
@@ -330,7 +342,7 @@ class RemapRow(ParseScript, ProfileCore):
         self.edit_frame.update()
         self.edit_frame.adjustSize()
 
-    def separator_widget(self):
+    def separator_widget(self, row_widget, default_key_entry, remap_key_entry):
         "Remap row separator widget"
         separator_widget = QWidget(self.edit_frame)
         separator_layout = QHBoxLayout(separator_widget)
@@ -365,9 +377,30 @@ class RemapRow(ParseScript, ProfileCore):
         right_sep.setFrameShadow(QFrame.Shadow.Sunken)
         separator_layout.addWidget(right_sep)
 
-        return plus_label, right_sep, left_sep, separator_widget
+        # Add row below when pressing plus
+        def on_plus_click(_):
+            "Pressing tow will add a new row below via insert after"
+            plus_label.setVisible(False)
+            right_sep.setVisible(False)
+            left_sep.setVisible(False)
+            self.remap_row(insert_after=(row_widget, separator_widget))
 
-    def default_key_widget(self, row_widget):
+        plus_label.mousePressEvent = on_plus_click
+
+        # Add or remove row when entry changed
+        def auto_add_row():
+            "Auto add row if all entry have text"
+            if self.key_rows and (default_key_entry, remap_key_entry) == self.key_rows[-1][:2]:
+                if (default_key_entry.text().strip()
+                    and remap_key_entry.text().strip()):
+                    on_plus_click(None)
+
+        default_key_entry.textChanged.connect(auto_add_row)
+        remap_key_entry.textChanged.connect(auto_add_row)
+
+        return separator_widget
+
+    def default_key_widget(self, row_widget, row_layout, parsed_remap):
         "Default key widget on remap row"
         default_key_select = QPushButton("Select", row_widget)
         default_key_select.setFixedWidth(140)
@@ -377,6 +410,7 @@ class RemapRow(ParseScript, ProfileCore):
                                             self.key_listening(
                                                     default_key_entry,
                                                     default_key_select))
+        row_layout.addWidget(default_key_select, 0, 0, 1, 2, Qt.AlignCenter)
 
         default_key_widget = QWidget(row_widget)
         default_key_layout = QHBoxLayout(default_key_widget)
@@ -388,6 +422,8 @@ class RemapRow(ParseScript, ProfileCore):
         default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         default_key_entry.setToolTip("Default key can be a single key, "
                                         "multiple keys, or a double key (eg. double-click)")
+        if parsed_remap:
+            default_key_entry.setText(parsed_remap.default_key)
         default_key_layout.addWidget(default_key_entry)
 
         default_key_choose = QPushButton(default_key_widget)
@@ -398,9 +434,11 @@ class RemapRow(ParseScript, ProfileCore):
             lambda: self.select_key(default_key_entry, context="default"))
         default_key_layout.addWidget(default_key_choose)
 
-        return default_key_entry, default_key_select, default_key_widget
+        row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
 
-    def remap_key_widget(self, row_widget):
+        return default_key_entry, default_key_select
+
+    def remap_key_widget(self, row_widget, row_layout, parsed_remap):
         "Remap key widget on remap row"
         remap_key_select = QPushButton("Select", row_widget)
         remap_key_select.setFixedWidth(140)
@@ -409,6 +447,7 @@ class RemapRow(ParseScript, ProfileCore):
                                             self.key_listening(
                                                 remap_key_entry,
                                                 remap_key_select))
+        row_layout.addWidget(remap_key_select, 0, 3, 1, 2, Qt.AlignCenter)
 
         remap_key_widget = QWidget(row_widget)
         remap_key_layout = QHBoxLayout(remap_key_widget)
@@ -420,6 +459,8 @@ class RemapRow(ParseScript, ProfileCore):
         remap_key_entry.setToolTip("Remap key can be "
                                     "a single key, multiple keys, text, or hold")
         remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        if parsed_remap:
+            remap_key_entry.setText(parsed_remap.remap_key)
         remap_key_layout.addWidget(remap_key_entry)
 
         remap_key_choose = QPushButton(remap_key_widget)
@@ -430,9 +471,11 @@ class RemapRow(ParseScript, ProfileCore):
             lambda: self.select_key(remap_key_entry, context="remap"))
         remap_key_layout.addWidget(remap_key_choose)
 
-        return remap_key_entry, remap_key_select, remap_key_widget
+        row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
 
-    def option_widget(self, row_widget):
+        return remap_key_entry, remap_key_select
+
+    def option_widget(self, row_widget, row_layout, parsed_remap):
         "Remap option widget on remap row"
         options_widget = QWidget(row_widget)
         options_layout = QHBoxLayout(options_widget)
@@ -443,6 +486,8 @@ class RemapRow(ParseScript, ProfileCore):
             "Default Key Only: "
             "Check this to disable the first key when using multiple keys.\n"
         )
+        if parsed_remap:
+            first_key_checkbox.setChecked(parsed_remap.is_first_key)
         options_layout.addWidget(first_key_checkbox)
 
         sc_checkbox = QCheckBox("Use Scan Code", options_widget)
@@ -453,16 +498,22 @@ class RemapRow(ParseScript, ProfileCore):
             "Scan Code is the hardware coordinate of the key, "
             "use this if the key is not detected or missing from the list."
         )
+        if parsed_remap:
+            sc_checkbox.setChecked(parsed_remap.is_sc)
         options_layout.addWidget(sc_checkbox)
 
         text_format_checkbox = QCheckBox("Text Format", options_widget)
         text_format_checkbox.setToolTip("Remap Key Only: "
                                         "Check this to send the actual text instead of a key")
+        if parsed_remap:
+            text_format_checkbox.setChecked(parsed_remap.is_text_format)
         options_layout.addWidget(text_format_checkbox)
 
         hold_format_checkbox = QCheckBox("Hold Format", options_widget)
         hold_format_checkbox.setToolTip("Remap Key Only: "
                                         "Simulate holding the key for a set interval")
+        if parsed_remap:
+            hold_format_checkbox.setChecked(parsed_remap.is_hold_format)
         options_layout.addWidget(hold_format_checkbox)
 
         hold_interval_entry = QLineEdit(options_widget)
@@ -471,11 +522,18 @@ class RemapRow(ParseScript, ProfileCore):
         hold_interval_entry.setToolTip("Remap Key Only: "
                                         "Enter the hold interval in seconds (Default is 10 second)")
         hold_interval_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        if parsed_remap:
+            hold_interval_float = float(parsed_remap.hold_interval)
+            hold_interval_str = (str(int(hold_interval_float))
+                                    if hold_interval_float.is_integer()
+                                    else str(hold_interval_float))
+            hold_interval_entry.setText(hold_interval_str)
         options_layout.addWidget(hold_interval_entry)
 
+        row_layout.addWidget(options_widget, 2, 0, 1, 5, Qt.AlignCenter)
+
         return (text_format_checkbox, hold_format_checkbox,
-                hold_interval_entry, first_key_checkbox, sc_checkbox,
-                options_widget)
+                hold_interval_entry, first_key_checkbox, sc_checkbox)
 
     def shortcut_row(self, shortcut='', insert_after=None,
                      show_plus_label=True):

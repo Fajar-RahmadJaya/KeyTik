@@ -101,18 +101,16 @@ class RemapRow(ParseScript, ProfileCore):
 
     def default_mode_widget(self, lines, key_map):
         "Default mode frame"
-        shortcuts = []
 
-        shortcuts = self.parse_shortcuts(lines, key_map)
-
+        parsed_shortcut_tuple = self.parse_shortcuts(lines, key_map)
 
         self.shortcut_title()
 
-        if not shortcuts:
-            self.shortcut_row()
+        if parsed_shortcut_tuple:
+            for parsed_shortcut in parsed_shortcut_tuple:
+                self.shortcut_row(parsed_shortcut)
         else:
-            for shortcut in shortcuts:
-                self.shortcut_row(shortcut)
+            self.shortcut_row()
 
         self.remap_title()
 
@@ -216,7 +214,7 @@ class RemapRow(ParseScript, ProfileCore):
         row_layout.setVerticalSpacing(5)
 
         # Separator widget
-        separator_widget, on_plus_click = self.separator_widget(row_widget)
+        separator_widget, on_plus_click = self.separator_widget(row_widget, row_type="remap row")
 
         # Arrow Widget
         arrow_icon = QSvgWidget(icons.arrow)
@@ -432,7 +430,7 @@ class RemapRow(ParseScript, ProfileCore):
         return (text_format_checkbox, hold_format_checkbox,
                 hold_interval_entry, first_key_checkbox, sc_checkbox)
 
-    def separator_widget(self, row_widget):
+    def separator_widget(self, row_widget, row_type):
         "Remap row separator widget"
         separator_widget = QWidget(self.edit_frame)
         separator_layout = QHBoxLayout(separator_widget)
@@ -473,14 +471,27 @@ class RemapRow(ParseScript, ProfileCore):
             plus_label.setVisible(False)
             right_sep.setVisible(False)
             left_sep.setVisible(False)
-            self.remap_row(insert_after=(row_widget, separator_widget))
+            if row_type == "remap row":
+                self.remap_row(insert_after=(row_widget, separator_widget))
+            elif row_type == "shortcut row":
+                self.shortcut_row(insert_after=(row_widget, separator_widget))
 
         plus_label.mousePressEvent = on_plus_click
 
         return separator_widget, on_plus_click
 
-    def shortcut_row(self, shortcut='', insert_after=None,
-                     show_plus_label=True):
+    def shortcut_title(self):
+        "Shortcuts row tittle label"
+        shortcut_label = QLabel("Shortcut", self.edit_frame)
+        shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        shortcut_label.setStyleSheet("""
+            font-size: 13px;
+            font-weight: bold;
+        """)
+        self.edit_frame_layout.addWidget(shortcut_label)
+        return shortcut_label
+
+    def shortcut_row(self, parsed_shortcut=None, insert_after=None):
         "Shortcut row"
         if not hasattr(self.edit_frame, 'layout'):
             self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -488,6 +499,7 @@ class RemapRow(ParseScript, ProfileCore):
         else:
             self.edit_frame_layout = self.edit_frame.layout()
 
+        # For text mode
         if self.is_text_mode and (not hasattr(self, 'text_block') or
         self.text_block is None):
             self.text_block = QTextEdit(self.edit_frame)
@@ -498,51 +510,7 @@ class RemapRow(ParseScript, ProfileCore):
             )
             self.edit_frame_layout.addWidget(self.text_block)
 
-        row_widget = QWidget(self.edit_frame)
-        row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
-                                 QSizePolicy.Policy.Fixed)
-        row_layout = QGridLayout(row_widget)
-        row_widget.setLayout(row_layout)
-        row_layout.setContentsMargins(10, 5, 10, 5)
-        row_layout.setHorizontalSpacing(10)
-        row_layout.setVerticalSpacing(5)
-
-        # Shortcut Widget
-        shortcut_key_select = QPushButton("Select", row_widget)
-        shortcut_key_select.setFixedWidth(280)
-        shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
-        shortcut_key_select.clicked.connect(lambda:
-                                            self.key_listening(
-                                                self.shortcut_entry,
-                                                shortcut_key_select))
-        row_layout.addWidget(shortcut_key_select, 0, 0, 1, 4, Qt.AlignCenter)
-
-        shortcut_widget = QWidget(row_widget)
-        shortcut_layout = QHBoxLayout(shortcut_widget)
-        shortcut_layout.setContentsMargins(0, 0, 0, 0)
-        shortcut_layout.setSpacing(2)
-
-        self.shortcut_entry = QLineEdit(shortcut_widget)
-        if shortcut:
-            self.shortcut_entry.setText(shortcut)
-        self.shortcut_entry.setFixedWidth(252)
-        self.shortcut_entry.setToolTip("Shortcut can be "
-                                       "a single key, multiple keys, or shortcut specials "
-                                       "(See select key)")
-        self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
-        shortcut_layout.addWidget(self.shortcut_entry)
-
-        shortcut_choose = QPushButton(shortcut_widget)
-        shortcut_choose.setFixedWidth(28)
-        shortcut_choose.setIcon(icons.get_icon(icons.search))
-        shortcut_choose.setToolTip("Choose Shortcut key")
-        shortcut_choose.clicked.connect(
-            lambda: self.select_key(self.shortcut_entry, context="shortcut"))
-        shortcut_layout.addWidget(shortcut_choose)
-
-        row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
-
+        # Card frame
         card_frame = QFrame(self.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
         if utils.theme == "dark":
@@ -564,61 +532,24 @@ class RemapRow(ParseScript, ProfileCore):
         card_layout = QVBoxLayout(card_frame)
         card_layout.setContentsMargins(8, 8, 8, 8)
         card_layout.setSpacing(0)
+
+        row_widget = QWidget(self.edit_frame)
+        row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
+                                 QSizePolicy.Policy.Fixed)
         card_layout.addWidget(row_widget)
 
-        separator_widget = QWidget(self.edit_frame)
-        separator_layout = QHBoxLayout(separator_widget)
-        separator_widget.setLayout(separator_layout)
-        separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
-                                       QSizePolicy.Policy.Fixed)
-        separator_layout.setContentsMargins(0, 0, 0, 0)
-        separator_layout.setSpacing(0)
+        row_layout = QGridLayout(row_widget)
+        row_widget.setLayout(row_layout)
+        row_layout.setContentsMargins(10, 5, 10, 5)
+        row_layout.setHorizontalSpacing(10)
+        row_layout.setVerticalSpacing(5)
 
-        left_sep = QFrame(separator_widget)
-        left_sep.setObjectName("left_sep")
-        left_sep.setFrameShape(QFrame.Shape.HLine)
-        left_sep.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(left_sep)
+        # Shortcut Widget
+        self.shortcut_widget(row_widget, row_layout, parsed_shortcut)
 
-        plus_label = None
+        # Separator widget
+        separator_widget, _ = self.separator_widget(row_widget, row_type="shortcut row")
 
-        plus_label = QLabel("+", separator_widget)
-        plus_label.setStyleSheet("""
-            color: gray;
-            padding: 0 5px;
-            font-size: 14px;
-            font-weight: bold;
-        """)
-        plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        plus_label.setFixedWidth(20)
-        plus_label.setFixedHeight(20)
-        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        separator_layout.addWidget(plus_label)
-        plus_label.setVisible(show_plus_label)
-
-        right_sep = QFrame(separator_widget)
-        right_sep.setObjectName("right_sep")
-        right_sep.setFrameShape(QFrame.Shape.HLine)
-        right_sep.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(right_sep)
-
-        def on_plus_click(_):
-            plus_label.setVisible(False)
-            right_sep.setVisible(False)
-            left_sep.setVisible(False)
-
-            if (hasattr
-                (self, "shortcut_row_widgets") and
-                    self.shortcut_row_widgets):
-                self.shortcut_row(insert_after=(
-                    row_widget, separator_widget))
-            else:
-                self.shortcut_row()
-
-        plus_label.mousePressEvent = on_plus_click
-
-        if not hasattr(self, "shortcut_row_widgets"):
-            self.shortcut_row_widgets = []
         if insert_after is not None:
             idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
             self.edit_frame_layout.insertWidget(idx, card_frame)
@@ -640,16 +571,42 @@ class RemapRow(ParseScript, ProfileCore):
         self.edit_frame.update()
         self.edit_frame.adjustSize()
 
-    def shortcut_title(self):
-        "Shortcuts row tittle label"
-        shortcut_label = QLabel("Shortcut", self.edit_frame)
-        shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        shortcut_label.setStyleSheet("""
-            font-size: 13px;
-            font-weight: bold;
-        """)
-        self.edit_frame_layout.addWidget(shortcut_label)
-        return shortcut_label
+    def shortcut_widget(self, row_widget, row_layout, parsed_shortcut):
+        "Shortcut widget"
+        shortcut_key_select = QPushButton("Select", row_widget)
+        shortcut_key_select.setFixedWidth(280)
+        shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
+        shortcut_key_select.clicked.connect(lambda:
+                                            self.key_listening(
+                                                self.shortcut_entry,
+                                                shortcut_key_select))
+        row_layout.addWidget(shortcut_key_select, 0, 0, 1, 4, Qt.AlignCenter)
+
+        shortcut_widget = QWidget(row_widget)
+        shortcut_layout = QHBoxLayout(shortcut_widget)
+        shortcut_layout.setContentsMargins(0, 0, 0, 0)
+        shortcut_layout.setSpacing(2)
+
+        self.shortcut_entry = QLineEdit(shortcut_widget)
+        if parsed_shortcut:
+            self.shortcut_entry.setText(parsed_shortcut)
+        self.shortcut_entry.setFixedWidth(252)
+        self.shortcut_entry.setToolTip("Shortcut can be "
+                                        "a single key, multiple keys, or shortcut specials "
+                                        "(See select key)")
+        self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
+        shortcut_layout.addWidget(self.shortcut_entry)
+
+        shortcut_choose = QPushButton(shortcut_widget)
+        shortcut_choose.setFixedWidth(28)
+        shortcut_choose.setIcon(icons.get_icon(icons.search))
+        shortcut_choose.setToolTip("Choose Shortcut key")
+        shortcut_choose.clicked.connect(
+            lambda: self.select_key(self.shortcut_entry, context="shortcut"))
+        shortcut_layout.addWidget(shortcut_choose)
+
+        row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
 
     def text_mode_widget(self, lines, key_map):
         "Text mode frame(to do: fix)"

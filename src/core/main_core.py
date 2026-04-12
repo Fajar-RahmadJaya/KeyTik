@@ -27,6 +27,7 @@ class MainCore():
         self.pinned_profiles = utils.load_pinned_profiles()
 
         self.scripts = None
+        self.current_page = 0
 
     def import_button_clicked(self):
         "Select AHK script and add necessary line"
@@ -263,16 +264,16 @@ class MainCore():
             button.clicked.connect(lambda checked=False: self.toggle_run_exit(
                 script_name, button))
 
-    def toggle_script_dir(self):
+    def toggle_script_dir(self, show_stored):
         "Change current directory based on store/active profile"
         if self.script_dir == utils.active_dir:
             self.script_dir = utils.store_dir
-            self.show_stored.setToolTip("Show Active Profile")
-            self.show_stored.setIcon(icons.get_icon(icons.show_stored_fill))
+            show_stored.setToolTip("Show Active Profile")
+            show_stored.setIcon(icons.get_icon(icons.show_stored_fill))
         else:
             self.script_dir = utils.active_dir
-            self.show_stored.setToolTip("Show Stored Profile")
-            self.show_stored.setIcon(icons.get_icon(icons.show_stored))
+            show_stored.setToolTip("Show Stored Profile")
+            show_stored.setIcon(icons.get_icon(icons.show_stored))
 
         self.list_scripts()
         self.update_script_list()
@@ -410,19 +411,8 @@ class MainCore():
         end_index = start_index + 6
         scripts_to_display = self.scripts[start_index:end_index]
 
-        running_scripts = utils.read_running_scripts_temp()
-
         for index, script in enumerate(scripts_to_display):
             row = index // 2
             column = index % 2
-            icon = (icons.pin_fill
-                    if script in self.pinned_profiles
-                    else icons.pin)
 
-            self.profile_card(script, icon, running_scripts, row, column)
-
-        self.profile_layout.setColumnStretch(0, 1)
-        self.profile_layout.setColumnStretch(1, 1)
-        self.profile_layout.setRowStretch(0, 1)
-        self.profile_layout.setRowStretch(1, 1)
-        self.profile_layout.setRowStretch(2, 1)
+            self.profile_card(script, row, column)

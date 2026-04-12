@@ -102,7 +102,6 @@ class RemapRow(ParseScript, ProfileCore):
     def default_mode_widget(self, lines, key_map):
         "Default mode frame"
         shortcuts = []
-        parsed_remaps = []
 
         shortcuts = self.parse_shortcuts(lines, key_map)
 
@@ -150,49 +149,28 @@ class RemapRow(ParseScript, ProfileCore):
         self.update_plus_visibility('shortcut')
         self.update_plus_visibility('remap')
 
-    def text_mode_widget(self, lines, key_map):
-        "Text mode frame(to do: fix)"
-        shortcuts = self.parse_shortcuts(lines, key_map)
-
-        if not shortcuts:
-            self.shortcut_row()
-        else:
-            for shortcut in shortcuts:
-                self.shortcut_row(shortcut)
-
-        self.row_num += 1
-
-        self.text_block = QTextEdit(self.edit_frame)
-        self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
-        self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
-        self.text_block.setFontPointSize(10)
-        self.text_block.setReadOnly(False)
-        self.text_block.setStyleSheet(
-        "font-family: Consolas; "
-        "font-size: 10pt;"
-        )
-        text_content = self.extract_and_filter_content(lines)
-        print(text_content)
-        self.text_block.setPlainText(text_content.strip())
-        self.edit_frame_layout.addWidget(self.text_block)
-
-        self.update_plus_visibility('shortcut')
-
-    def extract_and_filter_content(self, lines):
-        "Get text block value from the marker"
-        inside = False
-        result_lines = []
-        for line in lines:
-            stripped = line.strip()
-            if stripped == "; Text mode start":
-                inside = True
-                continue
-            if stripped == "; Text mode end":
-                inside = False
-                continue
-            if inside:
-                result_lines.append(line)
-        return ''.join(result_lines)
+    def remap_title(self):
+        "Key remap row tittle label"
+        remap_label_layout = QGridLayout()
+        remap_label_layout.setContentsMargins(0, 0, 0, 0)
+        default_key_label = QLabel("Default Key", self.edit_frame)
+        default_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        default_key_label.setStyleSheet("""
+            font-size: 13px;
+            font-weight: bold;
+        """)
+        remap_key_label = QLabel("Remap Key", self.edit_frame)
+        remap_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        remap_key_label.setStyleSheet("""
+            font-size: 13px;
+            font-weight: bold;
+        """)
+        remap_label_layout.addWidget(default_key_label, 0, 0, 1, 2)
+        remap_label_layout.addWidget(remap_key_label, 0, 2, 1, 2)
+        remap_label_widget = QWidget(self.edit_frame)
+        remap_label_widget.setLayout(remap_label_layout)
+        self.edit_frame_layout.addWidget(remap_label_widget)
+        return remap_label_widget
 
     def remap_row(self, parsed_remap=None, insert_after=None):
         "Remap row"
@@ -237,71 +215,16 @@ class RemapRow(ParseScript, ProfileCore):
         row_layout.setHorizontalSpacing(10)
         row_layout.setVerticalSpacing(5)
 
-        # Default Key Widget
-        (default_key_entry, default_key_select
-         ) = self.default_key_widget(row_widget, row_layout, parsed_remap)
+        # Separator widget
+        separator_widget, on_plus_click = self.separator_widget(row_widget)
 
         # Arrow Widget
         arrow_icon = QSvgWidget(icons.arrow)
         arrow_icon.setFixedSize(32, 24)
         row_layout.addWidget(arrow_icon, 0, 2, 2, 1)
 
-        # Remap Key Widget
-        (remap_key_entry, remap_key_select
-         ) = self.remap_key_widget(row_widget, row_layout, parsed_remap)
-
-        # Option Widget
-        (text_format_checkbox, hold_format_checkbox,
-         hold_interval_entry, first_key_checkbox,
-         sc_checkbox) = self.option_widget(row_widget, row_layout, parsed_remap)
-
-        self.key_rows.append((default_key_entry, remap_key_entry,
-                              default_key_select, remap_key_select,
-                              text_format_checkbox, hold_format_checkbox,
-                              hold_interval_entry, first_key_checkbox,
-                              sc_checkbox))
-
-        # Add parsed value to remap widget
-        # for (default_key, remap_key, is_text_format,
-        #      is_hold_format, hold_interval, is_first_key,
-        #      is_sc) in parsed_remaps:
-
-            # default_key_entry.setText(default_key)
-
-            # remap_key_entry.setText(remap_key)
-
-            # sc_checkbox.setChecked(is_sc)
-
-            # text_format_checkbox.setChecked(is_text_format)
-
-            # hold_format_checkbox.setChecked(is_hold_format)
-
-            # first_key_checkbox.setChecked(is_first_key)
-
-            # hold_interval_float = float(hold_interval)
-            # hold_interval_str = (str(int(hold_interval_float))
-            #                         if hold_interval_float.is_integer()
-            #                         else str(hold_interval_float))
-            # hold_interval_entry.setText(hold_interval_str)
-
-            # default_key_entry.setText(key[0])
-
-            # remap_key_entry.setText(key[1])
-
-            # text_format_checkbox.setChecked(key[2])
-
-            # hold_format_checkbox.setChecked(key[3])
-
-            # hold_interval_entry.setText(str(int(float(key[4])))
-            #                             if float(key[4]).is_integer()
-            #                             else str(float(key[4])))
-
-            # first_key_checkbox.setChecked(key[5])
-
-            # sc_checkbox.setChecked(key[6])
-
-        # Separator widget
-        separator_widget = self.separator_widget(row_widget, default_key_entry, remap_key_entry)
+        # Set widget and configure key rows tuple
+        self.set_key_rows(row_widget, row_layout, parsed_remap, on_plus_click)
 
         # The order where the widget will be added
         if insert_after is not None:
@@ -342,50 +265,20 @@ class RemapRow(ParseScript, ProfileCore):
         self.edit_frame.update()
         self.edit_frame.adjustSize()
 
-    def separator_widget(self, row_widget, default_key_entry, remap_key_entry):
-        "Remap row separator widget"
-        separator_widget = QWidget(self.edit_frame)
-        separator_layout = QHBoxLayout(separator_widget)
-        separator_widget.setLayout(separator_layout)
-        separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
-                                        QSizePolicy.Policy.Fixed)
-        separator_layout.setContentsMargins(0, 0, 0, 0)
-        separator_layout.setSpacing(0)
+    def set_key_rows(self, row_widget, row_layout, parsed_remap, on_plus_click):
+        "Set widget and configure key rows tuple"
+        # Default Key Widget
+        (default_key_entry, default_key_select
+            ) = self.default_key_widget(row_widget, row_layout, parsed_remap)
 
-        left_sep = QFrame(separator_widget)
-        left_sep.setObjectName("left_sep")
-        left_sep.setFrameShape(QFrame.Shape.HLine)
-        left_sep.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(left_sep)
+        # Remap Key Widget
+        (remap_key_entry, remap_key_select
+            ) = self.remap_key_widget(row_widget, row_layout, parsed_remap)
 
-        plus_label = QLabel("+", separator_widget)
-        plus_label.setStyleSheet("""
-            color: gray;
-            padding: 0 5px;
-            font-size: 14px;
-            font-weight: bold;
-        """)
-        plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        plus_label.setFixedWidth(20)
-        plus_label.setFixedHeight(20)
-        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        separator_layout.addWidget(plus_label)
-
-        right_sep = QFrame(separator_widget)
-        right_sep.setObjectName("right_sep")
-        right_sep.setFrameShape(QFrame.Shape.HLine)
-        right_sep.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(right_sep)
-
-        # Add row below when pressing plus
-        def on_plus_click(_):
-            "Pressing tow will add a new row below via insert after"
-            plus_label.setVisible(False)
-            right_sep.setVisible(False)
-            left_sep.setVisible(False)
-            self.remap_row(insert_after=(row_widget, separator_widget))
-
-        plus_label.mousePressEvent = on_plus_click
+        # Option Widget
+        (text_format_checkbox, hold_format_checkbox,
+            hold_interval_entry, first_key_checkbox,
+            sc_checkbox) = self.option_widget(row_widget, row_layout, parsed_remap)
 
         # Add or remove row when entry changed
         def auto_add_row():
@@ -398,7 +291,11 @@ class RemapRow(ParseScript, ProfileCore):
         default_key_entry.textChanged.connect(auto_add_row)
         remap_key_entry.textChanged.connect(auto_add_row)
 
-        return separator_widget
+        self.key_rows.append((default_key_entry, remap_key_entry,
+                                default_key_select, remap_key_select,
+                                text_format_checkbox, hold_format_checkbox,
+                                hold_interval_entry, first_key_checkbox,
+                                sc_checkbox))
 
     def default_key_widget(self, row_widget, row_layout, parsed_remap):
         "Default key widget on remap row"
@@ -534,6 +431,53 @@ class RemapRow(ParseScript, ProfileCore):
 
         return (text_format_checkbox, hold_format_checkbox,
                 hold_interval_entry, first_key_checkbox, sc_checkbox)
+
+    def separator_widget(self, row_widget):
+        "Remap row separator widget"
+        separator_widget = QWidget(self.edit_frame)
+        separator_layout = QHBoxLayout(separator_widget)
+        separator_widget.setLayout(separator_layout)
+        separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
+                                        QSizePolicy.Policy.Fixed)
+        separator_layout.setContentsMargins(0, 0, 0, 0)
+        separator_layout.setSpacing(0)
+
+        left_sep = QFrame(separator_widget)
+        left_sep.setObjectName("left_sep")
+        left_sep.setFrameShape(QFrame.Shape.HLine)
+        left_sep.setFrameShadow(QFrame.Shadow.Sunken)
+        separator_layout.addWidget(left_sep)
+
+        plus_label = QLabel("+", separator_widget)
+        plus_label.setStyleSheet("""
+            color: gray;
+            padding: 0 5px;
+            font-size: 14px;
+            font-weight: bold;
+        """)
+        plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
+        plus_label.setFixedWidth(20)
+        plus_label.setFixedHeight(20)
+        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        separator_layout.addWidget(plus_label)
+
+        right_sep = QFrame(separator_widget)
+        right_sep.setObjectName("right_sep")
+        right_sep.setFrameShape(QFrame.Shape.HLine)
+        right_sep.setFrameShadow(QFrame.Shadow.Sunken)
+        separator_layout.addWidget(right_sep)
+
+        # Add row below when pressing plus
+        def on_plus_click(_):
+            "Pressing tow will add a new row below via insert after"
+            plus_label.setVisible(False)
+            right_sep.setVisible(False)
+            left_sep.setVisible(False)
+            self.remap_row(insert_after=(row_widget, separator_widget))
+
+        plus_label.mousePressEvent = on_plus_click
+
+        return separator_widget, on_plus_click
 
     def shortcut_row(self, shortcut='', insert_after=None,
                      show_plus_label=True):
@@ -707,28 +651,49 @@ class RemapRow(ParseScript, ProfileCore):
         self.edit_frame_layout.addWidget(shortcut_label)
         return shortcut_label
 
-    def remap_title(self):
-        "Key remap row tittle label"
-        remap_label_layout = QGridLayout()
-        remap_label_layout.setContentsMargins(0, 0, 0, 0)
-        default_key_label = QLabel("Default Key", self.edit_frame)
-        default_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        default_key_label.setStyleSheet("""
-            font-size: 13px;
-            font-weight: bold;
-        """)
-        remap_key_label = QLabel("Remap Key", self.edit_frame)
-        remap_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        remap_key_label.setStyleSheet("""
-            font-size: 13px;
-            font-weight: bold;
-        """)
-        remap_label_layout.addWidget(default_key_label, 0, 0, 1, 2)
-        remap_label_layout.addWidget(remap_key_label, 0, 2, 1, 2)
-        remap_label_widget = QWidget(self.edit_frame)
-        remap_label_widget.setLayout(remap_label_layout)
-        self.edit_frame_layout.addWidget(remap_label_widget)
-        return remap_label_widget
+    def text_mode_widget(self, lines, key_map):
+        "Text mode frame(to do: fix)"
+        shortcuts = self.parse_shortcuts(lines, key_map)
+
+        if not shortcuts:
+            self.shortcut_row()
+        else:
+            for shortcut in shortcuts:
+                self.shortcut_row(shortcut)
+
+        self.row_num += 1
+
+        self.text_block = QTextEdit(self.edit_frame)
+        self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
+        self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
+        self.text_block.setFontPointSize(10)
+        self.text_block.setReadOnly(False)
+        self.text_block.setStyleSheet(
+        "font-family: Consolas; "
+        "font-size: 10pt;"
+        )
+        text_content = self.extract_and_filter_content(lines)
+        print(text_content)
+        self.text_block.setPlainText(text_content.strip())
+        self.edit_frame_layout.addWidget(self.text_block)
+
+        self.update_plus_visibility('shortcut')
+
+    def extract_and_filter_content(self, lines):
+        "Get text block value from the marker"
+        inside = False
+        result_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped == "; Text mode start":
+                inside = True
+                continue
+            if stripped == "; Text mode end":
+                inside = False
+                continue
+            if inside:
+                result_lines.append(line)
+        return ''.join(result_lines)
 
     def update_plus_visibility(self, row_type):
         "Make sure + only showed up only on the last row"

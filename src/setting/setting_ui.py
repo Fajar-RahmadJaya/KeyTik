@@ -26,7 +26,7 @@ class SettingUI(SettingCore, Announcement):
 
     def open_settings_window(self):
         "Setting window"
-        self.settings_window = QDialog()
+        self.settings_window = QDialog(self)
         self.settings_window.setWindowTitle("Settings")
         self.settings_window.setFixedSize(400, 250)
         self.settings_window.setWindowIcon(QIcon(constant.icon_path))
@@ -155,7 +155,7 @@ class SettingUI(SettingCore, Announcement):
             self.save_theme(theme.lower())
             QMessageBox.information(self,
                                     "Theme Changed", 
-                                    "Theme will be applied after restarting the app.") # noqa
+                                    "Theme will be applied after restarting the app.") 
 
     def update_messagebox(self, show_no_update_message=False):
         "Message when there is update avalible"

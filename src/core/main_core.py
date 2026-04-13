@@ -12,7 +12,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication, QFileDialog, QMessageBox,
     QInputDialog
 )
-from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QFont, QFontDatabase  # pylint: disable=E0611
 from pynput.keyboard import Controller, Key
 
@@ -28,85 +27,95 @@ class MainCore():
         self.pinned_profiles = utils.load_pinned_profiles()
 
         self.scripts = None
+        self.current_page = 0
 
     def import_button_clicked(self):
         "Select AHK script and add necessary line"
         file_dialog = QFileDialog(self)
         file_dialog.setNameFilter("AHK Scripts (*.ahk)")
+
         if file_dialog.exec():
             selected_files = file_dialog.selectedFiles()
+
             if selected_files:
                 selected_file = selected_files[0]
+
                 if not selected_file.endswith('.ahk'):
                     QMessageBox.warning(self, "Error",
                                         "Only .ahk files are allowed.")
                     return
+
                 file_name = os.path.basename(selected_file)
                 destination_path = os.path.join(self.script_dir, file_name)
+
                 try:
                     shutil.move(selected_file, destination_path)
                 except NotADirectoryError as e:
                     QMessageBox.warning(self, "Error",
                                         f"Failed to move file: {e}")
                     return
-                try:
-                    exit_key = self.generate_exit_key(file_name)
-                    with open(destination_path, 'r', encoding='utf-8') as file:
-                        lines = file.readlines()
 
-                    lines = [line for line in lines if "::ExitApp" not in line]
+                self.validate_imported_files(destination_path, file_name)
 
-                    first_line = lines[0].strip() if lines else ""
-                    has_text_or_default = (first_line.startswith("; text") or
-                                           first_line.startswith("; default"))
-                    new_lines = []
-                    if not has_text_or_default:
-
-                        if first_line and '::' in first_line:
-                            new_lines = [
-                                "; default\n",
-                                f"{exit_key}::ExitApp\n",
-                                "\n"
-                            ] + [first_line + '\n'] + lines[1:]
-                        else:
-                            new_lines = [
-                                "; text\n",
-                                f"{exit_key}::ExitApp\n",
-                                "\n"
-                            ] + lines
-                    else:
-
-                        new_lines = [lines[0] + f"{exit_key}::ExitApp\n",
-                                     "\n"] + lines[1:]
-
-                    content = ''.join(new_lines)
-                    content_lines = content.splitlines()
-                    content_lines = [line for line in content_lines if
-                                     line.strip() not in ["; Text mode start",
-                                                          "; Text mode end"]]
-
-                    header = content_lines[:3]
-                    body = content_lines[3:]
-                    result_lines = (header + ["; Text mode start"]
-                                    + body + ["; Text mode end"])
-
-                    with open(destination_path, 'w', encoding='utf-8') as file:
-                        file.write('\n'.join(result_lines) + '\n')
-                except FileNotFoundError as e:
-                    print(f"Error modifying script: {e}")
-                    try:
-                        if os.path.exists(constant.exit_keys_file):
-                            with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
-                                exit_keys = json.load(f)
-                            if file_name in exit_keys:
-                                del exit_keys[file_name]
-                            with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
-                                json.dump(exit_keys, f)
-                    except FileNotFoundError:
-                        pass
-                    return
                 self.scripts.append(file_name)
                 self.update_script_list()
+
+    def validate_imported_files(self, destination_path, file_name):
+        "Add necessary line on imported files"
+        try:
+            exit_key = self.generate_exit_key(file_name)
+
+            with open(destination_path, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+
+            lines = [line for line in lines if "::ExitApp" not in line]
+
+            first_line = lines[0].strip() if lines else ""
+            has_text_or_default = (first_line.startswith("; text") or
+                                    first_line.startswith("; default"))
+            new_lines = []
+            if not has_text_or_default:
+
+                if first_line and '::' in first_line:
+                    new_lines = [
+                        "; default\n",
+                        f"{exit_key}::ExitApp\n",
+                        "\n"
+                    ] + [first_line + '\n'] + lines[1:]
+                else:
+                    new_lines = [
+                        "; text\n",
+                        f"{exit_key}::ExitApp\n",
+                        "\n"
+                    ] + lines
+            else:
+
+                new_lines = [lines[0] + f"{exit_key}::ExitApp\n",
+                                "\n"] + lines[1:]
+
+            content = ''.join(new_lines)
+            content_lines = content.splitlines()
+            content_lines = [line for line in content_lines if
+                                line.strip() not in ["; Text mode start",
+                                                        "; Text mode end"]]
+
+            result_lines = (content_lines[:3] + ["; Text mode start"]
+                            + content_lines[3:] + ["; Text mode end"])
+
+            with open(destination_path, 'w', encoding='utf-8') as file:
+                file.write('\n'.join(result_lines) + '\n')
+        except FileNotFoundError as e:
+            print(f"Error modifying script: {e}")
+            try:
+                if os.path.exists(constant.exit_keys_file):
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
+                        exit_keys = json.load(f)
+                    if file_name in exit_keys:
+                        del exit_keys[file_name]
+                    with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
+                        json.dump(exit_keys, f)
+            except FileNotFoundError:
+                pass
 
     def copy_script(self, script):
         "Copy profile"
@@ -152,21 +161,6 @@ class MainCore():
             QMessageBox.warning(self, "Error",
                                 f"{script_name} does not exist.")
 
-    def toggle_on_top(self):
-        "Toggle window always on top"
-        is_on_top = bool(self.windowFlags() &
-                         Qt.WindowType.WindowStaysOnTopHint)
-        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, not is_on_top)
-        self.show()
-        on_top_text = (f"KeyTik{' (Always on Top)' if not is_on_top else ''}")
-        self.setWindowTitle(on_top_text)
-        if not is_on_top:
-            self.always_top.setToolTip("Disable Window Always on Top")
-            self.always_top.setIcon(icons.get_icon(icons.on_top_fill))
-        else:
-            self.always_top.setToolTip("Enable  Window Always on Top")
-            self.always_top.setIcon(icons.get_icon(icons.on_top))
-
     def activate_script(self, script_name, button):
         "Run profile"
         script_path = os.path.join(self.script_dir, script_name)
@@ -176,13 +170,13 @@ class MainCore():
             os.startfile(script_path)
 
             button.setText(" Exit")
-            button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"') # noqa
+            button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"')
             button.setIcon(icons.get_icon(icons.icon_exit))
             button.clicked.disconnect()
             button.clicked.connect(lambda: self.exit_script(script_name,
                                                             button))
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
 
     def exit_script(self, script_name, button):
         "Exit profile"
@@ -217,16 +211,16 @@ class MainCore():
                     keyboard.release(Key.ctrl)
 
                 button.setText(" Run")
-                button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"') # noqa
+                button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"')
                 button.setIcon(icons.get_icon(icons.run))
                 button.clicked.disconnect()
                 button.clicked.connect(lambda: self.activate_script(
                     script_name, button))
 
             except FileNotFoundError as e:
-                QMessageBox.critical(self, "Error", f"Failed to exit script: {e}") # noqa
+                QMessageBox.critical(self, "Error", f"Failed to exit script: {e}")
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
 
     def store_script(self, script_name):
         "Move profile to store directory"
@@ -247,9 +241,9 @@ class MainCore():
                 self.scripts = self.list_scripts()
                 self.update_script_list()
             except NotADirectoryError as e:
-                QMessageBox.critical(self, "Error", f"Failed to move the script: {e}") # noqa
+                QMessageBox.critical(self, "Error", f"Failed to move the script: {e}")
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.") # noqa
+            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
 
     def toggle_run_exit(self, script_name, button):
         "Switch between run/exit on profile"
@@ -270,16 +264,16 @@ class MainCore():
             button.clicked.connect(lambda checked=False: self.toggle_run_exit(
                 script_name, button))
 
-    def toggle_script_dir(self):
+    def toggle_script_dir(self, show_stored):
         "Change current directory based on store/active profile"
         if self.script_dir == utils.active_dir:
             self.script_dir = utils.store_dir
-            self.show_stored.setToolTip("Show Active Profile")
-            self.show_stored.setIcon(icons.get_icon(icons.show_stored_fill))
+            show_stored.setToolTip("Show Active Profile")
+            show_stored.setIcon(icons.get_icon(icons.show_stored_fill))
         else:
             self.script_dir = utils.active_dir
-            self.show_stored.setToolTip("Show Stored Profile")
-            self.show_stored.setIcon(icons.get_icon(icons.show_stored))
+            show_stored.setToolTip("Show Stored Profile")
+            show_stored.setIcon(icons.get_icon(icons.show_stored))
 
         self.list_scripts()
         self.update_script_list()
@@ -308,18 +302,18 @@ class MainCore():
                     "AHK Installation",
                     "AutoHotkey v2 is installed on your system.")
             return True
-        else:
-            reply = QMessageBox.question(
-                None,
-                "AHK Installation",
-                "AutoHotkey v2 is not installed on your system. "
-                "AutoHotkey is required for KeyTik to work.\n\n"
-                "Would you like to download it now?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-            if reply == QMessageBox.StandardButton.Yes:
-                webbrowser.open("https://www.autohotkey.com/")
-            return False
+
+        reply = QMessageBox.question(
+            None,
+            "AHK Installation",
+            "AutoHotkey v2 is not installed on your system. "
+            "AutoHotkey is required for KeyTik to work.\n\n"
+            "Would you like to download it now?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            webbrowser.open("https://www.autohotkey.com/")
+        return False
 
     def font_fallback(self):
         "Fallback font (Might still not work as expected)"
@@ -341,33 +335,6 @@ class MainCore():
                                                  font_name)
 
         QApplication.setFont(fallback_font)
-
-    def check_ahi_dir(self):
-        "Make sure AutoHotkey Interception directory is valid"
-        target_folder = os.path.join(utils.active_dir,
-                                     'AutoHotkey Interception')
-
-        def get_all_relative_paths(base_dir):
-            rel_paths = set()
-            for root, dirs, files in os.walk(base_dir):
-                for name in files:
-                    rel_path = os.path.relpath(os.path.join(root, name),
-                                               base_dir)
-                    rel_paths.add(rel_path)
-                for name in dirs:
-                    rel_path = os.path.relpath(os.path.join(root, name),
-                                               base_dir)
-                    rel_paths.add(rel_path)
-            return rel_paths
-
-        ahi_paths = get_all_relative_paths(constant.ahi_dir)
-        target_paths = get_all_relative_paths(target_folder)
-
-        if (not ahi_paths.issubset(target_paths) or
-                not os.path.isdir(target_folder)):
-            if os.path.exists(target_folder):
-                shutil.rmtree(target_folder)
-            shutil.copytree(constant.ahi_dir, target_folder)
 
     def list_scripts(self):
         "List profile, with listing all AHK script on active directory"
@@ -433,60 +400,6 @@ class MainCore():
         except NotADirectoryError as e:
             print(f"Error removing {shortcut_path}: {e}")
 
-    def run_monitor(self):
-        "Run AutoHotkey Interception built in device monitor"
-        script_path = os.path.join(constant.script_dir,
-                                   "_internal", "Data", "Active",
-                                   "AutoHotkey Interception", "Monitor.ahk")
-        if os.path.exists(script_path):
-            os.startfile(script_path)
-        else:
-            print(f"Error: The script at {script_path} does not exist.")
-
-    def load_key_translations(self):
-        "Load translation from raw key to readable key"
-        key_translations = {}
-        try:
-            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-                for category_dict in data:
-                    for _, keys in category_dict.items():
-                        for key, info in keys.items():
-                            readable_key = key.strip().lower()
-                            translation = info.get("translate", "").strip()
-                            if translation:
-                                key_translations[readable_key] = translation
-
-        except FileNotFoundError as e:
-            print(f"Error reading key translations: {e}")
-        return key_translations
-
-    def translate_key(self, key, key_translations):
-        "Translate raw key into readable key"
-        keys = key.split('+')
-        translated_keys = []
-
-        for single_key in keys:
-            translated_key = key_translations.get(single_key.strip().lower(),
-                                                  single_key.strip())
-            translated_keys.append(translated_key)
-
-        return " & ".join(translated_keys)
-
-    def load_key_values(self):
-        "Load hard coded key list"
-        key_values = []
-        try:
-            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-                for category_dict in data:
-                    for _, keys in category_dict.items():
-                        for key in keys.keys():
-                            key_values.append(key)
-        except FileNotFoundError as e:
-            print(f"Error reading key_list.json: {e}")
-        return key_values
-
     def update_script_list(self):
         "! From dashboard"
         for i in reversed(range(self.profile_layout.count())):
@@ -498,19 +411,8 @@ class MainCore():
         end_index = start_index + 6
         scripts_to_display = self.scripts[start_index:end_index]
 
-        running_scripts = utils.read_running_scripts_temp()
-
         for index, script in enumerate(scripts_to_display):
             row = index // 2
             column = index % 2
-            icon = (icons.pin_fill
-                    if script in self.pinned_profiles
-                    else icons.pin)
 
-            self.profile_card(script, icon, running_scripts, row, column)
-
-        self.profile_layout.setColumnStretch(0, 1)
-        self.profile_layout.setColumnStretch(1, 1)
-        self.profile_layout.setRowStretch(0, 1)
-        self.profile_layout.setRowStretch(1, 1)
-        self.profile_layout.setRowStretch(2, 1)
+            self.profile_card(script, row, column)

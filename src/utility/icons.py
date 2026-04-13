@@ -6,6 +6,7 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from utility import utils
 from utility import constant
 
+
 icon_cache = {}
 
 

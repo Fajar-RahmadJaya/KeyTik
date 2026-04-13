@@ -26,44 +26,6 @@ class ParseScript():
                 break
         return device_id
 
-    def parse_device_info(self, file_path):
-        "Parse device VID/PID or handle for device binding"
-        devices = []
-        try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                lines = file.readlines()
-
-            lines = [line.strip() for line in lines if line.strip()]
-
-            device_info = {}
-            for line in lines:
-                line = line.strip()
-                if line.startswith("Device ID"):
-                    if device_info:
-                        if (device_info.get('VID') and
-                                device_info.get('PID') and
-                                device_info.get('Handle')):
-                            devices.append(device_info)
-                    device_info = {'Device ID': line.split(":")[1].strip()}
-                elif line.startswith("VID:"):
-                    device_info['VID'] = line.split(":")[1].strip()
-                elif line.startswith("PID:"):
-                    device_info['PID'] = line.split(":")[1].strip()
-                elif line.startswith("Handle:"):
-                    device_info['Handle'] = line.split(":")[1].strip()
-                elif line.startswith("Is Mouse:"):
-                    device_info['Is Mouse'] = line.split(":")[1].strip()
-
-            if (device_info.get('VID') and
-                    device_info.get('PID') and
-                    device_info.get('Handle')):
-                devices.append(device_info)
-
-        except (ValueError, FileNotFoundError) as e:
-            print(f"Error reading device info: {e}")
-
-        return devices
-
     def parse_program(self, lines):
         "parse program binding"
         programs = []
@@ -121,7 +83,6 @@ class ParseScript():
 
     def parse_default_mode(self, lines, key_map):
         "Parse default mode"
-        shortcuts = self.parse_shortcuts(lines, key_map)
         remaps = []
         in_block = False
         current_block = []
@@ -157,7 +118,7 @@ class ParseScript():
                     not in line):
                 self.parse_remap_key(line, key_map, remaps)
 
-        return shortcuts, remaps
+        return remaps
 
     def parse_default_key(self, default_key, key_map):
         "Parse default key line"
@@ -209,6 +170,42 @@ class ParseScript():
 
             remaps.append((defaults_key, remap_key, is_text_format,
                            is_hold_format, hold_interval, is_first_key, is_sc))
+
+    def parse_double_click(self, default_key, block_text, remaps, key_map):
+        "Parse double click mode from default key"
+        is_text_format = False
+        is_hold_format = False
+        hold_interval = "10"
+        remap_key = ""
+        is_first_key = False
+        is_sc = False
+
+        if not default_key.startswith('~') and '&' in default_key:
+            is_first_key = True
+
+        if default_key.startswith('SC') or default_key.startswith('~SC'):
+            is_sc = True
+
+        if ('A_PriorHotkey' in block_text and
+                'A_TimeSincePriorHotkey < 400' in block_text):
+
+            if 'SendText' in block_text:
+                remap_key = self.parse_text_format(block_text)
+                is_text_format = True
+            elif 'SetTimer' in block_text:
+                remap_key, hold_interval = self.parse_hold_format(block_text)
+                is_hold_format = True
+            else:
+                send_match = re.search(
+                    r'Send(?:Input)?\("(.+?)"\)', block_text)
+                if send_match:
+                    remap_key = self.parse_send_remap(send_match.group(0), key_map)
+                else:
+                    remap_key = ""
+
+        remaps.append((f"{default_key} + {default_key}",
+                        remap_key, is_text_format,
+                        is_hold_format, hold_interval, is_first_key, is_sc))
 
     def get_unicode(self, text):
         'Parse Unicode fron SendInput'
@@ -271,34 +268,6 @@ class ParseScript():
         if text_match:
             remap_key = text_match.group(1)
         return remap_key
-
-    def parse_double_click(self, default_key, block_text, remaps, key_map):
-        "Parse double click mode from default key"
-        is_text_format = False
-        is_hold_format = False
-        hold_interval = "10"
-        remap_key = ""
-
-        if ('A_PriorHotkey' in block_text and
-                'A_TimeSincePriorHotkey < 400' in block_text):
-
-            if 'SendText' in block_text:
-                remap_key = self.parse_text_format(block_text)
-                is_text_format = True
-            elif 'SetTimer' in block_text:
-                remap_key, hold_interval = self.parse_hold_format(block_text)
-                is_hold_format = True
-            else:
-                send_match = re.search(
-                    r'Send(?:Input)?\("(.+?)"\)', block_text)
-                if send_match:
-                    remap_key = self.parse_send_remap(send_match.group(0), key_map)
-                else:
-                    remap_key = ""
-
-        remaps.append((f"{default_key} + {default_key}",
-                       remap_key, is_text_format,
-                       is_hold_format, hold_interval))
 
     def replace_raw_keys(self, key, key_map):
         "Translate raw key into readable key"

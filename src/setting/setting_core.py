@@ -106,12 +106,14 @@ class SettingCore(Diff):
         "Uninstall AutoHotkey"
         if ahk_installed:
             try:
-                subprocess.Popen(utils.ahk_uninstall_path, shell=True)
+                with subprocess.Popen(utils.ahk_uninstall_path, shell=True) as proc:
+                    proc.wait()
+
             except FileNotFoundError:
                 QMessageBox.critical(
                     dialog,
                     "Error", 
-                    "Failed to uninstall: AutoHotkey installation path not found") # noqa
+                    "Failed to uninstall: AutoHotkey installation path not found") 
         else:
             webbrowser.open("https://www.autohotkey.com")
 
@@ -132,12 +134,12 @@ class SettingCore(Diff):
             QMessageBox.critical(
                 dialog,
                 "Error", 
-                "Failed to uninstall: inter_uninstall.bat not found") # noqa
+                "Failed to uninstall: inter_uninstall.bat not found") 
 
     def check_for_update(self):
         "Check for update comparing current version and latest version from GitHub API"
         try:
-            response = requests.get(CHECK_UPDATE_LINK, timeout=5) # noqa
+            response = requests.get(CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == 200:
                 return self.parse_update_response(response)
         except requests.exceptions.ConnectionError:

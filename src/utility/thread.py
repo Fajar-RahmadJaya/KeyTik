@@ -5,12 +5,11 @@ import pynput
 from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
 from utility.diff import (Diff)
-
 from setting.announcement import Announcement
-
+from setting.setting_core import SettingCore
 from script_profile.write_script import WriteScript
 from script_profile.profile_core import ProfileCore
-from setting.setting_core import SettingCore
+
 
 class Thread(QThread, Diff):
     "Thread at initializaion"
@@ -29,6 +28,8 @@ class Thread(QThread, Diff):
     def run(self):
         "Run check update on thread to increase dashborad initialization time"
         self.write_script.initialize_exit_keys()
+        # To do: load all announcement file content on thread
+        # when "show announcement" is true
 
         latest_version = self.setting_core.check_for_update()
 

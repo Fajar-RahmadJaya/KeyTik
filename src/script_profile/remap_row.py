@@ -630,7 +630,6 @@ class RemapRow(ParseScript, ProfileCore):
         "font-size: 10pt;"
         )
         text_content = self.extract_and_filter_content(lines)
-        print(text_content)
         self.text_block.setPlainText(text_content.strip())
         self.edit_frame_layout.addWidget(self.text_block)
 

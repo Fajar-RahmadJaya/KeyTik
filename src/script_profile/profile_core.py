@@ -356,10 +356,12 @@ class ProfileCore(QObject):
             print(f"Error reading key translations: {e}")
         return key_translations
 
-    def translate_key(self, key, key_translations):
+    def translate_key(self, key):
         "Translate raw key into readable key"
         keys = key.split('+')
         translated_keys = []
+
+        key_translations = self.load_key_translations()
 
         for single_key in keys:
             translated_key = key_translations.get(single_key.strip().lower(),

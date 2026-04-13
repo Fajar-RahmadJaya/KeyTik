@@ -1,15 +1,27 @@
 "Write AutoHotkey script"
 
+from dataclasses import dataclass
 import os
 import json
 import random
 import traceback
 import re
-from PySide6.QtWidgets import (QMessageBox)  # pylint: disable=E0611
+from PySide6.QtWidgets import (QMessageBox, QLineEdit, QCheckBox)  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from utility import constant
 
 from utility import utils
+
+
+@dataclass
+class KeyRows:
+    "Dataclass containing key rows tuple"
+    default_key_entry: QLineEdit = None
+    remap_key_entry: QLineEdit = None
+    text_format_checkbox: QCheckBox = None
+    hold_format_checkbox: QCheckBox = None
+    hold_interval_entry: QLineEdit = None
+    first_key_checkbox: QCheckBox = None
 
 
 class WriteScript():
@@ -18,6 +30,122 @@ class WriteScript():
         super().__init__()
         self.is_text_mode = None
         self.scripts = None
+        self.key_rows = None
+
+    def save_changes(self, script_name, mode_combobox):
+        "Write script"
+        script_name = self.get_script_name()  # pylint: disable=E1101
+        if not script_name:
+            return
+
+        if not self.check_key_integrity():
+            return
+
+        try:
+            mode = mode_combobox.currentText().strip().lower()
+            self.is_text_mode = mode == "text mode"
+            self.handle_write(script_name, mode)
+            self.scripts = self.list_scripts() # pylint: disable=E1101
+            self.update_script_list() # pylint: disable=E1101
+            self.edit_window.destroy() # pylint: disable=E1101
+
+        except ValueError as e:
+            print(f"Error writing script: {e}")
+            traceback.print_exc()
+
+    def handle_write(self, script_name, mode):
+        "Action when saving profile (Can be moved)"
+        output_path = os.path.join(self.script_dir, script_name) # pylint: disable=E1101
+        key_translations = self.load_key_translations() # pylint: disable=E1101
+
+        with open(output_path, 'w', encoding='utf-8') as file:
+            if mode == "text mode":
+                self.handle_text_mode(file)
+            elif mode == "default mode":
+                self.handle_default_mode(file)
+            else:
+                self.pro_write(file, mode, key_translations) # pylint: disable=E1101
+
+    def handle_default_mode(self, file):
+        "Write default mode"
+        file.write("; default\n")
+        self.generate_exit_key(os.path.basename(file.name), file)
+        file.write("#SingleInstance force\n")
+        file.write("#Requires AutoHotkey v2.0\n")
+
+        write_hotif = self.write_condition(file,
+                                            write_shortcuts=True,
+                                            write_program=True,
+                                            write_device=True)
+
+        self.process_key_remaps(file)
+
+        if write_hotif:
+            file.write("#HotIf\n")
+
+    def process_key_remaps(self, file):
+        "Handle key remap write"
+        for row in self.key_rows:
+            (default_key_entry, remap_key_entry, _,
+            _, text_format_checkbox, hold_format_checkbox,
+            hold_interval_entry, first_key_checkbox, _) = row
+
+            self.key_rows = KeyRows(
+                default_key_entry =default_key_entry,
+                remap_key_entry = remap_key_entry,
+                text_format_checkbox = text_format_checkbox,
+                hold_format_checkbox = hold_format_checkbox,
+                hold_interval_entry = hold_interval_entry,
+                first_key_checkbox = first_key_checkbox
+            )
+
+            try:
+                default_key = default_key_entry.text().strip()
+                remap_key = remap_key_entry.text().strip()
+
+                if not default_key or not remap_key:
+                    continue
+
+                has_multiple_keys = "+" in default_key
+
+                if has_multiple_keys:
+                    keys = [k.strip() for k in default_key.split("+")]
+                    if len(keys) == 2 and keys[0] == keys[1]:
+                        self.write_double_click(
+                            file, keys[0], remap_key
+                        )
+                        continue
+                    default_translated = self.write_multiple_key_default(default_key)
+
+                else:
+                    default_translated = self.write_single_key_default(
+                        default_key)
+
+                self.handle_remap_type(file, default_translated, remap_key)
+
+            except ValueError:
+                continue
+
+    def handle_text_mode(self, file):
+        "Write text mode"
+        file.write("; text\n")
+        self.generate_exit_key(os.path.basename(file.name), file)
+        file.write("#SingleInstance force\n")
+        file.write("#Requires AutoHotkey v2.0\n")
+
+        write_hotif = self.write_condition(file,
+                                            write_shortcuts=True,
+                                            write_program=True,
+                                            write_device=True)
+
+        text_content = self.text_block.toPlainText().strip() # pylint: disable=E1101
+        if text_content:
+            file.write("; Text mode start\n")
+            file.write(text_content + '\n')
+            file.write("; Text mode end\n")
+
+        if write_hotif:
+            file.write("#HotIf\n")
 
     def generate_exit_key(self, script_name, file=None):
         "Generate key for profile exit"
@@ -166,8 +294,8 @@ class WriteScript():
         caps_off_present = False
         num_on_present = False
         num_off_present = False
-        for shortcut_row in self.shortcut_rows:
-            if self.is_widget_valid(shortcut_row):
+        for shortcut_row in self.shortcut_rows: # pylint: disable=E1101
+            if self.is_widget_valid(shortcut_row): # pylint: disable=E1101
                 shortcut = shortcut_row[0].text().strip()
                 if shortcut:
                     if shortcut.lower() == "capslock on":
@@ -222,30 +350,9 @@ class WriteScript():
             return False
         return True
 
-    def save_changes(self, script_name, mode_combobox):
-        "Write script"
-        script_name = self.get_script_name()
-        if not script_name:
-            return
-
-        if not self.check_key_integrity():
-            return
-
-        try:
-            mode = mode_combobox.currentText().strip().lower()
-            self.is_text_mode = mode == "text mode"
-            self.handle_write(script_name, mode)
-            self.scripts = self.list_scripts()
-            self.update_script_list()
-            self.edit_window.destroy()
-
-        except ValueError as e:
-            print(f"Error writing script: {e}")
-            traceback.print_exc()
-
     def get_program_condition(self):
         "Get program binding value from entry"
-        program_entry = self.program_entry.text().strip()
+        program_entry = self.program_entry.text().strip() # pylint: disable=E1101
         program_condition = ""
 
         if program_entry:
@@ -267,26 +374,36 @@ class WriteScript():
     def get_device_condition(self):
         "Get device binding value from entry"
         device_condition = ""
-        device_name = self.keyboard_entry.text().strip()
+        device_name = self.keyboard_entry.text().strip() # pylint: disable=E1101
         if device_name:
             device_condition = "cm1.IsActive"
         return device_condition
 
-    def write_condition(self, file, key_translations, write_shortcuts=True,
-                        write_program=True, write_device=True):
-        "Write shortcuts, program, device binding"
-        device = self.keyboard_entry.text().strip() if write_device else None
+    def write_condition(self, file, write_shortcuts=False,
+                        write_program=False, write_device=False):
+        "Write Hotif condition for shortcuts, device, program in one hotif line"
         program = self.get_program_condition() if write_program else None
-        shortcuts = None
-        if write_shortcuts:
-            shortcuts = [
-                shortcut_row[0].text().strip()
-                for shortcut_row in self.shortcut_rows
-                if self.is_widget_valid(shortcut_row)
-                and shortcut_row[0].text().strip()
-            ] or None
 
-        device_condition = None
+        hotif_conditions = []
+
+        # Shortcuts condition
+        self.shortcuts_condition(file, hotif_conditions, write_shortcuts)
+
+        # Device condition
+        self.device_condition(file, hotif_conditions, write_device)
+
+        if program:
+            hotif_conditions.append(f"({program})")
+
+        if hotif_conditions:
+            file.write("SetTitleMatchMode 2\n")
+            file.write(f"#HotIf {' && '.join(hotif_conditions)}\n")
+            return True
+        return False
+
+    def device_condition(self, file, hotif_conditions, write_device):
+        "Device condition"
+        device = self.keyboard_entry.text().strip() if write_device else None # pylint: disable=E1101
         if device:
             parts = device.split(",", 1)
             device_type = parts[0].strip().lower()
@@ -307,9 +424,19 @@ class WriteScript():
                 )
             )
             file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
-            device_condition = "cm1.IsActive"
+            hotif_conditions.append("cm1.IsActive")
 
-        hotif_conditions = []
+    def shortcuts_condition(self, file, hotif_conditions, write_shortcuts=False):
+        "Shortcuts condition"
+        shortcuts = None
+        if write_shortcuts:
+            shortcuts = [
+                shortcut_row[0].text().strip()
+                for shortcut_row in self.shortcut_rows # pylint: disable=E1101
+                if self.is_widget_valid(shortcut_row) # pylint: disable=E1101
+                and shortcut_row[0].text().strip()
+            ] or None
+
         if shortcuts:
             valid_shortcuts = [s for s in shortcuts if s]
             if valid_shortcuts:
@@ -329,175 +456,69 @@ class WriteScript():
                 if normal_shortcuts:
                     file.write("toggle := false\n\n")
                     for shortcut in normal_shortcuts:
-                        translated_shortcut = self.translate_key(
-                            shortcut, key_translations)
+                        translated_shortcut = self.translate_key(shortcut) # pylint: disable=E1101
                         file.write(f"~{translated_shortcut}:: ; Shortcuts\n")
                         file.write("{\n    global toggle\n    toggle := !toggle\n}\n\n")
                     hotif_conditions.append("toggle")
                 elif caps_shortcuts:
                     hotif_conditions.append(" || ".join(caps_shortcuts))
 
-        if program:
-            hotif_conditions.append(f"({program})")
-
-        if device_condition:
-            hotif_conditions.append(device_condition)
-
-        if hotif_conditions:
-            file.write("SetTitleMatchMode 2\n")
-            file.write(f"#HotIf {' && '.join(hotif_conditions)}\n")
-            return True
-        return False
-
-    def handle_default_mode(self, file, key_translations):
-        "Write default mode"
-        file.write("; default\n")
-        self.generate_exit_key(os.path.basename(file.name), file)
-        file.write("#SingleInstance force\n")
-        file.write("#Requires AutoHotkey v2.0\n")
-
-        write_hotif = self.write_condition(file, key_translations,
-                                           write_shortcuts=True,
-                                           write_program=True,
-                                           write_device=True)
-
-        self.process_key_remaps(file, key_translations)
-
-        if write_hotif:
-            file.write("#HotIf\n")
-
-    def handle_text_mode(self, file, key_translations):
-        "Write text mode"
-        file.write("; text\n")
-        self.generate_exit_key(os.path.basename(file.name), file)
-        file.write("#SingleInstance force\n")
-        file.write("#Requires AutoHotkey v2.0\n")
-
-        write_hotif = self.write_condition(file, key_translations,
-                                           write_shortcuts=True,
-                                           write_program=True,
-                                           write_device=True)
-
-        text_content = self.text_block.toPlainText().strip()
-        if text_content:
-            file.write("; Text mode start\n")
-            file.write(text_content + '\n')
-            file.write("; Text mode end\n")
-
-        if write_hotif:
-            file.write("#HotIf\n")
-
-    def process_key_remaps(self, file, key_translations):
-        "Handle key remap write"
-        for row in self.key_rows:
-            (default_key_entry, remap_key_entry, _,
-            _, text_format_var, hold_format_var,
-            hold_interval_entry, first_key_checkbox, _) = row
-
-            try:
-                default_key = default_key_entry.text().strip()
-                remap_key = remap_key_entry.text().strip()
-
-                if not default_key or not remap_key:
-                    continue
-
-                has_multiple_keys = "+" in default_key
-
-                if has_multiple_keys:
-                    keys = [k.strip() for k in default_key.split("+")]
-                    if len(keys) == 2 and keys[0] == keys[1]:
-                        self.write_double_click(
-                            file, keys[0], remap_key, key_translations,
-                            text_format_var.isChecked(),
-                            hold_format_var.isChecked(),
-                            hold_format_var,
-                            hold_interval_entry
-                        )
-                        continue
-                    default_translated = self.write_multiple_key_default(
-                        default_key, key_translations, first_key_checkbox)
-
-                else:
-                    default_translated = self.write_single_key_default(
-                        default_key, key_translations)
-
-                self.handle_remap_type(
-                    file, default_translated, remap_key, key_translations,
-                    text_format_var.isChecked(),
-                    hold_format_var.isChecked(),
-                    hold_format_var,
-                    hold_interval_entry)
-
-            except ValueError:
-                continue
-
-    def handle_remap_type(self, file, default_translated, remap_key,
-                          key_translations, is_text_mode, is_hold_mode,
-                          hold_format_var, hold_interval_entry,):
+    def handle_remap_type(self, file, default_translated, remap_key):
         "Handle text, hold, single, multiple key mode"
-        if is_text_mode:
+        if self.key_rows.text_format_checkbox.isChecked():
             self.write_text_format(file, default_translated, remap_key)
-        elif is_hold_mode:
-            self.write_hold_format(
-                file, default_translated, remap_key,
-                key_translations, hold_format_var,
-                hold_interval_entry
-            )
+        elif self.key_rows.hold_format_checkbox.isChecked():
+            self.write_hold_format(file, default_translated, remap_key)
         elif "+" in remap_key:
             self.write_multiple_key_remap(file, default_translated,
-                                          remap_key, key_translations)
+                                          remap_key)
         else:
             self.write_single_key_remap(file, default_translated,
-                                        remap_key, key_translations)
+                                        remap_key)
 
-    def write_single_key_default(self, default_key, key_translations):
+    def write_single_key_default(self, default_key):
         "Write single key case on default key"
-        translated_key = self.translate_key(default_key, key_translations)
+        translated_key = self.translate_key(default_key) # pylint: disable=E1101
         return translated_key
 
-    def write_single_key_remap(self, file, default_translated, remap_key,
-                               key_translations):
+    def write_single_key_remap(self, file, default_translated, remap_key):
         "Write single key case on remap key"
-        if self.is_unicode_key(remap_key):
+        if self.is_unicode_key(remap_key): # pylint: disable=E1101
             file.write(f'{default_translated}::SendInput Chr({ord(remap_key)})\n')
         else:
-            remap_key_tr = self.translate_key(remap_key, key_translations)
+            remap_key_tr = self.translate_key(remap_key) # pylint: disable=E1101
             file.write(f'{default_translated}::{remap_key_tr}\n')
 
-    def write_multiple_key_default(self, default_key, key_translations,
-                                   first_key_checkbox=None):
+    def write_multiple_key_default(self, default_key):
         "Write multiple key case on default key"
-        if first_key_checkbox is not None and first_key_checkbox.isChecked():
-            translated_key = self.translate_key(default_key, key_translations)
+        if (self.key_rows.first_key_checkbox is not None
+            and self.key_rows.first_key_checkbox.isChecked()):
+            translated_key = self.translate_key(default_key) # pylint: disable=E1101
         else:
-            translated_key = "~" + self.translate_key(default_key,
-                                                      key_translations)
+            translated_key = "~" + self.translate_key(default_key) # pylint: disable=E1101
         return translated_key
 
-    def write_multiple_key_remap(self, file, default_translated, remap_key,
-                                 key_translations):
+    def write_multiple_key_remap(self, file, default_translated, remap_key):
         "Write multiple key case on remap key"
         keys = [key.strip() for key in remap_key.split("+")]
         send_parts_down = []
         send_parts_up = []
 
         for key in keys:
-            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key):
+            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key): # pylint: disable=E1101
                 send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
                 send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
             else:
-                tr_key = self.translate_key(key, key_translations)
+                tr_key = self.translate_key(key) # pylint: disable=E1101
                 send_parts_down.append(f'{{{tr_key} down}}')
                 send_parts_up.insert(0, f'{{{tr_key} up}}')
 
         send_sequence = "".join(send_parts_down + send_parts_up)
         file.write(f'{default_translated}::SendInput("{send_sequence}")\n')
 
-    def write_double_click(self, file, single_key, remap_key,
-                           key_translations, is_text_mode, is_hold_mode,
-                           hold_format_var, hold_interval_entry):
+    def write_double_click(self, file, single_key, remap_key):
         "Write double click (same key twice) on default key"
-        translated_key = self.translate_key(single_key, key_translations)
+        translated_key = self.translate_key(single_key) # pylint: disable=E1101
 
         file.write(f'*{translated_key}::{{\n')
         file.write(
@@ -506,41 +527,10 @@ class WriteScript():
             )
         )
 
-        if is_text_mode:
+        if self.key_rows.text_format_checkbox.isChecked():
             file.write(f'        SendText("{remap_key}")\n')
-        elif is_hold_mode:
-            hold_interval_ms = "10000"
-            if hold_format_var.isChecked() and hold_interval_entry is not None:
-                hold_interval = "10"
-                if (hold_interval_entry.text().strip() and
-                    hold_interval_entry.text().strip()
-                        != "Hold Interval"):
-                    hold_interval = hold_interval_entry.text().strip()
-                hold_interval_ms = str(int(float(hold_interval) * 1000))
-
-            keys = [key.strip() for key in remap_key.split("+")]
-            down_parts = []
-            up_parts = []
-
-            for key in keys:
-                if (hasattr(self, "is_unicode_key") and
-                        self.is_unicode_key(key)):
-                    down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
-                    up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
-                else:
-                    tr_key = self.translate_key(key, key_translations)
-                    down_parts.append(f'{{{tr_key} Down}}')
-                    up_parts.insert(0, f'{{{tr_key} Up}}')
-
-            down_sequence = "".join(down_parts)
-            up_sequence = "".join(up_parts)
-
-            file.write(
-                (f'        (SendInput("{down_sequence}"), '
-                 f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
-                )
-            )
-
+        elif self.key_rows.hold_format_checkbox.isChecked():
+            self.hold_format_double_click(remap_key, file)
         else:
             if "+" in remap_key:
                 keys = [key.strip() for key in remap_key.split("+")]
@@ -549,11 +539,11 @@ class WriteScript():
 
                 for key in keys:
                     if (hasattr(self, "is_unicode_key") and
-                            self.is_unicode_key(key)):
+                            self.is_unicode_key(key)): # pylint: disable=E1101
                         send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
                         send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
                     else:
-                        tr_key = self.translate_key(key, key_translations)
+                        tr_key = self.translate_key(key) # pylint: disable=E1101
                         send_parts_down.append(f'{{{tr_key} down}}')
                         send_parts_up.insert(0, f'{{{tr_key} up}}')
 
@@ -561,30 +551,24 @@ class WriteScript():
                 file.write(f'        SendInput("{send_sequence}")\n')
             else:
                 if (hasattr(self, "is_unicode_key") and
-                        self.is_unicode_key(remap_key)):
+                        self.is_unicode_key(remap_key)): # pylint: disable=E1101
                     file.write(f'        Send Chr({ord(remap_key)})\n')
                 else:
-                    remap_key_tr = self.translate_key(
-                        remap_key, key_translations)
+                    remap_key_tr = self.translate_key(remap_key) # pylint: disable=E1101
                     file.write(f'        SendInput("{remap_key_tr}")\n')
 
         file.write('    }\n')
 
-    def write_text_format(self, file, default_translated, remap_key):
-        "write text format (Send literal string)"
-        file.write(f'{default_translated}::SendText("{remap_key}")\n')
-
-    def write_hold_format(self, file, default_translated, remap_key,
-                          key_translations, hold_format_var,
-                          hold_interval_entry):
-        "Write hold format"
+    def hold_format_double_click(self, remap_key, file):
+        "Write double click on hold format"
         hold_interval_ms = "10000"
-        if hold_format_var.isChecked() and hold_interval_entry is not None:
+        if (self.key_rows.hold_format_checkbox.isChecked()
+            and self.key_rows.hold_interval_entry is not None):
             hold_interval = "10"
-            if (hold_interval_entry.text().strip() and
-                hold_interval_entry.text().strip()
+            if (self.key_rows.hold_interval_entry.text().strip() and
+                self.key_rows.hold_interval_entry.text().strip()
                     != "Hold Interval"):
-                hold_interval = hold_interval_entry.text().strip()
+                hold_interval =self.key_rows. hold_interval_entry.text().strip()
             hold_interval_ms = str(int(float(hold_interval) * 1000))
 
         keys = [key.strip() for key in remap_key.split("+")]
@@ -592,11 +576,50 @@ class WriteScript():
         up_parts = []
 
         for key in keys:
-            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key):
+            if (hasattr(self, "is_unicode_key") and
+                    self.is_unicode_key(key)): # pylint: disable=E1101
                 down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
                 up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
             else:
-                tr_key = self.translate_key(key, key_translations)
+                tr_key = self.translate_key(key) # pylint: disable=E1101
+                down_parts.append(f'{{{tr_key} Down}}')
+                up_parts.insert(0, f'{{{tr_key} Up}}')
+
+        down_sequence = "".join(down_parts)
+        up_sequence = "".join(up_parts)
+
+        file.write(
+            (f'        (SendInput("{down_sequence}"), '
+                f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
+            )
+        )
+
+    def write_text_format(self, file, default_translated, remap_key):
+        "write text format (Send literal string)"
+        file.write(f'{default_translated}::SendText("{remap_key}")\n')
+
+    def write_hold_format(self, file, default_translated, remap_key):
+        "Write hold format"
+        hold_interval_ms = "10000"
+        if (self.key_rows.hold_format_checkbox.isChecked()
+            and self.key_rows.hold_interval_entry is not None):
+            hold_interval = "10"
+            if (self.key_rows.hold_interval_entry.text().strip() and
+                self.key_rows.hold_interval_entry.text().strip()
+                    != "Hold Interval"):
+                hold_interval = self.key_rows.hold_interval_entry.text().strip()
+            hold_interval_ms = str(int(float(hold_interval) * 1000))
+
+        keys = [key.strip() for key in remap_key.split("+")]
+        down_parts = []
+        up_parts = []
+
+        for key in keys:
+            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key): # pylint: disable=E1101
+                down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
+                up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
+            else:
+                tr_key = self.translate_key(key) # pylint: disable=E1101
                 down_parts.append(f'{{{tr_key} Down}}')
                 up_parts.insert(0, f'{{{tr_key} Up}}')
 
@@ -616,16 +639,3 @@ class WriteScript():
                  f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
                 )
             )
-
-    def handle_write(self, script_name, mode):
-        "Action when saving profile (Can be moved)"
-        output_path = os.path.join(self.script_dir, script_name)
-        key_translations = self.load_key_translations()
-
-        with open(output_path, 'w', encoding='utf-8') as file:
-            if mode == "text mode":
-                self.handle_text_mode(file, key_translations)
-            elif mode == "default mode":
-                self.handle_default_mode(file, key_translations)
-            else:
-                self.pro_write(file, mode, key_translations)

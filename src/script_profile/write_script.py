@@ -34,7 +34,7 @@ class WriteScript():
 
     def save_changes(self, script_name, mode_combobox):
         "Write script"
-        script_name = self.get_script_name()  # pylint: disable=E1101
+        script_name = self.get_script_name()
         if not script_name:
             return
 
@@ -45,9 +45,9 @@ class WriteScript():
             mode = mode_combobox.currentText().strip().lower()
             self.is_text_mode = mode == "text mode"
             self.handle_write(script_name, mode)
-            self.scripts = self.list_scripts() # pylint: disable=E1101
-            self.update_script_list() # pylint: disable=E1101
-            self.edit_window.destroy() # pylint: disable=E1101
+            self.scripts = self.list_scripts()
+            self.update_script_list()
+            self.edit_window.destroy()
 
         except ValueError as e:
             print(f"Error writing script: {e}")
@@ -55,8 +55,8 @@ class WriteScript():
 
     def handle_write(self, script_name, mode):
         "Action when saving profile (Can be moved)"
-        output_path = os.path.join(self.script_dir, script_name) # pylint: disable=E1101
-        key_translations = self.load_key_translations() # pylint: disable=E1101
+        output_path = os.path.join(self.script_dir, script_name)
+        key_translations = self.load_key_translations()
 
         with open(output_path, 'w', encoding='utf-8') as file:
             if mode == "text mode":
@@ -64,7 +64,7 @@ class WriteScript():
             elif mode == "default mode":
                 self.handle_default_mode(file)
             else:
-                self.pro_write(file, mode, key_translations) # pylint: disable=E1101
+                self.pro_write(file, mode, key_translations)
 
     def handle_default_mode(self, file):
         "Write default mode"
@@ -138,7 +138,7 @@ class WriteScript():
                                             write_program=True,
                                             write_device=True)
 
-        text_content = self.text_block.toPlainText().strip() # pylint: disable=E1101
+        text_content = self.text_block.toPlainText().strip()
         if text_content:
             file.write("; Text mode start\n")
             file.write(text_content + '\n')
@@ -294,8 +294,8 @@ class WriteScript():
         caps_off_present = False
         num_on_present = False
         num_off_present = False
-        for shortcut_row in self.shortcut_rows: # pylint: disable=E1101
-            if self.is_widget_valid(shortcut_row): # pylint: disable=E1101
+        for shortcut_row in self.shortcut_rows:
+            if self.is_widget_valid(shortcut_row):
                 shortcut = shortcut_row[0].text().strip()
                 if shortcut:
                     if shortcut.lower() == "capslock on":
@@ -352,7 +352,7 @@ class WriteScript():
 
     def get_program_condition(self):
         "Get program binding value from entry"
-        program_entry = self.program_entry.text().strip() # pylint: disable=E1101
+        program_entry = self.program_entry.text().strip()
         program_condition = ""
 
         if program_entry:
@@ -374,7 +374,7 @@ class WriteScript():
     def get_device_condition(self):
         "Get device binding value from entry"
         device_condition = ""
-        device_name = self.keyboard_entry.text().strip() # pylint: disable=E1101
+        device_name = self.keyboard_entry.text().strip()
         if device_name:
             device_condition = "cm1.IsActive"
         return device_condition
@@ -403,7 +403,7 @@ class WriteScript():
 
     def device_condition(self, file, hotif_conditions, write_device):
         "Device condition"
-        device = self.keyboard_entry.text().strip() if write_device else None # pylint: disable=E1101
+        device = self.keyboard_entry.text().strip() if write_device else None
         if device:
             parts = device.split(",", 1)
             device_type = parts[0].strip().lower()
@@ -432,8 +432,8 @@ class WriteScript():
         if write_shortcuts:
             shortcuts = [
                 shortcut_row[0].text().strip()
-                for shortcut_row in self.shortcut_rows # pylint: disable=E1101
-                if self.is_widget_valid(shortcut_row) # pylint: disable=E1101
+                for shortcut_row in self.shortcut_rows
+                if self.is_widget_valid(shortcut_row)
                 and shortcut_row[0].text().strip()
             ] or None
 
@@ -456,7 +456,7 @@ class WriteScript():
                 if normal_shortcuts:
                     file.write("toggle := false\n\n")
                     for shortcut in normal_shortcuts:
-                        translated_shortcut = self.translate_key(shortcut) # pylint: disable=E1101
+                        translated_shortcut = self.translate_key(shortcut)
                         file.write(f"~{translated_shortcut}:: ; Shortcuts\n")
                         file.write("{\n    global toggle\n    toggle := !toggle\n}\n\n")
                     hotif_conditions.append("toggle")
@@ -478,24 +478,24 @@ class WriteScript():
 
     def write_single_key_default(self, default_key):
         "Write single key case on default key"
-        translated_key = self.translate_key(default_key) # pylint: disable=E1101
+        translated_key = self.translate_key(default_key)
         return translated_key
 
     def write_single_key_remap(self, file, default_translated, remap_key):
         "Write single key case on remap key"
-        if self.is_unicode_key(remap_key): # pylint: disable=E1101
+        if self.is_unicode_key(remap_key):
             file.write(f'{default_translated}::SendInput Chr({ord(remap_key)})\n')
         else:
-            remap_key_tr = self.translate_key(remap_key) # pylint: disable=E1101
+            remap_key_tr = self.translate_key(remap_key)
             file.write(f'{default_translated}::{remap_key_tr}\n')
 
     def write_multiple_key_default(self, default_key):
         "Write multiple key case on default key"
         if (self.key_rows.first_key_checkbox is not None
             and self.key_rows.first_key_checkbox.isChecked()):
-            translated_key = self.translate_key(default_key) # pylint: disable=E1101
+            translated_key = self.translate_key(default_key)
         else:
-            translated_key = "~" + self.translate_key(default_key) # pylint: disable=E1101
+            translated_key = "~" + self.translate_key(default_key)
         return translated_key
 
     def write_multiple_key_remap(self, file, default_translated, remap_key):
@@ -505,11 +505,11 @@ class WriteScript():
         send_parts_up = []
 
         for key in keys:
-            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key): # pylint: disable=E1101
+            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key):
                 send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
                 send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
             else:
-                tr_key = self.translate_key(key) # pylint: disable=E1101
+                tr_key = self.translate_key(key)
                 send_parts_down.append(f'{{{tr_key} down}}')
                 send_parts_up.insert(0, f'{{{tr_key} up}}')
 
@@ -518,7 +518,7 @@ class WriteScript():
 
     def write_double_click(self, file, single_key, remap_key):
         "Write double click (same key twice) on default key"
-        translated_key = self.translate_key(single_key) # pylint: disable=E1101
+        translated_key = self.translate_key(single_key)
 
         file.write(f'*{translated_key}::{{\n')
         file.write(
@@ -539,11 +539,11 @@ class WriteScript():
 
                 for key in keys:
                     if (hasattr(self, "is_unicode_key") and
-                            self.is_unicode_key(key)): # pylint: disable=E1101
+                            self.is_unicode_key(key)):
                         send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
                         send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
                     else:
-                        tr_key = self.translate_key(key) # pylint: disable=E1101
+                        tr_key = self.translate_key(key)
                         send_parts_down.append(f'{{{tr_key} down}}')
                         send_parts_up.insert(0, f'{{{tr_key} up}}')
 
@@ -551,10 +551,10 @@ class WriteScript():
                 file.write(f'        SendInput("{send_sequence}")\n')
             else:
                 if (hasattr(self, "is_unicode_key") and
-                        self.is_unicode_key(remap_key)): # pylint: disable=E1101
+                        self.is_unicode_key(remap_key)):
                     file.write(f'        Send Chr({ord(remap_key)})\n')
                 else:
-                    remap_key_tr = self.translate_key(remap_key) # pylint: disable=E1101
+                    remap_key_tr = self.translate_key(remap_key)
                     file.write(f'        SendInput("{remap_key_tr}")\n')
 
         file.write('    }\n')
@@ -577,11 +577,11 @@ class WriteScript():
 
         for key in keys:
             if (hasattr(self, "is_unicode_key") and
-                    self.is_unicode_key(key)): # pylint: disable=E1101
+                    self.is_unicode_key(key)):
                 down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
                 up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
             else:
-                tr_key = self.translate_key(key) # pylint: disable=E1101
+                tr_key = self.translate_key(key)
                 down_parts.append(f'{{{tr_key} Down}}')
                 up_parts.insert(0, f'{{{tr_key} Up}}')
 
@@ -615,11 +615,11 @@ class WriteScript():
         up_parts = []
 
         for key in keys:
-            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key): # pylint: disable=E1101
+            if hasattr(self, "is_unicode_key") and self.is_unicode_key(key):
                 down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
                 up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
             else:
-                tr_key = self.translate_key(key) # pylint: disable=E1101
+                tr_key = self.translate_key(key)
                 down_parts.append(f'{{{tr_key} Down}}')
                 up_parts.insert(0, f'{{{tr_key} Up}}')
 

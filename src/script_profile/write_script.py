@@ -60,77 +60,13 @@ class WriteScript():
     def initialize_exit_keys(self):
         "Make sure there is no duplicate exit key usage on each script"
         try:
-            ahk_files = set()
-            for dir_path in [utils.active_dir, utils.store_dir]:
-                if os.path.exists(dir_path):
-                    ahk_files.update(
-                        f for f in os.listdir(dir_path) if f.endswith('.ahk')
-                    )
+            # Resolve and get exit keys from file
+            exit_keys =  self.resolve_exit_files_conflict()
 
-            exit_keys = {}
-            if os.path.exists(constant.exit_keys_file):
-                try:
-                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
-                        exit_keys = json.load(f)
-                except FileNotFoundError:
-                    exit_keys = {}
+            # Make sure each script have different exit keys
+            self.validate_exit_keys(exit_keys)
 
-            combo_to_scripts = {}
-            for script, combo in exit_keys.items():
-                combo_to_scripts.setdefault(combo, []).append(script)
-            possible_keys = list('abcdefghijklmnopqrstuvwxyz')
-            used_keys = set()
-            for combo, scripts in combo_to_scripts.items():
-                if len(scripts) == 1:
-                    used_keys.add(combo[-1:])
-                else:
-                    used_keys.add(combo[-1:])
-                    for script in scripts[1:]:
-                        available_keys = [k for k in possible_keys
-                                          if k not in used_keys]
-                        if not available_keys:
-                            available_keys = possible_keys
-                        new_key = random.choice(available_keys)
-                        used_keys.add(new_key)
-                        exit_keys[script] = f"^!{new_key}"
-
-            keys_to_remove = [k for k in exit_keys if k not in ahk_files]
-            for k in keys_to_remove:
-                del exit_keys[k]
-
-            for script_name in ahk_files:
-                if (script_name not in exit_keys
-                    or exit_keys[script_name][-1]
-                    in [exit_keys[s][-1]
-                        for s in exit_keys
-                        if s != script_name]):
-                    possible_keys = list('abcdefghijklmnopqrstuvwxyz')
-                    used_keys = set(exit_keys[s][-1]
-                                    for s in exit_keys
-                                    if s != script_name)
-                    available_keys = [k for k in possible_keys
-                                      if k not in used_keys]
-                    if not available_keys:
-                        available_keys = possible_keys
-                    new_key = random.choice(available_keys)
-                    exit_keys[script_name] = f"^!{new_key}"
-                exit_combo = exit_keys[script_name]
-
-                for dir_path in [utils.active_dir, utils.store_dir]:
-                    script_path = os.path.join(dir_path, script_name)
-                    if os.path.exists(script_path):
-                        try:
-                            with open(script_path, 'r', encoding='utf-8') as f:
-                                lines = f.readlines()
-                            if len(lines) < 2:
-                                lines += ['\n'] * (2 - len(lines))
-                            lines[1] = f"{exit_combo}::ExitApp\n"
-                            with open(script_path, 'w', encoding='utf-8') as f:
-                                f.writelines(lines)
-                        except FileNotFoundError as e:
-                            print(f"Error processing {script_name} in {dir_path}: {e}")
-                            continue
-
+            # Save the new exit keys back to save file
             try:
                 with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
                     json.dump(exit_keys, f)
@@ -140,9 +76,115 @@ class WriteScript():
         except FileNotFoundError as e:
             print(f"Error in initialize_exit_keys: {e}")
 
-    def check_key_integrity(self, shortcut_types, caps_on_present, caps_off_present,
-                            num_on_present, num_off_present):
+    def validate_exit_keys(self, exit_keys):
+        "Make sure each script have different exit keys"
+        # Collect all ahk script from active and store dit
+        ahk_files = set()
+        for ahk_path in [utils.active_dir, utils.store_dir]:
+            if os.path.exists(ahk_path):
+                ahk_files.update(f for f in os.listdir(ahk_path) if f.endswith('.ahk'))
+
+        # Remove exit key from save file for script that no longer exist
+        for key in [key for key in exit_keys if key not in ahk_files]:
+            del exit_keys[key]
+
+        # Ensure all scripts have a unique exit key
+        for script_name in ahk_files:
+            if (script_name not in exit_keys or exit_keys[script_name][-1] in [exit_keys[s][-1]
+                    for s in exit_keys if s != script_name]):
+                # If script has no exit key or its key is already used, assign a new one
+                possible_keys = list('abcdefghijklmnopqrstuvwxyz')
+                used_keys = set(exit_keys[s][-1]
+                                for s in exit_keys
+                                if s != script_name)
+                available_keys = [k for k in possible_keys
+                                    if k not in used_keys]
+                if not available_keys:
+                    available_keys = possible_keys
+                exit_keys[script_name] = f"^!{random.choice(available_keys)}"
+            exit_combo = exit_keys[script_name]
+
+            # Make sure ahk script using the correct exit keys
+            for dir_path in [utils.active_dir, utils.store_dir]:
+                script_path = os.path.join(dir_path, script_name)
+                if os.path.exists(script_path):
+                    try:
+                        with open(script_path, 'r', encoding='utf-8') as f:
+                            lines = f.readlines()
+                        if len(lines) < 2:
+                            lines += ['\n'] * (2 - len(lines))
+                        lines[1] = f"{exit_combo}::ExitApp\n"
+                        with open(script_path, 'w', encoding='utf-8') as f:
+                            f.writelines(lines)
+                    except FileNotFoundError as e:
+                        print(f"Error processing {script_name} in {dir_path}: {e}")
+                        continue
+
+    def resolve_exit_files_conflict(self):
+        "Resolve and get exit keys from file"
+        # Load the exit keys from save file
+        exit_keys = {}
+        if os.path.exists(constant.exit_keys_file):
+            try:
+                with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
+                    exit_keys = json.load(f)
+            except FileNotFoundError:
+                exit_keys = {}
+
+        # Create dictionary containing script and the exit key
+        combo_to_scripts = {}
+        for script, combo in exit_keys.items():
+            combo_to_scripts.setdefault(combo, []).append(script)
+
+        possible_keys = list('abcdefghijklmnopqrstuvwxyz')
+        used_keys = set()
+
+        # Resolve exit keys conflict if there any
+        for combo, scripts in combo_to_scripts.items():
+            if len(scripts) == 1:
+                # Only one script uses this combo, mark the key as used
+                used_keys.add(combo[-1:])
+            else:
+                # Multiple scripts use the same combo, only the first keeps it
+                used_keys.add(combo[-1:])
+                for script in scripts[1:]:
+                    # Assign a new, unused key to the rest
+                    available_keys = [k for k in possible_keys
+                                        if k not in used_keys]
+                    if not available_keys:
+                        available_keys = possible_keys
+                    new_key = random.choice(available_keys)
+                    used_keys.add(new_key)
+                    exit_keys[script] = f"^!{new_key}"
+
+        return exit_keys
+
+    def check_key_integrity(self):
         "Make sure there is no conflict on profile input"
+        shortcut_types = {"normal": [], "caps": []}
+        caps_on_present = False
+        caps_off_present = False
+        num_on_present = False
+        num_off_present = False
+        for shortcut_row in self.shortcut_rows:
+            if self.is_widget_valid(shortcut_row):
+                shortcut = shortcut_row[0].text().strip()
+                if shortcut:
+                    if shortcut.lower() == "capslock on":
+                        shortcut_types["caps"].append(shortcut)
+                        caps_on_present = True
+                    elif shortcut.lower() == "capslock off":
+                        shortcut_types["caps"].append(shortcut)
+                        caps_off_present = True
+                    elif shortcut.lower() == "numlock on":
+                        shortcut_types["caps"].append(shortcut)
+                        num_on_present = True
+                    elif shortcut.lower() == "numlock off":
+                        shortcut_types["caps"].append(shortcut)
+                        num_off_present = True
+                    else:
+                        shortcut_types["normal"].append(shortcut)
+
         if shortcut_types["normal"] and shortcut_types["caps"]:
             msg = (QMessageBox(self.edit_window
                                if hasattr(self, "edit_window")
@@ -186,32 +228,7 @@ class WriteScript():
         if not script_name:
             return
 
-        shortcut_types = {"normal": [], "caps": []}
-        caps_on_present = False
-        caps_off_present = False
-        num_on_present = False
-        num_off_present = False
-        for shortcut_row in self.shortcut_rows:
-            if self.is_widget_valid(shortcut_row):
-                shortcut = shortcut_row[0].text().strip()
-                if shortcut:
-                    if shortcut.lower() == "capslock on":
-                        shortcut_types["caps"].append(shortcut)
-                        caps_on_present = True
-                    elif shortcut.lower() == "capslock off":
-                        shortcut_types["caps"].append(shortcut)
-                        caps_off_present = True
-                    elif shortcut.lower() == "numlock on":
-                        shortcut_types["caps"].append(shortcut)
-                        num_on_present = True
-                    elif shortcut.lower() == "numlock off":
-                        shortcut_types["caps"].append(shortcut)
-                        num_off_present = True
-                    else:
-                        shortcut_types["normal"].append(shortcut)
-        if not self.check_key_integrity(shortcut_types, caps_on_present,
-                                        caps_off_present, num_on_present,
-                                        num_off_present):
+        if not self.check_key_integrity():
             return
 
         try:

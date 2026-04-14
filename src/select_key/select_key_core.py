@@ -81,11 +81,3 @@ class SelectKeyCore():
             return key_data
         except FileNotFoundError:
             return {}
-
-    def is_unicode_key(self, key):
-        "Determine whether it's unicode or hard coded key"
-        key_data = self.load_keylist()
-        for child_item in key_data.values():
-            if key in child_item:
-                return False
-        return True

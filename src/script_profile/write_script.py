@@ -11,6 +11,8 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from utility import constant
 
 from utility import utils
+from utility.diff import Diff
+from core.main_core import MainCore
 
 
 @dataclass
@@ -28,6 +30,9 @@ class WriteScript():
     "Write script based on profile input"
     def __init__(self):
         super().__init__()
+
+        self.diff = Diff()
+        self.main_core = MainCore()
         self.is_text_mode = None
         self.scripts = None
         self.key_rows = None
@@ -45,13 +50,43 @@ class WriteScript():
             mode = mode_combobox.currentText().strip().lower()
             self.is_text_mode = mode == "text mode"
             self.handle_write(script_name, mode)
-            self.scripts = self.list_scripts()
+            self.scripts = self.main_core.list_scripts()
             self.update_script_list()
             self.edit_window.destroy()
 
         except ValueError as e:
             print(f"Error writing script: {e}")
             traceback.print_exc()
+
+    def get_script_name(self):
+        "Get profile name from entry"
+        script_name = self.script_name_entry.text().strip()
+        if not script_name:
+            QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
+            return None
+
+        if not script_name.endswith('.ahk'):
+            script_name += '.ahk'
+
+        return script_name
+
+    def load_key_translations(self):
+        "Load translation from raw key to readable key"
+        key_translations = {}
+        try:
+            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                for category_dict in data:
+                    for _, keys in category_dict.items():
+                        for key, info in keys.items():
+                            readable_key = key.strip().lower()
+                            translation = info.get("translate", "").strip()
+                            if translation:
+                                key_translations[readable_key] = translation
+
+        except FileNotFoundError as e:
+            print(f"Error reading key translations: {e}")
+        return key_translations
 
     def handle_write(self, script_name, mode):
         "Action when saving profile (Can be moved)"
@@ -64,7 +99,7 @@ class WriteScript():
             elif mode == "default mode":
                 self.handle_default_mode(file)
             else:
-                self.pro_write(file, mode, key_translations)
+                self.diff.pro_write(file, mode, key_translations)
 
     def handle_default_mode(self, file):
         "Write default mode"
@@ -287,6 +322,14 @@ class WriteScript():
 
         return exit_keys
 
+    def is_widget_valid(self, widget_tuple):
+        "Check whether the row is valid"
+        try:
+            entry_widget, button_widget = widget_tuple
+            return entry_widget is not None and button_widget is not None
+        except ValueError:
+            return False
+
     def check_key_integrity(self):
         "Make sure there is no conflict on profile input"
         shortcut_types = {"normal": [], "caps": []}
@@ -426,6 +469,20 @@ class WriteScript():
             file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
             hotif_conditions.append("cm1.IsActive")
 
+    def translate_key(self, key):
+        "Translate raw key into readable key"
+        keys = key.split('+')
+        translated_keys = []
+
+        key_translations = self.load_key_translations()
+
+        for single_key in keys:
+            translated_key = key_translations.get(single_key.strip().lower(),
+                                                    single_key.strip())
+            translated_keys.append(translated_key)
+
+        return " & ".join(translated_keys)
+
     def shortcuts_condition(self, file, hotif_conditions, write_shortcuts=False):
         "Shortcuts condition"
         shortcuts = None
@@ -480,6 +537,14 @@ class WriteScript():
         "Write single key case on default key"
         translated_key = self.translate_key(default_key)
         return translated_key
+
+    def is_unicode_key(self, key):
+        "Determine whether it's unicode or hard coded key"
+        key_data = self.load_keylist()
+        for child_item in key_data.values():
+            if key in child_item:
+                return False
+        return True
 
     def write_single_key_remap(self, file, default_translated, remap_key):
         "Write single key case on remap key"

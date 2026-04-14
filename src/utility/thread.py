@@ -8,7 +8,7 @@ from utility.diff import (Diff)
 from setting.announcement import Announcement
 from setting.setting_core import SettingCore
 from script_profile.write_script import WriteScript
-from script_profile.profile_core import ProfileCore
+from script_profile.remap_row import RemapRow
 
 
 class Thread(QThread, Diff):
@@ -22,7 +22,7 @@ class Thread(QThread, Diff):
         self.main_window = main_window
         self.announcement = Announcement()
         self.write_script = WriteScript()
-        self.profile_core = ProfileCore()
+        self.remap_row = RemapRow(None)
         self.setting_core = SettingCore()
 
     def run(self):
@@ -42,10 +42,10 @@ class Thread(QThread, Diff):
             self.show_announcement.emit()
 
         if not hasattr(self.main_window, "keyboard_hook_initialized"):
-            keyboard.hook(lambda event: self.profile_core.multi_key_event(
+            keyboard.hook(lambda event: self.remap_row.multi_key_event(
                 event, self.main_window.active_entry, None))
             self.main_window.mouse_listener = pynput.mouse.Listener(
-                 on_click=self.profile_core.mouse_listening
+                 on_click=self.remap_row.mouse_listening
             )
             self.main_window.mouse_listener.start()
             self.main_window.keyboard_hook_initialized = True

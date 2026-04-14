@@ -30,6 +30,9 @@ class Dashboard(QMainWindow):
         self.profile_ui = ProfileUI()
         self.setting_ui = SettingUI()
 
+        # Signal
+        self.main_core.update_script_signal.connect(self.update_script_list)
+
         # Key Listening
         self.is_listening = False
         self.active_entry = None

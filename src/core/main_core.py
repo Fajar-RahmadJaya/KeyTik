@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QInputDialog
 )
 from PySide6.QtGui import QFont, QFontDatabase  # pylint: disable=E0611
+from PySide6.QtCore import Signal # pylint: disable=E0611
 from pynput.keyboard import Controller, Key
 
 from utility import constant
@@ -21,11 +22,13 @@ from utility import icons
 
 class MainCore():
     "Main Logic"
+    update_script_signal = Signal
     def __init__(self):
         # UI initialization
         self.script_dir = utils.active_dir
         self.pinned_profiles = utils.load_pinned_profiles()
 
+        # Variable
         self.scripts = None
         self.current_page = 0
 
@@ -58,7 +61,7 @@ class MainCore():
                 self.validate_imported_files(destination_path, file_name)
 
                 self.scripts.append(file_name)
-                self.update_script_list()
+                self.update_script_signal.emit()
 
     def validate_imported_files(self, destination_path, file_name):
         "Add necessary line on imported files"
@@ -134,7 +137,7 @@ class MainCore():
         try:
             shutil.copy(source_path, destination_path)
             self.scripts = self.list_scripts()
-            self.update_script_list()
+            self.update_script_signal.emit()
         except NotADirectoryError as e:
             QMessageBox.warning(self, "Error", f"Error copying script: {e}")
 
@@ -153,7 +156,7 @@ class MainCore():
             try:
                 os.remove(script_path)
                 self.scripts = self.list_scripts()
-                self.update_script_list()
+                self.update_script_signal.emit()
             except FileNotFoundError as e:
                 QMessageBox.warning(self, "Error",
                                     f"Failed to delete the script: {e}")
@@ -239,7 +242,7 @@ class MainCore():
                 shutil.move(script_path, target_path)
 
                 self.scripts = self.list_scripts()
-                self.update_script_list()
+                self.update_script_signal.emit()
             except NotADirectoryError as e:
                 QMessageBox.critical(self, "Error", f"Failed to move the script: {e}")
         else:
@@ -276,7 +279,7 @@ class MainCore():
             show_stored.setIcon(icons.get_icon(icons.show_stored))
 
         self.list_scripts()
-        self.update_script_list()
+        self.update_script_signal.emit()
 
     def toggle_pin(self, script, icon_label):
         "Pin profile from pinned profile list"
@@ -291,7 +294,7 @@ class MainCore():
 
         utils.save_pinned_profiles(self.pinned_profiles)
         self.list_scripts()
-        self.update_script_list()
+        self.update_script_signal.emit()
 
     def check_ahk_installation(self, show_installed_message=False):
         "Check AutoHotkey installation"
@@ -353,13 +356,13 @@ class MainCore():
         "Show previous profile list"
         if self.current_page > 0:
             self.current_page -= 1
-            self.update_script_list()
+            self.update_script_signal.emit()
 
     def next_page(self):
         "show next profile list"
         if (self.current_page + 1) * 6 < len(self.scripts):
             self.current_page += 1
-            self.update_script_list()
+            self.update_script_signal.emit()
 
     def add_ahk_to_startup(self, script_name):
         "Add profile to startup folder"
@@ -379,7 +382,7 @@ class MainCore():
 
         del shell
 
-        self.update_script_list()
+        self.update_script_signal.emit()
         return shortcut_path
 
     def remove_ahk_from_startup(self, script_name):
@@ -395,24 +398,34 @@ class MainCore():
             else:
                 print(f"{shortcut_path} does not exist in startup.")
 
-            self.update_script_list()
+            self.update_script_signal.emit()
 
         except NotADirectoryError as e:
             print(f"Error removing {shortcut_path}: {e}")
 
-    def update_script_list(self):
-        "! From dashboard"
-        for i in reversed(range(self.profile_layout.count())):
-            widget = self.profile_layout.itemAt(i).widget()
-            if widget:
-                widget.setParent(None)
+    def check_ahi_dir(self):
+        "Make sure AutoHotkey Interception folder is in active profile folder"
+        target_folder = os.path.join(utils.active_dir,
+                                        'AutoHotkey Interception')
 
-        start_index = self.current_page * 6
-        end_index = start_index + 6
-        scripts_to_display = self.scripts[start_index:end_index]
+        def get_all_relative_paths(base_dir):
+            rel_paths = set()
+            for root, dirs, files in os.walk(base_dir):
+                for name in files:
+                    rel_path = os.path.relpath(os.path.join(root, name),
+                                                base_dir)
+                    rel_paths.add(rel_path)
+                for name in dirs:
+                    rel_path = os.path.relpath(os.path.join(root, name),
+                                                base_dir)
+                    rel_paths.add(rel_path)
+            return rel_paths
 
-        for index, script in enumerate(scripts_to_display):
-            row = index // 2
-            column = index % 2
+        ahi_paths = get_all_relative_paths(constant.ahi_dir)
+        target_paths = get_all_relative_paths(target_folder)
 
-            self.profile_card(script, row, column)
+        if (not ahi_paths.issubset(target_paths) or
+                not os.path.isdir(target_folder)):
+            if os.path.exists(target_folder):
+                shutil.rmtree(target_folder)
+            shutil.copytree(constant.ahi_dir, target_folder)

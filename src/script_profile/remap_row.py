@@ -15,6 +15,7 @@ from utility import constant
 from utility.diff import Diff
 from script_profile.parse_script import ParseScript
 from script_profile.profile_core import ProfileCore
+from select_key.select_key_ui import SelectKeyUI
 
 
 @dataclass
@@ -29,15 +30,30 @@ class ParsedRemap:
     is_text_format: bool
 
 
-class RemapRow(QObject, ParseScript, ProfileCore):
+class RemapRow():
     "Remap & shortcut row on profile creation"
     request_timer_start = Signal(object)
-    def __init__(self, edit_frame):
+    def __init__(self, edit_frame, edit_window,
+                 script_name_entry, keyboard_entry, program_entry):
         super().__init__()
-        self.request_timer_start.connect(self.release_timer)
+        # Parameter
         self.edit_frame = edit_frame
+        self.script_name_entry = script_name_entry
+        self.keyboard_entry = keyboard_entry
+        self.edit_window = edit_window
+        self.program_entry = program_entry
 
+        # Composition
         self.diff = Diff()
+        self.parse_script = ParseScript()
+        self.profile_core = ProfileCore()
+        self.select_key_ui = SelectKeyUI()
+
+        # Signal
+        self.request_timer_start.connect(self.profile_core.release_timer)
+
+        # Parameter
+        self.edit_frame = edit_frame
 
         # Variables
         self.is_listening = False
@@ -50,6 +66,7 @@ class RemapRow(QObject, ParseScript, ProfileCore):
         self.files_opener_rows = []
         self.files_opener_row_widgets = []
         self.row_num = 0
+        self.previous_button_text = None
 
         # UI
         self.edit_frame_layout = None
@@ -98,7 +115,7 @@ class RemapRow(QObject, ParseScript, ProfileCore):
 
     def handle_parser(self, lines, first_line):
         "Action when editing profile (Can be moved)"
-        key_map = self.load_key_list()
+        key_map = self.profile_core.load_key_list()
         mode_line = lines[0].strip() if lines else "; default"
 
         if mode_line == "; default":
@@ -113,7 +130,7 @@ class RemapRow(QObject, ParseScript, ProfileCore):
     def default_mode_widget(self, lines, key_map):
         "Default mode frame"
 
-        parsed_shortcut_tuple = self.parse_shortcuts(lines, key_map)
+        parsed_shortcut_tuple = self.parse_script.parse_shortcuts(lines, key_map)
 
         self.shortcut_title()
 
@@ -125,7 +142,7 @@ class RemapRow(QObject, ParseScript, ProfileCore):
 
         self.remap_title()
 
-        parsed_remap_tuple = self.parse_default_mode(lines, key_map)
+        parsed_remap_tuple = self.parse_script.parse_default_mode(lines, key_map)
 
         if parsed_remap_tuple:
             # Unpack tuple
@@ -337,7 +354,7 @@ class RemapRow(QObject, ParseScript, ProfileCore):
         default_key_choose.setIcon(icons.get_icon(icons.search))
         default_key_choose.setToolTip("Choose Default/Original key")
         default_key_choose.clicked.connect(
-            lambda: self.select_key(default_key_entry, context="default"))
+            lambda: self.select_key_ui.select_key(default_key_entry, context="default"))
         default_key_layout.addWidget(default_key_choose)
 
         row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
@@ -374,7 +391,7 @@ class RemapRow(QObject, ParseScript, ProfileCore):
         remap_key_choose.setIcon(icons.get_icon(icons.search))
         remap_key_choose.setToolTip("Choose Remap key")
         remap_key_choose.clicked.connect(
-            lambda: self.select_key(remap_key_entry, context="remap"))
+            lambda: self.select_key_ui.select_key(remap_key_entry, context="remap"))
         remap_key_layout.addWidget(remap_key_choose)
 
         row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
@@ -614,14 +631,14 @@ class RemapRow(QObject, ParseScript, ProfileCore):
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: self.select_key(self.shortcut_entry, context="shortcut"))
+            lambda: self.select_key_ui.select_key(self.shortcut_entry, context="shortcut"))
         shortcut_layout.addWidget(shortcut_choose)
 
         row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
 
     def text_mode_widget(self, lines, key_map):
         "Text mode frame(to do: fix)"
-        shortcuts = self.parse_shortcuts(lines, key_map)
+        shortcuts = self.parse_script.parse_shortcuts(lines, key_map)
 
         if not shortcuts:
             self.shortcut_row()
@@ -758,7 +775,7 @@ class RemapRow(QObject, ParseScript, ProfileCore):
 
     def mouse_listening(self, button, pressed):
         "Get and listen to mouse key press"
-        if not (self.is_listening and self.active_entry):
+        if not (self.is_listening and self.profile_core.active_entry):
             return
 
         if pressed and hasattr(self, "edit_window"):
@@ -779,17 +796,17 @@ class RemapRow(QObject, ParseScript, ProfileCore):
             button, "name", str(button)))
 
         if pressed:
-            if mouse_button not in self.pressed_keys:
-                self.pressed_keys.append(mouse_button)
-                self.update_widget(self.active_entry)
+            if mouse_button not in self.profile_core.pressed_keys:
+                self.profile_core.pressed_keys.append(mouse_button)
+                self.profile_core.update_widget(self.profile_core.active_entry)
         else:
-            if mouse_button in self.pressed_keys:
-                self.pressed_keys.remove(mouse_button)
-                if not self.pressed_keys:
-                    self.key_listening(self.active_entry, None)
-                    self.request_timer_start.emit(self.active_entry)
+            if mouse_button in self.profile_core.pressed_keys:
+                self.profile_core.pressed_keys.remove(mouse_button)
+                if not self.profile_core.pressed_keys:
+                    self.key_listening(self.profile_core.active_entry, None)
+                    self.request_timer_start.emit(self.profile_core.active_entry)
                 elif hasattr(self, "release_timer"):
-                    self.request_timer_start.emit(self.active_entry)
+                    self.request_timer_start.emit(self.profile_core.active_entry)
 
     def handle_sc_listening(self, button):
         "Check whether to use scan code listening or not"
@@ -834,7 +851,7 @@ class RemapRow(QObject, ParseScript, ProfileCore):
 
     def multi_key_event(self, event, entry_widget, button):
         "Action when multiple key is pressed, set timer before saving the key"
-        if not self.is_listening or self.active_entry != entry_widget:
+        if not self.is_listening or self.profile_core.active_entry != entry_widget:
             return
 
         self.use_scan_code = self.handle_sc_listening(button)
@@ -851,17 +868,17 @@ class RemapRow(QObject, ParseScript, ProfileCore):
             key = key.lower()
 
         if event.event_type == "down":
-            if key not in self.pressed_keys:
-                self.pressed_keys.append(key)
-                self.update_widget(entry_widget)
+            if key not in self.profile_core.pressed_keys:
+                self.profile_core.pressed_keys.append(key)
+                self.profile_core.update_widget(entry_widget)
             if (hasattr(self, "release_timer")
-                    and self.set_timer.isActive()):
-                self.set_timer.stop()
+                    and self.profile_core.set_timer.isActive()):
+                self.profile_core.set_timer.stop()
 
         elif event.event_type == "up":
-            if key in self.pressed_keys:
-                self.pressed_keys.remove(key)
-                if not self.pressed_keys:
+            if key in self.profile_core.pressed_keys:
+                self.profile_core.pressed_keys.remove(key)
+                if not self.profile_core.pressed_keys:
                     self.key_listening(entry_widget, button)
                     self.request_timer_start.emit(entry_widget)
 
@@ -873,11 +890,11 @@ class RemapRow(QObject, ParseScript, ProfileCore):
         "Get and Listen to key press"
         if not self.is_listening:
             self.is_listening = True
-            self.active_entry = entry_widget
+            self.profile_core.active_entry = entry_widget
             self.previous_button_text = button.text()
             self.use_scan_code = False
-            self.pressed_keys = []
-            self.last_combination = ""
+            self.profile_core.pressed_keys = []
+            self.profile_core.last_combination = ""
 
             self.disable_input()
 
@@ -889,17 +906,17 @@ class RemapRow(QObject, ParseScript, ProfileCore):
             button.clicked.connect(lambda: self.key_listening
                                     (entry_widget, button))
 
-            self.set_timer = QTimer()
-            self.set_timer.setSingleShot(True)
-            self.set_timer.timeout.connect(
-                lambda: self.finalize_combination(entry_widget))
+            self.profile_core.set_timer = QTimer()
+            self.profile_core.set_timer.setSingleShot(True)
+            self.profile_core.set_timer.timeout.connect(
+                lambda: self.profile_core.finalize_combination(entry_widget))
 
             keyboard.hook(lambda event: self.multi_key_event(event, entry_widget, button))
 
         else:
             self.is_listening = False
-            self.active_entry = None
-            self.pressed_keys = []
+            self.profile_core.active_entry = None
+            self.profile_core.pressed_keys = []
 
             self.enable_input()
             self.toggle_other_buttons(True, button)

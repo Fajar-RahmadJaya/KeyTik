@@ -87,33 +87,6 @@ class SelectDeviceCore():
 
         return devices
 
-    def check_ahi_dir(self):
-        "Make sure AutoHotkey Interception directory is valid"
-        target_folder = os.path.join(utils.active_dir,
-                                        'AutoHotkey Interception')
-
-        def get_all_relative_paths(base_dir):
-            rel_paths = set()
-            for root, dirs, files in os.walk(base_dir):
-                for name in files:
-                    rel_path = os.path.relpath(os.path.join(root, name),
-                                                base_dir)
-                    rel_paths.add(rel_path)
-                for name in dirs:
-                    rel_path = os.path.relpath(os.path.join(root, name),
-                                                base_dir)
-                    rel_paths.add(rel_path)
-            return rel_paths
-
-        ahi_paths = get_all_relative_paths(constant.ahi_dir)
-        target_paths = get_all_relative_paths(target_folder)
-
-        if (not ahi_paths.issubset(target_paths) or
-                not os.path.isdir(target_folder)):
-            if os.path.exists(target_folder):
-                shutil.rmtree(target_folder)
-            shutil.copytree(constant.ahi_dir, target_folder)
-
     def check_interception_driver(self):
         "Check whether interception driver is installed"
         if os.path.exists(constant.DRIVER_PATH):

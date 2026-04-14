@@ -17,7 +17,6 @@ from utility import diff
 class Announcement():
     "Announcement"
     def __init__(self):
-        super().__init__()
         self.announcement_files = []
         self.current_announcement_index = 0
         self.announcement_condition = None

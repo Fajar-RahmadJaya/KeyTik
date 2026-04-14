@@ -14,16 +14,20 @@ from utility import icons
 from select_key.select_key_core import SelectKeyCore
 
 
-class SelectKeyUI(SelectKeyCore):
+class SelectKeyUI():
     "Select Key UI"
     def __init__(self, edit_window=None):
-        super().__init__()
+        # Parameter
         self.edit_window = edit_window
 
+        # Composition
+        self.select_key_core = SelectKeyCore()
+        # UI
         self.search_unicode_checkbox = QCheckBox("Search Unicode")
         self.filter_dropdown = QListWidget()
         self.select_key_tree = QTreeWidget()
 
+        # Variable
         self.checked_keys_list = []
         self.hide_parents = None
         self.key_data = None
@@ -111,11 +115,11 @@ class SelectKeyUI(SelectKeyCore):
         self.select_key_tree.header().setSectionResizeMode(1, QHeaderView.Fixed)
         self.select_key_tree.header().setStretchLastSection(False)
         # Connect Lazy Loading for Unicode Blocks
-        self.select_key_tree.itemExpanded.connect(self.load_unicode)
+        self.select_key_tree.itemExpanded.connect(self.select_key_core.load_unicode)
         main_layout.addWidget(self.select_key_tree)
 
         try:
-            self.key_data = self.load_keylist()
+            self.key_data = self.select_key_core.load_keylist()
             parent_names = list(self.key_data.keys())
 
             for parent in parent_names:
@@ -177,7 +181,7 @@ class SelectKeyUI(SelectKeyCore):
 
     def populate_tree(self, filter_text=""):
         "Insert item on the treeview"
-        filter_parents = self.get_checked_filter(self.filter_dropdown)
+        filter_parents = self.select_key_core.get_checked_filter(self.filter_dropdown)
 
         # Search with unicode
         if self.search_unicode_checkbox.isChecked() and filter_text:
@@ -261,7 +265,7 @@ class SelectKeyUI(SelectKeyCore):
     def search_with_unicode(self, filter_text):
         "Include unicode on search"
         unicode_matches = {}
-        filter_parents = self.get_checked_filter(self.filter_dropdown)
+        filter_parents = self.select_key_core.get_checked_filter(self.filter_dropdown)
 
         # Iterate over Unicode blocks
         for start, end, block_name in constant.unicode_blocks:
@@ -342,7 +346,7 @@ class SelectKeyUI(SelectKeyCore):
             if item.data(0, Qt.UserRole) == "unicode_block":
                 if item.text(0) in prev_expanded_unicode_blocks:
                     if item.childCount() == 1 and item.child(0).text(0) == "":
-                        self.load_unicode(item)
+                        self.select_key_core.load_unicode(item)
                     item.setExpanded(True)
 
     def show_filter_popup(self, search_entry, filter_popup):

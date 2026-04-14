@@ -18,10 +18,11 @@ from utility.diff import Diff, CHECK_UPDATE_LINK
 
 from core.main_core import MainCore
 
-class SettingCore(Diff):
+class SettingCore():
     "Setting logic"
     def __init__(self):
-        super().__init__()
+        # Composition
+        self.diff = Diff()
         self.main_core = MainCore()
 
         self.script_dir = utils.active_dir
@@ -141,7 +142,7 @@ class SettingCore(Diff):
         try:
             response = requests.get(CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == 200:
-                return self.parse_update_response(response)
+                return self.diff.parse_update_response(response)
         except requests.exceptions.ConnectionError:
             pass
         return None

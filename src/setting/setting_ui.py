@@ -18,10 +18,14 @@ from setting.setting_core import SettingCore
 from setting.announcement import Announcement
 
 
-class SettingUI(SettingCore, Announcement):
+class SettingUI():
     "Setting UI"
     def __init__(self):
-        super().__init__()
+        # Composition
+        self.setting_core = SettingCore()
+        self.announcement = Announcement()
+
+        # UI
         self.settings_window = QDialog()
 
     def open_settings_window(self):
@@ -50,7 +54,7 @@ class SettingUI(SettingCore, Announcement):
 
         change_path_button = QPushButton("Change Profile Location")
         change_path_button.setFixedHeight(40)
-        change_path_button.clicked.connect(self.change_data_location)
+        change_path_button.clicked.connect(self.setting_core.change_data_location)
         group_layout.addWidget(change_path_button, 0, 1, 1, 1)
 
         installation_button = QPushButton("Check Installation")
@@ -73,7 +77,7 @@ class SettingUI(SettingCore, Announcement):
 
         readme_button = QPushButton("Announcement")
         readme_button.setFixedHeight(40)
-        readme_button.clicked.connect(self.show_announcement_window)
+        readme_button.clicked.connect(self.announcement.show_announcement_window)
         group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
         group_layout.setRowStretch(0, 1)
@@ -131,9 +135,9 @@ class SettingUI(SettingCore, Announcement):
 
         layout.addWidget(install_group)
 
-        ahk_button.clicked.connect(lambda: self.ahk_action(
+        ahk_button.clicked.connect(lambda: self.setting_core.ahk_action(
             ahk_installed, dialog))
-        driver_button.clicked.connect(lambda: self.driver_action(
+        driver_button.clicked.connect(lambda: self.setting_core.driver_action(
             driver_installed, dialog))
 
         dialog.exec()
@@ -141,7 +145,7 @@ class SettingUI(SettingCore, Announcement):
     def change_theme_dialog(self):
         "Setting to change program theme"
         options = ["Light", "Dark", "System"]
-        current_theme = self.read_theme()
+        current_theme = self.setting_core.read_theme()
         if current_theme == "dark":
             current_index = 1
         elif current_theme == "light":
@@ -152,14 +156,14 @@ class SettingUI(SettingCore, Announcement):
             self, "Change Theme", "Select theme:",
             options, current_index, False)
         if ok:
-            self.save_theme(theme.lower())
+            self.setting_core.save_theme(theme.lower())
             QMessageBox.information(self,
                                     "Theme Changed", 
                                     "Theme will be applied after restarting the app.") 
 
     def update_messagebox(self, show_no_update_message=False):
         "Message when there is update avalible"
-        latest_version = self.check_for_update()
+        latest_version = self.setting_core.check_for_update()
         if latest_version:
             reply = QMessageBox.question(
                 self, "Update Available",

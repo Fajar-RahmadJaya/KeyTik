@@ -12,12 +12,16 @@ from utility import constant
 from select_program.select_program_core import SelectProgramCore
 
 
-class SelectProgramUI(SelectProgramCore):
+class SelectProgramUI():
     "Select program UI"
     def __init__(self, edit_window=None):
-        super().__init__()
+        # Parameter
         self.edit_window = edit_window
 
+        # Composition
+        self.select_program_core = SelectProgramCore()
+
+        # UI
         self.select_program_window = None
         self.program_tree = None
         self.show_all_button = None
@@ -120,12 +124,12 @@ class SelectProgramUI(SelectProgramCore):
                 self.show_all_button.text()) == "Show All Processes"
         self.program_tree.clear()
 
-        processes = self.get_running_processes(app_only=not show_all_processes)
+        processes = self.select_program_core.get_running_processes(app_only=not show_all_processes)
         for proc in processes:
             window_title, class_name, proc_name = proc[:3]
             p_type = proc[3] if len(proc) > 3 else "Application"
             if show_all_processes or p_type == "Application":
-                item = self.multi_check([window_title, class_name, proc_name])
+                item = self.select_program_core.multi_check([window_title, class_name, proc_name])
                 self.program_tree.addTopLevelItem(item)
 
         if hasattr(self, "fit_sorted_column"):

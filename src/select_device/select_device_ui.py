@@ -14,17 +14,20 @@ from utility import utils
 from select_device.select_device_core import SelectDeviceCore
 
 
-class SelectDeviceUI(SelectDeviceCore):
+class SelectDeviceUI():
     "Device selecition UI for device binding"
     def __init__(self):
-        super().__init__()
+        # Composition
+        self.select_device_core = SelectDeviceCore()
+
+        # UI
         self.device_selection_window = None
         self.device_tree = None
 
     def open_device_selection(self, edit_window, keyboard_entry):
         "Device selection window"
         # Make sure interception driver installed
-        if not self.check_interception_driver():
+        if not self.select_device_core.check_interception_driver():
             return
         self.device_selection_window = None
 
@@ -58,7 +61,7 @@ class SelectDeviceUI(SelectDeviceCore):
 
         select_button = QPushButton("Select", self.device_selection_window)
         select_button.clicked.connect(
-            lambda: self.select_device(
+            lambda: self.select_device_core.select_device(
                 self.device_tree,
                 keyboard_entry,
                 self.device_selection_window))
@@ -66,16 +69,16 @@ class SelectDeviceUI(SelectDeviceCore):
 
         monitor_button = QPushButton(
             "Open AHI Monitor To Test Device", self.device_selection_window)
-        monitor_button.clicked.connect(self.run_monitor)
+        monitor_button.clicked.connect(self.select_device_core.run_monitor)
         button_layout.addWidget(monitor_button)
 
         refresh_button = QPushButton("Refresh", self.device_selection_window)
-        refresh_button.clicked.connect(lambda: self.update_treeview(
-                self.refresh_device_list(utils.device_list_path),
+        refresh_button.clicked.connect(lambda: self.select_device_core.update_treeview(
+                self.select_device_core.refresh_device_list(utils.device_list_path),
                 self.device_tree))
         button_layout.addWidget(refresh_button)
 
-        devices = self.refresh_device_list(utils.device_list_path)
-        self.update_treeview(devices, self.device_tree)
+        devices = self.select_device_core.refresh_device_list(utils.device_list_path)
+        self.select_device_core.update_treeview(devices, self.device_tree)
 
         self.device_selection_window.exec()

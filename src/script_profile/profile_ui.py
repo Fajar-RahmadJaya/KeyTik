@@ -21,7 +21,6 @@ from select_device.select_device_ui import SelectDeviceUI
 from script_profile.remap_row import RemapRow
 from script_profile.write_script import WriteScript
 from select_key.select_key_ui import SelectKeyUI
-from core.main_core import MainCore
 
 
 class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,

@@ -9,13 +9,11 @@ from utility import constant
 class ProfileCore():
     "Create/edit profile logic"
     def __init__(self):
-        super().__init__()
         self.pressed_keys = []
         self.pressed_keys = []
         self.last_combination = ""
 
         self.active_entry = None
-        self.previous_button_text = None
         self.set_timer = None
 
     def eventFilter(self, _, event):  # pylint: disable=C0103

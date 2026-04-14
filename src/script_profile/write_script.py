@@ -97,8 +97,6 @@ class WriteScript():
             except ValueError:
                 continue
 
-
-
     def generate_exit_key(self, script_name, file=None):
         "Generate key for profile exit"
         possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -246,9 +244,6 @@ class WriteScript():
             return entry_widget is not None and button_widget is not None
         except ValueError:
             return False
-
-
-
 
     def translate_key(self, key):
         "Translate raw key into readable key"

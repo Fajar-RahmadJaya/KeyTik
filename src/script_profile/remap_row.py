@@ -1,14 +1,18 @@
 "Remap and shortctu row"
 
 from dataclasses import dataclass
+from pynput import mouse
+import keyboard
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLabel, QPushButton, QCheckBox, QLineEdit, QFrame, QHBoxLayout,
     QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit, QSpacerItem
 )
-from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtCore import Qt, Signal, QObject, QTimer  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from utility import utils
 from utility import icons
+from utility import constant
+from utility.diff import Diff
 from script_profile.parse_script import ParseScript
 from script_profile.profile_core import ProfileCore
 
@@ -25,17 +29,24 @@ class ParsedRemap:
     is_text_format: bool
 
 
-class RemapRow(ParseScript, ProfileCore):
+class RemapRow(QObject, ParseScript, ProfileCore):
     "Remap & shortcut row on profile creation"
+    request_timer_start = Signal(object)
     def __init__(self, edit_frame):
         super().__init__()
+        self.request_timer_start.connect(self.release_timer)
         self.edit_frame = edit_frame
 
+        self.diff = Diff()
+
         # Variables
+        self.is_listening = False
+        self.use_scan_code = False
         self.mapping_row_widgets = []
         self.shortcut_row_widgets = []
         self.key_rows = []
         self.shortcut_rows = []
+        self.copas_rows = []
         self.files_opener_rows = []
         self.files_opener_row_widgets = []
         self.row_num = 0
@@ -83,7 +94,7 @@ class RemapRow(ParseScript, ProfileCore):
                                             QSizePolicy.Expanding))
 
         else:
-            self.pro_mode(index)
+            self.diff.pro_mode(index)
 
     def handle_parser(self, lines, first_line):
         "Action when editing profile (Can be moved)"
@@ -97,7 +108,7 @@ class RemapRow(ParseScript, ProfileCore):
             self.text_mode_widget(lines, key_map)
 
         else:
-            self.pro_parser(lines, first_line)
+            self.diff.pro_parser(lines, first_line)
 
     def default_mode_widget(self, lines, key_map):
         "Default mode frame"
@@ -671,3 +682,231 @@ class RemapRow(ParseScript, ProfileCore):
                 left_sep.setVisible(is_last)
             if right_sep:
                 right_sep.setVisible(is_last)
+
+    # ----------- From profile core -----------
+    def disable_input(self):
+        "Disable input. Used on key listening"
+        entries_to_disable = []
+
+        entries_to_disable.append((self.script_name_entry, None))
+        entries_to_disable.append((self.keyboard_entry, None))
+        entries_to_disable.append((self.program_entry, None))
+
+        for key_row in self.key_rows:
+            (default_key_entry, remap_key_entry,
+                _, _,
+                text_format_checkbox, hold_format_checkbox,
+                hold_interval_entry, first_key_checkbox,
+                sc_checkbox) = key_row
+            entries_to_disable.append((default_key_entry, None))
+            entries_to_disable.append((remap_key_entry, None))
+            entries_to_disable.append((text_format_checkbox, None))
+            entries_to_disable.append((hold_format_checkbox, None))
+            entries_to_disable.append((hold_interval_entry, None))
+            entries_to_disable.append((first_key_checkbox, None))
+            entries_to_disable.append((sc_checkbox, None))
+
+        for shortcut_entry, _ in self.shortcut_rows:
+            entries_to_disable.append((shortcut_entry, None))
+
+        # Part of pro version code
+        for copas_row in self.copas_rows:
+            copy_entry, paste_entry, _, _, _, _ = copas_row
+            entries_to_disable.append((copy_entry, None))
+            entries_to_disable.append((paste_entry, None))
+
+        for entry_tuple in entries_to_disable:
+            entry = entry_tuple[0]
+            if entry is not None:
+                entry.installEventFilter(self)
+
+    def enable_input(self):
+        "Enable input. Used on key listening"
+        entries_to_enable = []
+
+        entries_to_enable.append((self.script_name_entry, None))
+        entries_to_enable.append((self.keyboard_entry, None))
+        entries_to_enable.append((self.program_entry, None))
+
+        for key_row in self.key_rows:
+            (default_key_entry, remap_key_entry,
+            _, _,
+            text_format_checkbox, hold_format_checkbox,
+            hold_interval_entry, first_key_checkbox,
+            sc_checkbox) = key_row
+
+            entries_to_enable.append((default_key_entry, None))
+            entries_to_enable.append((remap_key_entry, None))
+            entries_to_enable.append((text_format_checkbox, None))
+            entries_to_enable.append((hold_format_checkbox, None))
+            entries_to_enable.append((hold_interval_entry, None))
+            entries_to_enable.append((first_key_checkbox, None))
+            entries_to_enable.append((sc_checkbox, None))
+
+        for shortcut_entry, _ in self.shortcut_rows:
+            entries_to_enable.append((shortcut_entry, None))
+
+        for copas_row in self.copas_rows:
+            copy_entry, paste_entry, _, _, _, _ = copas_row
+            entries_to_enable.append((copy_entry, None))
+            entries_to_enable.append((paste_entry, None))
+
+        for entry_tuple in entries_to_enable:
+            entry = entry_tuple[0]
+            if entry is not None:
+                entry.removeEventFilter(self)
+
+    def mouse_listening(self, button, pressed):
+        "Get and listen to mouse key press"
+        if not (self.is_listening and self.active_entry):
+            return
+
+        if pressed and hasattr(self, "edit_window"):
+            widget = self.edit_window.childAt(
+                self.edit_window.mapFromGlobal(
+                    self.edit_window.cursor().pos()))
+            while widget:
+                if isinstance(widget, QPushButton):
+                    return
+                widget = widget.parent()
+
+        button_map = {
+            mouse.Button.left: "Left Button",
+            mouse.Button.right: "Right Button",
+            mouse.Button.middle: "Middle Button"
+        }
+        mouse_button = button_map.get(button, getattr(
+            button, "name", str(button)))
+
+        if pressed:
+            if mouse_button not in self.pressed_keys:
+                self.pressed_keys.append(mouse_button)
+                self.update_widget(self.active_entry)
+        else:
+            if mouse_button in self.pressed_keys:
+                self.pressed_keys.remove(mouse_button)
+                if not self.pressed_keys:
+                    self.key_listening(self.active_entry, None)
+                    self.request_timer_start.emit(self.active_entry)
+                elif hasattr(self, "release_timer"):
+                    self.request_timer_start.emit(self.active_entry)
+
+    def handle_sc_listening(self, button):
+        "Check whether to use scan code listening or not"
+        for key_row in self.key_rows:
+            (_, _, orig_button, _, _, _, _,_, _) = key_row
+
+            if button == orig_button:
+                parent_widget = button.parent()
+                if parent_widget:
+                    sc_checkboxes = [child for child
+                                        in parent_widget.
+                                        findChildren(QObject)
+                                        if child.objectName() ==
+                                        "sc_checkbox"]
+                    if sc_checkboxes:
+                        self.use_scan_code = sc_checkboxes[0].isChecked()
+                        return self.use_scan_code
+                    break
+        return None
+
+    def toggle_other_buttons(self, state, button):
+        "Change the state of non selected button"
+        for key_row in self.key_rows:
+            (_, _, orig_button, remap_button, _, _, _, _, _) = key_row
+
+            if orig_button != button and orig_button is not None:
+                orig_button.setEnabled(state)
+            if remap_button != button and remap_button is not None:
+                remap_button.setEnabled(state)
+
+        for copas_row in self.copas_rows:
+            (_, _, copy_button, paste_button, _, _) = copas_row
+
+            if copy_button != button and copy_button is not None:
+                copy_button.setEnabled(state)
+            if paste_button != button and paste_button is not None:
+                paste_button.setEnabled(state)
+
+        for _, shortcut_button in self.shortcut_rows:
+            if shortcut_button != button and shortcut_button is not None:
+                shortcut_button.setEnabled(state)
+
+    def multi_key_event(self, event, entry_widget, button):
+        "Action when multiple key is pressed, set timer before saving the key"
+        if not self.is_listening or self.active_entry != entry_widget:
+            return
+
+        self.use_scan_code = self.handle_sc_listening(button)
+        if hasattr(self, 'use_scan_code') and self.use_scan_code:
+            key = f"SC{event.scan_code:02X}"
+        else:
+            key = event.name
+
+        key_lower = key.lower()
+        if key_lower in constant.changes_key:
+            key = constant.changes_key[key_lower]
+
+        if (len(key) == 1 and key.isupper() and key.isalpha()):
+            key = key.lower()
+
+        if event.event_type == "down":
+            if key not in self.pressed_keys:
+                self.pressed_keys.append(key)
+                self.update_widget(entry_widget)
+            if (hasattr(self, "release_timer")
+                    and self.set_timer.isActive()):
+                self.set_timer.stop()
+
+        elif event.event_type == "up":
+            if key in self.pressed_keys:
+                self.pressed_keys.remove(key)
+                if not self.pressed_keys:
+                    self.key_listening(entry_widget, button)
+                    self.request_timer_start.emit(entry_widget)
+
+                else:
+                    if hasattr(self, "release_timer"):
+                        self.request_timer_start.emit(entry_widget)
+
+    def key_listening(self, entry_widget, button):
+        "Get and Listen to key press"
+        if not self.is_listening:
+            self.is_listening = True
+            self.active_entry = entry_widget
+            self.previous_button_text = button.text()
+            self.use_scan_code = False
+            self.pressed_keys = []
+            self.last_combination = ""
+
+            self.disable_input()
+
+            self.edit_window.installEventFilter(self)
+
+            self.toggle_other_buttons(False, button)
+
+            button.clicked.disconnect()
+            button.clicked.connect(lambda: self.key_listening
+                                    (entry_widget, button))
+
+            self.set_timer = QTimer()
+            self.set_timer.setSingleShot(True)
+            self.set_timer.timeout.connect(
+                lambda: self.finalize_combination(entry_widget))
+
+            keyboard.hook(lambda event: self.multi_key_event(event, entry_widget, button))
+
+        else:
+            self.is_listening = False
+            self.active_entry = None
+            self.pressed_keys = []
+
+            self.enable_input()
+            self.toggle_other_buttons(True, button)
+
+            self.edit_window.removeEventFilter(self)
+
+            if button is not None:
+                button.clicked.disconnect()
+                button.clicked.connect(lambda: self.key_listening
+                                        (entry_widget, button))

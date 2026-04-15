@@ -31,6 +31,7 @@ class ProfileUI():
         self.program_entry = None
         self.keyboard_entry = None
         self.edit_frame = None
+        self.edit_window = None
 
         # Composition
         self.select_program_ui = SelectProgramUI()
@@ -53,7 +54,7 @@ class ProfileUI():
         self.is_text_mode = False
         self.script_dir = utils.active_dir
 
-    def edit_script(self, script_name):
+    def edit_script(self, script_name, parent_window):
         "Create/edit profile window"
         # Clear row
         self.copas_rows = []
@@ -79,7 +80,7 @@ class ProfileUI():
         first_line = lines[0].strip()
 
         # Edit window
-        self.edit_window = QDialog(self)
+        self.edit_window = QDialog(parent_window)
         if is_new_profile:
             self.edit_window.setWindowTitle("Create New Profile")
         else:

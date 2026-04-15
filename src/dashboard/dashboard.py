@@ -144,7 +144,7 @@ class Dashboard(QMainWindow):
         create_button.setIcon(icons.get_icon(icons.plus))
         create_button.setFixedWidth(150)
         create_button.setFixedHeight(30)
-        create_button.clicked.connect(lambda: self.profile_ui.edit_script(None))
+        create_button.clicked.connect(lambda: self.profile_ui.edit_script(None, self))
         button_layout.addWidget(create_button, 0, 4)
 
         dummy_right = QLabel()
@@ -279,7 +279,7 @@ class Dashboard(QMainWindow):
             self.main_core.exit_script(script, run_button)
 
         # Pass parameter for editing script
-        self.profile_ui.edit_script(script)
+        self.profile_ui.edit_script(script, self)
 
         if was_running:
             run_btn = self.find_run_button(script)

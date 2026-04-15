@@ -54,7 +54,8 @@ class SettingUI():
 
         change_path_button = QPushButton("Change Profile Location")
         change_path_button.setFixedHeight(40)
-        change_path_button.clicked.connect(self.setting_core.change_data_location)
+        change_path_button.clicked.connect(
+            lambda: self.setting_core.change_data_location(self.settings_window))
         group_layout.addWidget(change_path_button, 0, 1, 1, 1)
 
         installation_button = QPushButton("Check Installation")
@@ -155,7 +156,7 @@ class SettingUI():
         else:
             current_index = 2
         theme, ok = QInputDialog.getItem(
-            self, "Change Theme", "Select theme:",
+            self.settings_window, "Change Theme", "Select theme:",
             options, current_index, False)
         if ok:
             self.setting_core.save_theme(theme.lower())

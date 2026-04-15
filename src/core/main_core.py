@@ -156,9 +156,9 @@ class MainCore(QObject):
                 file.write("^!p::ExitApp\n\n")
             return "^!p"
 
-    def copy_script(self, script):
+    def copy_script(self, script, parent):
         "Copy profile"
-        dialog = QInputDialog(self)
+        dialog = QInputDialog(parent)
         dialog.setWindowTitle("Copy Script")
         dialog.setLabelText("Enter the new script name:")
         dialog.resize(250, 100)

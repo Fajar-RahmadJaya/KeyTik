@@ -44,7 +44,6 @@ class Dashboard(QMainWindow):
         self.main_core.check_ahk_installation(show_installed_message=False)
         self.central_widget = QWidget()
         self.main_layout = QVBoxLayout(self.central_widget)
-        self.script_dir = utils.active_dir
         self.pinned_profiles = utils.load_pinned_profiles()
         self.create_ui()
         self.update_script_list()
@@ -204,7 +203,7 @@ class Dashboard(QMainWindow):
         copy_button.setFixedWidth(80)
         copy_button.setIcon(icons.get_icon(icons.copy))
         copy_button.setToolTip(f'Copy "{os.path.splitext(script)[0]}"')
-        copy_button.clicked.connect(lambda: self.main_core.copy_script(script))
+        copy_button.clicked.connect(lambda: self.main_core.copy_script(script, self))
         group_layout.addWidget(copy_button, 1, 0)
 
         # Delete button
@@ -217,11 +216,11 @@ class Dashboard(QMainWindow):
 
         # Store button
         store_button = QPushButton(" Store" if
-                                   self.script_dir == utils.active_dir
+                                   self.main_core.script_dir == utils.active_dir
                                    else " Restore")
         store_button.setFixedWidth(80)
         store_button.setIcon(icons.get_icon(icons.store))
-        if self.script_dir == utils.active_dir:
+        if self.main_core.script_dir == utils.active_dir:
             store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"')
         else:
             store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"')

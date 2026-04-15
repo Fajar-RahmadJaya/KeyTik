@@ -24,7 +24,6 @@ class SettingCore():
         self.diff = Diff()
 
         self.script_dir = utils.active_dir
-        self.scripts = self.main_core.list_scripts()
 
     def change_data_location(self):
         "Change active and stored profile directory for 'change profile location'"
@@ -67,7 +66,6 @@ class SettingCore():
             print(f"Global store_dir updated to: {utils.store_dir}")
 
             self.script_dir = utils.active_dir
-            self.scripts = self.main_core.list_scripts()
 
             QMessageBox.information(
                 self, "Change Profile Location",

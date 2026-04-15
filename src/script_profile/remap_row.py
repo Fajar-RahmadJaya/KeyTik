@@ -30,18 +30,14 @@ class ParsedRemap:
     is_text_format: bool
 
 
-class RemapRow(QObject):
+class RemapRow():
     "Remap & shortcut row on profile creation"
     request_timer_start = Signal(object)
-    def __init__(self, edit_frame, edit_window,
-                 script_name_entry, keyboard_entry, program_entry):
+    def __init__(self, edit_frame, edit_window):
         super().__init__()
         # Parameter
         self.edit_frame = edit_frame
-        self.script_name_entry = script_name_entry
-        self.keyboard_entry = keyboard_entry
         self.edit_window = edit_window
-        self.program_entry = program_entry
 
         # Composition
         self.diff = Diff()
@@ -67,6 +63,7 @@ class RemapRow(QObject):
         self.files_opener_row_widgets = []
         self.row_num = 0
         self.previous_button_text = None
+        self.entries_to_disable = []
 
         # UI
         self.edit_frame_layout = None
@@ -703,75 +700,28 @@ class RemapRow(QObject):
     # ----------- From profile core -----------
     def disable_input(self):
         "Disable input. Used on key listening"
-        entries_to_disable = []
-
-        entries_to_disable.append((self.script_name_entry, None))
-        entries_to_disable.append((self.keyboard_entry, None))
-        entries_to_disable.append((self.program_entry, None))
-
         for key_row in self.key_rows:
             (default_key_entry, remap_key_entry,
                 _, _,
                 text_format_checkbox, hold_format_checkbox,
                 hold_interval_entry, first_key_checkbox,
                 sc_checkbox) = key_row
-            entries_to_disable.append((default_key_entry, None))
-            entries_to_disable.append((remap_key_entry, None))
-            entries_to_disable.append((text_format_checkbox, None))
-            entries_to_disable.append((hold_format_checkbox, None))
-            entries_to_disable.append((hold_interval_entry, None))
-            entries_to_disable.append((first_key_checkbox, None))
-            entries_to_disable.append((sc_checkbox, None))
+            self.entries_to_disable.append((default_key_entry, None))
+            self.entries_to_disable.append((remap_key_entry, None))
+            self.entries_to_disable.append((text_format_checkbox, None))
+            self.entries_to_disable.append((hold_format_checkbox, None))
+            self.entries_to_disable.append((hold_interval_entry, None))
+            self.entries_to_disable.append((first_key_checkbox, None))
+            self.entries_to_disable.append((sc_checkbox, None))
 
         for shortcut_entry, _ in self.shortcut_rows:
-            entries_to_disable.append((shortcut_entry, None))
+            self.entries_to_disable.append((shortcut_entry, None))
 
         # Part of pro version code
         for copas_row in self.copas_rows:
             copy_entry, paste_entry, _, _, _, _ = copas_row
-            entries_to_disable.append((copy_entry, None))
-            entries_to_disable.append((paste_entry, None))
-
-        for entry_tuple in entries_to_disable:
-            entry = entry_tuple[0]
-            if entry is not None:
-                entry.installEventFilter(self)
-
-    def enable_input(self):
-        "Enable input. Used on key listening"
-        entries_to_enable = []
-
-        entries_to_enable.append((self.script_name_entry, None))
-        entries_to_enable.append((self.keyboard_entry, None))
-        entries_to_enable.append((self.program_entry, None))
-
-        for key_row in self.key_rows:
-            (default_key_entry, remap_key_entry,
-            _, _,
-            text_format_checkbox, hold_format_checkbox,
-            hold_interval_entry, first_key_checkbox,
-            sc_checkbox) = key_row
-
-            entries_to_enable.append((default_key_entry, None))
-            entries_to_enable.append((remap_key_entry, None))
-            entries_to_enable.append((text_format_checkbox, None))
-            entries_to_enable.append((hold_format_checkbox, None))
-            entries_to_enable.append((hold_interval_entry, None))
-            entries_to_enable.append((first_key_checkbox, None))
-            entries_to_enable.append((sc_checkbox, None))
-
-        for shortcut_entry, _ in self.shortcut_rows:
-            entries_to_enable.append((shortcut_entry, None))
-
-        for copas_row in self.copas_rows:
-            copy_entry, paste_entry, _, _, _, _ = copas_row
-            entries_to_enable.append((copy_entry, None))
-            entries_to_enable.append((paste_entry, None))
-
-        for entry_tuple in entries_to_enable:
-            entry = entry_tuple[0]
-            if entry is not None:
-                entry.removeEventFilter(self)
+            self.entries_to_disable.append((copy_entry, None))
+            self.entries_to_disable.append((paste_entry, None))
 
     def mouse_listening(self, button, pressed):
         "Get and listen to mouse key press"
@@ -896,7 +846,13 @@ class RemapRow(QObject):
             self.profile_core.pressed_keys = []
             self.profile_core.last_combination = ""
 
+            # Append entries to disable widget
             self.disable_input()
+            # Install disable widget event filter
+            for entry_tuple in self.entries_to_disable:
+                entry = entry_tuple[0]
+                if entry is not None:
+                    entry.installEventFilter(self)
 
             self.edit_window.installEventFilter(self)
 
@@ -918,7 +874,12 @@ class RemapRow(QObject):
             self.profile_core.active_entry = None
             self.profile_core.pressed_keys = []
 
-            self.enable_input()
+            # Remove disable widget event filet
+            for entry_tuple in self.entries_to_disable:
+                entry = entry_tuple[0]
+                if entry is not None:
+                    entry.removeEventFilter(self)
+
             self.toggle_other_buttons(True, button)
 
             self.edit_window.removeEventFilter(self)

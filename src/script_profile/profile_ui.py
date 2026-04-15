@@ -36,9 +36,7 @@ class ProfileUI():
         # Composition
         self.select_program_ui = SelectProgramUI()
         self.select_device_ui = SelectDeviceUI()
-        self.remap_row = RemapRow(self.edit_frame, self.edit_window,
-                                  self.script_name_entry, self.keyboard_entry,
-                                  self.program_entry)
+        self.remap_row = RemapRow(self.edit_frame, self.edit_window)
         self.write_script = WriteScript()
         self.select_key_ui = SelectKeyUI()
         self.main_core = MainCore()
@@ -124,6 +122,7 @@ class ProfileUI():
         else:
             self.script_name_entry.setText("")
             self.script_name_entry.setReadOnly(False)
+        self.remap_row.entries_to_disable.append((self.script_name_entry, None))
         top_layout.addWidget(self.script_name_entry, 0, 1, 1, 3)
 
         program_label = QLabel("Program", top_widget)
@@ -134,6 +133,7 @@ class ProfileUI():
         program_entry_value = self.parse_script.parse_program(lines)
         if program_entry_value:
             self.program_entry.setText(program_entry_value)
+        self.remap_row.entries_to_disable.append((self.program_entry, None))
         top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
 
         program_select_button = QPushButton("Select Program", top_widget)
@@ -149,6 +149,7 @@ class ProfileUI():
         device_id = self.parse_script.parse_device(lines)
         if device_id:
             self.keyboard_entry.setText(device_id)
+        self.remap_row.entries_to_disable.append((self.keyboard_entry, None))
         top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
 
         keyboard_select_button = QPushButton("Select Device", top_widget)

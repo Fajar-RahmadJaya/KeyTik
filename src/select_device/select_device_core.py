@@ -3,7 +3,6 @@
 import os
 import ctypes
 import time
-import shutil
 from PySide6.QtWidgets import QTreeWidgetItem , QMessageBox # pylint: disable=E0611
 
 from utility import utils

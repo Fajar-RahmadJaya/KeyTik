@@ -47,7 +47,6 @@ class ProfileUI():
         self.files_opener_rows = []
         self.files_opener_row_widgets = []
         self.is_text_mode = False
-        self.script_dir = utils.active_dir
 
     def edit_script(self, script_name, parent):
         "Create/edit profile window"
@@ -66,7 +65,7 @@ class ProfileUI():
             script_path = None
             lines = ["; default\n"]
         else:
-            script_path = os.path.join(self.script_dir, script_name)
+            script_path = os.path.join(self.main_core.script_dir, script_name)
             with open(script_path, 'r', encoding='utf-8') as file:
                 lines = file.readlines()
                 first_line = file.readline().strip()
@@ -234,7 +233,7 @@ class ProfileUI():
 
     def handle_write(self, script_name, mode, remap_row):
         "Action when saving profile (Can be moved)"
-        output_path = os.path.join(self.script_dir, script_name)
+        output_path = os.path.join(self.main_core.script_dir, script_name)
         key_translations = self.write_script.load_key_translations()
 
         with open(output_path, 'w', encoding='utf-8') as file:

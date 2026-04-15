@@ -23,8 +23,6 @@ class SettingCore():
         # Composition
         self.diff = Diff()
 
-        self.script_dir = utils.active_dir
-
     def change_data_location(self):
         "Change active and stored profile directory for 'change profile location'"
         new_path = QFileDialog.getExistingDirectory(
@@ -64,8 +62,6 @@ class SettingCore():
             utils.store_dir = new_store_dir
             print(f"Global active_dir updated to: {utils.active_dir}")
             print(f"Global store_dir updated to: {utils.store_dir}")
-
-            self.script_dir = utils.active_dir
 
             QMessageBox.information(
                 None, "Change Profile Location",

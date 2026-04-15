@@ -17,12 +17,11 @@ from utility import diff
 class Announcement():
     "Announcement"
     def __init__(self):
-        super().__init__()
         self.announcement_files = []
         self.current_announcement_index = 0
         self.announcement_condition = None
 
-        self.announcement_dialog = QDialog()
+        self.announcement_dialog = None
 
     def load_announcement_condition(self):
         "Load user preference from file, whether to show announcement or not"
@@ -51,13 +50,13 @@ class Announcement():
             except requests.exceptions.RequestException:
                 break
 
-    def show_announcement_window(self):
+    def show_announcement_window(self, parent):
         "Announcement window"
         try:
             self.get_announcement_url()
             self.current_announcement_index = 0
 
-            self.announcement_dialog = QDialog(self)
+            self.announcement_dialog = QDialog(parent)
             self.announcement_dialog.setWindowTitle("Announcement")
             self.announcement_dialog.setFixedSize(525, 290)
             self.announcement_dialog.setWindowIcon(QIcon(constant.icon_path))

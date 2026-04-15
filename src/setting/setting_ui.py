@@ -18,15 +18,19 @@ from setting.setting_core import SettingCore
 from setting.announcement import Announcement
 
 
-class SettingUI(SettingCore, Announcement):
+class SettingUI():
     "Setting UI"
     def __init__(self):
-        super().__init__()
-        self.settings_window = QDialog()
+        # Composition
+        self.setting_core = SettingCore()
+        self.announcement = Announcement()
 
-    def open_settings_window(self):
+        # UI
+        self.settings_window = None
+
+    def open_settings_window(self, parent):
         "Setting window"
-        self.settings_window = QDialog(self)
+        self.settings_window = QDialog(parent)
         self.settings_window.setWindowTitle("Settings")
         self.settings_window.setFixedSize(400, 250)
         self.settings_window.setWindowIcon(QIcon(constant.icon_path))
@@ -50,12 +54,14 @@ class SettingUI(SettingCore, Announcement):
 
         change_path_button = QPushButton("Change Profile Location")
         change_path_button.setFixedHeight(40)
-        change_path_button.clicked.connect(self.change_data_location)
+        change_path_button.clicked.connect(
+            lambda: self.setting_core.change_data_location(self.settings_window))
         group_layout.addWidget(change_path_button, 0, 1, 1, 1)
 
         installation_button = QPushButton("Check Installation")
         installation_button.setFixedHeight(40)
-        installation_button.clicked.connect(self.show_installation_dialog)
+        installation_button.clicked.connect(
+            lambda: self.show_installation_dialog(self.settings_window))
         group_layout.addWidget(installation_button, 1, 0, 1, 1)
 
         check_update_button = QPushButton("Check For Update")
@@ -73,7 +79,8 @@ class SettingUI(SettingCore, Announcement):
 
         readme_button = QPushButton("Announcement")
         readme_button.setFixedHeight(40)
-        readme_button.clicked.connect(self.show_announcement_window)
+        readme_button.clicked.connect(
+            lambda: self.announcement.show_announcement_window(self.settings_window))
         group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
         group_layout.setRowStretch(0, 1)
@@ -85,9 +92,9 @@ class SettingUI(SettingCore, Announcement):
         main_layout.addWidget(group_box)
         self.settings_window.exec()
 
-    def show_installation_dialog(self):
+    def show_installation_dialog(self, parent):
         "Setting to check, install, uninstall AutoHotkey and Interception driver installation"
-        dialog = QDialog(self)
+        dialog = QDialog(parent)
         dialog.setWindowTitle("Installation Manager")
         dialog.setWindowIcon(QIcon(constant.icon_path))
         dialog.setFixedSize(380, 180)
@@ -131,17 +138,17 @@ class SettingUI(SettingCore, Announcement):
 
         layout.addWidget(install_group)
 
-        ahk_button.clicked.connect(lambda: self.ahk_action(
-            ahk_installed, dialog))
-        driver_button.clicked.connect(lambda: self.driver_action(
-            driver_installed, dialog))
+        ahk_button.clicked.connect(lambda: self.setting_core.ahk_action(
+            ahk_installed))
+        driver_button.clicked.connect(lambda: self.setting_core.driver_action(
+            driver_installed))
 
         dialog.exec()
 
     def change_theme_dialog(self):
         "Setting to change program theme"
         options = ["Light", "Dark", "System"]
-        current_theme = self.read_theme()
+        current_theme = self.setting_core.read_theme()
         if current_theme == "dark":
             current_index = 1
         elif current_theme == "light":
@@ -149,20 +156,20 @@ class SettingUI(SettingCore, Announcement):
         else:
             current_index = 2
         theme, ok = QInputDialog.getItem(
-            self, "Change Theme", "Select theme:",
+            self.settings_window, "Change Theme", "Select theme:",
             options, current_index, False)
         if ok:
-            self.save_theme(theme.lower())
-            QMessageBox.information(self,
+            self.setting_core.save_theme(theme.lower())
+            QMessageBox.information(None,
                                     "Theme Changed", 
                                     "Theme will be applied after restarting the app.") 
 
     def update_messagebox(self, show_no_update_message=False):
         "Message when there is update avalible"
-        latest_version = self.check_for_update()
+        latest_version = self.setting_core.check_for_update()
         if latest_version:
             reply = QMessageBox.question(
-                self, "Update Available",
+                None, "Update Available",
                 (
                 f"New update available: {diff.PROGRAM_NAME} {latest_version}\n\n"
                 "Would you like to go to the update page?"
@@ -174,5 +181,5 @@ class SettingUI(SettingCore, Announcement):
         else:
             if show_no_update_message:
                 QMessageBox.information(
-                    self, "Check For Update",
+                    None, "Check For Update",
                     "You are using the latest version of KeyTik.")

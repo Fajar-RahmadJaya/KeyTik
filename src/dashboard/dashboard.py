@@ -18,14 +18,21 @@ from core.main_core import MainCore
 from script_profile.parse_script import ParseScript
 from script_profile.profile_ui import ProfileUI
 from setting.setting_ui import SettingUI
-from setting.announcement import Announcement
 
 
-class Dashboard(QMainWindow, MainCore, ProfileUI,
-                SettingUI, Announcement, ParseScript):
+class Dashboard(QMainWindow):
     "Main Window"
     def __init__(self):
         super().__init__()
+        # Composition
+        self.main_core = MainCore()
+        self.parse_script = ParseScript()
+        self.profile_ui = ProfileUI(self.main_core)
+        self.setting_ui = SettingUI()
+
+        # Signal
+        self.main_core.update_script_signal.connect(self.update_script_list)
+
         # Key Listening
         self.is_listening = False
         self.active_entry = None
@@ -34,21 +41,18 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         self.row_num = 0
 
         # UI initialization
-        self.check_ahk_installation(show_installed_message=False)
+        self.main_core.check_ahk_installation(show_installed_message=False)
         self.central_widget = QWidget()
         self.main_layout = QVBoxLayout(self.central_widget)
-        self.script_dir = utils.active_dir
         self.pinned_profiles = utils.load_pinned_profiles()
-        self.scripts = self.list_scripts()
         self.create_ui()
         self.update_script_list()
         self.setWindowTitle(diff.PROGRAM_NAME)
         self.setFixedSize(650, 492)
         self.setWindowIcon(QIcon(constant.icon_path))
         self.setCentralWidget(self.central_widget)
-        self.announcement_condition = self.load_announcement_condition()
-        self.font_fallback()
-        self.check_ahi_dir()
+        self.main_core.font_fallback()
+        self.main_core.check_ahi_dir()
         self.checked_keys_list = []
 
     def create_ui(self):
@@ -85,21 +89,22 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         prev_button.setFixedWidth(80)
         prev_button.setIcon(icons.get_icon(icons.prev))
         prev_button.setToolTip("Previous Profile")
-        prev_button.clicked.connect(self.prev_page)
+        prev_button.clicked.connect(self.main_core.prev_page)
         button_layout.addWidget(prev_button, 0, 0)
 
         show_stored = QPushButton()
         show_stored.setFixedWidth(30)
         show_stored.setIcon(icons.get_icon(icons.show_stored))
         show_stored.setToolTip("Show Stored Profile")
-        show_stored.clicked.connect(lambda: self.toggle_script_dir(show_stored))
+        show_stored.clicked.connect(lambda: self.main_core.toggle_script_dir(show_stored))
         button_layout.addWidget(show_stored, 0, 1)
 
         import_button = QPushButton()
         import_button.setFixedWidth(30)
         import_button.setIcon(icons.get_icon(icons.icon_import))
         import_button.setToolTip("Import AutoHotkey Script")
-        import_button.clicked.connect(self.import_button_clicked)
+        import_button.clicked.connect(
+            lambda: self.main_core.import_button_clicked(self))
         button_layout.addWidget(import_button, 0, 2)
 
         # Create new profile button
@@ -116,14 +121,14 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         setting_button.setFixedWidth(30)
         setting_button.setIcon(icons.get_icon(icons.setting))
         setting_button.setToolTip("Setting")
-        setting_button.clicked.connect(self.open_settings_window)
+        setting_button.clicked.connect(lambda: self.setting_ui.open_settings_window(self))
         button_layout.addWidget(setting_button, 0, 7)
 
         next_button = QPushButton()
         next_button.setFixedWidth(80)
         next_button.setIcon(icons.get_icon(icons.icon_next))
         next_button.setToolTip("Next Profile")
-        next_button.clicked.connect(self.next_page)
+        next_button.clicked.connect(self.main_core.next_page)
         button_layout.addWidget(next_button, 0, 8)
 
         return button_frame
@@ -138,12 +143,30 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         create_button.setIcon(icons.get_icon(icons.plus))
         create_button.setFixedWidth(150)
         create_button.setFixedHeight(30)
-        create_button.clicked.connect(lambda: self.edit_script(None))
+        create_button.clicked.connect(lambda: self.profile_ui.edit_script(None, self))
         button_layout.addWidget(create_button, 0, 4)
 
         dummy_right = QLabel()
         dummy_right.setFixedWidth(10)
         button_layout.addWidget(dummy_right, 0, 5)
+
+    def update_script_list(self):
+        "! From dashboard"
+        for i in reversed(range(self.profile_layout.count())):
+            widget = self.profile_layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
+
+        start_index = self.main_core.current_page * 6
+        end_index = start_index + 6
+        scripts = self.main_core.list_scripts()
+        scripts_to_display = scripts[start_index:end_index]
+
+        for index, script in enumerate(scripts_to_display):
+            row = index // 2
+            column = index % 2
+
+            self.profile_card(script, row, column)
 
     def profile_card(self, script, row, column):
         "Profile action"
@@ -165,7 +188,7 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
             run_button.setText(" Run")
             run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
             run_button.setIcon(icons.get_icon(icons.run))
-        run_button.clicked.connect(lambda: self.toggle_run_exit(script, run_button))
+        run_button.clicked.connect(lambda: self.main_core.toggle_run_exit(script, run_button))
         group_layout.addWidget(run_button, 0, 0)
 
         # Edit profile button
@@ -181,7 +204,7 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         copy_button.setFixedWidth(80)
         copy_button.setIcon(icons.get_icon(icons.copy))
         copy_button.setToolTip(f'Copy "{os.path.splitext(script)[0]}"')
-        copy_button.clicked.connect(lambda: self.copy_script(script))
+        copy_button.clicked.connect(lambda: self.main_core.copy_script(script, self))
         group_layout.addWidget(copy_button, 1, 0)
 
         # Delete button
@@ -189,20 +212,20 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         delete_button.setFixedWidth(80)
         delete_button.setIcon(icons.get_icon(icons.delete))
         delete_button.setToolTip(f'Remove "{os.path.splitext(script)[0]}"')
-        delete_button.clicked.connect(lambda: self.delete_script(script))
+        delete_button.clicked.connect(lambda: self.main_core.delete_script(script))
         group_layout.addWidget(delete_button, 1, 2)
 
         # Store button
         store_button = QPushButton(" Store" if
-                                   self.script_dir == utils.active_dir
+                                   self.main_core.script_dir == utils.active_dir
                                    else " Restore")
         store_button.setFixedWidth(80)
         store_button.setIcon(icons.get_icon(icons.store))
-        if self.script_dir == utils.active_dir:
+        if self.main_core.script_dir == utils.active_dir:
             store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"')
         else:
             store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"')
-        store_button.clicked.connect(lambda: self.store_script(script))
+        store_button.clicked.connect(lambda: self.main_core.store_script(script))
         group_layout.addWidget(store_button, 1, 1)
 
         # Startup button
@@ -221,7 +244,7 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         icon_label.setFixedSize(17, 17)
         icon_label.setToolTip(f'Pin "{os.path.splitext(script)[0]}"')
         icon_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        icon_label.mousePressEvent = lambda _: self.toggle_pin(script, icon_label)
+        icon_label.mousePressEvent = lambda _: self.main_core.toggle_pin(script, icon_label)
         icon_label.move(285, 3)
 
     def startup_button(self, script):
@@ -235,7 +258,7 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
                 'automatically when computer starts'
                 )
             )
-            startup_button.clicked.connect(lambda: self.remove_ahk_from_startup(script))
+            startup_button.clicked.connect(lambda: self.main_core.remove_ahk_from_startup(script))
         else:
             startup_button = QPushButton(" Startup")
             startup_button.setIcon(icons.get_icon(icons.rocket))
@@ -245,7 +268,7 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
                 'automatically when computer starts'
                 )
             )
-            startup_button.clicked.connect(lambda: self.add_ahk_to_startup(script))
+            startup_button.clicked.connect(lambda: self.main_core.add_ahk_to_startup(script))
         startup_button.setFixedWidth(80)
         return startup_button
 
@@ -253,14 +276,14 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
         "Exit profile if editing and re activate after done"
         was_running = run_button.text() == " Exit"
         if was_running:
-            self.exit_script(script, run_button)
+            self.main_core.exit_script(script, run_button)
 
         # Pass parameter for editing script
-        self.edit_script(script)
+        self.profile_ui.edit_script(script, self)
 
         if was_running:
             run_btn = self.find_run_button(script)
-            self.activate_script(script, run_btn)
+            self.main_core.activate_script(script, run_btn)
 
     def is_startup(self, script):
         "Whether profile is set as startup or not"
@@ -288,12 +311,6 @@ class Dashboard(QMainWindow, MainCore, ProfileUI,
                         if isinstance(run_btn, QPushButton):
                             return run_btn
         return None
-
-    def show_announcement_window(self):
-        try:
-            Announcement.show_announcement_window(self)
-        except RuntimeError as e:
-            print(f"Error displaying announcement window: {e}")
 
     def toggle_on_top(self, always_top):
         "Toggle window always on top"

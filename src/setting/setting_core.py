@@ -16,21 +16,19 @@ from utility import constant
 from utility import utils
 from utility.diff import Diff, CHECK_UPDATE_LINK
 
-from core.main_core import MainCore
 
-class SettingCore(Diff):
+class SettingCore():
     "Setting logic"
     def __init__(self):
-        super().__init__()
-        self.main_core = MainCore()
+        # Composition
+        self.diff = Diff()
 
-        self.script_dir = utils.active_dir
-        self.scripts = self.main_core.list_scripts()
-
-    def change_data_location(self):
+    def change_data_location(self, parent):
         "Change active and stored profile directory for 'change profile location'"
+        # To Do: fix known issue.
+        # Known issue: After successfully change data location, show stored not works
         new_path = QFileDialog.getExistingDirectory(
-            self, "Select a New Path for Active and Store Folders"
+            parent, "Select a New Path for Active and Store Folders"
         )
 
         if not new_path:
@@ -67,16 +65,12 @@ class SettingCore(Diff):
             print(f"Global active_dir updated to: {utils.active_dir}")
             print(f"Global store_dir updated to: {utils.store_dir}")
 
-            self.script_dir = utils.active_dir
-            self.scripts = self.main_core.list_scripts()
-            self.main_core.update_script_list()
-
             QMessageBox.information(
-                self, "Change Profile Location",
+                None, "Change Profile Location",
                 "Profile location changed successfully!")
         except PermissionError as e:
             print(f"An error occurred: {e}")
-            QMessageBox.critical(self, "Error", f"An error occurred: {e}")
+            QMessageBox.critical(None, "Error", f"An error occurred: {e}")
 
     def save_theme(self, theme):
         "Write theme preference to theme file"
@@ -102,7 +96,7 @@ class SettingCore(Diff):
             print("Error: theme_path file not found")
             return "system"
 
-    def ahk_action(self, ahk_installed, dialog):
+    def ahk_action(self, ahk_installed):
         "Uninstall AutoHotkey"
         if ahk_installed:
             try:
@@ -111,13 +105,13 @@ class SettingCore(Diff):
 
             except FileNotFoundError:
                 QMessageBox.critical(
-                    dialog,
+                    None,
                     "Error", 
                     "Failed to uninstall: AutoHotkey installation path not found") 
         else:
             webbrowser.open("https://www.autohotkey.com")
 
-    def driver_action(self, driver_installed, dialog):
+    def driver_action(self, driver_installed):
         "Uninstall interception driver"
         try:
             if driver_installed:
@@ -132,7 +126,7 @@ class SettingCore(Diff):
                 )
         except FileNotFoundError:
             QMessageBox.critical(
-                dialog,
+                None,
                 "Error", 
                 "Failed to uninstall: inter_uninstall.bat not found") 
 
@@ -141,7 +135,7 @@ class SettingCore(Diff):
         try:
             response = requests.get(CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == 200:
-                return self.parse_update_response(response)
+                return self.diff.parse_update_response(response)
         except requests.exceptions.ConnectionError:
             pass
         return None

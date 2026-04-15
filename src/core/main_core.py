@@ -4,7 +4,7 @@ import os
 import json
 import shutil
 import webbrowser
-
+import random
 import winshell
 from win32com.client import Dispatch
 
@@ -13,25 +13,28 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QInputDialog
 )
 from PySide6.QtGui import QFont, QFontDatabase  # pylint: disable=E0611
+from PySide6.QtCore import Signal, QObject # pylint: disable=E0611
 from pynput.keyboard import Controller, Key
 
 from utility import constant
 from utility import utils
 from utility import icons
 
-class MainCore():
+class MainCore(QObject):
     "Main Logic"
+    update_script_signal = Signal()
     def __init__(self):
+        super().__init__()
         # UI initialization
         self.script_dir = utils.active_dir
         self.pinned_profiles = utils.load_pinned_profiles()
 
-        self.scripts = None
+        # Variable
         self.current_page = 0
 
-    def import_button_clicked(self):
+    def import_button_clicked(self, parent):
         "Select AHK script and add necessary line"
-        file_dialog = QFileDialog(self)
+        file_dialog = QFileDialog(parent)
         file_dialog.setNameFilter("AHK Scripts (*.ahk)")
 
         if file_dialog.exec():
@@ -41,7 +44,7 @@ class MainCore():
                 selected_file = selected_files[0]
 
                 if not selected_file.endswith('.ahk'):
-                    QMessageBox.warning(self, "Error",
+                    QMessageBox.warning(None, "Error",
                                         "Only .ahk files are allowed.")
                     return
 
@@ -51,14 +54,12 @@ class MainCore():
                 try:
                     shutil.move(selected_file, destination_path)
                 except NotADirectoryError as e:
-                    QMessageBox.warning(self, "Error",
+                    QMessageBox.warning(None, "Error",
                                         f"Failed to move file: {e}")
                     return
 
                 self.validate_imported_files(destination_path, file_name)
-
-                self.scripts.append(file_name)
-                self.update_script_list()
+                self.update_script_signal.emit()
 
     def validate_imported_files(self, destination_path, file_name):
         "Add necessary line on imported files"
@@ -117,9 +118,47 @@ class MainCore():
             except FileNotFoundError:
                 pass
 
-    def copy_script(self, script):
+    def generate_exit_key(self, script_name, file=None):
+        "Generate key for profile exit"
+        possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+
+        try:
+            if os.path.exists(constant.exit_keys_file):
+                try:
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
+                        exit_keys = json.load(f)
+                except json.JSONDecodeError:
+                    exit_keys = {}
+            else:
+                exit_keys = {}
+
+            used_keys = set(key[-1] for key in exit_keys.values())
+            available_keys = [k for k in possible_keys if k not in used_keys]
+
+            if not available_keys:
+                available_keys = possible_keys
+
+            exit_combo = f"^!{random.choice(available_keys)}"
+
+            exit_keys[script_name] = exit_combo
+            with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
+                json.dump(exit_keys, f)
+
+            if file is not None:
+                file.write(f"{exit_combo}::ExitApp\n\n")
+
+            return exit_combo
+
+        except FileNotFoundError as e:
+            print(f"Error handling exit key: {e}")
+            if file is not None:
+                file.write("^!p::ExitApp\n\n")
+            return "^!p"
+
+    def copy_script(self, script, parent):
         "Copy profile"
-        dialog = QInputDialog(self)
+        dialog = QInputDialog(parent)
         dialog.setWindowTitle("Copy Script")
         dialog.setLabelText("Enter the new script name:")
         dialog.resize(250, 100)
@@ -133,17 +172,16 @@ class MainCore():
         destination_path = os.path.join(self.script_dir, new_name)
         try:
             shutil.copy(source_path, destination_path)
-            self.scripts = self.list_scripts()
-            self.update_script_list()
+            self.update_script_signal.emit()
         except NotADirectoryError as e:
-            QMessageBox.warning(self, "Error", f"Error copying script: {e}")
+            QMessageBox.warning(None, "Error", f"Error copying script: {e}")
 
     def delete_script(self, script_name):
         "Delete profile"
         script_path = os.path.join(self.script_dir, script_name)
         if os.path.isfile(script_path):
             reply = QMessageBox.question(
-                self,
+                None,
                 "Delete Script",
                 f"Are you sure you want to delete '{script_name}'?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -152,13 +190,12 @@ class MainCore():
                 return
             try:
                 os.remove(script_path)
-                self.scripts = self.list_scripts()
-                self.update_script_list()
+                self.update_script_signal.emit()
             except FileNotFoundError as e:
-                QMessageBox.warning(self, "Error",
+                QMessageBox.warning(None, "Error",
                                     f"Failed to delete the script: {e}")
         else:
-            QMessageBox.warning(self, "Error",
+            QMessageBox.warning(None, "Error",
                                 f"{script_name} does not exist.")
 
     def activate_script(self, script_name, button):
@@ -176,7 +213,7 @@ class MainCore():
             button.clicked.connect(lambda: self.exit_script(script_name,
                                                             button))
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
     def exit_script(self, script_name, button):
         "Exit profile"
@@ -190,7 +227,7 @@ class MainCore():
 
                 exit_combo = exit_keys.get(script_name)
                 if not exit_combo:
-                    QMessageBox.critical(self,
+                    QMessageBox.critical(None,
                                          "Error", 
                                          f"No exit key found for {script_name}")
                     return
@@ -218,9 +255,9 @@ class MainCore():
                     script_name, button))
 
             except FileNotFoundError as e:
-                QMessageBox.critical(self, "Error", f"Failed to exit script: {e}")
+                QMessageBox.critical(None, "Error", f"Failed to exit script: {e}")
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
     def store_script(self, script_name):
         "Move profile to store directory"
@@ -237,13 +274,11 @@ class MainCore():
             try:
 
                 shutil.move(script_path, target_path)
-
-                self.scripts = self.list_scripts()
-                self.update_script_list()
+                self.update_script_signal.emit()
             except NotADirectoryError as e:
-                QMessageBox.critical(self, "Error", f"Failed to move the script: {e}")
+                QMessageBox.critical(None, "Error", f"Failed to move the script: {e}")
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
     def toggle_run_exit(self, script_name, button):
         "Switch between run/exit on profile"
@@ -276,7 +311,7 @@ class MainCore():
             show_stored.setIcon(icons.get_icon(icons.show_stored))
 
         self.list_scripts()
-        self.update_script_list()
+        self.update_script_signal.emit()
 
     def toggle_pin(self, script, icon_label):
         "Pin profile from pinned profile list"
@@ -291,7 +326,7 @@ class MainCore():
 
         utils.save_pinned_profiles(self.pinned_profiles)
         self.list_scripts()
-        self.update_script_list()
+        self.update_script_signal.emit()
 
     def check_ahk_installation(self, show_installed_message=False):
         "Check AutoHotkey installation"
@@ -346,20 +381,20 @@ class MainCore():
         unpinned = [script for script in all_scripts
                     if script not in self.pinned_profiles]
 
-        self.scripts = pinned + unpinned
-        return self.scripts
+        scripts = pinned + unpinned
+        return scripts
 
     def prev_page(self):
         "Show previous profile list"
         if self.current_page > 0:
             self.current_page -= 1
-            self.update_script_list()
+            self.update_script_signal.emit()
 
     def next_page(self):
         "show next profile list"
-        if (self.current_page + 1) * 6 < len(self.scripts):
+        if (self.current_page + 1) * 6 < len(self.list_scripts()):
             self.current_page += 1
-            self.update_script_list()
+            self.update_script_signal.emit()
 
     def add_ahk_to_startup(self, script_name):
         "Add profile to startup folder"
@@ -379,7 +414,7 @@ class MainCore():
 
         del shell
 
-        self.update_script_list()
+        self.update_script_signal.emit()
         return shortcut_path
 
     def remove_ahk_from_startup(self, script_name):
@@ -395,24 +430,34 @@ class MainCore():
             else:
                 print(f"{shortcut_path} does not exist in startup.")
 
-            self.update_script_list()
+            self.update_script_signal.emit()
 
         except NotADirectoryError as e:
             print(f"Error removing {shortcut_path}: {e}")
 
-    def update_script_list(self):
-        "! From dashboard"
-        for i in reversed(range(self.profile_layout.count())):
-            widget = self.profile_layout.itemAt(i).widget()
-            if widget:
-                widget.setParent(None)
+    def check_ahi_dir(self):
+        "Make sure AutoHotkey Interception folder is in active profile folder"
+        target_folder = os.path.join(utils.active_dir,
+                                        'AutoHotkey Interception')
 
-        start_index = self.current_page * 6
-        end_index = start_index + 6
-        scripts_to_display = self.scripts[start_index:end_index]
+        def get_all_relative_paths(base_dir):
+            rel_paths = set()
+            for root, dirs, files in os.walk(base_dir):
+                for name in files:
+                    rel_path = os.path.relpath(os.path.join(root, name),
+                                                base_dir)
+                    rel_paths.add(rel_path)
+                for name in dirs:
+                    rel_path = os.path.relpath(os.path.join(root, name),
+                                                base_dir)
+                    rel_paths.add(rel_path)
+            return rel_paths
 
-        for index, script in enumerate(scripts_to_display):
-            row = index // 2
-            column = index % 2
+        ahi_paths = get_all_relative_paths(constant.ahi_dir)
+        target_paths = get_all_relative_paths(target_folder)
 
-            self.profile_card(script, row, column)
+        if (not ahi_paths.issubset(target_paths) or
+                not os.path.isdir(target_folder)):
+            if os.path.exists(target_folder):
+                shutil.rmtree(target_folder)
+            shutil.copytree(constant.ahi_dir, target_folder)

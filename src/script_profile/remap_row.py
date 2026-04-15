@@ -1,16 +1,21 @@
 "Remap and shortctu row"
 
 from dataclasses import dataclass
+import pynput
+import keyboard
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLabel, QPushButton, QCheckBox, QLineEdit, QFrame, QHBoxLayout,
     QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit, QSpacerItem
 )
-from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtCore import Qt, Signal, QObject, QTimer, QEvent  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from utility import utils
 from utility import icons
+from utility import constant
+from utility.diff import Diff
 from script_profile.parse_script import ParseScript
 from script_profile.profile_core import ProfileCore
+from select_key.select_key_ui import SelectKeyUI
 
 
 @dataclass
@@ -25,29 +30,53 @@ class ParsedRemap:
     is_text_format: bool
 
 
-class RemapRow(ParseScript, ProfileCore):
+class RemapRow(QObject):
     "Remap & shortcut row on profile creation"
-    def __init__(self, edit_frame):
+    request_timer_start = Signal(object)
+    def __init__(self, edit_window):
         super().__init__()
-        self.edit_frame = edit_frame
+        # Parameter
+        self.edit_window = edit_window
+
+        # Composition
+        self.diff = Diff()
+        self.parse_script = ParseScript()
+        self.profile_core = ProfileCore()
+        self.select_key_ui = SelectKeyUI()
+
+        # Signal
+        self.request_timer_start.connect(self.profile_core.release_timer)
 
         # Variables
+        self.edit_frame = QWidget()
+        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+        self.is_listening = False
+        self.use_scan_code = False
         self.mapping_row_widgets = []
         self.shortcut_row_widgets = []
         self.key_rows = []
         self.shortcut_rows = []
+        self.copas_rows = []
         self.files_opener_rows = []
         self.files_opener_row_widgets = []
         self.row_num = 0
+        self.previous_button_text = None
+        self.entries_to_disable = []
+        self.mouse_listening_initialized = False
 
         # UI
-        self.edit_frame_layout = None
         self.text_block = None
         self.shortcut_entry = None
         self.is_text_mode = None
 
     def handle_mode_changed(self, index):
         "Action when mode changed from combobox (can be moved)"
+        if self.edit_frame.layout() is None:
+            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+            self.edit_frame.setLayout(self.edit_frame_layout)
+        else:
+            self.edit_frame_layout = self.edit_frame.layout()
+
         while self.edit_frame_layout.count():
             item = self.edit_frame_layout.takeAt(0)
             widget = item.widget()
@@ -83,12 +112,18 @@ class RemapRow(ParseScript, ProfileCore):
                                             QSizePolicy.Expanding))
 
         else:
-            self.pro_mode(index)
+            self.diff.pro_mode(index)
 
     def handle_parser(self, lines, first_line):
         "Action when editing profile (Can be moved)"
-        key_map = self.load_key_list()
+        key_map = self.profile_core.load_key_list()
         mode_line = lines[0].strip() if lines else "; default"
+
+        if self.edit_frame.layout() is None:
+            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+            self.edit_frame.setLayout(self.edit_frame_layout)
+        else:
+            self.edit_frame_layout = self.edit_frame.layout()
 
         if mode_line == "; default":
             self.default_mode_widget(lines, key_map)
@@ -97,12 +132,12 @@ class RemapRow(ParseScript, ProfileCore):
             self.text_mode_widget(lines, key_map)
 
         else:
-            self.pro_parser(lines, first_line)
+            self.diff.pro_parser(lines, first_line)
 
     def default_mode_widget(self, lines, key_map):
         "Default mode frame"
 
-        parsed_shortcut_tuple = self.parse_shortcuts(lines, key_map)
+        parsed_shortcut_tuple = self.parse_script.parse_shortcuts(lines, key_map)
 
         self.shortcut_title()
 
@@ -114,7 +149,7 @@ class RemapRow(ParseScript, ProfileCore):
 
         self.remap_title()
 
-        parsed_remap_tuple = self.parse_default_mode(lines, key_map)
+        parsed_remap_tuple = self.parse_script.parse_default_mode(lines, key_map)
 
         if parsed_remap_tuple:
             # Unpack tuple
@@ -172,12 +207,6 @@ class RemapRow(ParseScript, ProfileCore):
 
     def remap_row(self, parsed_remap=None, insert_after=None):
         "Remap row"
-        if not hasattr(self.edit_frame, 'layout'):
-            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-            self.edit_frame.setLayout(self.edit_frame_layout)
-        else:
-            self.edit_frame_layout = self.edit_frame.layout()
-
         # Remap row card
         card_frame = QFrame(self.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -326,7 +355,8 @@ class RemapRow(ParseScript, ProfileCore):
         default_key_choose.setIcon(icons.get_icon(icons.search))
         default_key_choose.setToolTip("Choose Default/Original key")
         default_key_choose.clicked.connect(
-            lambda: self.select_key(default_key_entry, context="default"))
+            lambda: self.select_key_ui.select_key(
+                self.edit_window, default_key_entry, context="default"))
         default_key_layout.addWidget(default_key_choose)
 
         row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
@@ -363,7 +393,8 @@ class RemapRow(ParseScript, ProfileCore):
         remap_key_choose.setIcon(icons.get_icon(icons.search))
         remap_key_choose.setToolTip("Choose Remap key")
         remap_key_choose.clicked.connect(
-            lambda: self.select_key(remap_key_entry, context="remap"))
+            lambda: self.select_key_ui.select_key(
+                self.edit_window, remap_key_entry, context="remap"))
         remap_key_layout.addWidget(remap_key_choose)
 
         row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
@@ -493,12 +524,6 @@ class RemapRow(ParseScript, ProfileCore):
 
     def shortcut_row(self, parsed_shortcut=None, insert_after=None):
         "Shortcut row"
-        if not hasattr(self.edit_frame, 'layout'):
-            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-            self.edit_frame.setLayout(self.edit_frame_layout)
-        else:
-            self.edit_frame_layout = self.edit_frame.layout()
-
         # For text mode
         if self.is_text_mode and (not hasattr(self, 'text_block') or
         self.text_block is None):
@@ -603,14 +628,15 @@ class RemapRow(ParseScript, ProfileCore):
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: self.select_key(self.shortcut_entry, context="shortcut"))
+            lambda: self.select_key_ui.select_key(
+                self.edit_window, self.shortcut_entry, context="shortcut"))
         shortcut_layout.addWidget(shortcut_choose)
 
         row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
 
     def text_mode_widget(self, lines, key_map):
         "Text mode frame(to do: fix)"
-        shortcuts = self.parse_shortcuts(lines, key_map)
+        shortcuts = self.parse_script.parse_shortcuts(lines, key_map)
 
         if not shortcuts:
             self.shortcut_row()
@@ -671,3 +697,209 @@ class RemapRow(ParseScript, ProfileCore):
                 left_sep.setVisible(is_last)
             if right_sep:
                 right_sep.setVisible(is_last)
+
+    # ----------- From profile core -----------
+    def disable_input(self):
+        "Disable input. Used on key listening"
+        for key_row in self.key_rows:
+            (default_key_entry, remap_key_entry,
+                _, _,
+                text_format_checkbox, hold_format_checkbox,
+                hold_interval_entry, first_key_checkbox,
+                sc_checkbox) = key_row
+            self.entries_to_disable.append((default_key_entry, None))
+            self.entries_to_disable.append((remap_key_entry, None))
+            self.entries_to_disable.append((text_format_checkbox, None))
+            self.entries_to_disable.append((hold_format_checkbox, None))
+            self.entries_to_disable.append((hold_interval_entry, None))
+            self.entries_to_disable.append((first_key_checkbox, None))
+            self.entries_to_disable.append((sc_checkbox, None))
+
+        for shortcut_entry, _ in self.shortcut_rows:
+            self.entries_to_disable.append((shortcut_entry, None))
+
+        # Part of pro version code
+        for copas_row in self.copas_rows:
+            copy_entry, paste_entry, _, _, _, _ = copas_row
+            self.entries_to_disable.append((copy_entry, None))
+            self.entries_to_disable.append((paste_entry, None))
+
+    def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
+        "Get and listen to mouse key press. Pynput on_click"
+        if not (self.is_listening and self.profile_core.active_entry):
+            return
+
+        if pressed and hasattr(self, "edit_window"):
+            widget = self.edit_window.childAt(
+                self.edit_window.mapFromGlobal(
+                    self.edit_window.cursor().pos()))
+            while widget:
+                if isinstance(widget, QPushButton):
+                    return
+                widget = widget.parent()
+
+        button_map = {
+            pynput.mouse.Button.left: "Left Button",
+            pynput.mouse.Button.right: "Right Button",
+            pynput.mouse.Button.middle: "Middle Button"
+        }
+        mouse_button = button_map.get(button, getattr(
+            button, "name", str(button)))
+
+        if pressed:
+            if mouse_button not in self.profile_core.pressed_keys:
+                self.profile_core.pressed_keys.append(mouse_button)
+                self.profile_core.update_widget(self.profile_core.active_entry)
+        else:
+            if mouse_button in self.profile_core.pressed_keys:
+                self.profile_core.pressed_keys.remove(mouse_button)
+                if not self.profile_core.pressed_keys:
+                    self.key_listening(self.profile_core.active_entry, None)
+                    self.request_timer_start.emit(self.profile_core.active_entry)
+                elif hasattr(self, "release_timer"):
+                    self.request_timer_start.emit(self.profile_core.active_entry)
+
+    def handle_sc_listening(self, button):
+        "Check whether to use scan code listening or not"
+        for key_row in self.key_rows:
+            (_, _, orig_button, _, _, _, _,_, _) = key_row
+
+            if button == orig_button:
+                parent_widget = button.parent()
+                if parent_widget:
+                    sc_checkboxes = [child for child
+                                        in parent_widget.
+                                        findChildren(QObject)
+                                        if child.objectName() ==
+                                        "sc_checkbox"]
+                    if sc_checkboxes:
+                        self.use_scan_code = sc_checkboxes[0].isChecked()
+                        return self.use_scan_code
+                    break
+        return None
+
+    def toggle_other_buttons(self, state, button):
+        "Change the state of non selected button"
+        for key_row in self.key_rows:
+            (_, _, orig_button, remap_button, _, _, _, _, _) = key_row
+
+            if orig_button != button and orig_button is not None:
+                orig_button.setEnabled(state)
+            if remap_button != button and remap_button is not None:
+                remap_button.setEnabled(state)
+
+        for copas_row in self.copas_rows:
+            (_, _, copy_button, paste_button, _, _) = copas_row
+
+            if copy_button != button and copy_button is not None:
+                copy_button.setEnabled(state)
+            if paste_button != button and paste_button is not None:
+                paste_button.setEnabled(state)
+
+        for _, shortcut_button in self.shortcut_rows:
+            if shortcut_button != button and shortcut_button is not None:
+                shortcut_button.setEnabled(state)
+
+    def multi_key_event(self, event, entry_widget, button):
+        "Action when multiple key is pressed, set timer before saving the key"
+        if not self.is_listening or self.profile_core.active_entry != entry_widget:
+            return
+
+        self.use_scan_code = self.handle_sc_listening(button)
+        if hasattr(self, 'use_scan_code') and self.use_scan_code:
+            key = f"SC{event.scan_code:02X}"
+        else:
+            key = event.name
+
+        key_lower = key.lower()
+        if key_lower in constant.changes_key:
+            key = constant.changes_key[key_lower]
+
+        if (len(key) == 1 and key.isupper() and key.isalpha()):
+            key = key.lower()
+
+        if event.event_type == "down":
+            if key not in self.profile_core.pressed_keys:
+                self.profile_core.pressed_keys.append(key)
+                self.profile_core.update_widget(entry_widget)
+            if (hasattr(self, "release_timer")
+                    and self.profile_core.set_timer.isActive()):
+                self.profile_core.set_timer.stop()
+
+        elif event.event_type == "up":
+            if key in self.profile_core.pressed_keys:
+                self.profile_core.pressed_keys.remove(key)
+                if not self.profile_core.pressed_keys:
+                    self.key_listening(entry_widget, button)
+                    self.request_timer_start.emit(entry_widget)
+
+                else:
+                    if hasattr(self, "release_timer"):
+                        self.request_timer_start.emit(entry_widget)
+
+    def eventFilter(self, _, event):  # pylint: disable=C0103
+        "Filter event by key press and window"
+        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
+                            QEvent.KeyPress, QEvent.KeyRelease,
+                            QEvent.FocusIn, QEvent.FocusOut):
+            return True
+        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
+                            QEvent.Hide, QEvent.Leave):
+            return True
+        return False
+
+    def key_listening(self, entry_widget, button):
+        "Get and Listen to key press"
+        # Initialize mouse listening thread once
+        if not self.mouse_listening_initialized:
+            mouse_listener = pynput.mouse.Listener(
+                on_click=self.mouse_listening)
+            mouse_listener.start()
+            self.mouse_listening_initialized = True
+
+        if not self.is_listening:
+            self.is_listening = True
+            self.profile_core.active_entry = entry_widget
+            self.previous_button_text = button.text()
+            self.use_scan_code = False
+            self.profile_core.pressed_keys = []
+            self.profile_core.last_combination = ""
+
+            # Append entries to disable widget
+            self.disable_input()
+            # Install disable widget event filter
+            for entry_tuple in self.entries_to_disable:
+                entry = entry_tuple[0]
+                if entry is not None:
+                    entry.installEventFilter(self)
+
+            self.toggle_other_buttons(False, button)
+
+            button.clicked.disconnect()
+            button.clicked.connect(lambda: self.key_listening
+                                    (entry_widget, button))
+
+            self.profile_core.set_timer = QTimer()
+            self.profile_core.set_timer.setSingleShot(True)
+            self.profile_core.set_timer.timeout.connect(
+                lambda: self.profile_core.finalize_combination(entry_widget))
+
+            keyboard.hook(lambda event: self.multi_key_event(event, entry_widget, button))
+
+        else:
+            self.is_listening = False
+            self.profile_core.active_entry = None
+            self.profile_core.pressed_keys = []
+
+            # Remove disable widget event filet
+            for entry_tuple in self.entries_to_disable:
+                entry = entry_tuple[0]
+                if entry is not None:
+                    entry.removeEventFilter(self)
+
+            self.toggle_other_buttons(True, button)
+
+            if button is not None:
+                button.clicked.disconnect()
+                button.clicked.connect(lambda: self.key_listening
+                                        (entry_widget, button))

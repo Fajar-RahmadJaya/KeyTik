@@ -14,20 +14,36 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from utility import constant
 from utility.diff import (Diff, mode_item, mode_map)
 from utility import utils
-
 from select_program.select_program_ui import SelectProgramUI
-
 from select_device.select_device_ui import SelectDeviceUI
 from script_profile.remap_row import RemapRow
 from script_profile.write_script import WriteScript
+from script_profile.parse_script import ParseScript
 from select_key.select_key_ui import SelectKeyUI
+from core.main_core import MainCore
 
 
-class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
-                SelectKeyUI, WriteScript):
+class ProfileUI():
     "Create/edit profile UI"
     def __init__(self):
-        super().__init__(self.edit_frame)
+        # UI
+        self.script_name_entry = None
+        self.program_entry = None
+        self.keyboard_entry = None
+        self.edit_frame = None
+
+        # Composition
+        self.select_program_ui = SelectProgramUI()
+        self.select_device_ui = SelectDeviceUI()
+        self.remap_row = RemapRow(self.edit_frame, self.edit_window,
+                                  self.script_name_entry, self.keyboard_entry,
+                                  self.program_entry)
+        self.write_script = WriteScript()
+        self.select_key_ui = SelectKeyUI()
+        self.main_core = MainCore()
+        self.diff = Diff()
+        self.parse_script = ParseScript()
+
         # Variables
         self.copas_rows = []
         self.key_rows = []
@@ -37,20 +53,14 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.is_text_mode = False
         self.script_dir = utils.active_dir
 
-        # UI
-        self.script_name_entry = None
-        self.program_entry = None
-        self.keyboard_entry = None
-        self.edit_frame = None
-
     def edit_script(self, script_name):
         "Create/edit profile window"
         # Clear row
         self.copas_rows = []
         self.key_rows = []
         self.shortcut_rows = []
-        self.shortcut_row_widgets = []
-        self.mapping_row_widgets = []
+        self.remap_row.shortcut_row_widgets = []
+        self.remap_row.mapping_row_widgets = []
         self.is_text_mode = False
 
         # Handle create new profile
@@ -120,14 +130,14 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         top_layout.addWidget(program_label, 1, 0, 1, 1)
 
         self.program_entry = QLineEdit(top_widget)
-        program_entry_value = self.parse_program(lines)
+        program_entry_value = self.parse_script.parse_program(lines)
         if program_entry_value:
             self.program_entry.setText(program_entry_value)
         top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
 
         program_select_button = QPushButton("Select Program", top_widget)
         program_select_button.setToolTip("Choose program and bind profile to it")
-        program_select_button.clicked.connect(lambda: self.program_window(self.program_entry))
+        program_select_button.clicked.connect(lambda: self.select_program_ui.program_window(self.program_entry))
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
         keyboard_label = QLabel("Device ID", top_widget)
@@ -135,7 +145,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         top_layout.addWidget(keyboard_label, 2, 0, 1, 1)
 
         self.keyboard_entry = QLineEdit(top_widget)
-        device_id = self.parse_device(lines)
+        device_id = self.parse_script.parse_device(lines)
         if device_id:
             self.keyboard_entry.setText(device_id)
         top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
@@ -143,7 +153,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         keyboard_select_button = QPushButton("Select Device", top_widget)
         keyboard_select_button.setToolTip("Choose device and bind profile to it")
         keyboard_select_button.clicked.connect(
-            lambda: self.open_device_selection(self.edit_window, self.keyboard_entry))
+            lambda: self.select_device_ui.open_device_selection(self.edit_window, self.keyboard_entry))
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
         return top_widget
@@ -161,7 +171,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.edit_frame.setLayout(self.edit_frame_layout)
 
-        self.handle_parser(lines, first_line)
+        self.remap_row.handle_parser(lines, first_line)
 
         self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum,
                                                     QSizePolicy.Expanding))
@@ -185,7 +195,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         mode_combobox.lineEdit().setReadOnly(True)
         mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        mode_combobox.currentIndexChanged.connect(self.handle_mode_changed)
+        mode_combobox.currentIndexChanged.connect(self.remap_row.handle_mode_changed)
         default_index = mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
@@ -219,8 +229,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
             mode = mode_combobox.currentText().strip().lower()
             self.is_text_mode = mode == "text mode"
             self.handle_write(script_name, mode)
-            self.scripts = self.main_core.list_scripts()
-            self.update_script_list()
+            self.main_core.update_script_signal.emit()
             self.edit_window.destroy()
 
         except ValueError as e:
@@ -230,7 +239,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
     def handle_write(self, script_name, mode):
         "Action when saving profile (Can be moved)"
         output_path = os.path.join(self.script_dir, script_name)
-        key_translations = self.load_key_translations()
+        key_translations = self.write_script.load_key_translations()
 
         with open(output_path, 'w', encoding='utf-8') as file:
             if mode == "text mode":
@@ -243,7 +252,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
     def handle_default_mode(self, file):
         "Write default mode"
         file.write("; default\n")
-        self.generate_exit_key(os.path.basename(file.name), file)
+        self.main_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
@@ -252,7 +261,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
                                             write_program=True,
                                             write_device=True)
 
-        self.process_key_remaps(file)
+        self.write_script.process_key_remaps(file)
 
         if write_hotif:
             file.write("#HotIf\n")
@@ -260,7 +269,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
     def handle_text_mode(self, file):
         "Write text mode"
         file.write("; text\n")
-        self.generate_exit_key(os.path.basename(file.name), file)
+        self.main_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
@@ -269,7 +278,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
                                             write_program=True,
                                             write_device=True)
 
-        text_content = self.text_block.toPlainText().strip()
+        text_content = self.remap_row.text_block.toPlainText().strip()
         if text_content:
             file.write("; Text mode start\n")
             file.write(text_content + '\n')
@@ -286,7 +295,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
         num_on_present = False
         num_off_present = False
         for shortcut_row in self.shortcut_rows:
-            if self.is_widget_valid(shortcut_row):
+            if self.write_script.is_widget_valid(shortcut_row):
                 shortcut = shortcut_row[0].text().strip()
                 if shortcut:
                     if shortcut.lower() == "capslock on":
@@ -424,7 +433,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
             shortcuts = [
                 shortcut_row[0].text().strip()
                 for shortcut_row in self.shortcut_rows
-                if self.is_widget_valid(shortcut_row)
+                if self.write_script.is_widget_valid(shortcut_row)
                 and shortcut_row[0].text().strip()
             ] or None
 
@@ -447,7 +456,7 @@ class ProfileUI(Diff, RemapRow, SelectProgramUI, SelectDeviceUI,
                 if normal_shortcuts:
                     file.write("toggle := false\n\n")
                     for shortcut in normal_shortcuts:
-                        translated_shortcut = self.translate_key(shortcut)
+                        translated_shortcut = self.write_script.translate_key(shortcut)
                         file.write(f"~{translated_shortcut}:: ; Shortcuts\n")
                         file.write("{\n    global toggle\n    toggle := !toggle\n}\n\n")
                     hotif_conditions.append("toggle")

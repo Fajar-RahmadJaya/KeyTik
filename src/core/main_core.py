@@ -45,7 +45,7 @@ class MainCore(QObject):
                 selected_file = selected_files[0]
 
                 if not selected_file.endswith('.ahk'):
-                    QMessageBox.warning(self, "Error",
+                    QMessageBox.warning(None, "Error",
                                         "Only .ahk files are allowed.")
                     return
 
@@ -55,7 +55,7 @@ class MainCore(QObject):
                 try:
                     shutil.move(selected_file, destination_path)
                 except NotADirectoryError as e:
-                    QMessageBox.warning(self, "Error",
+                    QMessageBox.warning(None, "Error",
                                         f"Failed to move file: {e}")
                     return
 
@@ -178,14 +178,14 @@ class MainCore(QObject):
             self.scripts = self.list_scripts()
             self.update_script_signal.emit()
         except NotADirectoryError as e:
-            QMessageBox.warning(self, "Error", f"Error copying script: {e}")
+            QMessageBox.warning(None, "Error", f"Error copying script: {e}")
 
     def delete_script(self, script_name):
         "Delete profile"
         script_path = os.path.join(self.script_dir, script_name)
         if os.path.isfile(script_path):
             reply = QMessageBox.question(
-                self,
+                None,
                 "Delete Script",
                 f"Are you sure you want to delete '{script_name}'?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -197,10 +197,10 @@ class MainCore(QObject):
                 self.scripts = self.list_scripts()
                 self.update_script_signal.emit()
             except FileNotFoundError as e:
-                QMessageBox.warning(self, "Error",
+                QMessageBox.warning(None, "Error",
                                     f"Failed to delete the script: {e}")
         else:
-            QMessageBox.warning(self, "Error",
+            QMessageBox.warning(None, "Error",
                                 f"{script_name} does not exist.")
 
     def activate_script(self, script_name, button):
@@ -218,7 +218,7 @@ class MainCore(QObject):
             button.clicked.connect(lambda: self.exit_script(script_name,
                                                             button))
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
     def exit_script(self, script_name, button):
         "Exit profile"
@@ -232,7 +232,7 @@ class MainCore(QObject):
 
                 exit_combo = exit_keys.get(script_name)
                 if not exit_combo:
-                    QMessageBox.critical(self,
+                    QMessageBox.critical(None,
                                          "Error", 
                                          f"No exit key found for {script_name}")
                     return
@@ -260,9 +260,9 @@ class MainCore(QObject):
                     script_name, button))
 
             except FileNotFoundError as e:
-                QMessageBox.critical(self, "Error", f"Failed to exit script: {e}")
+                QMessageBox.critical(None, "Error", f"Failed to exit script: {e}")
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
     def store_script(self, script_name):
         "Move profile to store directory"
@@ -283,9 +283,9 @@ class MainCore(QObject):
                 self.scripts = self.list_scripts()
                 self.update_script_signal.emit()
             except NotADirectoryError as e:
-                QMessageBox.critical(self, "Error", f"Failed to move the script: {e}")
+                QMessageBox.critical(None, "Error", f"Failed to move the script: {e}")
         else:
-            QMessageBox.critical(self, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
     def toggle_run_exit(self, script_name, button):
         "Switch between run/exit on profile"

@@ -138,9 +138,9 @@ class SettingUI():
         layout.addWidget(install_group)
 
         ahk_button.clicked.connect(lambda: self.setting_core.ahk_action(
-            ahk_installed, dialog))
+            ahk_installed))
         driver_button.clicked.connect(lambda: self.setting_core.driver_action(
-            driver_installed, dialog))
+            driver_installed))
 
         dialog.exec()
 
@@ -159,7 +159,7 @@ class SettingUI():
             options, current_index, False)
         if ok:
             self.setting_core.save_theme(theme.lower())
-            QMessageBox.information(self,
+            QMessageBox.information(None,
                                     "Theme Changed", 
                                     "Theme will be applied after restarting the app.") 
 
@@ -168,7 +168,7 @@ class SettingUI():
         latest_version = self.setting_core.check_for_update()
         if latest_version:
             reply = QMessageBox.question(
-                self, "Update Available",
+                None, "Update Available",
                 (
                 f"New update available: {diff.PROGRAM_NAME} {latest_version}\n\n"
                 "Would you like to go to the update page?"
@@ -180,5 +180,5 @@ class SettingUI():
         else:
             if show_no_update_message:
                 QMessageBox.information(
-                    self, "Check For Update",
+                    None, "Check For Update",
                     "You are using the latest version of KeyTik.")

@@ -68,11 +68,11 @@ class SettingCore():
             self.script_dir = utils.active_dir
 
             QMessageBox.information(
-                self, "Change Profile Location",
+                None, "Change Profile Location",
                 "Profile location changed successfully!")
         except PermissionError as e:
             print(f"An error occurred: {e}")
-            QMessageBox.critical(self, "Error", f"An error occurred: {e}")
+            QMessageBox.critical(None, "Error", f"An error occurred: {e}")
 
     def save_theme(self, theme):
         "Write theme preference to theme file"
@@ -98,7 +98,7 @@ class SettingCore():
             print("Error: theme_path file not found")
             return "system"
 
-    def ahk_action(self, ahk_installed, dialog):
+    def ahk_action(self, ahk_installed):
         "Uninstall AutoHotkey"
         if ahk_installed:
             try:
@@ -107,13 +107,13 @@ class SettingCore():
 
             except FileNotFoundError:
                 QMessageBox.critical(
-                    dialog,
+                    None,
                     "Error", 
                     "Failed to uninstall: AutoHotkey installation path not found") 
         else:
             webbrowser.open("https://www.autohotkey.com")
 
-    def driver_action(self, driver_installed, dialog):
+    def driver_action(self, driver_installed):
         "Uninstall interception driver"
         try:
             if driver_installed:
@@ -128,7 +128,7 @@ class SettingCore():
                 )
         except FileNotFoundError:
             QMessageBox.critical(
-                dialog,
+                None,
                 "Error", 
                 "Failed to uninstall: inter_uninstall.bat not found") 
 

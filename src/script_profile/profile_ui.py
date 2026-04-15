@@ -310,9 +310,7 @@ class ProfileUI():
                         shortcut_types["normal"].append(shortcut)
 
         if shortcut_types["normal"] and shortcut_types["caps"]:
-            msg = (QMessageBox(self.edit_window
-                                if hasattr(self, "edit_window")
-                                else None))
+            msg = QMessageBox(None)
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText("You cannot use 'CapsLock On' or 'CapsLock Off' "
@@ -323,9 +321,7 @@ class ProfileUI():
             msg.exec()
             return False
         if caps_on_present and caps_off_present:
-            msg = (QMessageBox(self.edit_window
-                                if hasattr(self, "edit_window")
-                                else None))
+            msg = QMessageBox(None)
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText("You cannot use both 'CapsLock ON' and 'CapsLock OFF' at the same time. "
@@ -334,9 +330,7 @@ class ProfileUI():
             msg.exec()
             return False
         if num_on_present and num_off_present:
-            msg = (QMessageBox(self.edit_window
-                                if hasattr(self, "edit_window")
-                                else None))
+            msg = QMessageBox(None)
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText("You cannot use both 'NumLock ON' and 'NumLock OFF' at the same time. "

@@ -13,17 +13,18 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QInputDialog
 )
 from PySide6.QtGui import QFont, QFontDatabase  # pylint: disable=E0611
-from PySide6.QtCore import Signal # pylint: disable=E0611
+from PySide6.QtCore import Signal, QObject # pylint: disable=E0611
 from pynput.keyboard import Controller, Key
 
 from utility import constant
 from utility import utils
 from utility import icons
 
-class MainCore():
+class MainCore(QObject):
     "Main Logic"
-    update_script_signal = Signal
+    update_script_signal = Signal()
     def __init__(self):
+        super().__init__()
         # UI initialization
         self.script_dir = utils.active_dir
         self.pinned_profiles = utils.load_pinned_profiles()

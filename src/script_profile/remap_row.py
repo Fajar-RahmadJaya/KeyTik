@@ -30,7 +30,7 @@ class ParsedRemap:
     is_text_format: bool
 
 
-class RemapRow():
+class RemapRow(QObject):
     "Remap & shortcut row on profile creation"
     request_timer_start = Signal(object)
     def __init__(self, edit_frame, edit_window,

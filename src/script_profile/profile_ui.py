@@ -12,7 +12,6 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
 from utility.diff import (Diff, mode_item, mode_map)
-from utility import utils
 from select_program.select_program_ui import SelectProgramUI
 from select_device.select_device_ui import SelectDeviceUI
 from script_profile.remap_row import RemapRow

@@ -1,7 +1,7 @@
 "Remap and shortctu row"
 
 from dataclasses import dataclass
-from pynput import mouse
+import pynput
 import keyboard
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLabel, QPushButton, QCheckBox, QLineEdit, QFrame, QHBoxLayout,
@@ -62,6 +62,7 @@ class RemapRow(QObject):
         self.row_num = 0
         self.previous_button_text = None
         self.entries_to_disable = []
+        self.mouse_listening_initialized = False
 
         # UI
         self.text_block = None
@@ -723,8 +724,8 @@ class RemapRow(QObject):
             self.entries_to_disable.append((copy_entry, None))
             self.entries_to_disable.append((paste_entry, None))
 
-    def mouse_listening(self, button, pressed):
-        "Get and listen to mouse key press"
+    def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
+        "Get and listen to mouse key press. Pynput on_click"
         if not (self.is_listening and self.profile_core.active_entry):
             return
 
@@ -738,9 +739,9 @@ class RemapRow(QObject):
                 widget = widget.parent()
 
         button_map = {
-            mouse.Button.left: "Left Button",
-            mouse.Button.right: "Right Button",
-            mouse.Button.middle: "Middle Button"
+            pynput.mouse.Button.left: "Left Button",
+            pynput.mouse.Button.right: "Right Button",
+            pynput.mouse.Button.middle: "Middle Button"
         }
         mouse_button = button_map.get(button, getattr(
             button, "name", str(button)))
@@ -849,6 +850,13 @@ class RemapRow(QObject):
 
     def key_listening(self, entry_widget, button):
         "Get and Listen to key press"
+        # Initialize mouse listening thread once
+        if not self.mouse_listening_initialized:
+            mouse_listener = pynput.mouse.Listener(
+                on_click=self.mouse_listening)
+            mouse_listener.start()
+            self.mouse_listening_initialized = True
+
         if not self.is_listening:
             self.is_listening = True
             self.profile_core.active_entry = entry_widget

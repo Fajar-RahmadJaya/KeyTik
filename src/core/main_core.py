@@ -4,7 +4,7 @@ import os
 import json
 import shutil
 import webbrowser
-
+import random
 import winshell
 from win32com.client import Dispatch
 
@@ -119,6 +119,44 @@ class MainCore():
                         json.dump(exit_keys, f)
             except FileNotFoundError:
                 pass
+
+    def generate_exit_key(self, script_name, file=None):
+        "Generate key for profile exit"
+        possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+
+        try:
+            if os.path.exists(constant.exit_keys_file):
+                try:
+                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
+                        exit_keys = json.load(f)
+                except json.JSONDecodeError:
+                    exit_keys = {}
+            else:
+                exit_keys = {}
+
+            used_keys = set(key[-1] for key in exit_keys.values())
+            available_keys = [k for k in possible_keys if k not in used_keys]
+
+            if not available_keys:
+                available_keys = possible_keys
+
+            exit_combo = f"^!{random.choice(available_keys)}"
+
+            exit_keys[script_name] = exit_combo
+            with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
+                json.dump(exit_keys, f)
+
+            if file is not None:
+                file.write(f"{exit_combo}::ExitApp\n\n")
+
+            return exit_combo
+
+        except FileNotFoundError as e:
+            print(f"Error handling exit key: {e}")
+            if file is not None:
+                file.write("^!p::ExitApp\n\n")
+            return "^!p"
 
     def copy_script(self, script):
         "Copy profile"

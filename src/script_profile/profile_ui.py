@@ -19,12 +19,14 @@ from script_profile.remap_row import RemapRow
 from script_profile.write_script import WriteScript
 from script_profile.parse_script import ParseScript
 from select_key.select_key_ui import SelectKeyUI
-from core.main_core import MainCore
 
 
 class ProfileUI():
     "Create/edit profile UI"
-    def __init__(self):
+    def __init__(self, main_core):
+        # Parameter
+        self.main_core = main_core
+
         # UI
         self.script_name_entry = None
         self.program_entry = None
@@ -36,7 +38,6 @@ class ProfileUI():
         self.select_device_ui = SelectDeviceUI()
         self.write_script = WriteScript()
         self.select_key_ui = SelectKeyUI()
-        self.main_core = MainCore()
         self.diff = Diff()
         self.parse_script = ParseScript()
 

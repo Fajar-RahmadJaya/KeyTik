@@ -27,7 +27,7 @@ class Dashboard(QMainWindow):
         # Composition
         self.main_core = MainCore()
         self.parse_script = ParseScript()
-        self.profile_ui = ProfileUI()
+        self.profile_ui = ProfileUI(self.main_core)
         self.setting_ui = SettingUI()
 
         # Signal
@@ -160,7 +160,7 @@ class Dashboard(QMainWindow):
 
         start_index = self.main_core.current_page * 6
         end_index = start_index + 6
-        scripts_to_display = self.scripts[start_index:end_index]
+        scripts_to_display = self.main_core.scripts[start_index:end_index]
 
         for index, script in enumerate(scripts_to_display):
             row = index // 2

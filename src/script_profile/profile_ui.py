@@ -26,7 +26,6 @@ class ProfileUI():
     def __init__(self, main_core):
         # Parameter
         self.main_core = main_core
-
         # UI
         self.script_name_entry = None
         self.program_entry = None
@@ -242,11 +241,11 @@ class ProfileUI():
             if mode == "text mode":
                 self.handle_text_mode(file, remap_row)
             elif mode == "default mode":
-                self.handle_default_mode(file)
+                self.handle_default_mode(file, remap_row)
             else:
                 self.diff.pro_write(file, mode, key_translations)
 
-    def handle_default_mode(self, file):
+    def handle_default_mode(self, file, remap_row):
         "Write default mode"
         file.write("; default\n")
         self.main_core.generate_exit_key(os.path.basename(file.name), file)
@@ -258,7 +257,7 @@ class ProfileUI():
                                             write_program=True,
                                             write_device=True)
 
-        self.write_script.process_key_remaps(file)
+        self.write_script.process_key_remaps(file, remap_row)
 
         if write_hotif:
             file.write("#HotIf\n")

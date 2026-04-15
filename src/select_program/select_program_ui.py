@@ -27,18 +27,11 @@ class SelectProgramUI():
         self.show_all_button = None
         self.fit_sorted_column = None
 
-    def program_window(self, entry_widget):
+    def program_window(self, entry_widget, parent):
         "Select program window"
         self.select_program_window = None
 
-        if (hasattr(self, 'edit_window')
-                and self.edit_window
-                and self.edit_window.isVisible()):
-            parent_window = self.edit_window
-        else:
-            parent_window = self
-
-        self.select_program_window = QDialog(parent_window)
+        self.select_program_window = QDialog(parent)
         self.select_program_window.setWindowTitle("Select Programs")
         self.select_program_window.setWindowIcon(QIcon(constant.icon_path))
         self.select_program_window.setFixedSize(600, 300)

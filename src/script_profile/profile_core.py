@@ -1,8 +1,6 @@
 "Logic for create/edit profile"
 
 import json
-from PySide6.QtCore import QEvent  # pylint: disable=E0611
-
 from utility import constant
 
 
@@ -15,17 +13,6 @@ class ProfileCore():
 
         self.active_entry = None
         self.set_timer = None
-
-    def eventFilter(self, _, event):  # pylint: disable=C0103
-        "Filter event by key press and window"
-        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
-                            QEvent.KeyPress, QEvent.KeyRelease,
-                            QEvent.FocusIn, QEvent.FocusOut):
-            return True
-        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
-                            QEvent.Hide, QEvent.Leave):
-            return True
-        return False
 
     def update_entry(self):
         "Add + on multi key press"

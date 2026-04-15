@@ -16,10 +16,7 @@ from select_key.select_key_core import SelectKeyCore
 
 class SelectKeyUI():
     "Select Key UI"
-    def __init__(self, edit_window=None):
-        # Parameter
-        self.edit_window = edit_window
-
+    def __init__(self):
         # Composition
         self.select_key_core = SelectKeyCore()
         # UI
@@ -80,7 +77,7 @@ class SelectKeyUI():
         )
         choose_search_layout.addWidget(self.search_unicode_checkbox)
 
-    def select_key(self, target_entry=None, context=None):
+    def select_key(self, parent, target_entry=None, context=None):
         "Select Key"
         context_hide = {
             "shortcut": {"ANSI Keys"} | {b[2] for b in constant.unicode_blocks},
@@ -91,7 +88,7 @@ class SelectKeyUI():
 
         self.hide_parents = context_hide.get(context)
 
-        select_key_window = QDialog(self.edit_window)
+        select_key_window = QDialog(parent)
         select_key_window.setWindowTitle("Select Key")
         select_key_window.setWindowIcon(QIcon(constant.icon_path))
         select_key_window.setFixedSize(400, 425)
@@ -151,7 +148,6 @@ class SelectKeyUI():
         select_key_button.clicked.connect(
             lambda: self.on_save_keys(select_key_window, target_entry, select_key_entry))
 
-        select_key_window.installEventFilter(self)
         select_key_window.exec()
 
     def click_checkbox(self, item, select_key_entry):

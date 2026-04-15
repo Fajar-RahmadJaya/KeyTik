@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLabel, QPushButton, QCheckBox, QLineEdit, QFrame, QHBoxLayout,
     QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit, QSpacerItem
 )
-from PySide6.QtCore import Qt, Signal, QObject, QTimer  # pylint: disable=E0611
+from PySide6.QtCore import Qt, Signal, QObject, QTimer, QEvent  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from utility import utils
 from utility import icons
@@ -354,7 +354,8 @@ class RemapRow(QObject):
         default_key_choose.setIcon(icons.get_icon(icons.search))
         default_key_choose.setToolTip("Choose Default/Original key")
         default_key_choose.clicked.connect(
-            lambda: self.select_key_ui.select_key(default_key_entry, context="default"))
+            lambda: self.select_key_ui.select_key(
+                self.edit_window, default_key_entry, context="default"))
         default_key_layout.addWidget(default_key_choose)
 
         row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
@@ -391,7 +392,8 @@ class RemapRow(QObject):
         remap_key_choose.setIcon(icons.get_icon(icons.search))
         remap_key_choose.setToolTip("Choose Remap key")
         remap_key_choose.clicked.connect(
-            lambda: self.select_key_ui.select_key(remap_key_entry, context="remap"))
+            lambda: self.select_key_ui.select_key(
+                self.edit_window, remap_key_entry, context="remap"))
         remap_key_layout.addWidget(remap_key_choose)
 
         row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
@@ -625,7 +627,8 @@ class RemapRow(QObject):
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: self.select_key_ui.select_key(self.shortcut_entry, context="shortcut"))
+            lambda: self.select_key_ui.select_key(
+                self.edit_window, self.shortcut_entry, context="shortcut"))
         shortcut_layout.addWidget(shortcut_choose)
 
         row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
@@ -832,6 +835,17 @@ class RemapRow(QObject):
                 else:
                     if hasattr(self, "release_timer"):
                         self.request_timer_start.emit(entry_widget)
+
+    def eventFilter(self, _, event):  # pylint: disable=C0103
+        "Filter event by key press and window"
+        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
+                            QEvent.KeyPress, QEvent.KeyRelease,
+                            QEvent.FocusIn, QEvent.FocusOut):
+            return True
+        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
+                            QEvent.Hide, QEvent.Leave):
+            return True
+        return False
 
     def key_listening(self, entry_widget, button):
         "Get and Listen to key press"

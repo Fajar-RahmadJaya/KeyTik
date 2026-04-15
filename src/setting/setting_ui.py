@@ -26,11 +26,11 @@ class SettingUI():
         self.announcement = Announcement()
 
         # UI
-        self.settings_window = QDialog()
+        self.settings_window = None
 
-    def open_settings_window(self):
+    def open_settings_window(self, parent):
         "Setting window"
-        self.settings_window = QDialog(self)
+        self.settings_window = QDialog(parent)
         self.settings_window.setWindowTitle("Settings")
         self.settings_window.setFixedSize(400, 250)
         self.settings_window.setWindowIcon(QIcon(constant.icon_path))
@@ -59,7 +59,8 @@ class SettingUI():
 
         installation_button = QPushButton("Check Installation")
         installation_button.setFixedHeight(40)
-        installation_button.clicked.connect(self.show_installation_dialog)
+        installation_button.clicked.connect(
+            lambda: self.show_installation_dialog(self.settings_window))
         group_layout.addWidget(installation_button, 1, 0, 1, 1)
 
         check_update_button = QPushButton("Check For Update")
@@ -77,7 +78,8 @@ class SettingUI():
 
         readme_button = QPushButton("Announcement")
         readme_button.setFixedHeight(40)
-        readme_button.clicked.connect(self.announcement.show_announcement_window)
+        readme_button.clicked.connect(
+            lambda: self.announcement.show_announcement_window(self.settings_window))
         group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
         group_layout.setRowStretch(0, 1)
@@ -89,9 +91,9 @@ class SettingUI():
         main_layout.addWidget(group_box)
         self.settings_window.exec()
 
-    def show_installation_dialog(self):
+    def show_installation_dialog(self, parent):
         "Setting to check, install, uninstall AutoHotkey and Interception driver installation"
-        dialog = QDialog(self)
+        dialog = QDialog(parent)
         dialog.setWindowTitle("Installation Manager")
         dialog.setWindowIcon(QIcon(constant.icon_path))
         dialog.setFixedSize(380, 180)

@@ -49,7 +49,7 @@ class ProfileUI():
         self.is_text_mode = False
         self.script_dir = utils.active_dir
 
-    def edit_script(self, script_name, parent_window):
+    def edit_script(self, script_name, parent):
         "Create/edit profile window"
         # Clear row
         self.copas_rows = []
@@ -76,7 +76,7 @@ class ProfileUI():
         first_line = lines[0].strip()
 
         # Edit window
-        self.edit_window = QDialog(parent_window)
+        self.edit_window = QDialog(parent)
         if is_new_profile:
             self.edit_window.setWindowTitle("Create New Profile")
         else:
@@ -136,7 +136,8 @@ class ProfileUI():
 
         program_select_button = QPushButton("Select Program", top_widget)
         program_select_button.setToolTip("Choose program and bind profile to it")
-        program_select_button.clicked.connect(lambda: self.select_program_ui.program_window(self.program_entry))
+        program_select_button.clicked.connect(
+            lambda: self.select_program_ui.program_window(self.program_entry, self.edit_window))
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
         keyboard_label = QLabel("Device ID", top_widget)

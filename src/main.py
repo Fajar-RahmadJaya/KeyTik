@@ -28,7 +28,7 @@ def main():
     main_window.startup_worker.update_found.connect(
         lambda: setting_ui.update_messagebox(show_no_update_message=False))
     main_window.startup_worker.show_announcement.connect(
-        announcement.show_announcement_window)
+        lambda: announcement.show_announcement_window(main_window))
     main_window.startup_worker.start()
 
     sys.exit(app.exec())

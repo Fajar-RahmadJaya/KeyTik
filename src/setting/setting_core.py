@@ -16,14 +16,12 @@ from utility import constant
 from utility import utils
 from utility.diff import Diff, CHECK_UPDATE_LINK
 
-from core.main_core import MainCore
 
 class SettingCore():
     "Setting logic"
     def __init__(self):
         # Composition
         self.diff = Diff()
-        self.main_core = MainCore()
 
         self.script_dir = utils.active_dir
         self.scripts = self.main_core.list_scripts()
@@ -70,7 +68,6 @@ class SettingCore():
 
             self.script_dir = utils.active_dir
             self.scripts = self.main_core.list_scripts()
-            self.main_core.update_script_list()
 
             QMessageBox.information(
                 self, "Change Profile Location",

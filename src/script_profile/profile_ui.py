@@ -50,15 +50,6 @@ class ProfileUI():
 
     def edit_script(self, script_name, parent):
         "Create/edit profile window"
-        # Clear row
-        self.copas_rows = []
-        self.key_rows = []
-        self.shortcut_rows = []
-        remap_row = RemapRow(self.edit_window)
-        remap_row.shortcut_row_widgets = []
-        remap_row.mapping_row_widgets = []
-        self.is_text_mode = False
-
         # Handle create new profile
         is_new_profile = not script_name
         if is_new_profile:
@@ -85,6 +76,15 @@ class ProfileUI():
 
         edit_layout = QGridLayout(self.edit_window)
         edit_layout.setContentsMargins(30, 10, 30, 10)
+
+        # Clear row
+        self.copas_rows = []
+        self.key_rows = []
+        self.shortcut_rows = []
+        remap_row = RemapRow(self.edit_window)
+        remap_row.shortcut_row_widgets = []
+        remap_row.mapping_row_widgets = []
+        self.is_text_mode = False
 
         # Top part of profile manager
         top_widget = self.edit_top(script_name, lines, remap_row)

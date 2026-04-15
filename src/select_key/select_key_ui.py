@@ -260,6 +260,8 @@ class SelectKeyUI():
 
     def search_with_unicode(self, filter_text):
         "Include unicode on search"
+        # To Do: Fix known issue. Show search with unicode only on remap key
+        # Known issue: search with unicode cant search the actual character
         unicode_matches = {}
         filter_parents = self.select_key_core.get_checked_filter(self.filter_dropdown)
 

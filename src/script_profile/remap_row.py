@@ -865,8 +865,6 @@ class RemapRow(QObject):
                 if entry is not None:
                     entry.installEventFilter(self)
 
-            self.edit_window.installEventFilter(self)
-
             self.toggle_other_buttons(False, button)
 
             button.clicked.disconnect()
@@ -892,8 +890,6 @@ class RemapRow(QObject):
                     entry.removeEventFilter(self)
 
             self.toggle_other_buttons(True, button)
-
-            self.edit_window.removeEventFilter(self)
 
             if button is not None:
                 button.clicked.disconnect()

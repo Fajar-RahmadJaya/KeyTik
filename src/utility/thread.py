@@ -1,14 +1,12 @@
 "Thread handler"
 
 import keyboard
-import pynput
 from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
 from utility.diff import (Diff)
 from setting.announcement import Announcement
 from setting.setting_core import SettingCore
 from script_profile.write_script import WriteScript
-from script_profile.remap_row import RemapRow
 
 
 class Thread(QThread, Diff):
@@ -22,7 +20,6 @@ class Thread(QThread, Diff):
         self.main_window = main_window
         self.announcement = Announcement()
         self.write_script = WriteScript()
-        self.remap_row = RemapRow(None)
         self.setting_core = SettingCore()
 
     def run(self):
@@ -41,11 +38,8 @@ class Thread(QThread, Diff):
         if self.announcement.load_announcement_condition():
             self.show_announcement.emit()
 
-        if not hasattr(self.main_window, "keyboard_hook_initialized"):
-            keyboard.hook(lambda event: self.remap_row.multi_key_event(
-                event, self.main_window.active_entry, None))
-            self.main_window.mouse_listener = pynput.mouse.Listener(
-                 on_click=self.remap_row.mouse_listening
-            )
-            self.main_window.mouse_listener.start()
-            self.main_window.keyboard_hook_initialized = True
+        def _dummy(_):
+            pass
+
+        dummy_hook = keyboard.hook(_dummy)
+        keyboard.unhook(dummy_hook)

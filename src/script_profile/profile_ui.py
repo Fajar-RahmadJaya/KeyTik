@@ -5,8 +5,7 @@ import traceback
 import re
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
-    QVBoxLayout, QSpacerItem, QSizePolicy, QComboBox, QGridLayout,
-    QMessageBox
+    QComboBox, QGridLayout, QMessageBox
 )
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
@@ -30,13 +29,11 @@ class ProfileUI():
         self.script_name_entry = None
         self.program_entry = None
         self.keyboard_entry = None
-        self.edit_frame = None
         self.edit_window = None
 
         # Composition
         self.select_program_ui = SelectProgramUI()
         self.select_device_ui = SelectDeviceUI()
-        self.remap_row = RemapRow(self.edit_frame, self.edit_window)
         self.write_script = WriteScript()
         self.select_key_ui = SelectKeyUI()
         self.main_core = MainCore()
@@ -58,8 +55,9 @@ class ProfileUI():
         self.copas_rows = []
         self.key_rows = []
         self.shortcut_rows = []
-        self.remap_row.shortcut_row_widgets = []
-        self.remap_row.mapping_row_widgets = []
+        remap_row = RemapRow(self.edit_window)
+        remap_row.shortcut_row_widgets = []
+        remap_row.mapping_row_widgets = []
         self.is_text_mode = False
 
         # Handle create new profile
@@ -90,21 +88,21 @@ class ProfileUI():
         edit_layout.setContentsMargins(30, 10, 30, 10)
 
         # Top part of profile manager
-        top_widget = self.edit_top(script_name, lines)
+        top_widget = self.edit_top(script_name, lines, remap_row)
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
         # Middle part of profile manager
-        edit_scroll = self.edit_middle(lines, first_line)
+        edit_scroll = self.edit_middle(lines, first_line, remap_row)
         edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
 
         # Bottom part of profile manager
-        bottom_widget = self.edit_bottom(script_name, first_line)
+        bottom_widget = self.edit_bottom(script_name, first_line, remap_row)
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()
 
-    def edit_top(self, script_name, lines):
+    def edit_top(self, script_name, lines, remap_row):
         "Top part of profile manager"
         top_widget = QWidget(self.edit_window)
         top_layout = QGridLayout(top_widget)
@@ -122,7 +120,7 @@ class ProfileUI():
         else:
             self.script_name_entry.setText("")
             self.script_name_entry.setReadOnly(False)
-        self.remap_row.entries_to_disable.append((self.script_name_entry, None))
+        remap_row.entries_to_disable.append((self.script_name_entry, None))
         top_layout.addWidget(self.script_name_entry, 0, 1, 1, 3)
 
         program_label = QLabel("Program", top_widget)
@@ -133,7 +131,7 @@ class ProfileUI():
         program_entry_value = self.parse_script.parse_program(lines)
         if program_entry_value:
             self.program_entry.setText(program_entry_value)
-        self.remap_row.entries_to_disable.append((self.program_entry, None))
+        remap_row.entries_to_disable.append((self.program_entry, None))
         top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
 
         program_select_button = QPushButton("Select Program", top_widget)
@@ -149,38 +147,32 @@ class ProfileUI():
         device_id = self.parse_script.parse_device(lines)
         if device_id:
             self.keyboard_entry.setText(device_id)
-        self.remap_row.entries_to_disable.append((self.keyboard_entry, None))
+        remap_row.entries_to_disable.append((self.keyboard_entry, None))
         top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
 
         keyboard_select_button = QPushButton("Select Device", top_widget)
         keyboard_select_button.setToolTip("Choose device and bind profile to it")
         keyboard_select_button.clicked.connect(
-            lambda: self.select_device_ui.open_device_selection(self.edit_window, self.keyboard_entry))
+            lambda: self.select_device_ui.open_device_selection(
+                self.edit_window, self.keyboard_entry))
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
         return top_widget
 
-    def edit_middle(self, lines, first_line):
+    def edit_middle(self, lines, first_line, remap_row):
         "Middle part of profile manager"
         edit_scroll = QScrollArea(self.edit_window)
         edit_scroll.setFixedSize(535, 305)
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
-        self.edit_frame = QWidget()
-        edit_scroll.setWidget(self.edit_frame)
+        edit_scroll.setWidget(remap_row.edit_frame)
 
-        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-        self.edit_frame.setLayout(self.edit_frame_layout)
-
-        self.remap_row.handle_parser(lines, first_line)
-
-        self.edit_frame_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum,
-                                                    QSizePolicy.Expanding))
+        remap_row.handle_parser(lines, first_line)
 
         return edit_scroll
 
-    def edit_bottom(self, script_name, first_line):
+    def edit_bottom(self, script_name, first_line, remap_row):
         "Bottom part of profile manager"
         bottom_widget = QWidget(self.edit_window)
         bottom_layout = QGridLayout(bottom_widget)
@@ -188,7 +180,8 @@ class ProfileUI():
         bottom_layout.setHorizontalSpacing(225)
 
         save_button = QPushButton("Save Changes", self.edit_window)
-        save_button.clicked.connect(lambda: self.save_changes(script_name, mode_combobox))
+        save_button.clicked.connect(
+            lambda: self.save_changes(script_name, mode_combobox, remap_row))
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
@@ -197,7 +190,7 @@ class ProfileUI():
         mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         mode_combobox.lineEdit().setReadOnly(True)
         mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        mode_combobox.currentIndexChanged.connect(self.remap_row.handle_mode_changed)
+        mode_combobox.currentIndexChanged.connect(remap_row.handle_mode_changed)
         default_index = mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
@@ -218,7 +211,7 @@ class ProfileUI():
 
         return script_name
 
-    def save_changes(self, script_name, mode_combobox):
+    def save_changes(self, script_name, mode_combobox, remap_row):
         "Write script"
         script_name = self.get_script_name()
         if not script_name:
@@ -230,7 +223,7 @@ class ProfileUI():
         try:
             mode = mode_combobox.currentText().strip().lower()
             self.is_text_mode = mode == "text mode"
-            self.handle_write(script_name, mode)
+            self.handle_write(script_name, mode, remap_row)
             self.main_core.update_script_signal.emit()
             self.edit_window.destroy()
 
@@ -238,14 +231,14 @@ class ProfileUI():
             print(f"Error writing script: {e}")
             traceback.print_exc()
 
-    def handle_write(self, script_name, mode):
+    def handle_write(self, script_name, mode, remap_row):
         "Action when saving profile (Can be moved)"
         output_path = os.path.join(self.script_dir, script_name)
         key_translations = self.write_script.load_key_translations()
 
         with open(output_path, 'w', encoding='utf-8') as file:
             if mode == "text mode":
-                self.handle_text_mode(file)
+                self.handle_text_mode(file, remap_row)
             elif mode == "default mode":
                 self.handle_default_mode(file)
             else:
@@ -268,7 +261,7 @@ class ProfileUI():
         if write_hotif:
             file.write("#HotIf\n")
 
-    def handle_text_mode(self, file):
+    def handle_text_mode(self, file, remap_row):
         "Write text mode"
         file.write("; text\n")
         self.main_core.generate_exit_key(os.path.basename(file.name), file)
@@ -280,7 +273,7 @@ class ProfileUI():
                                             write_program=True,
                                             write_device=True)
 
-        text_content = self.remap_row.text_block.toPlainText().strip()
+        text_content = remap_row.text_block.toPlainText().strip()
         if text_content:
             file.write("; Text mode start\n")
             file.write(text_content + '\n')

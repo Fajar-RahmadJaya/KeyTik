@@ -30,13 +30,12 @@ class ParsedRemap:
     is_text_format: bool
 
 
-class RemapRow():
+class RemapRow(QObject):
     "Remap & shortcut row on profile creation"
     request_timer_start = Signal(object)
-    def __init__(self, edit_frame, edit_window):
+    def __init__(self, edit_window):
         super().__init__()
         # Parameter
-        self.edit_frame = edit_frame
         self.edit_window = edit_window
 
         # Composition
@@ -48,10 +47,9 @@ class RemapRow():
         # Signal
         self.request_timer_start.connect(self.profile_core.release_timer)
 
-        # Parameter
-        self.edit_frame = edit_frame
-
         # Variables
+        self.edit_frame = QWidget()
+        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.is_listening = False
         self.use_scan_code = False
         self.mapping_row_widgets = []
@@ -66,13 +64,18 @@ class RemapRow():
         self.entries_to_disable = []
 
         # UI
-        self.edit_frame_layout = None
         self.text_block = None
         self.shortcut_entry = None
         self.is_text_mode = None
 
     def handle_mode_changed(self, index):
         "Action when mode changed from combobox (can be moved)"
+        if self.edit_frame.layout() is None:
+            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+            self.edit_frame.setLayout(self.edit_frame_layout)
+        else:
+            self.edit_frame_layout = self.edit_frame.layout()
+
         while self.edit_frame_layout.count():
             item = self.edit_frame_layout.takeAt(0)
             widget = item.widget()
@@ -114,6 +117,12 @@ class RemapRow():
         "Action when editing profile (Can be moved)"
         key_map = self.profile_core.load_key_list()
         mode_line = lines[0].strip() if lines else "; default"
+
+        if self.edit_frame.layout() is None:
+            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+            self.edit_frame.setLayout(self.edit_frame_layout)
+        else:
+            self.edit_frame_layout = self.edit_frame.layout()
 
         if mode_line == "; default":
             self.default_mode_widget(lines, key_map)
@@ -197,12 +206,6 @@ class RemapRow():
 
     def remap_row(self, parsed_remap=None, insert_after=None):
         "Remap row"
-        if not hasattr(self.edit_frame, 'layout'):
-            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-            self.edit_frame.setLayout(self.edit_frame_layout)
-        else:
-            self.edit_frame_layout = self.edit_frame.layout()
-
         # Remap row card
         card_frame = QFrame(self.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -518,12 +521,6 @@ class RemapRow():
 
     def shortcut_row(self, parsed_shortcut=None, insert_after=None):
         "Shortcut row"
-        if not hasattr(self.edit_frame, 'layout'):
-            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-            self.edit_frame.setLayout(self.edit_frame_layout)
-        else:
-            self.edit_frame_layout = self.edit_frame.layout()
-
         # For text mode
         if self.is_text_mode and (not hasattr(self, 'text_block') or
         self.text_block is None):

@@ -46,7 +46,6 @@ class Dashboard(QMainWindow):
         self.main_layout = QVBoxLayout(self.central_widget)
         self.script_dir = utils.active_dir
         self.pinned_profiles = utils.load_pinned_profiles()
-        self.scripts = self.main_core.list_scripts()
         self.create_ui()
         self.update_script_list()
         self.setWindowTitle(diff.PROGRAM_NAME)
@@ -160,7 +159,8 @@ class Dashboard(QMainWindow):
 
         start_index = self.main_core.current_page * 6
         end_index = start_index + 6
-        scripts_to_display = self.main_core.scripts[start_index:end_index]
+        scripts = self.main_core.list_scripts()
+        scripts_to_display = scripts[start_index:end_index]
 
         for index, script in enumerate(scripts_to_display):
             row = index // 2

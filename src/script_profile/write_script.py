@@ -35,7 +35,6 @@ class WriteScript():
         self.remap_row = RemapRow(None)
 
         self.is_text_mode = None
-        self.scripts = None
 
     def load_key_translations(self):
         "Load translation from raw key to readable key"

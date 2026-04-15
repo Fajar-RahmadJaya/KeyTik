@@ -30,7 +30,6 @@ class MainCore(QObject):
         self.pinned_profiles = utils.load_pinned_profiles()
 
         # Variable
-        self.scripts = None
         self.current_page = 0
 
     def import_button_clicked(self):
@@ -60,8 +59,6 @@ class MainCore(QObject):
                     return
 
                 self.validate_imported_files(destination_path, file_name)
-
-                self.scripts.append(file_name)
                 self.update_script_signal.emit()
 
     def validate_imported_files(self, destination_path, file_name):
@@ -175,7 +172,6 @@ class MainCore(QObject):
         destination_path = os.path.join(self.script_dir, new_name)
         try:
             shutil.copy(source_path, destination_path)
-            self.scripts = self.list_scripts()
             self.update_script_signal.emit()
         except NotADirectoryError as e:
             QMessageBox.warning(None, "Error", f"Error copying script: {e}")
@@ -194,7 +190,6 @@ class MainCore(QObject):
                 return
             try:
                 os.remove(script_path)
-                self.scripts = self.list_scripts()
                 self.update_script_signal.emit()
             except FileNotFoundError as e:
                 QMessageBox.warning(None, "Error",
@@ -279,8 +274,6 @@ class MainCore(QObject):
             try:
 
                 shutil.move(script_path, target_path)
-
-                self.scripts = self.list_scripts()
                 self.update_script_signal.emit()
             except NotADirectoryError as e:
                 QMessageBox.critical(None, "Error", f"Failed to move the script: {e}")
@@ -388,8 +381,8 @@ class MainCore(QObject):
         unpinned = [script for script in all_scripts
                     if script not in self.pinned_profiles]
 
-        self.scripts = pinned + unpinned
-        return self.scripts
+        scripts = pinned + unpinned
+        return scripts
 
     def prev_page(self):
         "Show previous profile list"
@@ -399,7 +392,7 @@ class MainCore(QObject):
 
     def next_page(self):
         "show next profile list"
-        if (self.current_page + 1) * 6 < len(self.scripts):
+        if (self.current_page + 1) * 6 < len(self.list_scripts()):
             self.current_page += 1
             self.update_script_signal.emit()
 

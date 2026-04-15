@@ -32,9 +32,9 @@ class MainCore(QObject):
         # Variable
         self.current_page = 0
 
-    def import_button_clicked(self):
+    def import_button_clicked(self, parent):
         "Select AHK script and add necessary line"
-        file_dialog = QFileDialog(self)
+        file_dialog = QFileDialog(parent)
         file_dialog.setNameFilter("AHK Scripts (*.ahk)")
 
         if file_dialog.exec():

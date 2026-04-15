@@ -103,7 +103,8 @@ class Dashboard(QMainWindow):
         import_button.setFixedWidth(30)
         import_button.setIcon(icons.get_icon(icons.icon_import))
         import_button.setToolTip("Import AutoHotkey Script")
-        import_button.clicked.connect(self.main_core.import_button_clicked)
+        import_button.clicked.connect(
+            lambda: self.main_core.import_button_clicked(self))
         button_layout.addWidget(import_button, 0, 2)
 
         # Create new profile button

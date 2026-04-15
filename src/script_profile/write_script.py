@@ -10,6 +10,7 @@ from utility import constant
 from utility import utils
 from utility.diff import Diff
 from core.main_core import MainCore
+from select_key.select_key_core import SelectKeyCore
 
 
 @dataclass
@@ -26,10 +27,11 @@ class KeyRows:
 class WriteScript():
     "Write script based on profile input"
     def __init__(self):
-        super().__init__()
-
+        # Composition
         self.diff = Diff()
         self.main_core = MainCore()
+        self.select_key_core = SelectKeyCore()
+
         self.is_text_mode = None
         self.scripts = None
         self.key_rows = None
@@ -242,7 +244,7 @@ class WriteScript():
 
     def is_unicode_key(self, key):
         "Determine whether it's unicode or hard coded key"
-        key_data = self.load_keylist()
+        key_data = self.select_key_core.load_keylist()
         for child_item in key_data.values():
             if key in child_item:
                 return False

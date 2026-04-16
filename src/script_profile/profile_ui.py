@@ -17,7 +17,6 @@ from select_device.select_device import SelectDevice
 from script_profile.remap_row import RemapRow
 from script_profile.write_script import WriteScript
 from script_profile.parse_script import ParseScript
-from select_key.select_key_ui import SelectKeyUI
 
 
 class ProfileUI():
@@ -25,6 +24,7 @@ class ProfileUI():
     def __init__(self, main_core):
         # Parameter
         self.main_core = main_core
+
         # UI
         self.script_name_entry = None
         self.program_entry = None
@@ -32,20 +32,7 @@ class ProfileUI():
         self.edit_window = None
 
         # Composition
-        self.select_program_ui = SelectProgramUI()
-        self.select_device = SelectDevice()
         self.write_script = WriteScript()
-        self.select_key_ui = SelectKeyUI()
-        self.diff = Diff()
-        self.parse_script = ParseScript()
-
-        # Variables
-        self.copas_rows = []
-        self.key_rows = []
-        self.shortcut_rows = []
-        self.files_opener_rows = []
-        self.files_opener_row_widgets = []
-        self.is_text_mode = False
 
     def edit_script(self, script_name, parent):
         "Create/edit profile window"
@@ -77,13 +64,13 @@ class ProfileUI():
         edit_layout.setContentsMargins(30, 10, 30, 10)
 
         # Clear row
-        self.copas_rows = []
-        self.key_rows = []
-        self.shortcut_rows = []
-        remap_row = RemapRow(self.edit_window)
-        remap_row.shortcut_row_widgets = []
-        remap_row.mapping_row_widgets = []
-        self.is_text_mode = False
+        remap_row = RemapRow(self.edit_window)  # Composition
+        remap_row.copas_rows.clear()
+        remap_row.key_rows.clear()
+        remap_row.shortcut_rows.clear()
+        remap_row.shortcut_row_widgets.clear()
+        remap_row.mapping_row_widgets.clear()
+        remap_row.is_text_mode = False
 
         # Top part of profile manager
         top_widget = self.edit_top(script_name, lines, remap_row)
@@ -102,6 +89,8 @@ class ProfileUI():
 
     def edit_top(self, script_name, lines, remap_row):
         "Top part of profile manager"
+        parse_script = ParseScript()  # Composition
+
         top_widget = QWidget(self.edit_window)
         top_layout = QGridLayout(top_widget)
         top_layout.setContentsMargins(40, 0, 40, 5)
@@ -126,16 +115,17 @@ class ProfileUI():
         top_layout.addWidget(program_label, 1, 0, 1, 1)
 
         self.program_entry = QLineEdit(top_widget)
-        program_entry_value = self.parse_script.parse_program(lines)
-        if program_entry_value:
-            self.program_entry.setText(program_entry_value)
+        if parse_script.parse_program(lines):
+            self.program_entry.setText(parse_script.parse_program(lines))
         remap_row.entries_to_disable.append((self.program_entry, None))
         top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
 
+        # Select program to bind
+        select_program_ui = SelectProgramUI()  # Composition
         program_select_button = QPushButton("Select Program", top_widget)
         program_select_button.setToolTip("Choose program and bind profile to it")
         program_select_button.clicked.connect(
-            lambda: self.select_program_ui.program_window(self.program_entry, self.edit_window))
+            lambda: select_program_ui.program_window(self.program_entry, self.edit_window))
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
         keyboard_label = QLabel("Device ID", top_widget)
@@ -143,16 +133,17 @@ class ProfileUI():
         top_layout.addWidget(keyboard_label, 2, 0, 1, 1)
 
         self.keyboard_entry = QLineEdit(top_widget)
-        device_id = self.parse_script.parse_device(lines)
-        if device_id:
-            self.keyboard_entry.setText(device_id)
+        if parse_script.parse_device(lines):
+            self.keyboard_entry.setText(parse_script.parse_device(lines))
         remap_row.entries_to_disable.append((self.keyboard_entry, None))
         top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
 
+        # Select keyboard/mouse to bind
+        select_device = SelectDevice()  # Composition
         keyboard_select_button = QPushButton("Select Device", top_widget)
         keyboard_select_button.setToolTip("Choose device and bind profile to it")
         keyboard_select_button.clicked.connect(
-            lambda: self.select_device.open_device_selection(
+            lambda: select_device.open_device_selection(
                 self.edit_window, self.keyboard_entry))
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
@@ -216,12 +207,11 @@ class ProfileUI():
         if not script_name:
             return
 
-        if not self.check_key_integrity():
+        if not self.check_key_integrity(remap_row):
             return
 
         try:
             mode = mode_combobox.currentText().strip().lower()
-            self.is_text_mode = mode == "text mode"
             self.handle_write(script_name, mode, remap_row)
             self.main_core.update_script_signal.emit()
             self.edit_window.destroy()
@@ -234,6 +224,7 @@ class ProfileUI():
         "Action when saving profile (Can be moved)"
         output_path = os.path.join(self.main_core.script_dir, script_name)
         key_translations = self.write_script.load_key_translations()
+        diff = Diff()  # Composition
 
         with open(output_path, 'w', encoding='utf-8') as file:
             if mode == "text mode":
@@ -241,7 +232,7 @@ class ProfileUI():
             elif mode == "default mode":
                 self.handle_default_mode(file, remap_row)
             else:
-                self.diff.pro_write(file, mode, key_translations)
+                diff.pro_write(file, mode, key_translations)
 
     def handle_default_mode(self, file, remap_row):
         "Write default mode"
@@ -250,10 +241,7 @@ class ProfileUI():
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
-        write_hotif = self.write_condition(file,
-                                            write_shortcuts=True,
-                                            write_program=True,
-                                            write_device=True)
+        write_hotif = self.write_condition(remap_row, file, write_shortcuts=True)
 
         self.write_script.process_key_remaps(file, remap_row)
 
@@ -267,10 +255,7 @@ class ProfileUI():
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
-        write_hotif = self.write_condition(file,
-                                            write_shortcuts=True,
-                                            write_program=True,
-                                            write_device=True)
+        write_hotif = self.write_condition(remap_row, file, write_shortcuts=True)
 
         text_content = remap_row.text_block.toPlainText().strip()
         if text_content:
@@ -281,14 +266,14 @@ class ProfileUI():
         if write_hotif:
             file.write("#HotIf\n")
 
-    def check_key_integrity(self):
+    def check_key_integrity(self, remap_row):
         "Make sure there is no conflict on profile input"
         shortcut_types = {"normal": [], "caps": []}
         caps_on_present = False
         caps_off_present = False
         num_on_present = False
         num_off_present = False
-        for shortcut_row in self.shortcut_rows:
+        for shortcut_row in remap_row.shortcut_rows:
             if self.write_script.is_widget_valid(shortcut_row):
                 shortcut = shortcut_row[0].text().strip()
                 if shortcut:
@@ -338,10 +323,28 @@ class ProfileUI():
             return False
         return True
 
-    def get_program_condition(self):
+    def write_condition(self, remap_row, file, write_shortcuts=False):
+        "Write Hotif condition for shortcuts, device, program in one hotif line"
+        hotif_conditions = []
+
+        # Shortcuts condition
+        self.shortcuts_condition(remap_row, file, hotif_conditions, write_shortcuts)
+
+        # Device condition
+        self.device_condition(file, hotif_conditions)
+
+        # Program condition
+        self.get_program_condition(hotif_conditions)
+
+        if hotif_conditions:
+            file.write("SetTitleMatchMode 2\n")
+            file.write(f"#HotIf {' && '.join(hotif_conditions)}\n")
+            return True
+        return False
+
+    def get_program_condition(self, hotif_conditions):
         "Get program binding value from entry"
         program_entry = self.program_entry.text().strip()
-        program_condition = ""
 
         if program_entry:
             pattern = r"\[(Tittle|Class|Process),\s*([^\]]+)\]"
@@ -355,43 +358,11 @@ class ProfileUI():
                     conditions.append(f'WinActive("ahk_class {value}")')
                 elif typ.lower() == "tittle":
                     conditions.append(f'WinActive("{value}")')
-            program_condition = " || ".join(conditions)
+            hotif_conditions.append(" || ".join(conditions))
 
-        return program_condition
-
-    def get_device_condition(self):
-        "Get device binding value from entry"
-        device_condition = ""
-        device_name = self.keyboard_entry.text().strip()
-        if device_name:
-            device_condition = "cm1.IsActive"
-        return device_condition
-
-    def write_condition(self, file, write_shortcuts=False,
-                        write_program=False, write_device=False):
-        "Write Hotif condition for shortcuts, device, program in one hotif line"
-        program = self.get_program_condition() if write_program else None
-
-        hotif_conditions = []
-
-        # Shortcuts condition
-        self.shortcuts_condition(file, hotif_conditions, write_shortcuts)
-
-        # Device condition
-        self.device_condition(file, hotif_conditions, write_device)
-
-        if program:
-            hotif_conditions.append(f"({program})")
-
-        if hotif_conditions:
-            file.write("SetTitleMatchMode 2\n")
-            file.write(f"#HotIf {' && '.join(hotif_conditions)}\n")
-            return True
-        return False
-
-    def device_condition(self, file, hotif_conditions, write_device):
+    def device_condition(self, file, hotif_conditions):
         "Device condition"
-        device = self.keyboard_entry.text().strip() if write_device else None
+        device = self.keyboard_entry.text().strip()
         if device:
             parts = device.split(",", 1)
             device_type = parts[0].strip().lower()
@@ -414,13 +385,13 @@ class ProfileUI():
             file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
             hotif_conditions.append("cm1.IsActive")
 
-    def shortcuts_condition(self, file, hotif_conditions, write_shortcuts=False):
+    def shortcuts_condition(self, remap_row, file, hotif_conditions, write_shortcuts=False):
         "Shortcuts condition"
         shortcuts = None
         if write_shortcuts:
             shortcuts = [
                 shortcut_row[0].text().strip()
-                for shortcut_row in self.shortcut_rows
+                for shortcut_row in remap_row.shortcut_rows
                 if self.write_script.is_widget_valid(shortcut_row)
                 and shortcut_row[0].text().strip()
             ] or None

@@ -7,10 +7,7 @@ import json
 import subprocess
 import ctypes
 import requests
-
-from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QMessageBox, QFileDialog
-)
+from PySide6.QtWidgets import (QMessageBox, QFileDialog)  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils
@@ -19,10 +16,6 @@ from utility.diff import Diff, CHECK_UPDATE_LINK
 
 class SettingCore():
     "Setting logic"
-    def __init__(self):
-        # Composition
-        self.diff = Diff()
-
     def change_data_location(self, parent):
         "Change active and stored profile directory for 'change profile location'"
         # To Do: fix known issue.
@@ -132,10 +125,12 @@ class SettingCore():
 
     def check_for_update(self):
         "Check for update comparing current version and latest version from GitHub API"
+        # Composition
+        diff = Diff()
         try:
             response = requests.get(CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == 200:
-                return self.diff.parse_update_response(response)
+                return diff.parse_update_response(response)
         except requests.exceptions.ConnectionError:
             pass
         return None

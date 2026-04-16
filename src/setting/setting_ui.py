@@ -2,18 +2,15 @@
 
 import os
 import webbrowser
-
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton,
-    QHBoxLayout, QCheckBox, QInputDialog, QMessageBox
-)
+    QHBoxLayout, QCheckBox, QInputDialog, QMessageBox)
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils
 from utility import diff
-
 from setting.setting_core import SettingCore
 from setting.announcement import Announcement
 
@@ -23,23 +20,22 @@ class SettingUI():
     def __init__(self):
         # Composition
         self.setting_core = SettingCore()
-        self.announcement = Announcement()
-
-        # UI
-        self.settings_window = None
 
     def open_settings_window(self, parent):
         "Setting window"
-        self.settings_window = QDialog(parent)
-        self.settings_window.setWindowTitle("Settings")
-        self.settings_window.setFixedSize(400, 250)
-        self.settings_window.setWindowIcon(QIcon(constant.icon_path))
-        self.settings_window.setModal(True)
-        self.settings_window.setWindowFlag(
+        # Composition
+        announcement = Announcement()
+
+        settings_window = QDialog(parent)
+        settings_window.setWindowTitle("Settings")
+        settings_window.setFixedSize(400, 250)
+        settings_window.setWindowIcon(QIcon(constant.icon_path))
+        settings_window.setModal(True)
+        settings_window.setWindowFlag(
             Qt.WindowType.WindowStaysOnTopHint,
             getattr(self, "is_on_top", False))
 
-        main_layout = QVBoxLayout(self.settings_window)
+        main_layout = QVBoxLayout(settings_window)
         main_layout.setContentsMargins(10, 10, 10, 10)
 
         group_box = QGroupBox()
@@ -49,19 +45,19 @@ class SettingUI():
 
         theme_button = QPushButton("Change Theme")
         theme_button.setFixedHeight(40)
-        theme_button.clicked.connect(self.change_theme_dialog)
+        theme_button.clicked.connect(lambda: self.change_theme_dialog(settings_window))
         group_layout.addWidget(theme_button, 0, 0, 1, 1)
 
         change_path_button = QPushButton("Change Profile Location")
         change_path_button.setFixedHeight(40)
         change_path_button.clicked.connect(
-            lambda: self.setting_core.change_data_location(self.settings_window))
+            lambda: self.setting_core.change_data_location(settings_window))
         group_layout.addWidget(change_path_button, 0, 1, 1, 1)
 
         installation_button = QPushButton("Check Installation")
         installation_button.setFixedHeight(40)
         installation_button.clicked.connect(
-            lambda: self.show_installation_dialog(self.settings_window))
+            lambda: self.show_installation_dialog(settings_window))
         group_layout.addWidget(installation_button, 1, 0, 1, 1)
 
         check_update_button = QPushButton("Check For Update")
@@ -80,7 +76,7 @@ class SettingUI():
         readme_button = QPushButton("Announcement")
         readme_button.setFixedHeight(40)
         readme_button.clicked.connect(
-            lambda: self.announcement.show_announcement_window(self.settings_window))
+            lambda: announcement.show_announcement_window(settings_window))
         group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
         group_layout.setRowStretch(0, 1)
@@ -90,7 +86,7 @@ class SettingUI():
         group_layout.setColumnStretch(1, 1)
 
         main_layout.addWidget(group_box)
-        self.settings_window.exec()
+        settings_window.exec()
 
     def show_installation_dialog(self, parent):
         "Setting to check, install, uninstall AutoHotkey and Interception driver installation"
@@ -145,7 +141,7 @@ class SettingUI():
 
         dialog.exec()
 
-    def change_theme_dialog(self):
+    def change_theme_dialog(self, parent):
         "Setting to change program theme"
         options = ["Light", "Dark", "System"]
         current_theme = self.setting_core.read_theme()
@@ -156,7 +152,7 @@ class SettingUI():
         else:
             current_index = 2
         theme, ok = QInputDialog.getItem(
-            self.settings_window, "Change Theme", "Select theme:",
+            parent, "Change Theme", "Select theme:",
             options, current_index, False)
         if ok:
             self.setting_core.save_theme(theme.lower())

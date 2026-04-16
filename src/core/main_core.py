@@ -7,7 +7,6 @@ import webbrowser
 import random
 import winshell
 from win32com.client import Dispatch
-
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication, QFileDialog, QMessageBox,
     QInputDialog

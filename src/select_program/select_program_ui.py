@@ -106,8 +106,7 @@ class SelectProgramUI():
 
     def update_program_treeview(self, show_all_processes=None):
         "Populate process into treeview"
-        # Composition
-        select_program_core = SelectProgramCore()
+        select_program_core = SelectProgramCore()  # Composition
 
         if show_all_processes is None:
             show_all_processes = (

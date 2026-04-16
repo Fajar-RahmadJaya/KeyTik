@@ -23,8 +23,7 @@ class SettingUI():
 
     def open_settings_window(self, parent):
         "Setting window"
-        # Composition
-        announcement = Announcement()
+        announcement = Announcement()  # Composition
 
         settings_window = QDialog(parent)
         settings_window.setWindowTitle("Settings")

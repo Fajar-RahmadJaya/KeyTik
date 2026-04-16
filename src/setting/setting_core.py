@@ -125,8 +125,7 @@ class SettingCore():
 
     def check_for_update(self):
         "Check for update comparing current version and latest version from GitHub API"
-        # Composition
-        diff = Diff()
+        diff = Diff()  # Composition
         try:
             response = requests.get(CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == 200:

@@ -108,9 +108,8 @@ class Dashboard(QMainWindow):
         always_top.clicked.connect(lambda: self.toggle_on_top(always_top))
         button_layout.addWidget(always_top, 0, 6)
 
-        # Composition
-        setting_ui = SettingUI()
         # Setting button
+        setting_ui = SettingUI()  # Composition
         setting_button = QPushButton()
         setting_button.setFixedWidth(30)
         setting_button.setIcon(icons.get_icon(icons.setting))

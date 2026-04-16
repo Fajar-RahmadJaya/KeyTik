@@ -44,7 +44,6 @@ class Dashboard(QMainWindow):
         self.main_core.check_ahk_installation(show_installed_message=False)
         self.central_widget = QWidget()
         self.main_layout = QVBoxLayout(self.central_widget)
-        self.pinned_profiles = utils.load_pinned_profiles()
         self.create_ui()
         self.update_script_list()
         self.setWindowTitle(diff.PROGRAM_NAME)
@@ -236,15 +235,15 @@ class Dashboard(QMainWindow):
 
     def pin_icon(self, script, group_box):
         "Pin icon"
-        if script in self.pinned_profiles:
-            icon_label = QSvgWidget(icons.pin, group_box)
-        else:
+        if script in self.main_core.pinned_profiles:
             icon_label = QSvgWidget(icons.pin_fill, group_box)
+        else:
+            icon_label = QSvgWidget(icons.pin, group_box)
 
         icon_label.setFixedSize(17, 17)
         icon_label.setToolTip(f'Pin "{os.path.splitext(script)[0]}"')
         icon_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        icon_label.mousePressEvent = lambda _: self.main_core.toggle_pin(script, icon_label)
+        icon_label.mousePressEvent = lambda _: self.main_core.toggle_pin(script)
         icon_label.move(285, 3)
 
     def startup_button(self, script):

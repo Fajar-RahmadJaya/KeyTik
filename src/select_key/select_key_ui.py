@@ -19,6 +19,7 @@ class SelectKeyUI():
     def __init__(self):
         # Composition
         self.select_key_core = SelectKeyCore()
+
         # UI
         self.search_unicode_checkbox = QCheckBox("Search Unicode")
         self.filter_dropdown = QListWidget()
@@ -26,10 +27,8 @@ class SelectKeyUI():
 
         # Variable
         self.checked_keys_list = []
-        self.hide_parents = None
-        self.key_data = None
 
-    def select_key_top(self, main_layout, select_key_window):
+    def select_key_top(self, main_layout, select_key_window, hide_parents):
         "Top part of select key"
         choose_search_layout = QHBoxLayout()
         choose_search_layout.setContentsMargins(30, 0, 30, 5)
@@ -53,14 +52,14 @@ class SelectKeyUI():
         self.filter_dropdown.setSelectionMode(QListWidget.NoSelection)
         self.filter_dropdown.itemChanged.connect(
             lambda: self.populate_tree(
-                search_entry.text()
+                hide_parents, search_entry.text()
             ))
         filter_popup_layout.addWidget(self.filter_dropdown)
 
         search_entry = QLineEdit()
         search_entry.setPlaceholderText(" Search Key")
         search_entry.setFixedWidth(170)
-        search_entry.textChanged.connect(self.populate_tree)
+        search_entry.textChanged.connect(lambda: self.populate_tree(hide_parents))
         choose_search_layout.addWidget(search_entry)
 
         self.search_unicode_checkbox = QCheckBox("Search Unicode")
@@ -72,12 +71,12 @@ class SelectKeyUI():
         )
         self.search_unicode_checkbox.toggled.connect(
             lambda checked: self.populate_tree(
-                search_entry.text()
+                hide_parents, search_entry.text()
             )
         )
         choose_search_layout.addWidget(self.search_unicode_checkbox)
 
-    def select_key(self, parent, target_entry=None, context=None):
+    def select_key(self, parent_window, target_entry=None, context=None):
         "Select Key"
         context_hide = {
             "shortcut": {"ANSI Keys"} | {b[2] for b in constant.unicode_blocks},
@@ -86,9 +85,9 @@ class SelectKeyUI():
             "remap": {"Shortcut Special"}
         }
 
-        self.hide_parents = context_hide.get(context)
+        hide_parents = context_hide.get(context)
 
-        select_key_window = QDialog(parent)
+        select_key_window = QDialog(parent_window)
         select_key_window.setWindowTitle("Select Key")
         select_key_window.setWindowIcon(QIcon(constant.icon_path))
         select_key_window.setFixedSize(400, 425)
@@ -96,7 +95,7 @@ class SelectKeyUI():
         main_layout = QVBoxLayout(select_key_window)
 
         # Top part
-        self.select_key_top(main_layout, select_key_window)
+        self.select_key_top(main_layout, select_key_window, hide_parents)
 
         self.select_key_tree = QTreeWidget()
         self.select_key_tree.setColumnCount(2)
@@ -116,18 +115,17 @@ class SelectKeyUI():
         main_layout.addWidget(self.select_key_tree)
 
         try:
-            self.key_data = self.select_key_core.load_keylist()
-            parent_names = list(self.key_data.keys())
+            key_data = self.select_key_core.load_keylist()
 
-            for parent in parent_names:
-                if parent in self.hide_parents:
+            for parent in list(key_data.keys()):
+                if parent in hide_parents:
                     continue
                 item = QListWidgetItem(parent)
                 item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
                 item.setCheckState(Qt.Checked)
                 self.filter_dropdown.addItem(item)
 
-            self.populate_tree()
+            self.populate_tree(hide_parents)
 
         except FileNotFoundError:
             print("key_list not found")
@@ -175,7 +173,7 @@ class SelectKeyUI():
             target_entry.setText(select_key_entry.text())
         select_key_window.accept()
 
-    def populate_tree(self, filter_text=""):
+    def populate_tree(self, hide_parents, filter_text=""):
         "Insert item on the treeview"
         filter_parents = self.select_key_core.get_checked_filter(self.filter_dropdown)
 
@@ -183,17 +181,18 @@ class SelectKeyUI():
         if self.search_unicode_checkbox.isChecked() and filter_text:
             if filter_text.isalpha() and all('a' <= c <= 'z' for c in filter_text):
                 if len(filter_text) >= 3:
-                    self.search_with_unicode(filter_text)
+                    self.search_with_unicode(filter_text, hide_parents)
             else:
                 if len(filter_text) >= 1:
-                    self.search_with_unicode(filter_text)
+                    self.search_with_unicode(filter_text, hide_parents)
 
         # Clear the Tree
         self.select_key_tree.clear()
 
         # Iterate Over Key Data and Add Parent/Child Items (Populate tree)
-        for parent_name, children in self.key_data.items():
-            if parent_name in self.hide_parents:
+        key_data = self.select_key_core.load_keylist()
+        for parent_name, children in key_data.items():
+            if parent_name in hide_parents:
                 continue
             if filter_parents and parent_name not in filter_parents:
                 continue
@@ -246,7 +245,7 @@ class SelectKeyUI():
             child_item.setFlags(
                 child_item.flags() | Qt.ItemIsUserCheckable)
             key_tuple = (parent_name, child_name)
-            if key_tuple in getattr(self, 'checked_keys_list', []):
+            if key_tuple in self.checked_keys_list:
                 child_item.setCheckState(0, Qt.Checked)
             else:
                 child_item.setCheckState(0, Qt.Unchecked)
@@ -258,7 +257,7 @@ class SelectKeyUI():
 
         parent_item.setExpanded(True)
 
-    def search_with_unicode(self, filter_text):
+    def search_with_unicode(self, filter_text, hide_parents):
         "Include unicode on search"
         # To Do: Fix known issue. Show search with unicode only on remap key
         # Known issue: search with unicode cant search the actual character
@@ -267,7 +266,7 @@ class SelectKeyUI():
 
         # Iterate over Unicode blocks
         for start, end, block_name in constant.unicode_blocks:
-            if block_name in self.hide_parents:
+            if block_name in hide_parents:
                 continue
             if filter_parents and block_name not in filter_parents:
                 continue
@@ -318,7 +317,7 @@ class SelectKeyUI():
                 child_item.setFlags(
                     child_item.flags() | Qt.ItemIsUserCheckable)
                 key_tuple = (block_name, char)
-                if key_tuple in getattr(self, 'checked_keys_list', []):
+                if key_tuple in self.checked_keys_list:
                     child_item.setCheckState(0, Qt.Checked)
                 else:
                     child_item.setCheckState(0, Qt.Unchecked)

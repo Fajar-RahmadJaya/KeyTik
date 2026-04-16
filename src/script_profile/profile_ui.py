@@ -13,7 +13,7 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from utility import constant
 from utility.diff import (Diff, mode_item, mode_map)
 from select_program.select_program_ui import SelectProgramUI
-from select_device.select_device_ui import SelectDeviceUI
+from select_device.select_device import SelectDevice
 from script_profile.remap_row import RemapRow
 from script_profile.write_script import WriteScript
 from script_profile.parse_script import ParseScript
@@ -33,7 +33,7 @@ class ProfileUI():
 
         # Composition
         self.select_program_ui = SelectProgramUI()
-        self.select_device_ui = SelectDeviceUI()
+        self.select_device = SelectDevice()
         self.write_script = WriteScript()
         self.select_key_ui = SelectKeyUI()
         self.diff = Diff()
@@ -152,7 +152,7 @@ class ProfileUI():
         keyboard_select_button = QPushButton("Select Device", top_widget)
         keyboard_select_button.setToolTip("Choose device and bind profile to it")
         keyboard_select_button.clicked.connect(
-            lambda: self.select_device_ui.open_device_selection(
+            lambda: self.select_device.open_device_selection(
                 self.edit_window, self.keyboard_entry))
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 

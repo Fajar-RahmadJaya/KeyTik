@@ -15,7 +15,6 @@ from utility import utils
 from utility import icons
 from utility import diff
 from core.main_core import MainCore
-from script_profile.parse_script import ParseScript
 from script_profile.profile_ui import ProfileUI
 from setting.setting_ui import SettingUI
 
@@ -26,38 +25,29 @@ class Dashboard(QMainWindow):
         super().__init__()
         # Composition
         self.main_core = MainCore()
-        self.parse_script = ParseScript()
         self.profile_ui = ProfileUI(self.main_core)
-        self.setting_ui = SettingUI()
 
         # Signal
         self.main_core.update_script_signal.connect(self.update_script_list)
 
-        # Key Listening
-        self.is_listening = False
-        self.active_entry = None
-        self.pressed_keys = []
-        # Variable
-        self.row_num = 0
-
         # UI initialization
-        self.main_core.check_ahk_installation(show_installed_message=False)
-        self.central_widget = QWidget()
-        self.main_layout = QVBoxLayout(self.central_widget)
-        self.create_ui()
-        self.update_script_list()
         self.setWindowTitle(diff.PROGRAM_NAME)
         self.setFixedSize(650, 492)
         self.setWindowIcon(QIcon(constant.icon_path))
+        self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
+
+        # Startup
         self.main_core.font_fallback()
+        self.create_ui()
+        self.main_core.check_ahk_installation(show_installed_message=False)
         self.main_core.check_ahi_dir()
-        self.checked_keys_list = []
 
     def create_ui(self):
         "Dashboard Window"
         self.frame = QFrame()
-        self.main_layout.addWidget(self.frame)
+        main_layout = QVBoxLayout(self.central_widget)
+        main_layout.addWidget(self.frame)
         self.frame_layout = QVBoxLayout(self.frame)
 
         self.profile_frame = QFrame()
@@ -77,6 +67,8 @@ class Dashboard(QMainWindow):
         button_frame = self.dashboard_button()
 
         self.frame_layout.addWidget(button_frame)
+
+        self.main_core.update_script_signal.emit()
 
     def dashboard_button(self):
         "Dashboard button widget"
@@ -116,11 +108,14 @@ class Dashboard(QMainWindow):
         always_top.clicked.connect(lambda: self.toggle_on_top(always_top))
         button_layout.addWidget(always_top, 0, 6)
 
+        # Composition
+        setting_ui = SettingUI()
+        # Setting button
         setting_button = QPushButton()
         setting_button.setFixedWidth(30)
         setting_button.setIcon(icons.get_icon(icons.setting))
         setting_button.setToolTip("Setting")
-        setting_button.clicked.connect(lambda: self.setting_ui.open_settings_window(self))
+        setting_button.clicked.connect(lambda: setting_ui.open_settings_window(self))
         button_layout.addWidget(setting_button, 0, 7)
 
         next_button = QPushButton()

@@ -24,6 +24,9 @@ class KeyRows:
 
 class WriteScript():
     "Write script based on profile input"
+    def __init__(self, remap_row_comp=None):
+        self.remap_row_comp = remap_row_comp
+
     def load_key_translations(self):
         "Load translation from raw key to readable key"
         key_translations = {}
@@ -42,14 +45,14 @@ class WriteScript():
             print(f"Error reading key translations: {e}")
         return key_translations
 
-    def process_key_remaps(self, file, remap_row):
+    def process_key_remaps(self, file):
         "Handle key remap write"
-        for row in remap_row.key_rows:
+        for row in self.remap_row_comp.key_rows:
             (default_key_entry, remap_key_entry, _,
             _, text_format_checkbox, hold_format_checkbox,
             hold_interval_entry, first_key_checkbox, _) = row
 
-            remap_row.key_rows = KeyRows(
+            self.remap_row_comp.key_rows = KeyRows(
                 default_key_entry =default_key_entry,
                 remap_key_entry = remap_key_entry,
                 text_format_checkbox = text_format_checkbox,
@@ -71,16 +74,16 @@ class WriteScript():
                     keys = [k.strip() for k in default_key.split("+")]
                     if len(keys) == 2 and keys[0] == keys[1]:
                         self.write_double_click(
-                            file, keys[0], remap_key, remap_row
+                            file, keys[0], remap_key
                         )
                         continue
-                    default_translated = self.write_multiple_key_default(default_key, remap_row)
+                    default_translated = self.write_multiple_key_default(default_key)
 
                 else:
                     default_translated = self.write_single_key_default(
                         default_key)
 
-                self.handle_remap_type(file, default_translated, remap_key, remap_row)
+                self.handle_remap_type(file, default_translated, remap_key)
 
             except ValueError:
                 continue
@@ -210,12 +213,12 @@ class WriteScript():
         return " & ".join(translated_keys)
 
 
-    def handle_remap_type(self, file, default_translated, remap_key, remap_row):
+    def handle_remap_type(self, file, default_translated, remap_key):
         "Handle text, hold, single, multiple key mode"
-        if remap_row.key_rows.text_format_checkbox.isChecked():
+        if self.remap_row_comp.key_rows.text_format_checkbox.isChecked():
             self.write_text_format(file, default_translated, remap_key)
-        elif remap_row.key_rows.hold_format_checkbox.isChecked():
-            self.write_hold_format(file, default_translated, remap_key, remap_row)
+        elif self.remap_row_comp.key_rows.hold_format_checkbox.isChecked():
+            self.write_hold_format(file, default_translated, remap_key)
         elif "+" in remap_key:
             self.write_multiple_key_remap(file, default_translated,
                                           remap_key)
@@ -245,10 +248,10 @@ class WriteScript():
             remap_key_tr = self.translate_key(remap_key)
             file.write(f'{default_translated}::{remap_key_tr}\n')
 
-    def write_multiple_key_default(self, default_key, remap_row):
+    def write_multiple_key_default(self, default_key):
         "Write multiple key case on default key"
-        if (remap_row.key_rows.first_key_checkbox is not None
-            and remap_row.key_rows.first_key_checkbox.isChecked()):
+        if (self.remap_row_comp.key_rows.first_key_checkbox is not None
+            and self.remap_row_comp.key_rows.first_key_checkbox.isChecked()):
             translated_key = self.translate_key(default_key)
         else:
             translated_key = "~" + self.translate_key(default_key)
@@ -272,7 +275,7 @@ class WriteScript():
         send_sequence = "".join(send_parts_down + send_parts_up)
         file.write(f'{default_translated}::SendInput("{send_sequence}")\n')
 
-    def write_double_click(self, file, single_key, remap_key, remap_row):
+    def write_double_click(self, file, single_key, remap_key):
         "Write double click (same key twice) on default key"
         translated_key = self.translate_key(single_key)
 
@@ -283,10 +286,10 @@ class WriteScript():
             )
         )
 
-        if remap_row.key_rows.text_format_checkbox.isChecked():
+        if self.remap_row_comp.key_rows.text_format_checkbox.isChecked():
             file.write(f'        SendText("{remap_key}")\n')
-        elif remap_row.key_rows.hold_format_checkbox.isChecked():
-            self.hold_format_double_click(remap_key, file, remap_row)
+        elif self.remap_row_comp.key_rows.hold_format_checkbox.isChecked():
+            self.hold_format_double_click(remap_key, file)
         else:
             if "+" in remap_key:
                 keys = [key.strip() for key in remap_key.split("+")]
@@ -315,16 +318,16 @@ class WriteScript():
 
         file.write('    }\n')
 
-    def hold_format_double_click(self, remap_key, file, remap_row):
+    def hold_format_double_click(self, remap_key, file):
         "Write double click on hold format"
         hold_interval_ms = "10000"
-        if (remap_row.key_rows.hold_format_checkbox.isChecked()
-            and remap_row.key_rows.hold_interval_entry is not None):
+        if (self.remap_row_comp.key_rows.hold_format_checkbox.isChecked()
+            and self.remap_row_comp.key_rows.hold_interval_entry is not None):
             hold_interval = "10"
-            if (remap_row.key_rows.hold_interval_entry.text().strip() and
-                remap_row.key_rows.hold_interval_entry.text().strip()
+            if (self.remap_row_comp.key_rows.hold_interval_entry.text().strip() and
+                self.remap_row_comp.key_rows.hold_interval_entry.text().strip()
                     != "Hold Interval"):
-                hold_interval =remap_row.key_rows. hold_interval_entry.text().strip()
+                hold_interval = self.remap_row_comp.key_rows. hold_interval_entry.text().strip()
             hold_interval_ms = str(int(float(hold_interval) * 1000))
 
         keys = [key.strip() for key in remap_key.split("+")]
@@ -354,16 +357,16 @@ class WriteScript():
         "write text format (Send literal string)"
         file.write(f'{default_translated}::SendText("{remap_key}")\n')
 
-    def write_hold_format(self, file, default_translated, remap_key, remap_row):
+    def write_hold_format(self, file, default_translated, remap_key):
         "Write hold format"
         hold_interval_ms = "10000"
-        if (remap_row.key_rows.hold_format_checkbox.isChecked()
-            and remap_row.key_rows.hold_interval_entry is not None):
+        if (self.remap_row_comp.key_rows.hold_format_checkbox.isChecked()
+            and self.remap_row_comp.key_rows.hold_interval_entry is not None):
             hold_interval = "10"
-            if (remap_row.key_rows.hold_interval_entry.text().strip() and
-                remap_row.key_rows.hold_interval_entry.text().strip()
+            if (self.remap_row_comp.key_rows.hold_interval_entry.text().strip() and
+                self.remap_row_comp.key_rows.hold_interval_entry.text().strip()
                     != "Hold Interval"):
-                hold_interval = remap_row.key_rows.hold_interval_entry.text().strip()
+                hold_interval = self.remap_row_comp.key_rows.hold_interval_entry.text().strip()
             hold_interval_ms = str(int(float(hold_interval) * 1000))
 
         keys = [key.strip() for key in remap_key.split("+")]

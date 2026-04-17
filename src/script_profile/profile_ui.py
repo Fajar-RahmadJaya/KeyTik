@@ -32,8 +32,8 @@ class ProfileUI():
         self.edit_window = None
 
         # Composition
-        self.write_script = WriteScript()
         self.remap_row_comp = RemapRow(self.edit_window)
+        self.write_script = WriteScript(self.remap_row_comp)
 
     def edit_script(self, script_name, parent):
         "Create/edit profile window"
@@ -240,7 +240,7 @@ class ProfileUI():
 
         write_hotif = self.write_condition(file, write_shortcuts=True)
 
-        self.write_script.process_key_remaps(file, self.remap_row_comp)
+        self.write_script.process_key_remaps(file)
 
         if write_hotif:
             file.write("#HotIf\n")

@@ -68,8 +68,6 @@ class ProfileUI():
         remap_row.copas_rows.clear()
         remap_row.key_rows.clear()
         remap_row.shortcut_rows.clear()
-        remap_row.shortcut_row_widgets.clear()
-        remap_row.mapping_row_widgets.clear()
         remap_row.is_text_mode = False
 
         # Top part of profile manager

@@ -67,14 +67,28 @@ class RemapRow(QObject):
         self.edit_frame = QWidget()
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
 
+    def handle_parser(self, lines, first_line):
+        "Action when editing profile (Can be moved)"
+        key_map = self.profile_core.load_key_list()
+        mode_line = lines[0].strip() if lines else "; default"
+
+        self.edit_frame = QWidget()
+        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+        self.edit_frame.setLayout(self.edit_frame_layout)
+
+        if mode_line == "; default":
+            self.default_mode_widget(lines, key_map)
+
+        elif mode_line == "; text":
+            self.text_mode_widget(lines, key_map)
+
+        else:
+            self.diff.pro_parser(lines, first_line)
+
+        return self.edit_frame
+
     def handle_mode_changed(self, index):
         "Action when mode changed from combobox (can be moved)"
-        if self.edit_frame.layout() is None:
-            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-            self.edit_frame.setLayout(self.edit_frame_layout)
-        else:
-            self.edit_frame_layout = self.edit_frame.layout()
-
         while self.edit_frame_layout.count():
             item = self.edit_frame_layout.takeAt(0)
             widget = item.widget()
@@ -111,26 +125,6 @@ class RemapRow(QObject):
 
         else:
             self.diff.pro_mode(index)
-
-    def handle_parser(self, lines, first_line):
-        "Action when editing profile (Can be moved)"
-        key_map = self.profile_core.load_key_list()
-        mode_line = lines[0].strip() if lines else "; default"
-
-        if self.edit_frame.layout() is None:
-            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-            self.edit_frame.setLayout(self.edit_frame_layout)
-        else:
-            self.edit_frame_layout = self.edit_frame.layout()
-
-        if mode_line == "; default":
-            self.default_mode_widget(lines, key_map)
-
-        elif mode_line == "; text":
-            self.text_mode_widget(lines, key_map)
-
-        else:
-            self.diff.pro_parser(lines, first_line)
 
     def default_mode_widget(self, lines, key_map):
         "Default mode frame"

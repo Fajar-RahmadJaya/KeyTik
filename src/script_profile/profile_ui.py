@@ -33,6 +33,7 @@ class ProfileUI():
 
         # Composition
         self.write_script = WriteScript()
+        self.remap_row_comp = RemapRow(self.edit_window)
 
     def edit_script(self, script_name, parent):
         "Create/edit profile window"
@@ -64,28 +65,27 @@ class ProfileUI():
         edit_layout.setContentsMargins(30, 10, 30, 10)
 
         # Clear row
-        remap_row = RemapRow(self.edit_window)  # Composition
-        remap_row.copas_rows.clear()
-        remap_row.key_rows.clear()
-        remap_row.shortcut_rows.clear()
-        remap_row.is_text_mode = False
+        self.remap_row_comp.copas_rows.clear()
+        self.remap_row_comp.key_rows.clear()
+        self.remap_row_comp.shortcut_rows.clear()
+        self.remap_row_comp.is_text_mode = False
 
         # Top part of profile manager
-        top_widget = self.edit_top(script_name, lines, remap_row)
+        top_widget = self.edit_top(script_name, lines)
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
         # Middle part of profile manager
-        edit_scroll = self.edit_middle(lines, first_line, remap_row)
+        edit_scroll = self.edit_middle(lines, first_line)
         edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
 
         # Bottom part of profile manager
-        bottom_widget = self.edit_bottom(script_name, first_line, remap_row)
+        bottom_widget = self.edit_bottom(script_name, first_line)
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()
 
-    def edit_top(self, script_name, lines, remap_row):
+    def edit_top(self, script_name, lines):
         "Top part of profile manager"
         parse_script = ParseScript()  # Composition
 
@@ -105,7 +105,7 @@ class ProfileUI():
         else:
             self.script_name_entry.setText("")
             self.script_name_entry.setReadOnly(False)
-        remap_row.entries_to_disable.append((self.script_name_entry, None))
+        self.remap_row_comp.entries_to_disable.append((self.script_name_entry, None))
         top_layout.addWidget(self.script_name_entry, 0, 1, 1, 3)
 
         program_label = QLabel("Program", top_widget)
@@ -115,7 +115,7 @@ class ProfileUI():
         self.program_entry = QLineEdit(top_widget)
         if parse_script.parse_program(lines):
             self.program_entry.setText(parse_script.parse_program(lines))
-        remap_row.entries_to_disable.append((self.program_entry, None))
+        self.remap_row_comp.entries_to_disable.append((self.program_entry, None))
         top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
 
         # Select program to bind
@@ -133,7 +133,7 @@ class ProfileUI():
         self.keyboard_entry = QLineEdit(top_widget)
         if parse_script.parse_device(lines):
             self.keyboard_entry.setText(parse_script.parse_device(lines))
-        remap_row.entries_to_disable.append((self.keyboard_entry, None))
+        self.remap_row_comp.entries_to_disable.append((self.keyboard_entry, None))
         top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
 
         # Select keyboard/mouse to bind
@@ -147,20 +147,19 @@ class ProfileUI():
 
         return top_widget
 
-    def edit_middle(self, lines, first_line, remap_row):
+    def edit_middle(self, lines, first_line):
         "Middle part of profile manager"
         edit_scroll = QScrollArea(self.edit_window)
         edit_scroll.setFixedSize(535, 305)
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
-        edit_scroll.setWidget(remap_row.edit_frame)
-
-        remap_row.handle_parser(lines, first_line)
+        edit_frame = self.remap_row_comp.handle_parser(lines, first_line)
+        edit_scroll.setWidget(edit_frame)
 
         return edit_scroll
 
-    def edit_bottom(self, script_name, first_line, remap_row):
+    def edit_bottom(self, script_name, first_line):
         "Bottom part of profile manager"
         bottom_widget = QWidget(self.edit_window)
         bottom_layout = QGridLayout(bottom_widget)
@@ -169,7 +168,7 @@ class ProfileUI():
 
         save_button = QPushButton("Save Changes", self.edit_window)
         save_button.clicked.connect(
-            lambda: self.save_changes(script_name, mode_combobox, remap_row))
+            lambda: self.save_changes(script_name, mode_combobox))
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
@@ -178,7 +177,7 @@ class ProfileUI():
         mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         mode_combobox.lineEdit().setReadOnly(True)
         mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        mode_combobox.currentIndexChanged.connect(remap_row.handle_mode_changed)
+        mode_combobox.currentIndexChanged.connect(self.remap_row_comp.handle_mode_changed)
         default_index = mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
@@ -199,18 +198,18 @@ class ProfileUI():
 
         return script_name
 
-    def save_changes(self, script_name, mode_combobox, remap_row):
+    def save_changes(self, script_name, mode_combobox):
         "Write script"
         script_name = self.get_script_name()
         if not script_name:
             return
 
-        if not self.check_key_integrity(remap_row):
+        if not self.check_key_integrity():
             return
 
         try:
             mode = mode_combobox.currentText().strip().lower()
-            self.handle_write(script_name, mode, remap_row)
+            self.handle_write(script_name, mode)
             self.main_core.update_script_signal.emit()
             self.edit_window.destroy()
 
@@ -218,7 +217,7 @@ class ProfileUI():
             print(f"Error writing script: {e}")
             traceback.print_exc()
 
-    def handle_write(self, script_name, mode, remap_row):
+    def handle_write(self, script_name, mode):
         "Action when saving profile (Can be moved)"
         output_path = os.path.join(self.main_core.script_dir, script_name)
         key_translations = self.write_script.load_key_translations()
@@ -226,36 +225,36 @@ class ProfileUI():
 
         with open(output_path, 'w', encoding='utf-8') as file:
             if mode == "text mode":
-                self.handle_text_mode(file, remap_row)
+                self.handle_text_mode(file)
             elif mode == "default mode":
-                self.handle_default_mode(file, remap_row)
+                self.handle_default_mode(file)
             else:
                 diff.pro_write(file, mode, key_translations)
 
-    def handle_default_mode(self, file, remap_row):
+    def handle_default_mode(self, file):
         "Write default mode"
         file.write("; default\n")
         self.main_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
-        write_hotif = self.write_condition(remap_row, file, write_shortcuts=True)
+        write_hotif = self.write_condition(file, write_shortcuts=True)
 
-        self.write_script.process_key_remaps(file, remap_row)
+        self.write_script.process_key_remaps(file, self.remap_row_comp)
 
         if write_hotif:
             file.write("#HotIf\n")
 
-    def handle_text_mode(self, file, remap_row):
+    def handle_text_mode(self, file):
         "Write text mode"
         file.write("; text\n")
         self.main_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
-        write_hotif = self.write_condition(remap_row, file, write_shortcuts=True)
+        write_hotif = self.write_condition(file, write_shortcuts=True)
 
-        text_content = remap_row.text_block.toPlainText().strip()
+        text_content = self.remap_row_comp.text_block.toPlainText().strip()
         if text_content:
             file.write("; Text mode start\n")
             file.write(text_content + '\n')
@@ -264,14 +263,14 @@ class ProfileUI():
         if write_hotif:
             file.write("#HotIf\n")
 
-    def check_key_integrity(self, remap_row):
+    def check_key_integrity(self):
         "Make sure there is no conflict on profile input"
         shortcut_types = {"normal": [], "caps": []}
         caps_on_present = False
         caps_off_present = False
         num_on_present = False
         num_off_present = False
-        for shortcut_row in remap_row.shortcut_rows:
+        for shortcut_row in self.remap_row_comp.shortcut_rows:
             if self.write_script.is_widget_valid(shortcut_row):
                 shortcut = shortcut_row[0].text().strip()
                 if shortcut:
@@ -321,12 +320,12 @@ class ProfileUI():
             return False
         return True
 
-    def write_condition(self, remap_row, file, write_shortcuts=False):
+    def write_condition(self, file, write_shortcuts=False):
         "Write Hotif condition for shortcuts, device, program in one hotif line"
         hotif_conditions = []
 
         # Shortcuts condition
-        self.shortcuts_condition(remap_row, file, hotif_conditions, write_shortcuts)
+        self.shortcuts_condition(file, hotif_conditions, write_shortcuts)
 
         # Device condition
         self.device_condition(file, hotif_conditions)
@@ -383,13 +382,13 @@ class ProfileUI():
             file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
             hotif_conditions.append("cm1.IsActive")
 
-    def shortcuts_condition(self, remap_row, file, hotif_conditions, write_shortcuts=False):
+    def shortcuts_condition(self, file, hotif_conditions, write_shortcuts=False):
         "Shortcuts condition"
         shortcuts = None
         if write_shortcuts:
             shortcuts = [
                 shortcut_row[0].text().strip()
-                for shortcut_row in remap_row.shortcut_rows
+                for shortcut_row in self.remap_row_comp.shortcut_rows
                 if self.write_script.is_widget_valid(shortcut_row)
                 and shortcut_row[0].text().strip()
             ] or None

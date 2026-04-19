@@ -94,8 +94,7 @@ class ProfileUI():
 
         self.script_name_entry = QLineEdit(top_widget)
         if script_name:
-            script_name_without_extension = script_name.replace('.ahk', '')
-            self.script_name_entry.setText(script_name_without_extension)
+            self.script_name_entry.setText(script_name.replace('.ahk', ''))
             self.script_name_entry.setReadOnly(True)
         else:
             self.script_name_entry.setText("")

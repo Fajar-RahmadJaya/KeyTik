@@ -4,11 +4,15 @@ from dataclasses import dataclass
 import os
 import json
 import random
-from PySide6.QtWidgets import (QLineEdit, QCheckBox)  # pylint: disable=E0611
-from utility import constant
+import re
+from PySide6.QtWidgets import (QLineEdit, QCheckBox, QMessageBox)  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
+from utility import constant
 from utility import utils
+from utility.diff import Diff
 from select_key.select_key_core import SelectKeyCore
+from core.main_core import MainCore
 
 
 @dataclass
@@ -26,6 +30,211 @@ class WriteScript():
     "Write script based on profile input"
     def __init__(self, remap_row_comp=None):
         self.remap_row_comp = remap_row_comp
+        self.main_core = MainCore()
+
+    def check_key_integrity(self):
+        "Make sure there is no conflict on profile input"
+        shortcut_types = {"normal": [], "caps": []}
+        caps_on_present = False
+        caps_off_present = False
+        num_on_present = False
+        num_off_present = False
+        for shortcut_row in self.remap_row_comp.shortcut_rows:
+            if self.is_widget_valid(shortcut_row):
+                shortcut = shortcut_row[0].text().strip()
+                if shortcut:
+                    if shortcut.lower() == "capslock on":
+                        shortcut_types["caps"].append(shortcut)
+                        caps_on_present = True
+                    elif shortcut.lower() == "capslock off":
+                        shortcut_types["caps"].append(shortcut)
+                        caps_off_present = True
+                    elif shortcut.lower() == "numlock on":
+                        shortcut_types["caps"].append(shortcut)
+                        num_on_present = True
+                    elif shortcut.lower() == "numlock off":
+                        shortcut_types["caps"].append(shortcut)
+                        num_off_present = True
+                    else:
+                        shortcut_types["normal"].append(shortcut)
+
+        if shortcut_types["normal"] and shortcut_types["caps"]:
+            msg = QMessageBox(None)
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("Shortcut Conflict")
+            msg.setText("You cannot use 'CapsLock On' or 'CapsLock Off' "
+                        "or 'NumLock On' or 'Numlock Off' together with normal keys as shortcuts. "
+                        "Please use only one type "
+                        "(either normal keys or CapsLock NumLock ON/OFF) for all shortcuts.")
+            msg.setWindowIcon(QIcon(constant.icon_path))
+            msg.exec()
+            return False
+        if caps_on_present and caps_off_present:
+            msg = QMessageBox(None)
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("Shortcut Conflict")
+            msg.setText("You cannot use both 'CapsLock ON' and 'CapsLock OFF' at the same time. "
+                        "Please use only one of of them. If you need both, just use 'Caps Lock'.")
+            msg.setWindowIcon(QIcon(constant.icon_path))
+            msg.exec()
+            return False
+        if num_on_present and num_off_present:
+            msg = QMessageBox(None)
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("Shortcut Conflict")
+            msg.setText("You cannot use both 'NumLock ON' and 'NumLock OFF' at the same time. "
+                        "Please use only one of of them. If you need both, just use 'Caps Lock'.")
+            msg.setWindowIcon(QIcon(constant.icon_path))
+            msg.exec()
+            return False
+        return True
+
+    def handle_write(self, script_name, mode, keyboard_entry, program_entry):
+        "Action when saving profile (Can be moved)"
+        output_path = os.path.join(self.main_core.script_dir, script_name)
+        key_translations = self.load_key_translations()
+        diff = Diff()  # Composition
+
+        with open(output_path, 'w', encoding='utf-8') as file:
+            if mode == "text mode":
+                self.handle_text_mode(file, keyboard_entry, program_entry)
+            elif mode == "default mode":
+                self.handle_default_mode(file, keyboard_entry, program_entry)
+            else:
+                diff.pro_write(file, mode, key_translations)
+
+    def handle_default_mode(self, file, keyboard_entry, program_entry):
+        "Write default mode"
+        file.write("; default\n")
+        self.main_core.generate_exit_key(os.path.basename(file.name), file)
+        file.write("#SingleInstance force\n")
+        file.write("#Requires AutoHotkey v2.0\n")
+
+        write_hotif = self.write_condition(
+            file, keyboard_entry, program_entry, write_shortcuts=True)
+
+        self.process_key_remaps(file)
+
+        if write_hotif:
+            file.write("#HotIf\n")
+
+    def handle_text_mode(self, file, keyboard_entry, program_entry):
+        "Write text mode"
+        file.write("; text\n")
+        self.main_core.generate_exit_key(os.path.basename(file.name), file)
+        file.write("#SingleInstance force\n")
+        file.write("#Requires AutoHotkey v2.0\n")
+
+        write_hotif = self.write_condition(
+            file, keyboard_entry, program_entry, write_shortcuts=True)
+
+        text_content = self.remap_row_comp.text_block.toPlainText().strip()
+        if text_content:
+            file.write("; Text mode start\n")
+            file.write(text_content + '\n')
+            file.write("; Text mode end\n")
+
+        if write_hotif:
+            file.write("#HotIf\n")
+
+    def write_condition(self, file, keyboard_entry, program_entry, write_shortcuts=False):
+        "Write Hotif condition for shortcuts, device, program in one hotif line"
+        hotif_conditions = []
+
+        # Shortcuts condition
+        self.shortcuts_condition(file, hotif_conditions, write_shortcuts)
+
+        # Device condition
+        self.device_condition(file, hotif_conditions, keyboard_entry)
+
+        # Program condition
+        self.get_program_condition(hotif_conditions, program_entry)
+
+        if hotif_conditions:
+            file.write("SetTitleMatchMode 2\n")
+            file.write(f"#HotIf {' && '.join(hotif_conditions)}\n")
+            return True
+        return False
+
+    def shortcuts_condition(self, file, hotif_conditions, write_shortcuts=False):
+        "Shortcuts condition"
+        shortcuts = None
+        if write_shortcuts:
+            shortcuts = [
+                shortcut_row[0].text().strip()
+                for shortcut_row in self.remap_row_comp.shortcut_rows
+                if self.is_widget_valid(shortcut_row)
+                and shortcut_row[0].text().strip()
+            ] or None
+
+        if shortcuts:
+            valid_shortcuts = [s for s in shortcuts if s]
+            if valid_shortcuts:
+                caps_shortcuts = []
+                normal_shortcuts = []
+                for shortcut in valid_shortcuts:
+                    if shortcut.lower() == "capslock on":
+                        caps_shortcuts.append('GetKeyState("CapsLock", "T")')
+                    elif shortcut.lower() == "capslock off":
+                        caps_shortcuts.append('!GetKeyState("CapsLock", "T")')
+                    elif shortcut.lower() == "numlock on":
+                        caps_shortcuts.append('GetKeyState("NumLock", "T")')
+                    elif shortcut.lower() == "numlock off":
+                        caps_shortcuts.append('!GetKeyState("NumLock", "T")')
+                    else:
+                        normal_shortcuts.append(shortcut)
+                if normal_shortcuts:
+                    file.write("toggle := false\n\n")
+                    for shortcut in normal_shortcuts:
+                        translated_shortcut = self.translate_key(shortcut)
+                        file.write(f"~{translated_shortcut}:: ; Shortcuts\n")
+                        file.write("{\n    global toggle\n    toggle := !toggle\n}\n\n")
+                    hotif_conditions.append("toggle")
+                elif caps_shortcuts:
+                    hotif_conditions.append(" || ".join(caps_shortcuts))
+
+    def get_program_condition(self, hotif_conditions, program_entry):
+        "Get program binding value from entry"
+        program_entry = program_entry.text().strip()
+
+        if program_entry:
+            pattern = r"\[(Tittle|Class|Process),\s*([^\]]+)\]"
+            matches = re.findall(pattern, program_entry)
+            conditions = []
+            for typ, value in matches:
+                value = value.strip()
+                if typ.lower() == "process":
+                    conditions.append(f'WinActive("ahk_exe {value}")')
+                elif typ.lower() == "class":
+                    conditions.append(f'WinActive("ahk_class {value}")')
+                elif typ.lower() == "tittle":
+                    conditions.append(f'WinActive("{value}")')
+            hotif_conditions.append(" || ".join(conditions))
+
+    def device_condition(self, file, hotif_conditions, keyboard_entry):
+        "Device condition"
+        device = keyboard_entry.text().strip()
+        if device:
+            parts = device.split(",", 1)
+            device_type = parts[0].strip().lower()
+            vid_pid_or_handle = parts[1].strip() if len(parts) > 1 else ""
+            if device_type == "mouse":
+                is_mouse = True
+            elif device_type == "keyboard":
+                is_mouse = False
+            else:
+                raise ValueError(f"Unknown device type: {device_type}")
+            file.write("Persistent\n")
+            file.write("#include AutoHotkey Interception\\Lib\\AutoHotInterception.ahk\n\n")
+            file.write("AHI := AutoHotInterception()\n")
+            file.write(
+                (
+                f'id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, '
+                f'"{vid_pid_or_handle}")\n'
+                )
+            )
+            file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
+            hotif_conditions.append("cm1.IsActive")
 
     def load_key_translations(self):
         "Load translation from raw key to readable key"

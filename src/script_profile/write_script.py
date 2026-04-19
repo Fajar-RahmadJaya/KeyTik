@@ -256,23 +256,19 @@ class WriteScript():
 
     def process_key_remaps(self, file):
         "Handle key remap write"
-        for row in self.remap_row_comp.key_rows:
-            (default_key_entry, remap_key_entry, _,
-            _, text_format_checkbox, hold_format_checkbox,
-            hold_interval_entry, first_key_checkbox, _) = row
-
+        for key_widget in self.remap_row_comp.key_rows:
             self.remap_row_comp.key_rows = KeyRows(
-                default_key_entry =default_key_entry,
-                remap_key_entry = remap_key_entry,
-                text_format_checkbox = text_format_checkbox,
-                hold_format_checkbox = hold_format_checkbox,
-                hold_interval_entry = hold_interval_entry,
-                first_key_checkbox = first_key_checkbox
+                default_key_entry = key_widget.default_key.default_key_entry,
+                remap_key_entry = key_widget.remap_key.remap_key_entry,
+                text_format_checkbox = key_widget.option.text_format_checkbox,
+                hold_format_checkbox = key_widget.option.hold_format_checkbox,
+                hold_interval_entry = key_widget.option.hold_interval_entry,
+                first_key_checkbox = key_widget.option.first_key_checkbox
             )
 
             try:
-                default_key = default_key_entry.text().strip()
-                remap_key = remap_key_entry.text().strip()
+                default_key = key_widget.default_key.default_key_entry.text().strip()
+                remap_key = key_widget.remap_key.remap_key_entry.text().strip()
 
                 if not default_key or not remap_key:
                     continue

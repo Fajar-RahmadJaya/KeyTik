@@ -4,7 +4,7 @@ import os
 import traceback
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
-    QComboBox, QGridLayout
+    QComboBox, QGridLayout, QMessageBox
 )
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
@@ -75,7 +75,7 @@ class ProfileUI():
         self.edit_middle(lines, first_line, edit_layout, remap_row_comp)
 
         # Bottom part of profile manager
-        self.edit_bottom(script_name, first_line, edit_layout, remap_row_comp)
+        self.edit_bottom(first_line, edit_layout, remap_row_comp)
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()
@@ -153,7 +153,7 @@ class ProfileUI():
 
         edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
 
-    def edit_bottom(self, script_name, first_line, edit_layout, remap_row_comp):
+    def edit_bottom(self, first_line, edit_layout, remap_row_comp):
         "Bottom part of profile manager"
         bottom_widget = QWidget(self.edit_window)
         bottom_layout = QGridLayout(bottom_widget)
@@ -162,8 +162,8 @@ class ProfileUI():
 
         save_button = QPushButton("Save Changes", self.edit_window)
         save_button.clicked.connect(
-            lambda: self.save_changes(script_name, mode_combobox,
-                                      self.keyboard_entry, self.program_entry))
+            lambda: self.save_changes(mode_combobox, self.keyboard_entry,
+                                      self.program_entry, remap_row_comp))
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
@@ -180,9 +180,10 @@ class ProfileUI():
 
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
-    def save_changes(self, script_name, mode_combobox, keyboard_entry, program_entry):
+    def save_changes(self, mode_combobox, keyboard_entry, program_entry, remap_row_comp):
         "Write script"
-        write_script = WriteScript()
+        write_script = WriteScript(remap_row_comp)
+        script_name = self.get_script_name()
         if not script_name:
             return
 
@@ -198,3 +199,15 @@ class ProfileUI():
         except ValueError as e:
             print(f"Error writing script: {e}")
             traceback.print_exc()
+
+    def get_script_name(self):
+        "Get profile name from entry"
+        script_name = self.script_name_entry.text().strip()
+        if not script_name:
+            QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
+            return None
+
+        if not script_name.endswith('.ahk'):
+            script_name += '.ahk'
+
+        return script_name

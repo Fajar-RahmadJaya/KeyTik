@@ -142,7 +142,7 @@ class RemapRow(QObject):
             self.shortcut_title()
             self.shortcut_row(parent_window)
             self.remap_title()
-            self.remap_row(parent_window)
+            self.remap_row(parent_window=parent_window)
             self.edit_frame_layout.addItem(QSpacerItem(20, 40,
                                             QSizePolicy.Minimum,
                                             QSizePolicy.Expanding))
@@ -174,7 +174,6 @@ class RemapRow(QObject):
         self.remap_title()
 
         parsed_remap_tuple = self.parse_script.parse_default_mode(lines, key_map)
-
         if parsed_remap_tuple:
             # Unpack tuple
             for (default_key, remap_key, is_text_format,
@@ -191,9 +190,9 @@ class RemapRow(QObject):
                     is_first_key = is_first_key,
                     is_sc = is_sc
                     )
-                self.remap_row(parsed_remap)
+                self.remap_row(parsed_remap=parsed_remap)
         else:
-            self.remap_row(parent_window)
+            self.remap_row(parent_window=parent_window)
 
 
         # if parsed_remap_tuple:
@@ -226,7 +225,7 @@ class RemapRow(QObject):
         self.edit_frame_layout.addWidget(remap_label_widget)
         return remap_label_widget
 
-    def remap_row(self, parent_window, parsed_remap=None, insert_after=None):
+    def remap_row(self, parent_window=None, parsed_remap=None, insert_after=None):
         "Remap row"
         # Remap row card
         card_frame = QFrame(self.edit_frame)

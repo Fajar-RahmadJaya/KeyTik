@@ -12,10 +12,7 @@ from select_program.select_program_core import SelectProgramCore
 
 class SelectProgramUI():
     "Select program UI"
-    def __init__(self, edit_window=None):
-        # Parameter
-        self.edit_window = edit_window
-
+    def __init__(self):
         # UI
         self.program_tree = None
         self.show_all_button = None

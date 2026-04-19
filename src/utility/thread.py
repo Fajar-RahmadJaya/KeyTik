@@ -13,10 +13,6 @@ class Thread(QThread):
     update_found = Signal()
     show_announcement = Signal()
 
-    def __init__(self, main_window):
-        super().__init__()
-        self.main_window = main_window
-
     def run(self):
         "Run check update on thread to increase dashborad initialization time"
         # To do: load all announcement file content on thread

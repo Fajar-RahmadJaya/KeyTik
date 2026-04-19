@@ -57,7 +57,7 @@ class ProfileUI():
         self.edit_window.setFixedSize(600, 460)
 
         # Composition
-        remap_row_comp = RemapRow(self.edit_window)
+        remap_row_comp = RemapRow()
 
         edit_layout = QGridLayout(self.edit_window)
         edit_layout.setContentsMargins(30, 10, 30, 10)
@@ -149,7 +149,7 @@ class ProfileUI():
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
-        edit_frame = remap_row_comp.handle_parser(lines, first_line)
+        edit_frame = remap_row_comp.handle_parser(lines, first_line, self.edit_window)
         edit_scroll.setWidget(edit_frame)
 
         edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
@@ -173,7 +173,8 @@ class ProfileUI():
         mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         mode_combobox.lineEdit().setReadOnly(True)
         mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        mode_combobox.currentIndexChanged.connect(remap_row_comp.handle_mode_changed)
+        mode_combobox.currentIndexChanged.connect(
+            lambda index: remap_row_comp.handle_mode_changed(index, self.edit_window))
         default_index = mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)

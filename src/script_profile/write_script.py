@@ -16,7 +16,7 @@ from core.main_core import MainCore
 
 
 @dataclass
-class KeyRows:
+class RemapWidget:
     "Dataclass containing key rows tuple"
     default_key_entry: QLineEdit = None
     remap_key_entry: QLineEdit = None
@@ -30,6 +30,7 @@ class WriteScript():
     "Write script based on profile input"
     def __init__(self, remap_row_comp=None):
         self.remap_row_comp = remap_row_comp
+        self.remap_widget = RemapWidget()
         self.main_core = MainCore()
 
     def check_key_integrity(self):
@@ -257,7 +258,7 @@ class WriteScript():
     def process_key_remaps(self, file):
         "Handle key remap write"
         for key_widget in self.remap_row_comp.key_rows:
-            self.remap_row_comp.key_rows = KeyRows(
+            self.remap_widget = RemapWidget(
                 default_key_entry = key_widget.default_key.default_key_entry,
                 remap_key_entry = key_widget.remap_key.remap_key_entry,
                 text_format_checkbox = key_widget.option.text_format_checkbox,
@@ -420,9 +421,9 @@ class WriteScript():
 
     def handle_remap_type(self, file, default_translated, remap_key):
         "Handle text, hold, single, multiple key mode"
-        if self.remap_row_comp.key_rows.text_format_checkbox.isChecked():
+        if self.remap_widget.text_format_checkbox.isChecked():
             self.write_text_format(file, default_translated, remap_key)
-        elif self.remap_row_comp.key_rows.hold_format_checkbox.isChecked():
+        elif self.remap_widget.hold_format_checkbox.isChecked():
             self.write_hold_format(file, default_translated, remap_key)
         elif "+" in remap_key:
             self.write_multiple_key_remap(file, default_translated,
@@ -455,8 +456,8 @@ class WriteScript():
 
     def write_multiple_key_default(self, default_key):
         "Write multiple key case on default key"
-        if (self.remap_row_comp.key_rows.first_key_checkbox is not None
-            and self.remap_row_comp.key_rows.first_key_checkbox.isChecked()):
+        if (self.remap_widget.first_key_checkbox is not None
+            and self.remap_widget.first_key_checkbox.isChecked()):
             translated_key = self.translate_key(default_key)
         else:
             translated_key = "~" + self.translate_key(default_key)
@@ -491,9 +492,9 @@ class WriteScript():
             )
         )
 
-        if self.remap_row_comp.key_rows.text_format_checkbox.isChecked():
+        if self.remap_widget.text_format_checkbox.isChecked():
             file.write(f'        SendText("{remap_key}")\n')
-        elif self.remap_row_comp.key_rows.hold_format_checkbox.isChecked():
+        elif self.remap_widget.hold_format_checkbox.isChecked():
             self.hold_format_double_click(remap_key, file)
         else:
             if "+" in remap_key:
@@ -526,13 +527,13 @@ class WriteScript():
     def hold_format_double_click(self, remap_key, file):
         "Write double click on hold format"
         hold_interval_ms = "10000"
-        if (self.remap_row_comp.key_rows.hold_format_checkbox.isChecked()
-            and self.remap_row_comp.key_rows.hold_interval_entry is not None):
+        if (self.remap_widget.hold_format_checkbox.isChecked()
+            and self.remap_widget.hold_interval_entry is not None):
             hold_interval = "10"
-            if (self.remap_row_comp.key_rows.hold_interval_entry.text().strip() and
-                self.remap_row_comp.key_rows.hold_interval_entry.text().strip()
+            if (self.remap_widget.hold_interval_entry.text().strip() and
+                self.remap_widget.hold_interval_entry.text().strip()
                     != "Hold Interval"):
-                hold_interval = self.remap_row_comp.key_rows. hold_interval_entry.text().strip()
+                hold_interval = self.remap_widget. hold_interval_entry.text().strip()
             hold_interval_ms = str(int(float(hold_interval) * 1000))
 
         keys = [key.strip() for key in remap_key.split("+")]
@@ -565,13 +566,13 @@ class WriteScript():
     def write_hold_format(self, file, default_translated, remap_key):
         "Write hold format"
         hold_interval_ms = "10000"
-        if (self.remap_row_comp.key_rows.hold_format_checkbox.isChecked()
-            and self.remap_row_comp.key_rows.hold_interval_entry is not None):
+        if (self.remap_widget.hold_format_checkbox.isChecked()
+            and self.remap_widget.hold_interval_entry is not None):
             hold_interval = "10"
-            if (self.remap_row_comp.key_rows.hold_interval_entry.text().strip() and
-                self.remap_row_comp.key_rows.hold_interval_entry.text().strip()
+            if (self.remap_widget.hold_interval_entry.text().strip() and
+                self.remap_widget.hold_interval_entry.text().strip()
                     != "Hold Interval"):
-                hold_interval = self.remap_row_comp.key_rows.hold_interval_entry.text().strip()
+                hold_interval = self.remap_widget.hold_interval_entry.text().strip()
             hold_interval_ms = str(int(float(hold_interval) * 1000))
 
         keys = [key.strip() for key in remap_key.split("+")]

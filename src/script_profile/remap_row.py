@@ -32,6 +32,38 @@ class ParsedRemap:
     is_text_format: bool
 
 
+@dataclass
+class OptionWidget:
+    "Data class containing option widget"
+    text_format_checkbox: QCheckBox = None
+    hold_format_checkbox: QCheckBox = None
+    hold_interval_entry: QLineEdit = None
+    first_key_checkbox: QCheckBox = None
+    sc_checkbox: QCheckBox = None
+
+
+@dataclass
+class DefaultKeyWidget:
+    "Data class containing default key widget"
+    default_key_entry: QLineEdit = None
+    default_key_select: QPushButton = None
+
+
+@dataclass
+class RemapKeyWidget:
+    "Data class containing remap key widget"
+    remap_key_entry: QLineEdit = None
+    remap_key_select: QPushButton = None
+
+
+@dataclass
+class KeyWidget:
+    "Data class containing key widget"
+    default_key: DefaultKeyWidget = None
+    remap_key: RemapKeyWidget = None
+    option: OptionWidget = None
+
+
 class RemapRow(QObject):
     "Remap & shortcut row on profile creation"
     request_timer_start = Signal(object)
@@ -243,34 +275,23 @@ class RemapRow(QObject):
 
         # Set widget and configure key rows tuple
         # Default Key Widget
-        (default_key_entry, default_key_select
-            ) = self.default_key_widget(row_widget, row_layout, parsed_remap, parent_window)
+        default_key = self.default_key_widget(row_widget, row_layout, parsed_remap, parent_window)
 
         # Remap Key Widget
-        (remap_key_entry, remap_key_select
-            ) = self.remap_key_widget(row_widget, row_layout, parsed_remap, parent_window)
-
-        # Option Widget
-        (text_format_checkbox, hold_format_checkbox,
-            hold_interval_entry, first_key_checkbox,
-            sc_checkbox) = self.option_widget(row_widget, row_layout, parsed_remap)
+        remap_key = self.remap_key_widget(row_widget, row_layout, parsed_remap, parent_window)
 
         # Add or remove row when entry changed
-        def auto_add_row():
-            "Auto add row if all entry have text"
-            if self.key_rows and (default_key_entry, remap_key_entry) == self.key_rows[-1][:2]:
-                if (default_key_entry.text().strip()
-                    and remap_key_entry.text().strip()):
-                    on_plus_click(None)
+        default_key.default_key_entry.textChanged.connect(
+            lambda: self.auto_add_row(default_key, remap_key, on_plus_click))
+        remap_key.remap_key_entry.textChanged.connect(
+            lambda: self.auto_add_row(default_key, remap_key, on_plus_click))
 
-        default_key_entry.textChanged.connect(auto_add_row)
-        remap_key_entry.textChanged.connect(auto_add_row)
-
-        self.key_rows.append((default_key_entry, remap_key_entry,
-                                default_key_select, remap_key_select,
-                                text_format_checkbox, hold_format_checkbox,
-                                hold_interval_entry, first_key_checkbox,
-                                sc_checkbox))
+        # Set key_rows
+        self.key_rows.append(KeyWidget(
+            default_key=default_key,
+            remap_key=remap_key,
+            # Option Widget
+            option=self.option_widget(row_widget, row_layout, parsed_remap)))
 
         # The order where the widget will be added
         mapping_row_widgets = []
@@ -278,40 +299,25 @@ class RemapRow(QObject):
             idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
             self.edit_frame_layout.insertWidget(idx, card_frame)
             self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
-            mapping_row_widgets.insert(idx // 2, (card_frame,
-                                                        separator_widget))
+            mapping_row_widgets.insert(idx // 2, (card_frame, separator_widget))
         else:
             self.edit_frame_layout.addWidget(card_frame)
             self.edit_frame_layout.addWidget(separator_widget)
             mapping_row_widgets.append((card_frame, separator_widget))
-
-        # Unused for now
-        # def auto_remove_row():
-        #     "Auto remove row if all entry don't have text"
-        #     if idx == len(self.key_rows) - 2:
-        #         if (not default_key_entry.text().strip() and
-        #                 not remap_key_entry.text().strip()):
-        #             for i, (sw) in enumerate(self.mapping_row_widgets):
-        #                 # plus = sw.findChild(QLabel, None)
-        #                 # frames = sw.findChildren(QFrame)
-        #                 # left_sep = frames[0] if len(frames) > 0 else None
-        #                 # right_sep = frames[2] if len(frames) > 1 else None
-        #                 # is_last = i == len(self.mapping_row_widgets) - 1
-        #                 # if plus:
-        #                 #     plus.setVisible(is_last)
-        #                 # if left_sep:
-        #                 #     left_sep.setVisible(is_last)
-        #                 # if right_sep:
-        #                 #     right_sep.setVisible(is_last)
-        # default_key_entry.textChanged.connect(
-        #     auto_remove_row)
-        # remap_key_entry.textChanged.connect(
-        #     auto_remove_row)
-
         self.update_plus_visibility(mapping_row_widgets=mapping_row_widgets)
+
         self.edit_frame.setUpdatesEnabled(True)
         self.edit_frame.update()
         self.edit_frame.adjustSize()
+
+    def auto_add_row(self, default_key, remap_key, on_plus_click):
+        "Auto add row if all entry have text"
+        if (self.key_rows
+            and default_key.default_key_entry == self.key_rows[-1].default_key.default_key_entry
+            and remap_key.remap_key_entry == self.key_rows[-1].remap_key.remap_key_entry):
+            if (default_key.default_key_entry.text().strip()
+                and remap_key.remap_key_entry.text().strip()):
+                on_plus_click(None)
 
     def default_key_widget(self, row_widget, row_layout, parsed_remap, parent_window):
         "Default key widget on remap row"
@@ -351,7 +357,11 @@ class RemapRow(QObject):
 
         row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
 
-        return default_key_entry, default_key_select
+        default_key = DefaultKeyWidget(
+            default_key_entry=default_key_entry,
+            default_key_select=default_key_select
+        )
+        return default_key
 
     def remap_key_widget(self, row_widget, row_layout, parsed_remap, parent_window):
         "Remap key widget on remap row"
@@ -390,7 +400,11 @@ class RemapRow(QObject):
 
         row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
 
-        return remap_key_entry, remap_key_select
+        remap_key = RemapKeyWidget(
+            remap_key_entry=remap_key_entry,
+            remap_key_select=remap_key_select)
+
+        return remap_key
 
     def option_widget(self, row_widget, row_layout, parsed_remap):
         "Remap option widget on remap row"
@@ -450,8 +464,14 @@ class RemapRow(QObject):
 
         row_layout.addWidget(options_widget, 2, 0, 1, 5, Qt.AlignCenter)
 
-        return (text_format_checkbox, hold_format_checkbox,
-                hold_interval_entry, first_key_checkbox, sc_checkbox)
+        option = OptionWidget(
+            text_format_checkbox=text_format_checkbox,
+            hold_format_checkbox=hold_format_checkbox,
+            hold_interval_entry=hold_interval_entry,
+            first_key_checkbox=first_key_checkbox,
+            sc_checkbox=sc_checkbox
+        )
+        return option
 
     def separator_widget(self, row_widget, row_type, parent_window):
         "Remap row separator widget"
@@ -698,10 +718,8 @@ class RemapRow(QObject):
     # ----------- From profile core -----------
     def handle_sc_listening(self, button):
         "Check whether to use scan code listening or not"
-        for key_row in self.key_rows:
-            (_, _, orig_button, _, _, _, _,_, _) = key_row
-
-            if button == orig_button:
+        for key_widget in self.key_rows:
+            if button == key_widget.default_key.default_key_select:
                 parent_widget = button.parent()
                 if parent_widget:
                     sc_checkboxes = [child for child
@@ -716,9 +734,9 @@ class RemapRow(QObject):
 
     def toggle_other_buttons(self, state, button):
         "Change the state of non selected button"
-        for key_row in self.key_rows:
-            (_, _, orig_button, remap_button, _, _, _, _, _) = key_row
-
+        for key_widget in self.key_rows:
+            orig_button = key_widget.default_key.default_key_select
+            remap_button = key_widget.remap_key.remap_key_select
             if orig_button != button and orig_button is not None:
                 orig_button.setEnabled(state)
             if remap_button != button and remap_button is not None:

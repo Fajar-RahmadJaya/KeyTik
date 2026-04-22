@@ -63,23 +63,8 @@ class KeyWidget:
     remap_key: RemapKeyWidget = None
     option: OptionWidget = None
 
-class InputFilter(QObject):  # pylint: disable=R0903
-    "Event filter to block input"
-    def __init__(self):  # pylint: disable=W0246
-        super().__init__()
 
-    def eventFilter(self, _, event):  # pylint: disable=C0103
-        "Filter event by key press and window"
-        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
-                            QEvent.KeyPress, QEvent.KeyRelease,
-                            QEvent.FocusIn, QEvent.FocusOut):
-            return True
-        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
-                            QEvent.Hide, QEvent.Leave):
-            return True
-        return False
-
-class RemapRow():
+class RemapRow(QObject):
     "Remap & shortcut row on profile creation"
     request_timer_start = Signal(object)
     def __init__(self):
@@ -803,6 +788,17 @@ class RemapRow():
                 else:
                     if hasattr(self, "release_timer"):
                         self.request_timer_start.emit(entry_widget)
+
+    def eventFilter(self, _, event):  # pylint: disable=C0103
+        "Filter event by key press and window"
+        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
+                            QEvent.KeyPress, QEvent.KeyRelease,
+                            QEvent.FocusIn, QEvent.FocusOut):
+            return True
+        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
+                            QEvent.Hide, QEvent.Leave):
+            return True
+        return False
 
     def key_listening(self, entry_widget, button):
         "Get and Listen to key press"

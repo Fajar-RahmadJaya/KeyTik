@@ -8,7 +8,7 @@ from setting.setting_core import SettingCore
 from script_profile.write_script import WriteScript
 
 
-class Thread(QThread):
+class Thread(QThread):  # pylint: disable=R0903
     "Thread at initializaion"
     update_found = Signal()
     show_announcement = Signal()

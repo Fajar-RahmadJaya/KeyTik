@@ -39,7 +39,7 @@ class WriteScript():
         caps_off_present = False
         num_on_present = False
         num_off_present = False
-        for shortcut_row in self.remap_row_comp.shortcut_rows:
+        for shortcut_row in self.remap_row_comp.shortcut_row_comp.shortcut_rows:
             if self.is_widget_valid(shortcut_row):
                 shortcut = shortcut_row[0].text().strip()
                 if shortcut:
@@ -148,7 +148,7 @@ class WriteScript():
         if write_shortcuts:
             shortcuts = [
                 shortcut_row[0].text().strip()
-                for shortcut_row in self.remap_row_comp.shortcut_rows
+                for shortcut_row in self.remap_row_comp.shortcut_row_comp.shortcut_rows
                 if self.is_widget_valid(shortcut_row)
                 and shortcut_row[0].text().strip()
             ] or None

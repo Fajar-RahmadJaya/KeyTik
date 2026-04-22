@@ -58,15 +58,17 @@ class ProfileUI():
 
         # Composition
         remap_row_comp = RemapRow()
+        shortcut_row_comp = remap_row_comp.shortcut_row_comp
+        key_listening = remap_row_comp.key_listening_comp
 
         edit_layout = QGridLayout(self.edit_window)
         edit_layout.setContentsMargins(30, 10, 30, 10)
 
         # Clear row
-        remap_row_comp.copas_rows.clear()
+        key_listening.copas_rows.clear()
         remap_row_comp.key_rows.clear()
-        remap_row_comp.shortcut_rows.clear()
-        remap_row_comp.is_text_mode = False
+        shortcut_row_comp.shortcut_rows.clear()
+        shortcut_row_comp.is_text_mode = False
 
         # Top part of profile manager
         self.edit_top(script_name, lines, edit_layout, remap_row_comp)

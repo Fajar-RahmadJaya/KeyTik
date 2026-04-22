@@ -64,9 +64,8 @@ class KeyWidget:
     option: OptionWidget = None
 
 
-class RemapRow(QObject):
-    "Remap & shortcut row on profile creation"
-    request_timer_start = Signal(object)
+class RemapRow():
+    "Remap row on profile creation"
     def __init__(self):
         super().__init__()
         # Parameter
@@ -76,26 +75,18 @@ class RemapRow(QObject):
         self.parse_script = ParseScript()
         self.profile_core = ProfileCore()
         self.select_key_ui = SelectKeyUI()
-
-        # Signal
-        self.request_timer_start.connect(self.profile_core.release_timer)
+        self.shortcut_row_comp = ShortcutRow(self)
+        self.key_listening_comp = self.shortcut_row_comp.key_listening_comp
 
         # Variables
-        self.mouse_listening_initialized = False
-        self.is_listening = False
         self.entries_to_disable = []
 
         self.key_rows = []
-        self.shortcut_rows = []
 
-        self.copas_rows = []
         self.files_opener_rows = []
         self.files_opener_row_widgets = []
 
         # UI
-        self.text_block = None
-        self.shortcut_entry = None
-        self.is_text_mode = None
         self.edit_frame = QWidget()
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
 
@@ -112,7 +103,7 @@ class RemapRow(QObject):
             self.default_mode_widget(lines, key_map, parent_window)
 
         elif mode_line == "; text":
-            self.text_mode_widget(lines, key_map, parent_window)
+            self.shortcut_row_comp.text_mode_widget(lines, key_map, parent_window)
 
         else:
             self.diff.pro_parser(lines, first_line)
@@ -128,19 +119,19 @@ class RemapRow(QObject):
                 widget.setParent(None)
 
         self.key_rows = []
-        self.shortcut_rows = []
+        self.shortcut_row_comp.shortcut_rows = []
         if hasattr(self, "files_opener_rows"):
             self.files_opener_rows = []
         if hasattr(self, "files_opener_row_widgets"):
             self.files_opener_row_widgets = []
         if hasattr(self, "text_block"):
-            self.text_block = None
-        self.is_text_mode = False
+            self.shortcut_row_comp.text_block = None
+        self.shortcut_row_comp.is_text_mode = False
 
         if index == 0:
-            self.is_text_mode = False
-            self.shortcut_title()
-            self.shortcut_row(parent_window)
+            self.shortcut_row_comp.is_text_mode = False
+            self.shortcut_row_comp.shortcut_title()
+            self.shortcut_row_comp.shortcut_row(parent_window)
             self.remap_title()
             self.remap_row(parent_window=parent_window)
             self.edit_frame_layout.addItem(QSpacerItem(20, 40,
@@ -148,9 +139,9 @@ class RemapRow(QObject):
                                             QSizePolicy.Expanding))
 
         elif index == 1:
-            self.is_text_mode = True
-            self.shortcut_title()
-            self.shortcut_row(parent_window)
+            self.shortcut_row_comp.is_text_mode = True
+            self.shortcut_row_comp.shortcut_title()
+            self.shortcut_row_comp.shortcut_row(parent_window)
             self.edit_frame_layout.addItem(QSpacerItem(20, 40,
                                             QSizePolicy.Minimum,
                                             QSizePolicy.Expanding))
@@ -163,13 +154,13 @@ class RemapRow(QObject):
 
         parsed_shortcut_tuple = self.parse_script.parse_shortcuts(lines, key_map)
 
-        self.shortcut_title()
+        self.shortcut_row_comp.shortcut_title()
 
         if parsed_shortcut_tuple:
             for parsed_shortcut in parsed_shortcut_tuple:
-                self.shortcut_row(parsed_shortcut)
+                self.shortcut_row_comp.shortcut_row(parsed_shortcut)
         else:
-            self.shortcut_row(parent_window)
+            self.shortcut_row_comp.shortcut_row(parent_window)
 
         self.remap_title()
 
@@ -325,7 +316,7 @@ class RemapRow(QObject):
         default_key_select.setToolTip("Press any key or shortcut "
                                         "to capture it automatically")
         default_key_select.clicked.connect(lambda:
-                                            self.key_listening(
+                                            self.key_listening_comp.key_listening(
                                                     default_key_entry,
                                                     default_key_select))
         row_layout.addWidget(default_key_select, 0, 0, 1, 2, Qt.AlignCenter)
@@ -368,7 +359,7 @@ class RemapRow(QObject):
         remap_key_select.setFixedWidth(140)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(lambda:
-                                            self.key_listening(
+                                            self.key_listening_comp.key_listening(
                                                 remap_key_entry,
                                                 remap_key_select))
         row_layout.addWidget(remap_key_select, 0, 3, 1, 2, Qt.AlignCenter)
@@ -517,181 +508,12 @@ class RemapRow(QObject):
                 self.remap_row(parent_window=parent_window,
                                insert_after=(row_widget, separator_widget))
             elif row_type == "shortcut row":
-                self.shortcut_row(parent_window=parent_window,
-                                  insert_after=(row_widget, separator_widget))
+                self.shortcut_row_comp.shortcut_row(
+                    parent_window=parent_window, insert_after=(row_widget, separator_widget))
 
         plus_label.mousePressEvent = on_plus_click
 
         return separator_widget, on_plus_click
-
-    def shortcut_title(self):
-        "Shortcuts row tittle label"
-        shortcut_label = QLabel("Shortcut", self.edit_frame)
-        shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        shortcut_label.setStyleSheet("""
-            font-size: 13px;
-            font-weight: bold;
-        """)
-        self.edit_frame_layout.addWidget(shortcut_label)
-        return shortcut_label
-
-    def shortcut_row(self, parent_window, parsed_shortcut=None, insert_after=None):
-        "Shortcut row"
-        # For text mode
-        if self.is_text_mode and (not hasattr(self, 'text_block') or
-        self.text_block is None):
-            self.text_block = QTextEdit(self.edit_frame)
-            self.text_block.setReadOnly(False)
-            self.text_block.setStyleSheet(
-            "font-family: Consolas; "
-            "font-size: 10pt;"
-            )
-            self.edit_frame_layout.addWidget(self.text_block)
-
-        # Card frame
-        card_frame = QFrame(self.edit_frame)
-        card_frame.setFrameShape(QFrame.NoFrame)
-        if utils.theme == "dark":
-            card_frame.setStyleSheet("""
-            QFrame {
-                background: #313131;
-                border: 1px solid #404040;
-                border-radius: 10px;
-            }
-            """)
-        else:
-            card_frame.setStyleSheet("""
-            QFrame {
-                background: #f8f8f8;
-                border: 1px solid #c9c9c9;
-                border-radius: 10px;
-            }
-            """)
-        card_layout = QVBoxLayout(card_frame)
-        card_layout.setContentsMargins(8, 8, 8, 8)
-        card_layout.setSpacing(0)
-
-        row_widget = QWidget(self.edit_frame)
-        row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
-                                 QSizePolicy.Policy.Fixed)
-        card_layout.addWidget(row_widget)
-
-        row_layout = QGridLayout(row_widget)
-        row_widget.setLayout(row_layout)
-        row_layout.setContentsMargins(10, 5, 10, 5)
-        row_layout.setHorizontalSpacing(10)
-        row_layout.setVerticalSpacing(5)
-
-        # Shortcut Widget
-        self.shortcut_widget(row_widget, row_layout, parsed_shortcut, parent_window)
-
-        # Separator widget
-        separator_widget, _ = self.separator_widget(row_widget, parent_window=parent_window,
-                                                    row_type="shortcut row")
-
-        shortcut_row_widgets = []
-        if insert_after is not None:
-            idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
-            self.edit_frame_layout.insertWidget(idx, card_frame)
-            self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
-            shortcut_row_widgets.insert(idx // 2, (card_frame,
-                                                        separator_widget))
-        else:
-            self.edit_frame_layout.addWidget(card_frame)
-            self.edit_frame_layout.addWidget(separator_widget)
-            shortcut_row_widgets.append((card_frame, separator_widget))
-
-        if (self.is_text_mode and
-            hasattr(self, 'text_block') and
-            self.text_block is not None):
-
-            self.edit_frame_layout.addWidget(self.text_block)
-
-        self.update_plus_visibility(shortcut_row_widgets=shortcut_row_widgets)
-        self.edit_frame.setUpdatesEnabled(True)
-        self.edit_frame.update()
-        self.edit_frame.adjustSize()
-
-    def shortcut_widget(self, row_widget, row_layout, parsed_shortcut, parent_window):
-        "Shortcut widget"
-        shortcut_key_select = QPushButton("Select", row_widget)
-        shortcut_key_select.setFixedWidth(280)
-        shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
-        shortcut_key_select.clicked.connect(lambda:
-                                            self.key_listening(
-                                                self.shortcut_entry,
-                                                shortcut_key_select))
-        row_layout.addWidget(shortcut_key_select, 0, 0, 1, 4, Qt.AlignCenter)
-
-        shortcut_widget = QWidget(row_widget)
-        shortcut_layout = QHBoxLayout(shortcut_widget)
-        shortcut_layout.setContentsMargins(0, 0, 0, 0)
-        shortcut_layout.setSpacing(2)
-
-        self.shortcut_entry = QLineEdit(shortcut_widget)
-
-        self.shortcut_entry.setFixedWidth(252)
-        self.shortcut_entry.setToolTip("Shortcut can be "
-                                        "a single key, multiple keys, or shortcut specials "
-                                        "(See select key)")
-        self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        if parsed_shortcut:
-            self.shortcut_entry.setText(parsed_shortcut)
-        self.entries_to_disable.append((self.shortcut_entry, None))
-        self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
-        shortcut_layout.addWidget(self.shortcut_entry)
-
-        shortcut_choose = QPushButton(shortcut_widget)
-        shortcut_choose.setFixedWidth(28)
-        shortcut_choose.setIcon(icons.get_icon(icons.search))
-        shortcut_choose.setToolTip("Choose Shortcut key")
-        shortcut_choose.clicked.connect(
-            lambda: self.select_key_ui.select_key(
-                parent_window, self.shortcut_entry, context="shortcut"))
-        shortcut_layout.addWidget(shortcut_choose)
-
-        row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
-
-    def text_mode_widget(self, lines, key_map, parent_window):
-        "Text mode frame(to do: fix)"
-        shortcuts = self.parse_script.parse_shortcuts(lines, key_map)
-
-        if not shortcuts:
-            self.shortcut_row(parent_window)
-        else:
-            for shortcut in shortcuts:
-                self.shortcut_row(shortcut)
-
-        self.text_block = QTextEdit(self.edit_frame)
-        self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
-        self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
-        self.text_block.setFontPointSize(10)
-        self.text_block.setReadOnly(False)
-        self.text_block.setStyleSheet(
-        "font-family: Consolas; "
-        "font-size: 10pt;"
-        )
-        text_content = self.extract_and_filter_content(lines)
-        self.text_block.setPlainText(text_content.strip())
-        self.edit_frame_layout.addWidget(self.text_block)
-
-        self.update_plus_visibility('shortcut')
-
-    def extract_and_filter_content(self, lines):
-        "Get text block value from the marker"
-        inside = False
-        result_lines = []
-        for line in lines:
-            stripped = line.strip()
-            if stripped == "; Text mode start":
-                inside = True
-                continue
-            if stripped == "; Text mode end":
-                inside = False
-                continue
-            if inside:
-                result_lines.append(line)
-        return ''.join(result_lines)
 
     def update_plus_visibility(self, mapping_row_widgets=None, shortcut_row_widgets=None):
         "Make sure + only showed up only on the last row"
@@ -714,26 +536,223 @@ class RemapRow(QObject):
             if right_sep:
                 right_sep.setVisible(is_last)
 
-    # ----------- From profile core -----------
-    def handle_sc_listening(self, button):
-        "Check whether to use scan code listening or not"
-        for key_widget in self.key_rows:
-            if button == key_widget.default_key.default_key_select:
-                parent_widget = button.parent()
-                if parent_widget:
-                    sc_checkboxes = [child for child
-                                        in parent_widget.
-                                        findChildren(QObject)
-                                        if child.objectName() ==
-                                        "sc_checkbox"]
-                    if sc_checkboxes:
-                        return sc_checkboxes[0].isChecked()
-                    break
-        return None
+class ShortcutRow():
+    "Shortcut row on profile creation"
+    def __init__(self, remap_row_comp):
+        # Variable
+        self.is_text_mode = None
+        self.shortcut_rows = []
+
+        # Composition
+        self.remap_row_comp = remap_row_comp
+        self.key_listening_comp = KeyListening(
+            shortcut_row_comp=self, remap_row_comp=self.remap_row_comp)
+
+        # UI
+        self.text_block = None
+        self.shortcut_entry = None
+
+    def shortcut_title(self):
+        "Shortcuts row tittle label"
+        shortcut_label = QLabel("Shortcut", self.remap_row_comp.edit_frame)
+        shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        shortcut_label.setStyleSheet("""
+            font-size: 13px;
+            font-weight: bold;
+        """)
+        self.remap_row_comp.edit_frame_layout.addWidget(shortcut_label)
+        return shortcut_label
+
+    def shortcut_row(self, parent_window, parsed_shortcut=None, insert_after=None):
+        "Shortcut row"
+        # For text mode
+        if self.is_text_mode and (not hasattr(self, 'text_block') or
+        self.text_block is None):
+            self.text_block = QTextEdit(self.remap_row_comp.edit_frame)
+            self.text_block.setReadOnly(False)
+            self.text_block.setStyleSheet(
+            "font-family: Consolas; "
+            "font-size: 10pt;"
+            )
+            self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
+
+        # Card frame
+        card_frame = QFrame(self.remap_row_comp.edit_frame)
+        card_frame.setFrameShape(QFrame.NoFrame)
+        if utils.theme == "dark":
+            card_frame.setStyleSheet("""
+            QFrame {
+                background: #313131;
+                border: 1px solid #404040;
+                border-radius: 10px;
+            }
+            """)
+        else:
+            card_frame.setStyleSheet("""
+            QFrame {
+                background: #f8f8f8;
+                border: 1px solid #c9c9c9;
+                border-radius: 10px;
+            }
+            """)
+        card_layout = QVBoxLayout(card_frame)
+        card_layout.setContentsMargins(8, 8, 8, 8)
+        card_layout.setSpacing(0)
+
+        row_widget = QWidget(self.remap_row_comp.edit_frame)
+        row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
+                                    QSizePolicy.Policy.Fixed)
+        card_layout.addWidget(row_widget)
+
+        row_layout = QGridLayout(row_widget)
+        row_widget.setLayout(row_layout)
+        row_layout.setContentsMargins(10, 5, 10, 5)
+        row_layout.setHorizontalSpacing(10)
+        row_layout.setVerticalSpacing(5)
+
+        # Shortcut Widget
+        self.shortcut_widget(row_widget, row_layout, parsed_shortcut, parent_window)
+
+        # Separator widget
+        separator_widget, _ = self.remap_row_comp.separator_widget(
+            row_widget, parent_window=parent_window, row_type="shortcut row")
+
+        shortcut_row_widgets = []
+        if insert_after is not None:
+            idx = self.remap_row_comp.edit_frame_layout.indexOf(insert_after[1]) + 1
+            self.remap_row_comp.edit_frame_layout.insertWidget(idx, card_frame)
+            self.remap_row_comp.edit_frame_layout.insertWidget(idx + 1, separator_widget)
+            shortcut_row_widgets.insert(idx // 2, (card_frame,
+                                                        separator_widget))
+        else:
+            self.remap_row_comp.edit_frame_layout.addWidget(card_frame)
+            self.remap_row_comp.edit_frame_layout.addWidget(separator_widget)
+            shortcut_row_widgets.append((card_frame, separator_widget))
+
+        if (self.is_text_mode and
+            hasattr(self, 'text_block') and
+            self.text_block is not None):
+
+            self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
+
+        self.remap_row_comp.update_plus_visibility(shortcut_row_widgets=shortcut_row_widgets)
+        self.remap_row_comp.edit_frame.setUpdatesEnabled(True)
+        self.remap_row_comp.edit_frame.update()
+        self.remap_row_comp.edit_frame.adjustSize()
+
+    def shortcut_widget(self, row_widget, row_layout, parsed_shortcut, parent_window):
+        "Shortcut widget"
+        shortcut_key_select = QPushButton("Select", row_widget)
+        shortcut_key_select.setFixedWidth(280)
+        shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
+        shortcut_key_select.clicked.connect(lambda:
+                                            self.key_listening_comp.key_listening(
+                                                self.shortcut_entry,
+                                                shortcut_key_select))
+        row_layout.addWidget(shortcut_key_select, 0, 0, 1, 4, Qt.AlignCenter)
+
+        shortcut_widget = QWidget(row_widget)
+        shortcut_layout = QHBoxLayout(shortcut_widget)
+        shortcut_layout.setContentsMargins(0, 0, 0, 0)
+        shortcut_layout.setSpacing(2)
+
+        self.shortcut_entry = QLineEdit(shortcut_widget)
+
+        self.shortcut_entry.setFixedWidth(252)
+        self.shortcut_entry.setToolTip("Shortcut can be "
+                                        "a single key, multiple keys, or shortcut specials "
+                                        "(See select key)")
+        self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        if parsed_shortcut:
+            self.shortcut_entry.setText(parsed_shortcut)
+        self.remap_row_comp.entries_to_disable.append((self.shortcut_entry, None))
+        self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
+        shortcut_layout.addWidget(self.shortcut_entry)
+
+        shortcut_choose = QPushButton(shortcut_widget)
+        shortcut_choose.setFixedWidth(28)
+        shortcut_choose.setIcon(icons.get_icon(icons.search))
+        shortcut_choose.setToolTip("Choose Shortcut key")
+        shortcut_choose.clicked.connect(
+            lambda: self.remap_row_comp.select_key_ui.select_key(
+                parent_window, self.shortcut_entry, context="shortcut"))
+        shortcut_layout.addWidget(shortcut_choose)
+
+        row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
+
+    def text_mode_widget(self, lines, key_map, parent_window):
+        "Text mode frame(to do: fix)"
+        shortcuts = self.remap_row_comp.parse_script.parse_shortcuts(lines, key_map)
+
+        if not shortcuts:
+            self.shortcut_row(parent_window)
+        else:
+            for shortcut in shortcuts:
+                self.shortcut_row(shortcut)
+
+        self.text_block = QTextEdit(self.remap_row_comp.edit_frame)
+        self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
+        self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
+        self.text_block.setFontPointSize(10)
+        self.text_block.setReadOnly(False)
+        self.text_block.setStyleSheet(
+        "font-family: Consolas; "
+        "font-size: 10pt;"
+        )
+        text_content = self.extract_and_filter_content(lines)
+        self.text_block.setPlainText(text_content.strip())
+        self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
+
+        self.remap_row_comp.update_plus_visibility('shortcut')
+
+    def extract_and_filter_content(self, lines):
+        "Get text block value from the marker"
+        inside = False
+        result_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped == "; Text mode start":
+                inside = True
+                continue
+            if stripped == "; Text mode end":
+                inside = False
+                continue
+            if inside:
+                result_lines.append(line)
+        return ''.join(result_lines)
+
+class KeyListening(QObject):
+    "Listen to key press"
+    request_timer_start = Signal()
+    def __init__(self, remap_row_comp=None, shortcut_row_comp=None):
+        super().__init__()
+        # Composition
+        self.remap_row_comp = remap_row_comp
+        self.profile_core = self.remap_row_comp.profile_core
+        self.shortcut_row_comp = shortcut_row_comp
+
+        # Signal
+        self.request_timer_start.connect(self.profile_core.release_timer)
+
+        # Variable
+        self.mouse_listening_initialized = False
+        self.is_listening = False
+        self.copas_rows = []
+
+    def eventFilter(self, _, event):  # pylint: disable=C0103
+        "Filter event by key press and window"
+        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
+                            QEvent.KeyPress, QEvent.KeyRelease,
+                            QEvent.FocusIn, QEvent.FocusOut):
+            return True
+        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
+                            QEvent.Hide, QEvent.Leave):
+            return True
+        return False
 
     def toggle_other_buttons(self, state, button):
         "Change the state of non selected button"
-        for key_widget in self.key_rows:
+        for key_widget in self.remap_row_comp.key_rows:
             orig_button = key_widget.default_key.default_key_select
             remap_button = key_widget.remap_key.remap_key_select
             if orig_button != button and orig_button is not None:
@@ -749,7 +768,7 @@ class RemapRow(QObject):
             if paste_button != button and paste_button is not None:
                 paste_button.setEnabled(state)
 
-        for _, shortcut_button in self.shortcut_rows:
+        for _, shortcut_button in self.shortcut_row_comp.shortcut_rows:
             if shortcut_button != button and shortcut_button is not None:
                 shortcut_button.setEnabled(state)
 
@@ -783,22 +802,27 @@ class RemapRow(QObject):
                 self.profile_core.pressed_keys.remove(key)
                 if not self.profile_core.pressed_keys:
                     self.key_listening(entry_widget, button)
-                    self.request_timer_start.emit(entry_widget)
+                    self.request_timer_start.emit()
 
                 else:
                     if hasattr(self, "release_timer"):
-                        self.request_timer_start.emit(entry_widget)
+                        self.request_timer_start.emit()
 
-    def eventFilter(self, _, event):  # pylint: disable=C0103
-        "Filter event by key press and window"
-        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
-                            QEvent.KeyPress, QEvent.KeyRelease,
-                            QEvent.FocusIn, QEvent.FocusOut):
-            return True
-        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
-                            QEvent.Hide, QEvent.Leave):
-            return True
-        return False
+    def handle_sc_listening(self, button):
+        "Check whether to use scan code listening or not"
+        for key_widget in self.remap_row_comp.key_rows:
+            if button == key_widget.default_key.default_key_select:
+                parent_widget = button.parent()
+                if parent_widget:
+                    sc_checkboxes = [child for child
+                                        in parent_widget.
+                                        findChildren(QObject)
+                                        if child.objectName() ==
+                                        "sc_checkbox"]
+                    if sc_checkboxes:
+                        return sc_checkboxes[0].isChecked()
+                    break
+        return None
 
     def key_listening(self, entry_widget, button):
         "Get and Listen to key press"
@@ -819,11 +843,11 @@ class RemapRow(QObject):
             # Part of pro version code
             for copas_row in self.copas_rows:
                 copy_entry, paste_entry, _, _, _, _ = copas_row
-                self.entries_to_disable.append((copy_entry, None))
-                self.entries_to_disable.append((paste_entry, None))
+                self.remap_row_comp.entries_to_disable.append((copy_entry, None))
+                self.remap_row_comp.entries_to_disable.append((paste_entry, None))
 
             # Install disable widget event filter
-            for entry_tuple in self.entries_to_disable:
+            for entry_tuple in self.remap_row_comp.entries_to_disable:
                 entry = entry_tuple[0]
                 if entry is not None:
                     entry.installEventFilter(self)
@@ -847,7 +871,7 @@ class RemapRow(QObject):
             self.profile_core.pressed_keys = []
 
             # Remove disable widget event filet
-            for entry_tuple in self.entries_to_disable:
+            for entry_tuple in self.remap_row_comp.entries_to_disable:
                 entry = entry_tuple[0]
                 if entry is not None:
                     entry.removeEventFilter(self)
@@ -881,12 +905,12 @@ class RemapRow(QObject):
                 self.profile_core.pressed_keys.remove(mouse_button)
                 if not self.profile_core.pressed_keys:
                     self.key_listening(self.profile_core.active_entry, None)
-                    self.request_timer_start.emit(self.profile_core.active_entry)
+                    self.request_timer_start.emit()
 
     def check_mouse_event(self):
         "Check if cursor is over any widget in key_rows"
-        local_pos = self.edit_frame.mapFromGlobal(QCursor.pos())
-        widget = self.edit_frame.childAt(local_pos)
+        local_pos = self.remap_row_comp.edit_frame.mapFromGlobal(QCursor.pos())
+        widget = self.remap_row_comp.edit_frame.childAt(local_pos)
         if isinstance(widget, (QPushButton, QLineEdit, QCheckBox)):
             print("true")
             return True

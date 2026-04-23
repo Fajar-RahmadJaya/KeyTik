@@ -7,7 +7,6 @@ import webbrowser
 import random
 import winshell
 from win32com.client import Dispatch
-
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication, QFileDialog, QMessageBox,
     QInputDialog
@@ -20,17 +19,17 @@ from utility import constant
 from utility import utils
 from utility import icons
 
-class MainCore(QObject):
+class DashboardCore(QObject):
     "Main Logic"
     update_script_signal = Signal()
     def __init__(self):
         super().__init__()
         # UI initialization
         self.script_dir = utils.active_dir
-        self.pinned_profiles = utils.load_pinned_profiles()
 
         # Variable
         self.current_page = 0
+        self.pinned_profiles = utils.load_pinned_profiles()
 
     def import_button_clicked(self, parent):
         "Select AHK script and add necessary line"
@@ -313,21 +312,6 @@ class MainCore(QObject):
         self.list_scripts()
         self.update_script_signal.emit()
 
-    def toggle_pin(self, script, icon_label):
-        "Pin profile from pinned profile list"
-        if script in self.pinned_profiles:
-
-            self.pinned_profiles.remove(script)
-            icon_label.load(icons.pin)
-        else:
-
-            self.pinned_profiles.insert(0, script)
-            icon_label.load(icons.pin_fill)
-
-        utils.save_pinned_profiles(self.pinned_profiles)
-        self.list_scripts()
-        self.update_script_signal.emit()
-
     def check_ahk_installation(self, show_installed_message=False):
         "Check AutoHotkey installation"
         if os.path.exists(utils.ahkv2_dir):
@@ -371,8 +355,18 @@ class MainCore(QObject):
 
         QApplication.setFont(fallback_font)
 
+    def toggle_pin(self, script):
+        "Pin profile from pinned profile list"
+        if script in self.pinned_profiles:
+            self.pinned_profiles.remove(script)
+        else:
+            self.pinned_profiles.insert(0, script)
+
+        utils.save_pinned_profiles(self.pinned_profiles)
+        self.update_script_signal.emit()
+
     def list_scripts(self):
-        "List profile, with listing all AHK script on active directory"
+        "List profile, with listing all AHK script on active directory order by pinned first"
         all_scripts = [f for f in os.listdir(self.script_dir)
                        if f.endswith('.ahk') or f.endswith('.py')]
 

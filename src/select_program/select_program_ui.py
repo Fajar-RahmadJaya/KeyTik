@@ -2,46 +2,37 @@
 
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QLabel, QLineEdit, QPushButton, QTreeWidget,
-    QVBoxLayout, QHBoxLayout
-)
+    QVBoxLayout, QHBoxLayout)
 from PySide6.QtCore import Qt, QTimer  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
-
 from select_program.select_program_core import SelectProgramCore
 
 
 class SelectProgramUI():
     "Select program UI"
-    def __init__(self, edit_window=None):
-        # Parameter
-        self.edit_window = edit_window
-
-        # Composition
-        self.select_program_core = SelectProgramCore()
-
+    def __init__(self):
         # UI
-        self.select_program_window = None
         self.program_tree = None
         self.show_all_button = None
         self.fit_sorted_column = None
 
     def program_window(self, entry_widget, parent):
         "Select program window"
-        self.select_program_window = None
+        select_program_window = None
 
-        self.select_program_window = QDialog(parent)
-        self.select_program_window.setWindowTitle("Select Programs")
-        self.select_program_window.setWindowIcon(QIcon(constant.icon_path))
-        self.select_program_window.setFixedSize(600, 300)
-        self.select_program_window.setModal(True)
-        self.select_program_window.setAttribute(
+        select_program_window = QDialog(parent)
+        select_program_window.setWindowTitle("Select Programs")
+        select_program_window.setWindowIcon(QIcon(constant.icon_path))
+        select_program_window.setFixedSize(600, 300)
+        select_program_window.setModal(True)
+        select_program_window.setAttribute(
             Qt.WidgetAttribute.WA_DeleteOnClose)
 
-        main_layout = QVBoxLayout(self.select_program_window)
+        main_layout = QVBoxLayout(select_program_window)
 
-        self.program_tree = QTreeWidget(self.select_program_window)
+        self.program_tree = QTreeWidget(select_program_window)
         self.program_tree.setHeaderLabels(["Window Title", "Class", "Process"])
         self.program_tree.setSortingEnabled(True)
         self.program_tree.setFixedWidth(580)
@@ -71,58 +62,60 @@ class SelectProgramUI():
         QTimer.singleShot(0, fit_sorted_column)
         header.sectionClicked.connect(lambda _: fit_sorted_column())
 
-        self.program_window_button(main_layout, entry_widget)
+        self.program_window_button(main_layout, entry_widget, select_program_window)
 
         self.update_program_treeview(show_all_processes=False)
         self.fit_sorted_column()
 
-        self.select_program_window.exec()
+        select_program_window.exec()
 
-    def program_window_button(self, main_layout, entry_widget):
+    def program_window_button(self, main_layout, entry_widget, select_program_window):
         "Button on program window"
         button_layout = QHBoxLayout()
         main_layout.addLayout(button_layout)
 
-        save_button = QPushButton("Select", self.select_program_window)
+        save_button = QPushButton("Select", select_program_window)
         save_button.clicked.connect(
-            lambda: self.save_selected_programs(entry_widget))
+            lambda: self.save_selected_programs(entry_widget, select_program_window))
         button_layout.addWidget(save_button)
 
         search_layout = QHBoxLayout()
         button_layout.addLayout(search_layout)
 
-        search_label = QLabel("Search:", self.select_program_window)
+        search_label = QLabel("Search:", select_program_window)
         search_layout.addWidget(search_label)
 
-        search_entry = QLineEdit(self.select_program_window)
+        search_entry = QLineEdit(select_program_window)
         search_layout.addWidget(search_entry)
 
         search_entry.textChanged.connect(self.search_programs)
 
-        refresh_button = QPushButton("Refresh", self.select_program_window)
+        refresh_button = QPushButton("Refresh", select_program_window)
         refresh_button.clicked.connect(lambda: self.update_program_treeview(
             show_all_processes=self.show_all_button.text() == "Show App Only"
         ))
         search_layout.addWidget(refresh_button)
 
         self.show_all_button = QPushButton(
-            "Show All Processes", self.select_program_window)
+            "Show All Processes", select_program_window)
         self.show_all_button.clicked.connect(self.toggle_show_all_processes)
         search_layout.addWidget(self.show_all_button)
 
     def update_program_treeview(self, show_all_processes=None):
         "Populate process into treeview"
+        select_program_core = SelectProgramCore()  # Composition
+
         if show_all_processes is None:
             show_all_processes = (
                 self.show_all_button.text()) == "Show All Processes"
         self.program_tree.clear()
 
-        processes = self.select_program_core.get_running_processes(app_only=not show_all_processes)
+        processes = select_program_core.get_running_processes(app_only=not show_all_processes)
         for proc in processes:
             window_title, class_name, proc_name = proc[:3]
             p_type = proc[3] if len(proc) > 3 else "Application"
             if show_all_processes or p_type == "Application":
-                item = self.select_program_core.multi_check([window_title, class_name, proc_name])
+                item = select_program_core.multi_check([window_title, class_name, proc_name])
                 self.program_tree.addTopLevelItem(item)
 
         if hasattr(self, "fit_sorted_column"):
@@ -144,7 +137,7 @@ class SelectProgramUI():
             item = self.program_tree.topLevelItem(index)
             item.setHidden(query.lower() not in item.text(0).lower())
 
-    def save_selected_programs(self, entry_widget):
+    def save_selected_programs(self, entry_widget, select_program_window):
         "Append selected process onto"
         name_checked = []
         class_checked = []
@@ -161,4 +154,5 @@ class SelectProgramUI():
 
         if selected_programs:
             entry_widget.setText(" ".join(selected_programs))
-        self.select_program_window.accept()
+
+        select_program_window.accept()

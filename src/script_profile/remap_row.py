@@ -9,12 +9,14 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 from PySide6.QtCore import Qt, Signal, QObject, QTimer, QEvent  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
+from PySide6.QtGui import QCursor  # pylint: disable=E0611
+
 from utility import utils
 from utility import icons
 from utility import constant
 from utility.diff import Diff
 from script_profile.parse_script import ParseScript
-from script_profile.profile_core import ProfileCore
+from script_profile.remap_row_core import RemapRowCore
 from select_key.select_key_ui import SelectKeyUI
 
 
@@ -30,53 +32,79 @@ class ParsedRemap:
     is_text_format: bool
 
 
-class RemapRow(QObject):
-    "Remap & shortcut row on profile creation"
-    request_timer_start = Signal(object)
-    def __init__(self, edit_window):
+@dataclass
+class OptionWidget:
+    "Data class containing option widget"
+    text_format_checkbox: QCheckBox = None
+    hold_format_checkbox: QCheckBox = None
+    hold_interval_entry: QLineEdit = None
+    first_key_checkbox: QCheckBox = None
+    sc_checkbox: QCheckBox = None
+
+
+@dataclass
+class DefaultKeyWidget:
+    "Data class containing default key widget"
+    default_key_entry: QLineEdit = None
+    default_key_select: QPushButton = None
+
+
+@dataclass
+class RemapKeyWidget:
+    "Data class containing remap key widget"
+    remap_key_entry: QLineEdit = None
+    remap_key_select: QPushButton = None
+
+
+@dataclass
+class KeyWidget:
+    "Data class containing key widget"
+    default_key: DefaultKeyWidget = None
+    remap_key: RemapKeyWidget = None
+    option: OptionWidget = None
+
+
+class RemapRow():
+    "Remap row on profile creation"
+    def __init__(self):
         super().__init__()
-        # Parameter
-        self.edit_window = edit_window
-
         # Composition
-        self.diff = Diff()
-        self.parse_script = ParseScript()
-        self.profile_core = ProfileCore()
         self.select_key_ui = SelectKeyUI()
-
-        # Signal
-        self.request_timer_start.connect(self.profile_core.release_timer)
+        self.shortcut_row_comp = ShortcutRow(self)
+        self.key_listening_comp = self.shortcut_row_comp.key_listening_comp
 
         # Variables
-        self.edit_frame = QWidget()
-        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-        self.is_listening = False
-        self.use_scan_code = False
-        self.mapping_row_widgets = []
-        self.shortcut_row_widgets = []
-        self.key_rows = []
-        self.shortcut_rows = []
-        self.copas_rows = []
-        self.files_opener_rows = []
-        self.files_opener_row_widgets = []
-        self.row_num = 0
-        self.previous_button_text = None
         self.entries_to_disable = []
-        self.mouse_listening_initialized = False
+        self.key_rows = []
 
         # UI
-        self.text_block = None
-        self.shortcut_entry = None
-        self.is_text_mode = None
+        self.edit_frame = QWidget()
+        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
 
-    def handle_mode_changed(self, index):
-        "Action when mode changed from combobox (can be moved)"
-        if self.edit_frame.layout() is None:
-            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-            self.edit_frame.setLayout(self.edit_frame_layout)
+    def handle_parser(self, lines, first_line, parent_window):
+        "Action when editing profile (Can be moved)"
+        remap_row_core = RemapRowCore()
+        key_map = remap_row_core.load_key_list()
+        mode_line = lines[0].strip() if lines else "; default"
+
+        self.edit_frame = QWidget()
+        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+        self.edit_frame.setLayout(self.edit_frame_layout)
+
+        if mode_line == "; default":
+            self.default_mode_widget(lines, key_map, parent_window)
+
+        elif mode_line == "; text":
+            self.shortcut_row_comp.text_mode_widget(lines, key_map, parent_window)
+
         else:
-            self.edit_frame_layout = self.edit_frame.layout()
+            diff = Diff()
+            diff.pro_parser(lines, first_line)
 
+        return self.edit_frame
+
+    def handle_mode_changed(self, index, parent_window):
+        "Action when mode changed from combobox (can be moved)"
         while self.edit_frame_layout.count():
             item = self.edit_frame_layout.takeAt(0)
             widget = item.widget()
@@ -84,78 +112,51 @@ class RemapRow(QObject):
                 widget.setParent(None)
 
         self.key_rows = []
-        self.shortcut_rows = []
-        if hasattr(self, "files_opener_rows"):
-            self.files_opener_rows = []
-        if hasattr(self, "files_opener_row_widgets"):
-            self.files_opener_row_widgets = []
+        self.shortcut_row_comp.shortcut_rows = []
         if hasattr(self, "text_block"):
-            self.text_block = None
-        self.is_text_mode = False
+            self.shortcut_row_comp.text_block = None
+        self.shortcut_row_comp.is_text_mode = False
 
         if index == 0:
-            self.is_text_mode = False
-            self.shortcut_title()
-            self.shortcut_row()
+            self.shortcut_row_comp.is_text_mode = False
+            self.shortcut_row_comp.shortcut_title()
+            self.shortcut_row_comp.shortcut_row(parent_window)
             self.remap_title()
-            self.remap_row()
+            self.remap_row(parent_window=parent_window)
             self.edit_frame_layout.addItem(QSpacerItem(20, 40,
                                             QSizePolicy.Minimum,
                                             QSizePolicy.Expanding))
 
         elif index == 1:
-            self.is_text_mode = True
-            self.shortcut_title()
-            self.shortcut_row()
+            self.shortcut_row_comp.is_text_mode = True
+            self.shortcut_row_comp.shortcut_title()
+            self.shortcut_row_comp.shortcut_row(parent_window)
             self.edit_frame_layout.addItem(QSpacerItem(20, 40,
                                             QSizePolicy.Minimum,
                                             QSizePolicy.Expanding))
 
         else:
-            self.diff.pro_mode(index)
+            diff = Diff()
+            diff.pro_mode(index)
 
-    def handle_parser(self, lines, first_line):
-        "Action when editing profile (Can be moved)"
-        key_map = self.profile_core.load_key_list()
-        mode_line = lines[0].strip() if lines else "; default"
-
-        if self.edit_frame.layout() is None:
-            self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-            self.edit_frame.setLayout(self.edit_frame_layout)
-        else:
-            self.edit_frame_layout = self.edit_frame.layout()
-
-        if mode_line == "; default":
-            self.default_mode_widget(lines, key_map)
-
-        elif mode_line == "; text":
-            self.text_mode_widget(lines, key_map)
-
-        else:
-            self.diff.pro_parser(lines, first_line)
-
-    def default_mode_widget(self, lines, key_map):
+    def default_mode_widget(self, lines, key_map, parent_window):
         "Default mode frame"
+        parse_script = ParseScript()  # Composition
+        self.shortcut_row_comp.shortcut_title()
 
-        parsed_shortcut_tuple = self.parse_script.parse_shortcuts(lines, key_map)
-
-        self.shortcut_title()
-
-        if parsed_shortcut_tuple:
-            for parsed_shortcut in parsed_shortcut_tuple:
-                self.shortcut_row(parsed_shortcut)
+        if parse_script.parse_shortcuts(lines, key_map):
+            for parsed_shortcut in parse_script.parse_shortcuts(lines, key_map):
+                self.shortcut_row_comp.shortcut_row(parsed_shortcut)
         else:
-            self.shortcut_row()
+            self.shortcut_row_comp.shortcut_row(parent_window)
 
         self.remap_title()
 
-        parsed_remap_tuple = self.parse_script.parse_default_mode(lines, key_map)
-
-        if parsed_remap_tuple:
+        if parse_script.parse_default_mode(lines, key_map):
             # Unpack tuple
             for (default_key, remap_key, is_text_format,
                  is_hold_format, hold_interval, is_first_key,
-                 is_sc) in parsed_remap_tuple:
+                 is_sc) in parse_script.parse_default_mode(lines, key_map):
 
                 # Add unpacked tople to dataclass
                 parsed_remap = ParsedRemap(
@@ -167,9 +168,9 @@ class RemapRow(QObject):
                     is_first_key = is_first_key,
                     is_sc = is_sc
                     )
-                self.remap_row(parsed_remap)
+                self.remap_row(parsed_remap=parsed_remap)
         else:
-            self.remap_row()
+            self.remap_row(parent_window=parent_window)
 
 
         # if parsed_remap_tuple:
@@ -178,9 +179,6 @@ class RemapRow(QObject):
         # else:
         #     # For create new profile
         #     self.remap_row()
-
-        self.update_plus_visibility('shortcut')
-        self.update_plus_visibility('remap')
 
     def remap_title(self):
         "Key remap row tittle label"
@@ -205,7 +203,7 @@ class RemapRow(QObject):
         self.edit_frame_layout.addWidget(remap_label_widget)
         return remap_label_widget
 
-    def remap_row(self, parsed_remap=None, insert_after=None):
+    def remap_row(self, parent_window=None, parsed_remap=None, insert_after=None):
         "Remap row"
         # Remap row card
         card_frame = QFrame(self.edit_frame)
@@ -243,7 +241,9 @@ class RemapRow(QObject):
         row_layout.setVerticalSpacing(5)
 
         # Separator widget
-        separator_widget, on_plus_click = self.separator_widget(row_widget, row_type="remap row")
+        separator_widget, on_plus_click = self.separator_widget(row_widget,
+                                                                parent_window=parent_window,
+                                                                row_type="remap row")
 
         # Arrow Widget
         arrow_icon = QSvgWidget(icons.arrow)
@@ -251,87 +251,59 @@ class RemapRow(QObject):
         row_layout.addWidget(arrow_icon, 0, 2, 2, 1)
 
         # Set widget and configure key rows tuple
-        self.set_key_rows(row_widget, row_layout, parsed_remap, on_plus_click)
+        # Default Key Widget
+        default_key = self.default_key_widget(row_widget, row_layout, parsed_remap, parent_window)
+
+        # Remap Key Widget
+        remap_key = self.remap_key_widget(row_widget, row_layout, parsed_remap, parent_window)
+
+        # Add or remove row when entry changed
+        default_key.default_key_entry.textChanged.connect(
+            lambda: self.auto_add_row(default_key, remap_key, on_plus_click))
+        remap_key.remap_key_entry.textChanged.connect(
+            lambda: self.auto_add_row(default_key, remap_key, on_plus_click))
+
+        # Set key_rows
+        self.key_rows.append(KeyWidget(
+            default_key=default_key,
+            remap_key=remap_key,
+            # Option Widget
+            option=self.option_widget(row_widget, row_layout, parsed_remap)))
 
         # The order where the widget will be added
+        mapping_row_widgets = []
         if insert_after is not None:
             idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
             self.edit_frame_layout.insertWidget(idx, card_frame)
             self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
-            self.mapping_row_widgets.insert(idx // 2, (card_frame,
-                                                        separator_widget))
+            mapping_row_widgets.insert(idx // 2, (card_frame, separator_widget))
         else:
             self.edit_frame_layout.addWidget(card_frame)
             self.edit_frame_layout.addWidget(separator_widget)
-            self.mapping_row_widgets.append((card_frame, separator_widget))
-
-        # Unused for now
-        # def auto_remove_row():
-        #     "Auto remove row if all entry don't have text"
-        #     if idx == len(self.key_rows) - 2:
-        #         if (not default_key_entry.text().strip() and
-        #                 not remap_key_entry.text().strip()):
-        #             for i, (sw) in enumerate(self.mapping_row_widgets):
-        #                 # plus = sw.findChild(QLabel, None)
-        #                 # frames = sw.findChildren(QFrame)
-        #                 # left_sep = frames[0] if len(frames) > 0 else None
-        #                 # right_sep = frames[2] if len(frames) > 1 else None
-        #                 # is_last = i == len(self.mapping_row_widgets) - 1
-        #                 # if plus:
-        #                 #     plus.setVisible(is_last)
-        #                 # if left_sep:
-        #                 #     left_sep.setVisible(is_last)
-        #                 # if right_sep:
-        #                 #     right_sep.setVisible(is_last)
-        # default_key_entry.textChanged.connect(
-        #     auto_remove_row)
-        # remap_key_entry.textChanged.connect(
-        #     auto_remove_row)
+            mapping_row_widgets.append((card_frame, separator_widget))
+        self.update_plus_visibility(mapping_row_widgets=mapping_row_widgets)
 
         self.edit_frame.setUpdatesEnabled(True)
         self.edit_frame.update()
         self.edit_frame.adjustSize()
 
-    def set_key_rows(self, row_widget, row_layout, parsed_remap, on_plus_click):
-        "Set widget and configure key rows tuple"
-        # Default Key Widget
-        (default_key_entry, default_key_select
-            ) = self.default_key_widget(row_widget, row_layout, parsed_remap)
+    def auto_add_row(self, default_key, remap_key, on_plus_click):
+        "Auto add row if all entry have text"
+        if (self.key_rows
+            and default_key.default_key_entry == self.key_rows[-1].default_key.default_key_entry
+            and remap_key.remap_key_entry == self.key_rows[-1].remap_key.remap_key_entry):
+            if (default_key.default_key_entry.text().strip()
+                and remap_key.remap_key_entry.text().strip()):
+                on_plus_click(None)
 
-        # Remap Key Widget
-        (remap_key_entry, remap_key_select
-            ) = self.remap_key_widget(row_widget, row_layout, parsed_remap)
-
-        # Option Widget
-        (text_format_checkbox, hold_format_checkbox,
-            hold_interval_entry, first_key_checkbox,
-            sc_checkbox) = self.option_widget(row_widget, row_layout, parsed_remap)
-
-        # Add or remove row when entry changed
-        def auto_add_row():
-            "Auto add row if all entry have text"
-            if self.key_rows and (default_key_entry, remap_key_entry) == self.key_rows[-1][:2]:
-                if (default_key_entry.text().strip()
-                    and remap_key_entry.text().strip()):
-                    on_plus_click(None)
-
-        default_key_entry.textChanged.connect(auto_add_row)
-        remap_key_entry.textChanged.connect(auto_add_row)
-
-        self.key_rows.append((default_key_entry, remap_key_entry,
-                                default_key_select, remap_key_select,
-                                text_format_checkbox, hold_format_checkbox,
-                                hold_interval_entry, first_key_checkbox,
-                                sc_checkbox))
-
-    def default_key_widget(self, row_widget, row_layout, parsed_remap):
+    def default_key_widget(self, row_widget, row_layout, parsed_remap, parent_window):
         "Default key widget on remap row"
         default_key_select = QPushButton("Select", row_widget)
         default_key_select.setFixedWidth(140)
         default_key_select.setToolTip("Press any key or shortcut "
                                         "to capture it automatically")
         default_key_select.clicked.connect(lambda:
-                                            self.key_listening(
+                                            self.key_listening_comp.key_listening(
                                                     default_key_entry,
                                                     default_key_select))
         row_layout.addWidget(default_key_select, 0, 0, 1, 2, Qt.AlignCenter)
@@ -348,6 +320,7 @@ class RemapRow(QObject):
                                         "multiple keys, or a double key (eg. double-click)")
         if parsed_remap:
             default_key_entry.setText(parsed_remap.default_key)
+        self.entries_to_disable.append((default_key_entry, None))
         default_key_layout.addWidget(default_key_entry)
 
         default_key_choose = QPushButton(default_key_widget)
@@ -356,20 +329,24 @@ class RemapRow(QObject):
         default_key_choose.setToolTip("Choose Default/Original key")
         default_key_choose.clicked.connect(
             lambda: self.select_key_ui.select_key(
-                self.edit_window, default_key_entry, context="default"))
+                parent_window, default_key_entry, context="default"))
         default_key_layout.addWidget(default_key_choose)
 
         row_layout.addWidget(default_key_widget, 1, 0, 1, 2, Qt.AlignCenter)
 
-        return default_key_entry, default_key_select
+        default_key = DefaultKeyWidget(
+            default_key_entry=default_key_entry,
+            default_key_select=default_key_select
+        )
+        return default_key
 
-    def remap_key_widget(self, row_widget, row_layout, parsed_remap):
+    def remap_key_widget(self, row_widget, row_layout, parsed_remap, parent_window):
         "Remap key widget on remap row"
         remap_key_select = QPushButton("Select", row_widget)
         remap_key_select.setFixedWidth(140)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(lambda:
-                                            self.key_listening(
+                                            self.key_listening_comp.key_listening(
                                                 remap_key_entry,
                                                 remap_key_select))
         row_layout.addWidget(remap_key_select, 0, 3, 1, 2, Qt.AlignCenter)
@@ -386,6 +363,7 @@ class RemapRow(QObject):
         remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if parsed_remap:
             remap_key_entry.setText(parsed_remap.remap_key)
+        self.entries_to_disable.append((remap_key_entry, None))
         remap_key_layout.addWidget(remap_key_entry)
 
         remap_key_choose = QPushButton(remap_key_widget)
@@ -394,12 +372,16 @@ class RemapRow(QObject):
         remap_key_choose.setToolTip("Choose Remap key")
         remap_key_choose.clicked.connect(
             lambda: self.select_key_ui.select_key(
-                self.edit_window, remap_key_entry, context="remap"))
+                parent_window, remap_key_entry, context="remap"))
         remap_key_layout.addWidget(remap_key_choose)
 
         row_layout.addWidget(remap_key_widget, 1, 3, 1, 2, Qt.AlignCenter)
 
-        return remap_key_entry, remap_key_select
+        remap_key = RemapKeyWidget(
+            remap_key_entry=remap_key_entry,
+            remap_key_select=remap_key_select)
+
+        return remap_key
 
     def option_widget(self, row_widget, row_layout, parsed_remap):
         "Remap option widget on remap row"
@@ -454,14 +436,21 @@ class RemapRow(QObject):
                                     if hold_interval_float.is_integer()
                                     else str(hold_interval_float))
             hold_interval_entry.setText(hold_interval_str)
+        self.entries_to_disable.append((hold_interval_entry, None))
         options_layout.addWidget(hold_interval_entry)
 
         row_layout.addWidget(options_widget, 2, 0, 1, 5, Qt.AlignCenter)
 
-        return (text_format_checkbox, hold_format_checkbox,
-                hold_interval_entry, first_key_checkbox, sc_checkbox)
+        option = OptionWidget(
+            text_format_checkbox=text_format_checkbox,
+            hold_format_checkbox=hold_format_checkbox,
+            hold_interval_entry=hold_interval_entry,
+            first_key_checkbox=first_key_checkbox,
+            sc_checkbox=sc_checkbox
+        )
+        return option
 
-    def separator_widget(self, row_widget, row_type):
+    def separator_widget(self, row_widget, row_type, parent_window):
         "Remap row separator widget"
         separator_widget = QWidget(self.edit_frame)
         separator_layout = QHBoxLayout(separator_widget)
@@ -503,40 +492,79 @@ class RemapRow(QObject):
             right_sep.setVisible(False)
             left_sep.setVisible(False)
             if row_type == "remap row":
-                self.remap_row(insert_after=(row_widget, separator_widget))
+                self.remap_row(parent_window=parent_window,
+                               insert_after=(row_widget, separator_widget))
             elif row_type == "shortcut row":
-                self.shortcut_row(insert_after=(row_widget, separator_widget))
+                self.shortcut_row_comp.shortcut_row(
+                    parent_window=parent_window, insert_after=(row_widget, separator_widget))
 
         plus_label.mousePressEvent = on_plus_click
 
         return separator_widget, on_plus_click
 
+    def update_plus_visibility(self, mapping_row_widgets=None, shortcut_row_widgets=None):
+        "Make sure + only showed up only on the last row"
+        if mapping_row_widgets:
+            widgets = mapping_row_widgets
+        elif shortcut_row_widgets:
+            widgets = shortcut_row_widgets
+        else:
+            return
+
+        for i, (_, sw) in enumerate(widgets):
+            plus = sw.findChild(QLabel, None)
+            left_sep = sw.findChild(QFrame, "left_sep")
+            right_sep = sw.findChild(QFrame, "right_sep")
+            is_last = i == len(widgets) - 1
+            if plus:
+                plus.setVisible(is_last)
+            if left_sep:
+                left_sep.setVisible(is_last)
+            if right_sep:
+                right_sep.setVisible(is_last)
+
+class ShortcutRow():
+    "Shortcut row on profile creation"
+    def __init__(self, remap_row_comp):
+        # Variable
+        self.is_text_mode = None
+        self.shortcut_rows = []
+
+        # Composition
+        self.remap_row_comp = remap_row_comp
+        self.key_listening_comp = KeyListening(
+            shortcut_row_comp=self, remap_row_comp=self.remap_row_comp)
+
+        # UI
+        self.text_block = None
+        self.shortcut_entry = None
+
     def shortcut_title(self):
         "Shortcuts row tittle label"
-        shortcut_label = QLabel("Shortcut", self.edit_frame)
+        shortcut_label = QLabel("Shortcut", self.remap_row_comp.edit_frame)
         shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         shortcut_label.setStyleSheet("""
             font-size: 13px;
             font-weight: bold;
         """)
-        self.edit_frame_layout.addWidget(shortcut_label)
+        self.remap_row_comp.edit_frame_layout.addWidget(shortcut_label)
         return shortcut_label
 
-    def shortcut_row(self, parsed_shortcut=None, insert_after=None):
+    def shortcut_row(self, parent_window, parsed_shortcut=None, insert_after=None):
         "Shortcut row"
         # For text mode
         if self.is_text_mode and (not hasattr(self, 'text_block') or
         self.text_block is None):
-            self.text_block = QTextEdit(self.edit_frame)
+            self.text_block = QTextEdit(self.remap_row_comp.edit_frame)
             self.text_block.setReadOnly(False)
             self.text_block.setStyleSheet(
             "font-family: Consolas; "
             "font-size: 10pt;"
             )
-            self.edit_frame_layout.addWidget(self.text_block)
+            self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
 
         # Card frame
-        card_frame = QFrame(self.edit_frame)
+        card_frame = QFrame(self.remap_row_comp.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
         if utils.theme == "dark":
             card_frame.setStyleSheet("""
@@ -558,9 +586,9 @@ class RemapRow(QObject):
         card_layout.setContentsMargins(8, 8, 8, 8)
         card_layout.setSpacing(0)
 
-        row_widget = QWidget(self.edit_frame)
+        row_widget = QWidget(self.remap_row_comp.edit_frame)
         row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
-                                 QSizePolicy.Policy.Fixed)
+                                    QSizePolicy.Policy.Fixed)
         card_layout.addWidget(row_widget)
 
         row_layout = QGridLayout(row_widget)
@@ -570,39 +598,42 @@ class RemapRow(QObject):
         row_layout.setVerticalSpacing(5)
 
         # Shortcut Widget
-        self.shortcut_widget(row_widget, row_layout, parsed_shortcut)
+        self.shortcut_widget(row_widget, row_layout, parsed_shortcut, parent_window)
 
         # Separator widget
-        separator_widget, _ = self.separator_widget(row_widget, row_type="shortcut row")
+        separator_widget, _ = self.remap_row_comp.separator_widget(
+            row_widget, parent_window=parent_window, row_type="shortcut row")
 
+        shortcut_row_widgets = []
         if insert_after is not None:
-            idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
-            self.edit_frame_layout.insertWidget(idx, card_frame)
-            self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
-            self.shortcut_row_widgets.insert(idx // 2, (card_frame,
+            idx = self.remap_row_comp.edit_frame_layout.indexOf(insert_after[1]) + 1
+            self.remap_row_comp.edit_frame_layout.insertWidget(idx, card_frame)
+            self.remap_row_comp.edit_frame_layout.insertWidget(idx + 1, separator_widget)
+            shortcut_row_widgets.insert(idx // 2, (card_frame,
                                                         separator_widget))
         else:
-            self.edit_frame_layout.addWidget(card_frame)
-            self.edit_frame_layout.addWidget(separator_widget)
-            self.shortcut_row_widgets.append((card_frame, separator_widget))
+            self.remap_row_comp.edit_frame_layout.addWidget(card_frame)
+            self.remap_row_comp.edit_frame_layout.addWidget(separator_widget)
+            shortcut_row_widgets.append((card_frame, separator_widget))
 
         if (self.is_text_mode and
             hasattr(self, 'text_block') and
             self.text_block is not None):
 
-            self.edit_frame_layout.addWidget(self.text_block)
+            self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
 
-        self.edit_frame.setUpdatesEnabled(True)
-        self.edit_frame.update()
-        self.edit_frame.adjustSize()
+        self.remap_row_comp.update_plus_visibility(shortcut_row_widgets=shortcut_row_widgets)
+        self.remap_row_comp.edit_frame.setUpdatesEnabled(True)
+        self.remap_row_comp.edit_frame.update()
+        self.remap_row_comp.edit_frame.adjustSize()
 
-    def shortcut_widget(self, row_widget, row_layout, parsed_shortcut):
+    def shortcut_widget(self, row_widget, row_layout, parsed_shortcut, parent_window):
         "Shortcut widget"
         shortcut_key_select = QPushButton("Select", row_widget)
         shortcut_key_select.setFixedWidth(280)
         shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         shortcut_key_select.clicked.connect(lambda:
-                                            self.key_listening(
+                                            self.key_listening_comp.key_listening(
                                                 self.shortcut_entry,
                                                 shortcut_key_select))
         row_layout.addWidget(shortcut_key_select, 0, 0, 1, 4, Qt.AlignCenter)
@@ -613,13 +644,15 @@ class RemapRow(QObject):
         shortcut_layout.setSpacing(2)
 
         self.shortcut_entry = QLineEdit(shortcut_widget)
-        if parsed_shortcut:
-            self.shortcut_entry.setText(parsed_shortcut)
+
         self.shortcut_entry.setFixedWidth(252)
         self.shortcut_entry.setToolTip("Shortcut can be "
                                         "a single key, multiple keys, or shortcut specials "
                                         "(See select key)")
         self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        if parsed_shortcut:
+            self.shortcut_entry.setText(parsed_shortcut)
+        self.remap_row_comp.entries_to_disable.append((self.shortcut_entry, None))
         self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
         shortcut_layout.addWidget(self.shortcut_entry)
 
@@ -628,25 +661,23 @@ class RemapRow(QObject):
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: self.select_key_ui.select_key(
-                self.edit_window, self.shortcut_entry, context="shortcut"))
+            lambda: self.remap_row_comp.select_key_ui.select_key(
+                parent_window, self.shortcut_entry, context="shortcut"))
         shortcut_layout.addWidget(shortcut_choose)
 
         row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
 
-    def text_mode_widget(self, lines, key_map):
+    def text_mode_widget(self, lines, key_map, parent_window):
         "Text mode frame(to do: fix)"
-        shortcuts = self.parse_script.parse_shortcuts(lines, key_map)
+        shortcuts = self.remap_row_comp.parse_script.parse_shortcuts(lines, key_map)
 
         if not shortcuts:
-            self.shortcut_row()
+            self.shortcut_row(parent_window)
         else:
             for shortcut in shortcuts:
                 self.shortcut_row(shortcut)
 
-        self.row_num += 1
-
-        self.text_block = QTextEdit(self.edit_frame)
+        self.text_block = QTextEdit(self.remap_row_comp.edit_frame)
         self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
         self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
         self.text_block.setFontPointSize(10)
@@ -657,9 +688,9 @@ class RemapRow(QObject):
         )
         text_content = self.extract_and_filter_content(lines)
         self.text_block.setPlainText(text_content.strip())
-        self.edit_frame_layout.addWidget(self.text_block)
+        self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
 
-        self.update_plus_visibility('shortcut')
+        self.remap_row_comp.update_plus_visibility('shortcut')
 
     def extract_and_filter_content(self, lines):
         "Get text block value from the marker"
@@ -677,112 +708,40 @@ class RemapRow(QObject):
                 result_lines.append(line)
         return ''.join(result_lines)
 
-    def update_plus_visibility(self, row_type):
-        "Make sure + only showed up only on the last row"
-        if row_type == 'remap':
-            widgets = getattr(self, "mapping_row_widgets", [])
-        elif row_type == 'shortcut':
-            widgets = getattr(self, "shortcut_row_widgets", [])
-        else:
-            return
+class KeyListening(QObject):
+    "Listen to key press"
+    request_timer_start = Signal()
+    def __init__(self, remap_row_comp=None, shortcut_row_comp=None):
+        super().__init__()
+        # Composition
+        self.remap_row_comp = remap_row_comp
+        self.shortcut_row_comp = shortcut_row_comp
+        self.remap_row_core = RemapRowCore()
 
-        for i, (_, sw) in enumerate(widgets):
-            plus = sw.findChild(QLabel, None)
-            left_sep = sw.findChild(QFrame, "left_sep")
-            right_sep = sw.findChild(QFrame, "right_sep")
-            is_last = i == len(widgets) - 1
-            if plus:
-                plus.setVisible(is_last)
-            if left_sep:
-                left_sep.setVisible(is_last)
-            if right_sep:
-                right_sep.setVisible(is_last)
+        # Signal
+        self.request_timer_start.connect(self.remap_row_core.release_timer)
 
-    # ----------- From profile core -----------
-    def disable_input(self):
-        "Disable input. Used on key listening"
-        for key_row in self.key_rows:
-            (default_key_entry, remap_key_entry,
-                _, _,
-                text_format_checkbox, hold_format_checkbox,
-                hold_interval_entry, first_key_checkbox,
-                sc_checkbox) = key_row
-            self.entries_to_disable.append((default_key_entry, None))
-            self.entries_to_disable.append((remap_key_entry, None))
-            self.entries_to_disable.append((text_format_checkbox, None))
-            self.entries_to_disable.append((hold_format_checkbox, None))
-            self.entries_to_disable.append((hold_interval_entry, None))
-            self.entries_to_disable.append((first_key_checkbox, None))
-            self.entries_to_disable.append((sc_checkbox, None))
+        # Variable
+        self.mouse_listening_initialized = False
+        self.is_listening = False
+        self.copas_rows = []
 
-        for shortcut_entry, _ in self.shortcut_rows:
-            self.entries_to_disable.append((shortcut_entry, None))
-
-        # Part of pro version code
-        for copas_row in self.copas_rows:
-            copy_entry, paste_entry, _, _, _, _ = copas_row
-            self.entries_to_disable.append((copy_entry, None))
-            self.entries_to_disable.append((paste_entry, None))
-
-    def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
-        "Get and listen to mouse key press. Pynput on_click"
-        if not (self.is_listening and self.profile_core.active_entry):
-            return
-
-        if pressed and hasattr(self, "edit_window"):
-            widget = self.edit_window.childAt(
-                self.edit_window.mapFromGlobal(
-                    self.edit_window.cursor().pos()))
-            while widget:
-                if isinstance(widget, QPushButton):
-                    return
-                widget = widget.parent()
-
-        button_map = {
-            pynput.mouse.Button.left: "Left Button",
-            pynput.mouse.Button.right: "Right Button",
-            pynput.mouse.Button.middle: "Middle Button"
-        }
-        mouse_button = button_map.get(button, getattr(
-            button, "name", str(button)))
-
-        if pressed:
-            if mouse_button not in self.profile_core.pressed_keys:
-                self.profile_core.pressed_keys.append(mouse_button)
-                self.profile_core.update_widget(self.profile_core.active_entry)
-        else:
-            if mouse_button in self.profile_core.pressed_keys:
-                self.profile_core.pressed_keys.remove(mouse_button)
-                if not self.profile_core.pressed_keys:
-                    self.key_listening(self.profile_core.active_entry, None)
-                    self.request_timer_start.emit(self.profile_core.active_entry)
-                elif hasattr(self, "release_timer"):
-                    self.request_timer_start.emit(self.profile_core.active_entry)
-
-    def handle_sc_listening(self, button):
-        "Check whether to use scan code listening or not"
-        for key_row in self.key_rows:
-            (_, _, orig_button, _, _, _, _,_, _) = key_row
-
-            if button == orig_button:
-                parent_widget = button.parent()
-                if parent_widget:
-                    sc_checkboxes = [child for child
-                                        in parent_widget.
-                                        findChildren(QObject)
-                                        if child.objectName() ==
-                                        "sc_checkbox"]
-                    if sc_checkboxes:
-                        self.use_scan_code = sc_checkboxes[0].isChecked()
-                        return self.use_scan_code
-                    break
-        return None
+    def eventFilter(self, _, event):  # pylint: disable=C0103
+        "Filter event by key press and window"
+        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
+                            QEvent.KeyPress, QEvent.KeyRelease,
+                            QEvent.FocusIn, QEvent.FocusOut):
+            return True
+        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
+                            QEvent.Hide, QEvent.Leave):
+            return True
+        return False
 
     def toggle_other_buttons(self, state, button):
         "Change the state of non selected button"
-        for key_row in self.key_rows:
-            (_, _, orig_button, remap_button, _, _, _, _, _) = key_row
-
+        for key_widget in self.remap_row_comp.key_rows:
+            orig_button = key_widget.default_key.default_key_select
+            remap_button = key_widget.remap_key.remap_key_select
             if orig_button != button and orig_button is not None:
                 orig_button.setEnabled(state)
             if remap_button != button and remap_button is not None:
@@ -796,17 +755,16 @@ class RemapRow(QObject):
             if paste_button != button and paste_button is not None:
                 paste_button.setEnabled(state)
 
-        for _, shortcut_button in self.shortcut_rows:
+        for _, shortcut_button in self.shortcut_row_comp.shortcut_rows:
             if shortcut_button != button and shortcut_button is not None:
                 shortcut_button.setEnabled(state)
 
     def multi_key_event(self, event, entry_widget, button):
         "Action when multiple key is pressed, set timer before saving the key"
-        if not self.is_listening or self.profile_core.active_entry != entry_widget:
+        if not self.is_listening or self.remap_row_core.active_entry != entry_widget:
             return
 
-        self.use_scan_code = self.handle_sc_listening(button)
-        if hasattr(self, 'use_scan_code') and self.use_scan_code:
+        if self.handle_sc_listening(button):
             key = f"SC{event.scan_code:02X}"
         else:
             key = event.name
@@ -819,34 +777,39 @@ class RemapRow(QObject):
             key = key.lower()
 
         if event.event_type == "down":
-            if key not in self.profile_core.pressed_keys:
-                self.profile_core.pressed_keys.append(key)
-                self.profile_core.update_widget(entry_widget)
+            if key not in self.remap_row_core.pressed_keys:
+                self.remap_row_core.pressed_keys.append(key)
+                self.remap_row_core.update_widget(entry_widget)
             if (hasattr(self, "release_timer")
-                    and self.profile_core.set_timer.isActive()):
-                self.profile_core.set_timer.stop()
+                    and self.remap_row_core.set_timer.isActive()):
+                self.remap_row_core.set_timer.stop()
 
         elif event.event_type == "up":
-            if key in self.profile_core.pressed_keys:
-                self.profile_core.pressed_keys.remove(key)
-                if not self.profile_core.pressed_keys:
+            if key in self.remap_row_core.pressed_keys:
+                self.remap_row_core.pressed_keys.remove(key)
+                if not self.remap_row_core.pressed_keys:
                     self.key_listening(entry_widget, button)
-                    self.request_timer_start.emit(entry_widget)
+                    self.request_timer_start.emit()
 
                 else:
                     if hasattr(self, "release_timer"):
-                        self.request_timer_start.emit(entry_widget)
+                        self.request_timer_start.emit()
 
-    def eventFilter(self, _, event):  # pylint: disable=C0103
-        "Filter event by key press and window"
-        if event.type() in (QEvent.MouseButtonPress, QEvent.MouseButtonRelease,
-                            QEvent.KeyPress, QEvent.KeyRelease,
-                            QEvent.FocusIn, QEvent.FocusOut):
-            return True
-        if event.type() in (QEvent.Close, QEvent.WindowDeactivate,
-                            QEvent.Hide, QEvent.Leave):
-            return True
-        return False
+    def handle_sc_listening(self, button):
+        "Check whether to use scan code listening or not"
+        for key_widget in self.remap_row_comp.key_rows:
+            if button == key_widget.default_key.default_key_select:
+                parent_widget = button.parent()
+                if parent_widget:
+                    sc_checkboxes = [child for child
+                                        in parent_widget.
+                                        findChildren(QObject)
+                                        if child.objectName() ==
+                                        "sc_checkbox"]
+                    if sc_checkboxes:
+                        return sc_checkboxes[0].isChecked()
+                    break
+        return None
 
     def key_listening(self, entry_widget, button):
         "Get and Listen to key press"
@@ -859,16 +822,19 @@ class RemapRow(QObject):
 
         if not self.is_listening:
             self.is_listening = True
-            self.profile_core.active_entry = entry_widget
-            self.previous_button_text = button.text()
-            self.use_scan_code = False
-            self.profile_core.pressed_keys = []
-            self.profile_core.last_combination = ""
+            self.remap_row_core.active_entry = entry_widget
+            self.remap_row_core.pressed_keys = []
+            self.remap_row_core.last_combination = ""
 
             # Append entries to disable widget
-            self.disable_input()
+            # Part of pro version code
+            for copas_row in self.copas_rows:
+                copy_entry, paste_entry, _, _, _, _ = copas_row
+                self.remap_row_comp.entries_to_disable.append((copy_entry, None))
+                self.remap_row_comp.entries_to_disable.append((paste_entry, None))
+
             # Install disable widget event filter
-            for entry_tuple in self.entries_to_disable:
+            for entry_tuple in self.remap_row_comp.entries_to_disable:
                 entry = entry_tuple[0]
                 if entry is not None:
                     entry.installEventFilter(self)
@@ -879,20 +845,20 @@ class RemapRow(QObject):
             button.clicked.connect(lambda: self.key_listening
                                     (entry_widget, button))
 
-            self.profile_core.set_timer = QTimer()
-            self.profile_core.set_timer.setSingleShot(True)
-            self.profile_core.set_timer.timeout.connect(
-                lambda: self.profile_core.finalize_combination(entry_widget))
+            self.remap_row_core.set_timer = QTimer()
+            self.remap_row_core.set_timer.setSingleShot(True)
+            self.remap_row_core.set_timer.timeout.connect(
+                lambda: self.remap_row_core.finalize_combination(entry_widget))
 
             keyboard.hook(lambda event: self.multi_key_event(event, entry_widget, button))
 
         else:
             self.is_listening = False
-            self.profile_core.active_entry = None
-            self.profile_core.pressed_keys = []
+            self.remap_row_core.active_entry = None
+            self.remap_row_core.pressed_keys = []
 
             # Remove disable widget event filet
-            for entry_tuple in self.entries_to_disable:
+            for entry_tuple in self.remap_row_comp.entries_to_disable:
                 entry = entry_tuple[0]
                 if entry is not None:
                     entry.removeEventFilter(self)
@@ -903,3 +869,38 @@ class RemapRow(QObject):
                 button.clicked.disconnect()
                 button.clicked.connect(lambda: self.key_listening
                                         (entry_widget, button))
+
+    def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
+        "Get and listen to mouse key press. Pynput on_click"
+        if not (self.is_listening and self.remap_row_core.active_entry):
+            return
+
+        button_map = {
+            pynput.mouse.Button.left: "Left Button",
+            pynput.mouse.Button.right: "Right Button",
+            pynput.mouse.Button.middle: "Middle Button"
+        }
+        mouse_button = button_map.get(button, getattr(
+            button, "name", str(button)))
+
+        if pressed and not self.check_mouse_event():
+            if mouse_button not in self.remap_row_core.pressed_keys:
+                self.remap_row_core.pressed_keys.append(mouse_button)
+                self.remap_row_core.update_widget(self.remap_row_core.active_entry)
+        else:
+            if mouse_button in self.remap_row_core.pressed_keys:
+                self.remap_row_core.pressed_keys.remove(mouse_button)
+                if not self.remap_row_core.pressed_keys:
+                    self.key_listening(self.remap_row_core.active_entry, None)
+                    self.request_timer_start.emit()
+
+    def check_mouse_event(self):
+        "Check if cursor is over any widget in key_rows"
+        local_pos = self.remap_row_comp.edit_frame.mapFromGlobal(QCursor.pos())
+        widget = self.remap_row_comp.edit_frame.childAt(local_pos)
+        if isinstance(widget, (QPushButton, QLineEdit, QCheckBox)):
+            print("true")
+            return True
+
+        print("false")
+        return False

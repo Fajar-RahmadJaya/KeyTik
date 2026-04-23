@@ -6,10 +6,10 @@ import requests
 from markdown import markdown
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QHBoxLayout, QCheckBox, QPushButton,
-    QTextBrowser, QWidget, QFrame
-)
+    QTextBrowser, QWidget, QFrame)
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
+
 from utility import constant
 from utility import diff
 
@@ -19,9 +19,6 @@ class Announcement():
     def __init__(self):
         self.announcement_files = []
         self.current_announcement_index = 0
-        self.announcement_condition = None
-
-        self.announcement_dialog = None
 
     def load_announcement_condition(self):
         "Load user preference from file, whether to show announcement or not"
@@ -56,19 +53,19 @@ class Announcement():
             self.get_announcement_url()
             self.current_announcement_index = 0
 
-            self.announcement_dialog = QDialog(parent)
-            self.announcement_dialog.setWindowTitle("Announcement")
-            self.announcement_dialog.setFixedSize(525, 290)
-            self.announcement_dialog.setWindowIcon(QIcon(constant.icon_path))
-            self.announcement_dialog.setModal(True)
-            self.announcement_dialog.setWindowModality(
+            announcement_dialog = QDialog(parent)
+            announcement_dialog.setWindowTitle("Announcement")
+            announcement_dialog.setFixedSize(525, 290)
+            announcement_dialog.setWindowIcon(QIcon(constant.icon_path))
+            announcement_dialog.setModal(True)
+            announcement_dialog.setWindowModality(
                 Qt.WindowModality.WindowModal)
-            self.announcement_dialog.setFixedSize(525, 290)
+            announcement_dialog.setFixedSize(525, 290)
 
-            main_layout = QVBoxLayout(self.announcement_dialog)
+            main_layout = QVBoxLayout(announcement_dialog)
             main_layout.setContentsMargins(10, 10, 10, 10)
 
-            app_palette = self.announcement_dialog.palette()
+            app_palette = announcement_dialog.palette()
             bg_color = app_palette.window().color().name()
             text_color = app_palette.windowText().color().name()
 
@@ -116,15 +113,12 @@ class Announcement():
             main_layout.addWidget(
                 button_frame, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-            self.announcement_dialog.raise_()
-            self.announcement_dialog.activateWindow()
-            self.announcement_dialog.exec()
+            announcement_dialog.raise_()
+            announcement_dialog.activateWindow()
+            announcement_dialog.exec()
 
         except requests.HTTPError as e:
             print(f"Error displaying announcement window: {e}")
-
-    def announcement_content_frame(self):
-        "Frame that hold announcement content"
 
     def load_content(self, index, html_label):
         "Get announcement content from official website"
@@ -176,13 +170,11 @@ class Announcement():
 
     def save_announcement_condition(self, dont_show_checkbox):
         "Save user preference on file when don't show announcement checkbox is checked"
-        self.announcement_condition = (
-            not dont_show_checkbox.isChecked())
-
+        announcement_condition = not dont_show_checkbox.isChecked()
         try:
             with open(constant.dont_show_path, "w", encoding='utf-8') as f:
                 json.dump({"welcome_condition":
-                            self.announcement_condition}, f)
+                            announcement_condition}, f)
         except FileNotFoundError as e:
             print(f"Error saving condition file: {e}")
 

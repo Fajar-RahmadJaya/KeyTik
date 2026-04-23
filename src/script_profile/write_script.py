@@ -12,7 +12,7 @@ from utility import constant
 from utility import utils
 from utility.diff import Diff
 from select_key.select_key_core import SelectKeyCore
-from core.main_core import MainCore
+from dashboard.dashboard_core import DashboardCore
 
 
 @dataclass
@@ -30,7 +30,7 @@ class WriteScript():
     "Write script based on profile input"
     def __init__(self, remap_row_comp=None):
         self.remap_row_comp = remap_row_comp
-        self.main_core = MainCore()
+        self.dashboard_core = DashboardCore()
 
     def check_key_integrity(self):
         "Make sure there is no conflict on profile input"
@@ -91,7 +91,7 @@ class WriteScript():
 
     def handle_write(self, script_name, mode, keyboard_entry, program_entry):
         "Action when saving profile (Can be moved)"
-        output_path = os.path.join(self.main_core.script_dir, script_name)
+        output_path = os.path.join(self.dashboard_core.script_dir, script_name)
         key_translations = self.load_key_translations()
         diff = Diff()  # Composition
         write_default = WriteDefault(self)  # Composition
@@ -107,7 +107,7 @@ class WriteScript():
     def handle_text_mode(self, file, keyboard_entry, program_entry):
         "Write text mode"
         file.write("; text\n")
-        self.main_core.generate_exit_key(os.path.basename(file.name), file)
+        self.dashboard_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
@@ -384,10 +384,10 @@ class WriteDefault():
 
     def handle_default_mode(self, file, keyboard_entry, program_entry):
         "Write default mode"
-        main_core = MainCore()  # Composition
+        dashboard_core = DashboardCore()  # Composition
 
         file.write("; default\n")
-        main_core.generate_exit_key(os.path.basename(file.name), file)
+        dashboard_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 

@@ -19,7 +19,7 @@ from utility import constant
 from utility import utils
 from utility import icons
 
-class MainCore(QObject):
+class DashboardCore(QObject):
     "Main Logic"
     update_script_signal = Signal()
     def __init__(self):

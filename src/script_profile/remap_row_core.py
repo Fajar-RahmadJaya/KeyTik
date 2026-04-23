@@ -1,8 +1,7 @@
 "Logic for create/edit profile"
-
 import json
-from utility import constant
 
+from utility import constant
 
 class RemapRowCore():
     "Create/edit profile logic"
@@ -50,18 +49,25 @@ class RemapRowCore():
         self.pressed_keys = []
 
     def load_key_list(self):
-        "Load list of hard coded key from json file"
+        "Load translation from raw key to readable key"
         key_map = {}
+        key, info = self.read_keylist()
+        readable = key
+        raw = info.get("translate", "")
+        if raw:
+            key_map[raw] = readable
+
+        return key_map
+
+    def read_keylist(self):
+        "Open and read key list"
         try:
             with open(constant.keylist_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 for category_dict in data:
                     for _, keys in category_dict.items():
                         for key, info in keys.items():
-                            readable = key
-                            raw = info.get("translate", "")
-                            if raw:
-                                key_map[raw] = readable
+                            return key, info
         except FileNotFoundError as e:
             print(f"Error reading key list: {e}")
-        return key_map
+            return None

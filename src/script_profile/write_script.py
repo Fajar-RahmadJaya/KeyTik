@@ -13,6 +13,7 @@ from utility import utils
 from utility.diff import Diff
 from select_key.select_key_core import SelectKeyCore
 from dashboard.dashboard_core import DashboardCore
+from script_profile.remap_row_core import RemapRowCore
 
 
 @dataclass
@@ -223,21 +224,15 @@ class WriteScript():
             hotif_conditions.append("cm1.IsActive")
 
     def load_key_translations(self):
-        "Load translation from raw key to readable key"
+        "Load translation from readable key to raw key"
+        remap_row_core = RemapRowCore()
         key_translations = {}
-        try:
-            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-                for category_dict in data:
-                    for _, keys in category_dict.items():
-                        for key, info in keys.items():
-                            readable_key = key.strip().lower()
-                            translation = info.get("translate", "").strip()
-                            if translation:
-                                key_translations[readable_key] = translation
+        key, info = remap_row_core.read_keylist()
+        readable_key = key.strip().lower()
+        translation = info.get("translate", "").strip()
+        if translation:
+            key_translations[readable_key] = translation
 
-        except FileNotFoundError as e:
-            print(f"Error reading key translations: {e}")
         return key_translations
 
     def initialize_exit_keys(self):

@@ -317,15 +317,7 @@ class SelectKeyUI():
                 child_item.setFlags(
                     child_item.flags() | Qt.ItemIsUserCheckable)
                 key_tuple = (block_name, char)
-                if key_tuple in self.checked_keys_list:
-                    child_item.setCheckState(0, Qt.Checked)
-                else:
-                    child_item.setCheckState(0, Qt.Unchecked)
-                description = info.get("description", "")
-                if description:
-                    child_item.setIcon(1, QIcon(icons.question))
-                    child_item.setToolTip(1, description)
-                parent_item.addChild(child_item)
+                self.select_key_core.populate_unicode(key_tuple, child_item, info)
             parent_item.setExpanded(True)
 
         # Initialize and Track Expanded Unicode Blocks

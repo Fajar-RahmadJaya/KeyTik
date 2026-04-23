@@ -60,16 +60,20 @@ class SelectKeyCore():
                     child_item.setFlags(
                         child_item.flags() | Qt.ItemIsUserCheckable)
                     key_tuple = (block_name, char)
-                    if key_tuple in getattr(self, 'checked_keys_list', []):
-                        child_item.setCheckState(0, Qt.Checked)
-                    else:
-                        child_item.setCheckState(0, Qt.Unchecked)
-                    description = info.get("description", "")
-                    if description:
-                        child_item.setIcon(1, QIcon(icons.question))
-                        child_item.setToolTip(1, description)
+                    self.populate_unicode(key_tuple, child_item, info)
                     item.addChild(child_item)
             item.setExpanded(True)
+
+    def populate_unicode(self, key_tuple, child_item, info):
+        "Populate unicode description and check state"
+        if key_tuple in getattr(self, 'checked_keys_list', []):
+            child_item.setCheckState(0, Qt.Checked)
+        else:
+            child_item.setCheckState(0, Qt.Unchecked)
+        description = info.get("description", "")
+        if description:
+            child_item.setIcon(1, QIcon(icons.question))
+            child_item.setToolTip(1, description)
 
     def load_keylist(self):
         "Get the hardcoded key list"

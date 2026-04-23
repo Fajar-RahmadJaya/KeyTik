@@ -4,7 +4,7 @@ import json
 from utility import constant
 
 
-class ProfileCore():
+class RemapRowCore():
     "Create/edit profile logic"
     def __init__(self):
         self.pressed_keys = []

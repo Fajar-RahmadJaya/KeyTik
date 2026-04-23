@@ -16,7 +16,7 @@ from utility import icons
 from utility import constant
 from utility.diff import Diff
 from script_profile.parse_script import ParseScript
-from script_profile.profile_core import ProfileCore
+from script_profile.remap_row_core import RemapRowCore
 from select_key.select_key_ui import SelectKeyUI
 
 
@@ -83,8 +83,8 @@ class RemapRow():
 
     def handle_parser(self, lines, first_line, parent_window):
         "Action when editing profile (Can be moved)"
-        profile_core = ProfileCore()
-        key_map = profile_core.load_key_list()
+        remap_row_core = RemapRowCore()
+        key_map = remap_row_core.load_key_list()
         mode_line = lines[0].strip() if lines else "; default"
 
         self.edit_frame = QWidget()
@@ -716,10 +716,10 @@ class KeyListening(QObject):
         # Composition
         self.remap_row_comp = remap_row_comp
         self.shortcut_row_comp = shortcut_row_comp
-        self.profile_core = ProfileCore()
+        self.remap_row_core = RemapRowCore()
 
         # Signal
-        self.request_timer_start.connect(self.profile_core.release_timer)
+        self.request_timer_start.connect(self.remap_row_core.release_timer)
 
         # Variable
         self.mouse_listening_initialized = False
@@ -761,7 +761,7 @@ class KeyListening(QObject):
 
     def multi_key_event(self, event, entry_widget, button):
         "Action when multiple key is pressed, set timer before saving the key"
-        if not self.is_listening or self.profile_core.active_entry != entry_widget:
+        if not self.is_listening or self.remap_row_core.active_entry != entry_widget:
             return
 
         if self.handle_sc_listening(button):
@@ -777,17 +777,17 @@ class KeyListening(QObject):
             key = key.lower()
 
         if event.event_type == "down":
-            if key not in self.profile_core.pressed_keys:
-                self.profile_core.pressed_keys.append(key)
-                self.profile_core.update_widget(entry_widget)
+            if key not in self.remap_row_core.pressed_keys:
+                self.remap_row_core.pressed_keys.append(key)
+                self.remap_row_core.update_widget(entry_widget)
             if (hasattr(self, "release_timer")
-                    and self.profile_core.set_timer.isActive()):
-                self.profile_core.set_timer.stop()
+                    and self.remap_row_core.set_timer.isActive()):
+                self.remap_row_core.set_timer.stop()
 
         elif event.event_type == "up":
-            if key in self.profile_core.pressed_keys:
-                self.profile_core.pressed_keys.remove(key)
-                if not self.profile_core.pressed_keys:
+            if key in self.remap_row_core.pressed_keys:
+                self.remap_row_core.pressed_keys.remove(key)
+                if not self.remap_row_core.pressed_keys:
                     self.key_listening(entry_widget, button)
                     self.request_timer_start.emit()
 
@@ -822,9 +822,9 @@ class KeyListening(QObject):
 
         if not self.is_listening:
             self.is_listening = True
-            self.profile_core.active_entry = entry_widget
-            self.profile_core.pressed_keys = []
-            self.profile_core.last_combination = ""
+            self.remap_row_core.active_entry = entry_widget
+            self.remap_row_core.pressed_keys = []
+            self.remap_row_core.last_combination = ""
 
             # Append entries to disable widget
             # Part of pro version code
@@ -845,17 +845,17 @@ class KeyListening(QObject):
             button.clicked.connect(lambda: self.key_listening
                                     (entry_widget, button))
 
-            self.profile_core.set_timer = QTimer()
-            self.profile_core.set_timer.setSingleShot(True)
-            self.profile_core.set_timer.timeout.connect(
-                lambda: self.profile_core.finalize_combination(entry_widget))
+            self.remap_row_core.set_timer = QTimer()
+            self.remap_row_core.set_timer.setSingleShot(True)
+            self.remap_row_core.set_timer.timeout.connect(
+                lambda: self.remap_row_core.finalize_combination(entry_widget))
 
             keyboard.hook(lambda event: self.multi_key_event(event, entry_widget, button))
 
         else:
             self.is_listening = False
-            self.profile_core.active_entry = None
-            self.profile_core.pressed_keys = []
+            self.remap_row_core.active_entry = None
+            self.remap_row_core.pressed_keys = []
 
             # Remove disable widget event filet
             for entry_tuple in self.remap_row_comp.entries_to_disable:
@@ -872,7 +872,7 @@ class KeyListening(QObject):
 
     def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
         "Get and listen to mouse key press. Pynput on_click"
-        if not (self.is_listening and self.profile_core.active_entry):
+        if not (self.is_listening and self.remap_row_core.active_entry):
             return
 
         button_map = {
@@ -884,14 +884,14 @@ class KeyListening(QObject):
             button, "name", str(button)))
 
         if pressed and not self.check_mouse_event():
-            if mouse_button not in self.profile_core.pressed_keys:
-                self.profile_core.pressed_keys.append(mouse_button)
-                self.profile_core.update_widget(self.profile_core.active_entry)
+            if mouse_button not in self.remap_row_core.pressed_keys:
+                self.remap_row_core.pressed_keys.append(mouse_button)
+                self.remap_row_core.update_widget(self.remap_row_core.active_entry)
         else:
-            if mouse_button in self.profile_core.pressed_keys:
-                self.profile_core.pressed_keys.remove(mouse_button)
-                if not self.profile_core.pressed_keys:
-                    self.key_listening(self.profile_core.active_entry, None)
+            if mouse_button in self.remap_row_core.pressed_keys:
+                self.remap_row_core.pressed_keys.remove(mouse_button)
+                if not self.remap_row_core.pressed_keys:
+                    self.key_listening(self.remap_row_core.active_entry, None)
                     self.request_timer_start.emit()
 
     def check_mouse_event(self):

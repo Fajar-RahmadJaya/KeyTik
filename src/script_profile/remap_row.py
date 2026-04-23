@@ -68,23 +68,14 @@ class RemapRow():
     "Remap row on profile creation"
     def __init__(self):
         super().__init__()
-        # Parameter
-
         # Composition
-        self.diff = Diff()
-        self.parse_script = ParseScript()
-        self.profile_core = ProfileCore()
         self.select_key_ui = SelectKeyUI()
         self.shortcut_row_comp = ShortcutRow(self)
         self.key_listening_comp = self.shortcut_row_comp.key_listening_comp
 
         # Variables
         self.entries_to_disable = []
-
         self.key_rows = []
-
-        self.files_opener_rows = []
-        self.files_opener_row_widgets = []
 
         # UI
         self.edit_frame = QWidget()
@@ -92,7 +83,8 @@ class RemapRow():
 
     def handle_parser(self, lines, first_line, parent_window):
         "Action when editing profile (Can be moved)"
-        key_map = self.profile_core.load_key_list()
+        profile_core = ProfileCore()
+        key_map = profile_core.load_key_list()
         mode_line = lines[0].strip() if lines else "; default"
 
         self.edit_frame = QWidget()
@@ -106,7 +98,8 @@ class RemapRow():
             self.shortcut_row_comp.text_mode_widget(lines, key_map, parent_window)
 
         else:
-            self.diff.pro_parser(lines, first_line)
+            diff = Diff()
+            diff.pro_parser(lines, first_line)
 
         return self.edit_frame
 
@@ -120,10 +113,6 @@ class RemapRow():
 
         self.key_rows = []
         self.shortcut_row_comp.shortcut_rows = []
-        if hasattr(self, "files_opener_rows"):
-            self.files_opener_rows = []
-        if hasattr(self, "files_opener_row_widgets"):
-            self.files_opener_row_widgets = []
         if hasattr(self, "text_block"):
             self.shortcut_row_comp.text_block = None
         self.shortcut_row_comp.is_text_mode = False
@@ -147,29 +136,27 @@ class RemapRow():
                                             QSizePolicy.Expanding))
 
         else:
-            self.diff.pro_mode(index)
+            diff = Diff()
+            diff.pro_mode(index)
 
     def default_mode_widget(self, lines, key_map, parent_window):
         "Default mode frame"
-
-        parsed_shortcut_tuple = self.parse_script.parse_shortcuts(lines, key_map)
-
+        parse_script = ParseScript()  # Composition
         self.shortcut_row_comp.shortcut_title()
 
-        if parsed_shortcut_tuple:
-            for parsed_shortcut in parsed_shortcut_tuple:
+        if parse_script.parse_shortcuts(lines, key_map):
+            for parsed_shortcut in parse_script.parse_shortcuts(lines, key_map):
                 self.shortcut_row_comp.shortcut_row(parsed_shortcut)
         else:
             self.shortcut_row_comp.shortcut_row(parent_window)
 
         self.remap_title()
 
-        parsed_remap_tuple = self.parse_script.parse_default_mode(lines, key_map)
-        if parsed_remap_tuple:
+        if parse_script.parse_default_mode(lines, key_map):
             # Unpack tuple
             for (default_key, remap_key, is_text_format,
                  is_hold_format, hold_interval, is_first_key,
-                 is_sc) in parsed_remap_tuple:
+                 is_sc) in parse_script.parse_default_mode(lines, key_map):
 
                 # Add unpacked tople to dataclass
                 parsed_remap = ParsedRemap(
@@ -728,8 +715,8 @@ class KeyListening(QObject):
         super().__init__()
         # Composition
         self.remap_row_comp = remap_row_comp
-        self.profile_core = self.remap_row_comp.profile_core
         self.shortcut_row_comp = shortcut_row_comp
+        self.profile_core = ProfileCore()
 
         # Signal
         self.request_timer_start.connect(self.profile_core.release_timer)

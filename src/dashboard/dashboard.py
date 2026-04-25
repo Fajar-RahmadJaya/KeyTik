@@ -155,13 +155,15 @@ class Dashboard(QMainWindow):
         scripts = self.dashboard_core.list_scripts()
         scripts_to_display = scripts[start_index:end_index]
 
+        running_scripts = self.dashboard_core.get_running_ahk()
+
         for index, script in enumerate(scripts_to_display):
             row = index // 2
             column = index % 2
 
-            self.profile_card(script, row, column)
+            self.profile_card(script, row, column, running_scripts)
 
-    def profile_card(self, script, row, column):
+    def profile_card(self, script, row, column, running_scripts):
         "Profile action"
         group_box = QGroupBox(os.path.splitext(script)[0])
         group_layout = QGridLayout(group_box)
@@ -172,8 +174,7 @@ class Dashboard(QMainWindow):
         # Run/exit button
         run_button = QPushButton()
         run_button.setFixedWidth(80)
-        running_scripts = utils.read_running_scripts_temp()
-        if self.is_startup(script) or script in running_scripts:
+        if script in running_scripts:
             run_button.setText(" Exit")
             run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
             run_button.setIcon(icons.get_icon(icons.icon_exit))

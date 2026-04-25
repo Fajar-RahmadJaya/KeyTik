@@ -1,7 +1,6 @@
 "Utility module"
 import os
 import json
-import tempfile
 import sys
 import winreg
 from PySide6.QtCore import QRect  # pylint: disable=E0611
@@ -99,44 +98,6 @@ device_finder_path = os.path.join(
     active_dir, "Autohotkey Interception", "find_device.ahk")
 coordinate_path = os.path.join(
     active_dir, "Autohotkey Interception", "Coordinate.ahk")
-
-TEMP_RUNNING_FILE = os.path.join(tempfile.gettempdir(), "running_scripts.tmp")
-
-
-def read_running_scripts_temp():
-    "Read temp to store running script"
-    scripts = set()
-    if os.path.exists(TEMP_RUNNING_FILE):
-        try:
-            with open(TEMP_RUNNING_FILE, "r", encoding="utf-8") as run_file:
-                scripts = set(line.strip() for line in run_file if line.strip())
-        except FileNotFoundError as e:
-            print(f"Error: {e}")
-    return scripts
-
-
-def write_running_scripts_temp(scripts):
-    "Write temp to store running script"
-    try:
-        with open(TEMP_RUNNING_FILE, "w", encoding="utf-8") as run_file:
-            for s in scripts:
-                run_file.write(s + "\n")
-    except FileNotFoundError as e:
-        print(f"Error: {e}")
-
-
-def add_script_to_temp(script_name):
-    "Add running script to temp"
-    scripts = read_running_scripts_temp()
-    scripts.add(script_name)
-    write_running_scripts_temp(scripts)
-
-
-def remove_script_from_temp(script_name):
-    "Remove running script to temp"
-    scripts = read_running_scripts_temp()
-    scripts.discard(script_name)
-    write_running_scripts_temp(scripts)
 
 
 def detect_system_theme():

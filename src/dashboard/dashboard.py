@@ -174,7 +174,7 @@ class Dashboard(QMainWindow):
         # Run/exit button
         run_button = QPushButton()
         run_button.setFixedWidth(80)
-        if self.is_startup(script) or script in running_scripts:
+        if script in running_scripts:
             run_button.setText(" Exit")
             run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
             run_button.setIcon(icons.get_icon(icons.icon_exit))

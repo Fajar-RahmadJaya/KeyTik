@@ -27,7 +27,8 @@ class SettingUI():
 
         settings_window = QDialog(parent)
         settings_window.setWindowTitle("Settings")
-        settings_window.setFixedSize(400, 250)
+        geometry = utils.get_geometry(parent, 400, 250)
+        settings_window.setGeometry(geometry)
         settings_window.setWindowIcon(QIcon(constant.icon_path))
         settings_window.setModal(True)
         settings_window.setWindowFlag(

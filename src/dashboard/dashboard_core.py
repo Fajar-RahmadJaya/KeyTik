@@ -2,10 +2,12 @@
 
 import os
 import json
+import re
 import shutil
 import webbrowser
 import random
 import winshell
+import win32gui
 from win32com.client import Dispatch
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication, QFileDialog, QMessageBox,
@@ -282,17 +284,13 @@ class DashboardCore(QObject):
     def toggle_run_exit(self, script_name, button):
         "Switch between run/exit on profile"
         if button.text() == " Run":
-
             self.activate_script(script_name, button)
-            utils.add_script_to_temp(script_name)
 
             button.clicked.disconnect()
             button.clicked.connect(lambda checked=False: self.toggle_run_exit(
                 script_name, button))
         else:
-
             self.exit_script(script_name, button)
-            utils.remove_script_from_temp(script_name)
 
             button.clicked.disconnect()
             button.clicked.connect(lambda checked=False: self.toggle_run_exit(
@@ -455,3 +453,17 @@ class DashboardCore(QObject):
             if os.path.exists(target_folder):
                 shutil.rmtree(target_folder)
             shutil.copytree(constant.ahi_dir, target_folder)
+
+    def get_running_ahk(self):
+        "Get running ahk script"
+        running_script = set()
+        def callback(hwnd, running_script):
+            if win32gui.IsWindowVisible(hwnd) or win32gui.IsWindowEnabled(hwnd):  # pylint: disable=I1101
+                class_name = win32gui.GetClassName(hwnd)  # pylint: disable=I1101
+                if class_name == "AutoHotkey":
+                    title = win32gui.GetWindowText(hwnd)  # pylint: disable=I1101
+                    title = re.sub(r" - AutoHotkey v[\d\.]+$", "", title)
+                    if title:
+                        running_script.add(os.path.basename(title))
+        win32gui.EnumWindows(callback, running_script)  # pylint: disable=I1101
+        return running_script

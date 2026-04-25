@@ -11,6 +11,7 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
 from utility.diff import (mode_item, mode_map)
+from utility import utils
 from select_program.select_program_ui import SelectProgramUI
 from select_device.select_device import SelectDevice
 from script_profile.remap_row import RemapRow
@@ -54,7 +55,8 @@ class ProfileUI():
         else:
             self.edit_window.setWindowTitle("Edit Profile")
         self.edit_window.setWindowIcon(QIcon(constant.icon_path))
-        self.edit_window.setFixedSize(600, 460)
+        geometry = utils.get_geometry(parent, 600, 460)
+        self.edit_window.setGeometry(geometry)
 
         # Composition
         remap_row_comp = RemapRow()

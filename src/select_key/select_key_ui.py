@@ -11,6 +11,7 @@ from PySide6.QtCore import Qt, QPoint  # pylint: disable=E0611
 
 from utility import constant
 from utility import icons
+from utility import utils
 from select_key.select_key_core import SelectKeyCore
 
 
@@ -90,7 +91,8 @@ class SelectKeyUI():
         select_key_window = QDialog(parent_window)
         select_key_window.setWindowTitle("Select Key")
         select_key_window.setWindowIcon(QIcon(constant.icon_path))
-        select_key_window.setFixedSize(400, 425)
+        geometry = utils.get_geometry(parent_window, 400, 425)
+        select_key_window.setGeometry(geometry)
 
         main_layout = QVBoxLayout(select_key_window)
 
@@ -130,6 +132,12 @@ class SelectKeyUI():
         except FileNotFoundError:
             print("key_list not found")
 
+        select_key_entry = self.select_key_bottom(main_layout, select_key_window, target_entry)
+
+        select_key_window.exec()
+
+    def select_key_bottom(self, main_layout, select_key_window, target_entry):
+        "Bottom part of select key window"
         select_key_layout = QHBoxLayout()
         select_key_layout.setContentsMargins(25, 10, 25, 10)
         main_layout.addLayout(select_key_layout)
@@ -142,11 +150,11 @@ class SelectKeyUI():
         select_key_layout.addWidget(select_key_entry)
 
         select_key_button = QPushButton("Save Keys")
-        select_key_layout.addWidget(select_key_button)
         select_key_button.clicked.connect(
             lambda: self.on_save_keys(select_key_window, target_entry, select_key_entry))
+        select_key_layout.addWidget(select_key_button)
 
-        select_key_window.exec()
+        return select_key_entry
 
     def click_checkbox(self, item, select_key_entry):
         "Save checked item to keep the checked state when treeview updated"

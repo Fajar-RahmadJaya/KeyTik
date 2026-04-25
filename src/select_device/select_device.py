@@ -37,7 +37,8 @@ class SelectDevice():
         device_selection_window = QDialog(parent)
         device_selection_window.setWindowTitle("Select Device")
         device_selection_window.setWindowIcon(QIcon(constant.icon_path))
-        device_selection_window.setFixedSize(600, 300)
+        geometry = utils.get_geometry(parent, 600, 300)
+        device_selection_window.setGeometry(geometry)
         device_selection_window.setModal(True)
         device_selection_window.setAttribute(
             Qt.WidgetAttribute.WA_DeleteOnClose)

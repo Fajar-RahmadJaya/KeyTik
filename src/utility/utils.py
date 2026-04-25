@@ -4,6 +4,7 @@ import json
 import tempfile
 import sys
 import winreg
+from PySide6.QtCore import QRect  # pylint: disable=E0611
 
 from utility import constant
 
@@ -185,3 +186,16 @@ def get_ahk_install_dir():
 
 ahk_uninstall_path = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk", "UX", "ui-uninstall.ahk")  # pylint: disable=C0301,E0401
 ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")
+
+
+def get_geometry(parent_window, width, height):
+    "Get x and y centered relative to parent window"
+    parent_geometry = parent_window.geometry()
+    parent_x = parent_geometry.x()
+    parent_y = parent_geometry.y()
+    parent_width = parent_geometry.width()
+    parent_height = parent_geometry.height()
+
+    x = parent_x + (parent_width - width) // 2
+    y = parent_y + (parent_height - height) // 2
+    return QRect(x, y, width, height)

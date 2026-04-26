@@ -38,10 +38,7 @@ class Dashboard(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         # Startup
-        self.dashboard_core.font_fallback()
         self.create_ui()
-        self.dashboard_core.check_ahk_installation(show_installed_message=False)
-        self.dashboard_core.check_ahi_dir()
 
     def create_ui(self):
         "Dashboard Window"

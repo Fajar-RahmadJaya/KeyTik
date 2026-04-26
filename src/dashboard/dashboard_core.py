@@ -10,10 +10,9 @@ import winshell
 import win32gui
 from win32com.client import Dispatch
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QApplication, QFileDialog, QMessageBox,
+    QFileDialog, QMessageBox,
     QInputDialog
 )
-from PySide6.QtGui import QFont, QFontDatabase  # pylint: disable=E0611
 from PySide6.QtCore import Signal, QObject # pylint: disable=E0611
 from pynput.keyboard import Controller, Key
 
@@ -310,18 +309,10 @@ class DashboardCore(QObject):
         self.list_scripts()
         self.update_script_signal.emit()
 
-    def check_ahk_installation(self, show_installed_message=False):
+    def ahk_notinstalled_msg(self, parent):
         "Check AutoHotkey installation"
-        if os.path.exists(utils.ahkv2_dir):
-            if show_installed_message:
-                QMessageBox.information(
-                    None,
-                    "AHK Installation",
-                    "AutoHotkey v2 is installed on your system.")
-            return True
-
         reply = QMessageBox.question(
-            None,
+            parent,
             "AHK Installation",
             "AutoHotkey v2 is not installed on your system. "
             "AutoHotkey is required for KeyTik to work.\n\n"
@@ -331,27 +322,6 @@ class DashboardCore(QObject):
         if reply == QMessageBox.StandardButton.Yes:
             webbrowser.open("https://www.autohotkey.com/")
         return False
-
-    def font_fallback(self):
-        "Fallback font (Might still not work as expected)"
-        available_fonts = []
-        all_fonts = QFontDatabase.families()
-        for font_name in all_fonts:
-            is_scalable = QFontDatabase.isSmoothlyScalable(font_name)
-            if is_scalable:
-                available_fonts.append(font_name)
-
-        default_font = QApplication.font()
-        default_font_family = default_font.family()
-
-        fallback_font = QFont(default_font_family, 9, QFont.Normal, False)
-
-        for font_name in available_fonts:
-            if font_name != default_font_family:
-                fallback_font.insertSubstitution(default_font_family,
-                                                 font_name)
-
-        QApplication.setFont(fallback_font)
 
     def toggle_pin(self, script):
         "Pin profile from pinned profile list"

@@ -1,8 +1,12 @@
 name: Pylint
-on: [pull_request]
+
+on:
+   pull_request:
+     branches: [ "main" ]
 
 jobs:
   lint:
+    name: Checking Pylint 
     runs-on: windows-latest
     steps:
       - name: Checkout repository

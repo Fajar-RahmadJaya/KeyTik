@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (QApplication) # pylint: disable=E0611
 
 from utility import utils
 from utility import thread
-from dashboard.dashboard import Dashboard
+from dashboard.dashboard_ui import DashboardUI
 from dashboard.dashboard_core import DashboardCore
 from setting.announcement import Announcement
 from setting.setting_ui import SettingUI
@@ -19,7 +19,7 @@ def main():
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
 
     app = QApplication(sys.argv)
-    main_window = Dashboard()
+    main_window = DashboardUI()
     announcement = Announcement()
     setting_ui = SettingUI()
     dashboad_core = DashboardCore()

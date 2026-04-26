@@ -19,7 +19,7 @@ from script_profile.profile_ui import ProfileUI
 from setting.setting_ui import SettingUI
 
 
-class Dashboard(QMainWindow):
+class DashboardUI(QMainWindow):
     "Main Window"
     def __init__(self):
         super().__init__()

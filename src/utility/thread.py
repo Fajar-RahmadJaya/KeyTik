@@ -11,16 +11,13 @@ from utility import utils
 from dashboard.dashboard_core import DashboardCore
 
 class Thread(QThread):  # pylint: disable=R0903
-    "Thread worker"
+    "Startup thread worker"
     update_found = Signal()
     show_announcement = Signal()
     ahk_not_installed = Signal()
 
     def run(self):
         "Run check update on thread to increase dashborad initialization time"
-        # To do: load all announcement file content on thread
-        # when "show announcement" is true
-
         # Composition
         announcement = Announcement()
         write_script = WriteScript()

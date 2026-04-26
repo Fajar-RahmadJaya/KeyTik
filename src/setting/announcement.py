@@ -14,7 +14,7 @@ from utility import constant
 from utility import diff
 
 
-class AnnouncmentThread(QThread):
+class AnnouncmentThread(QThread):  # pylint: disable=R0903
     "Worker to run get announcement url"
     url_found = Signal()
     def __init__(self):

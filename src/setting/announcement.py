@@ -8,31 +8,26 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QHBoxLayout, QCheckBox, QPushButton,
     QTextBrowser, QWidget, QFrame)
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
-from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtCore import Qt, QThread, Signal  # pylint: disable=E0611
 
 from utility import constant
 from utility import diff
 
 
-class Announcement():
-    "Announcement"
+class AnnouncmentThread(QThread):
+    "Worker to run get announcement url"
+    url_found = Signal()
     def __init__(self):
+        super().__init__()
         self.announcement_files = []
-        self.current_announcement_index = 0
 
-    def load_announcement_condition(self):
-        "Load user preference from file, whether to show announcement or not"
-        try:
-            if os.path.exists(constant.dont_show_path):
-                with open(constant.dont_show_path, "r", encoding='utf-8') as f:
-                    config = json.load(f)
-                    return config.get("welcome_condition", True)
-        except FileNotFoundError as e:
-            print(f"Error loading condition file: {e}")
-        return True
+    def run(self):
+        "Overwrite run method"
+        self.get_announcement_url()
 
     def get_announcement_url(self):
         "Loop through announcement file url in order and stop when url invalid"
+        print("called")
         self.announcement_files = []
         i = 1
         while True:
@@ -46,11 +41,28 @@ class Announcement():
                 i += 1
             except requests.exceptions.RequestException:
                 break
+        self.url_found.emit()
+
+class Announcement():
+    "Announcement"
+    def __init__(self):
+        self.current_announcement_index = 0
+        self.announcement_thread = AnnouncmentThread()
+
+    def load_announcement_condition(self):
+        "Load user preference from file, whether to show announcement or not"
+        try:
+            if os.path.exists(constant.dont_show_path):
+                with open(constant.dont_show_path, "r", encoding='utf-8') as f:
+                    config = json.load(f)
+                    return config.get("welcome_condition", True)
+        except FileNotFoundError as e:
+            print(f"Error loading condition file: {e}")
+        return True
 
     def show_announcement_window(self, parent):
         "Announcement window"
         try:
-            self.get_announcement_url()
             self.current_announcement_index = 0
 
             announcement_dialog = QDialog(parent)
@@ -96,13 +108,17 @@ class Announcement():
                 }}
             """)
 
-            if self.announcement_files:
-                # Set html_label text
-                self.load_content(self.current_announcement_index, html_label)
-            else:
-                html_label.setHtml(
-                    "<p>Unable to load announcements.</p>"
-                )
+            html_label.setHtml(
+                "<p>Fetching Announcement . . .</p>"
+            )
+
+            # After get_announcement_url done, call load content to overwrite html content
+            self.announcement_thread.url_found.connect(
+                lambda: self.load_content(self.current_announcement_index, html_label)
+            )
+
+            # Start thread running get_annoucement_url
+            self.announcement_thread.start()
 
             html_layout.addWidget(html_label)
             main_layout.addWidget(
@@ -123,7 +139,7 @@ class Announcement():
     def load_content(self, index, html_label):
         "Get announcement content from official website"
         try:
-            url = self.announcement_files[index]
+            url = self.announcement_thread.announcement_files[index]
             if url in constant.announcement_cache:
                 md_content = constant.announcement_cache[url]
             else:
@@ -143,6 +159,26 @@ class Announcement():
             html_label.setHtml(
                 "<p>File not found.</p>" 
             )
+
+    def update_buttons(self, prev_button, next_button):
+        "Update button enable/disable state"
+        prev_button.setEnabled(self.current_announcement_index > 0)
+        next_button.setEnabled(
+            self.current_announcement_index < len(self.announcement_thread.announcement_files) - 1)
+
+    def next_doc(self, html_label, prev_button, next_button):
+        "Next announcement"
+        if self.current_announcement_index < len(self.announcement_thread.announcement_files) - 1:
+            self.current_announcement_index += 1
+            self.load_content(self.current_announcement_index, html_label)
+            self.update_buttons(prev_button, next_button)
+
+    def prev_doc(self, html_label, prev_button, next_button):
+        "previous announcement"
+        if self.current_announcement_index > 0:
+            self.current_announcement_index -= 1
+            self.load_content(self.current_announcement_index, html_label)
+            self.update_buttons(prev_button, next_button)
 
     def announcement_button_frame(self, html_label):
         "Button and checkbox"
@@ -177,25 +213,3 @@ class Announcement():
                             announcement_condition}, f)
         except FileNotFoundError as e:
             print(f"Error saving condition file: {e}")
-
-    def update_buttons(self, prev_button, next_button):
-        "Update button enable/disable state"
-        prev_button.setEnabled(self.current_announcement_index > 0)
-        next_button.setEnabled(
-            self.current_announcement_index < len(
-                self.announcement_files) - 1)
-
-    def next_doc(self, html_label, prev_button, next_button):
-        "Next announcement"
-        if self.current_announcement_index < len(
-                self.announcement_files) - 1:
-            self.current_announcement_index += 1
-            self.load_content(self.current_announcement_index, html_label)
-            self.update_buttons(prev_button, next_button)
-
-    def prev_doc(self, html_label, prev_button, next_button):
-        "previous announcement"
-        if self.current_announcement_index > 0:
-            self.current_announcement_index -= 1
-            self.load_content(self.current_announcement_index, html_label)
-            self.update_buttons(prev_button, next_button)

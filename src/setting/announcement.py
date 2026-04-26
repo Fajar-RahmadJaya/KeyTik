@@ -23,11 +23,7 @@ class AnnouncmentThread(QThread):
 
     def run(self):
         "Overwrite run method"
-        self.get_announcement_url()
-
-    def get_announcement_url(self):
-        "Loop through announcement file url in order and stop when url invalid"
-        print("called")
+        # Loop through announcement file url in order and stop when url invalid
         self.announcement_files = []
         i = 1
         while True:
@@ -41,6 +37,16 @@ class AnnouncmentThread(QThread):
                 i += 1
             except requests.exceptions.RequestException:
                 break
+
+        for url in self.announcement_files:
+            try:
+                response = requests.get(url, timeout=5)
+                response.raise_for_status()
+                md_content = response.text
+                constant.announcement_cache[url] = md_content
+            except requests.HTTPError:
+                constant.announcement_cache[url] = "File not found."
+
         self.url_found.emit()
 
 class Announcement():
@@ -112,14 +118,6 @@ class Announcement():
                 "<p>Fetching Announcement . . .</p>"
             )
 
-            # After get_announcement_url done, call load content to overwrite html content
-            self.announcement_thread.url_found.connect(
-                lambda: self.load_content(self.current_announcement_index, html_label)
-            )
-
-            # Start thread running get_annoucement_url
-            self.announcement_thread.start()
-
             html_layout.addWidget(html_label)
             main_layout.addWidget(
                 html_frame, alignment=Qt.AlignmentFlag.AlignHCenter)
@@ -136,32 +134,19 @@ class Announcement():
         except requests.HTTPError as e:
             print(f"Error displaying announcement window: {e}")
 
-    def load_content(self, index, html_label):
+    def load_content(self, index, html_label, prev_button, next_button):
         "Get announcement content from official website"
-        try:
-            url = self.announcement_thread.announcement_files[index]
-            if url in constant.announcement_cache:
-                md_content = constant.announcement_cache[url]
-            else:
-                response = requests.get(url, timeout=5)
-                response.raise_for_status()
-                md_content = response.text
-                constant.announcement_cache[url] = md_content
-            html_content = markdown(md_content)
-            styling = """
-            <style>
-            ol { -qt-list-indent: 1; margin-left: -20px; padding-left: 0px; } 
-            ol li { margin-left: -5px; padding-left: 0px; }
-            </style>
-            """
-            html_label.setHtml(styling + html_content)
-        except requests.HTTPError:
-            html_label.setHtml(
-                "<p>File not found.</p>" 
-            )
+        url = self.announcement_thread.announcement_files[index]
+        md_content = constant.announcement_cache[url]
+        html_content = markdown(md_content)
+        styling = """
+        <style>
+        ol { -qt-list-indent: 1; margin-left: -20px; padding-left: 0px; }
+        ol li { margin-left: -5px; padding-left: 0px; }
+        </style>
+        """
+        html_label.setHtml(styling + html_content)
 
-    def update_buttons(self, prev_button, next_button):
-        "Update button enable/disable state"
         prev_button.setEnabled(self.current_announcement_index > 0)
         next_button.setEnabled(
             self.current_announcement_index < len(self.announcement_thread.announcement_files) - 1)
@@ -170,15 +155,13 @@ class Announcement():
         "Next announcement"
         if self.current_announcement_index < len(self.announcement_thread.announcement_files) - 1:
             self.current_announcement_index += 1
-            self.load_content(self.current_announcement_index, html_label)
-            self.update_buttons(prev_button, next_button)
+            self.load_content(self.current_announcement_index, html_label, prev_button, next_button)
 
     def prev_doc(self, html_label, prev_button, next_button):
         "previous announcement"
         if self.current_announcement_index > 0:
             self.current_announcement_index -= 1
-            self.load_content(self.current_announcement_index, html_label)
-            self.update_buttons(prev_button, next_button)
+            self.load_content(self.current_announcement_index, html_label, prev_button, next_button)
 
     def announcement_button_frame(self, html_label):
         "Button and checkbox"
@@ -188,12 +171,13 @@ class Announcement():
 
         prev_button = QPushButton("Previous")
         prev_button.setFixedWidth(100)
-        prev_button.setEnabled(self.current_announcement_index > 0)
+        prev_button.setEnabled(False)
         prev_button.clicked.connect(lambda: self.prev_doc(html_label, prev_button, next_button))
         button_layout.addWidget(prev_button)
 
         next_button = QPushButton("Next")
         next_button.setFixedWidth(100)
+        next_button.setEnabled(False)
         next_button.clicked.connect(lambda: self.next_doc(html_label, prev_button, next_button))
         button_layout.addWidget(next_button)
 
@@ -202,6 +186,16 @@ class Announcement():
         dont_show_checkbox.stateChanged.connect(
             lambda: self.save_announcement_condition(dont_show_checkbox))
         button_layout.addWidget(dont_show_checkbox)
+
+        # After get_announcement_url done, call load content to overwrite html content
+        self.announcement_thread.url_found.connect(
+            lambda: self.load_content(self.current_announcement_index, html_label,
+                                      prev_button, next_button)
+        )
+
+        # Start thread running get_annoucement_url
+        self.announcement_thread.start()
+
         return button_frame
 
     def save_announcement_condition(self, dont_show_checkbox):

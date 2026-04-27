@@ -167,6 +167,7 @@ class ProfileUI():
         save_button.clicked.connect(
             lambda: self.save_changes(mode_combobox, self.keyboard_entry,
                                       self.program_entry, remap_row_comp))
+        save_button.setFixedHeight(28)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
@@ -179,6 +180,7 @@ class ProfileUI():
             lambda index: remap_row_comp.handle_mode_changed(index, self.edit_window))
         default_index = mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
+        mode_combobox.setFixedHeight(28)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
 
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)

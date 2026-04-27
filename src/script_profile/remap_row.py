@@ -299,7 +299,7 @@ class RemapRow():
     def default_key_widget(self, row_widget, row_layout, parsed_remap, parent_window):
         "Default key widget on remap row"
         default_key_select = QPushButton("Select", row_widget)
-        default_key_select.setFixedWidth(140)
+        default_key_select.setFixedWidth(160)
         default_key_select.setToolTip("Press any key or shortcut "
                                         "to capture it automatically")
         default_key_select.clicked.connect(lambda:
@@ -314,7 +314,6 @@ class RemapRow():
         default_key_layout.setSpacing(2)
 
         default_key_entry = QLineEdit(default_key_widget)
-        default_key_entry.setFixedWidth(112)
         default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         default_key_entry.setToolTip("Default key can be a single key, "
                                         "multiple keys, or a double key (eg. double-click)")
@@ -343,7 +342,7 @@ class RemapRow():
     def remap_key_widget(self, row_widget, row_layout, parsed_remap, parent_window):
         "Remap key widget on remap row"
         remap_key_select = QPushButton("Select", row_widget)
-        remap_key_select.setFixedWidth(140)
+        remap_key_select.setFixedWidth(160)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(lambda:
                                             self.key_listening_comp.key_listening(
@@ -357,7 +356,6 @@ class RemapRow():
         remap_key_layout.setSpacing(2)
 
         remap_key_entry = QLineEdit(remap_key_widget)
-        remap_key_entry.setFixedWidth(112)
         remap_key_entry.setToolTip("Remap key can be "
                                     "a single key, multiple keys, text, or hold")
         remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)

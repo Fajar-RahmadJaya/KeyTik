@@ -91,7 +91,7 @@ class SelectKeyUI():
         select_key_window = QDialog(parent_window)
         select_key_window.setWindowTitle("Select Key")
         select_key_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = utils.get_geometry(parent_window, 400, 425)
+        geometry = utils.get_geometry(parent_window, 400, 430)
         select_key_window.setGeometry(geometry)
 
         main_layout = QVBoxLayout(select_key_window)

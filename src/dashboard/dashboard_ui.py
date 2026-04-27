@@ -32,7 +32,7 @@ class DashboardUI(QMainWindow):
 
         # UI initialization
         self.setWindowTitle(diff.PROGRAM_NAME)
-        self.setFixedSize(650, 492)
+        self.setFixedSize(660, 500)
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)

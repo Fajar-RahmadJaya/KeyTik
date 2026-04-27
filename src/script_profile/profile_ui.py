@@ -55,7 +55,7 @@ class ProfileUI():
         else:
             self.edit_window.setWindowTitle("Edit Profile")
         self.edit_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = utils.get_geometry(parent, 600, 460)
+        geometry = utils.get_geometry(parent, 640, 480)
         self.edit_window.setGeometry(geometry)
 
         # Composition
@@ -148,7 +148,6 @@ class ProfileUI():
     def edit_middle(self, lines, first_line, edit_layout, remap_row_comp):
         "Middle part of profile manager"
         edit_scroll = QScrollArea(self.edit_window)
-        edit_scroll.setFixedSize(535, 305)
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 

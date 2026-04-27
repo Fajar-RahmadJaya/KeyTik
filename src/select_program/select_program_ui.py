@@ -26,7 +26,7 @@ class SelectProgramUI():
         select_program_window = QDialog(parent)
         select_program_window.setWindowTitle("Select Programs")
         select_program_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = utils.get_geometry(parent, 600, 300)
+        geometry = utils.get_geometry(parent, 620, 300)
         select_program_window.setGeometry(geometry)
         select_program_window.setModal(True)
         select_program_window.setAttribute(
@@ -37,7 +37,6 @@ class SelectProgramUI():
         self.program_tree = QTreeWidget(select_program_window)
         self.program_tree.setHeaderLabels(["Window Title", "Class", "Process"])
         self.program_tree.setSortingEnabled(True)
-        self.program_tree.setFixedWidth(580)
         main_layout.addWidget(self.program_tree)
 
         header = self.program_tree.header()

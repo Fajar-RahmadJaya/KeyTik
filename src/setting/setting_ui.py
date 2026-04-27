@@ -93,7 +93,8 @@ class SettingUI():
         dialog = QDialog(parent)
         dialog.setWindowTitle("Installation Manager")
         dialog.setWindowIcon(QIcon(constant.icon_path))
-        dialog.setFixedSize(380, 180)
+        geometry = utils.get_geometry(parent, 380, 180)
+        dialog.setGeometry(geometry)
         layout = QVBoxLayout(dialog)
         layout.setContentsMargins(20, 20, 20, 20)
 

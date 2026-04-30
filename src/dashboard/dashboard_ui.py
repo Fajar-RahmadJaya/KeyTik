@@ -4,7 +4,7 @@ import os
 import winshell
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMainWindow, QWidget, QVBoxLayout, QGridLayout,
-    QFrame, QPushButton, QGroupBox, QLabel
+    QFrame, QPushButton, QGroupBox, QLabel, QSizePolicy
 )
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
@@ -163,14 +163,18 @@ class DashboardUI(QMainWindow):
     def profile_card(self, script, row, column, running_scripts):
         "Profile action"
         group_box = QGroupBox(os.path.splitext(script)[0])
+
         group_layout = QGridLayout(group_box)
+        group_layout.setContentsMargins(12, 6, 12, 12)
+        group_layout.setHorizontalSpacing(8)
+        group_layout.setVerticalSpacing(8)
 
         # Pin icon
         self.pin_icon(script, group_box)
 
         # Run/exit button
         run_button = QPushButton()
-        run_button.setFixedWidth(80)
+        run_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         if script in running_scripts:
             run_button.setText(" Exit")
             run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
@@ -184,15 +188,15 @@ class DashboardUI(QMainWindow):
 
         # Edit profile button
         edit_button = QPushButton(" Edit")
+        edit_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         edit_button.setIcon(icons.get_icon(icons.edit))
-        edit_button.setFixedWidth(80)
         edit_button.setToolTip(f'Adjust "{os.path.splitext(script)[0]}"')
         edit_button.clicked.connect(lambda: self.handle_edit(script, run_button))
         group_layout.addWidget(edit_button, 0, 1)
 
         # Copy button
         copy_button = QPushButton(" Copy")
-        copy_button.setFixedWidth(80)
+        copy_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         copy_button.setIcon(icons.get_icon(icons.copy))
         copy_button.setToolTip(f'Copy "{os.path.splitext(script)[0]}"')
         copy_button.clicked.connect(lambda: self.dashboard_core.copy_script(script, self))
@@ -200,7 +204,7 @@ class DashboardUI(QMainWindow):
 
         # Delete button
         delete_button = QPushButton(" Delete")
-        delete_button.setFixedWidth(80)
+        delete_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         delete_button.setIcon(icons.get_icon(icons.delete))
         delete_button.setToolTip(f'Remove "{os.path.splitext(script)[0]}"')
         delete_button.clicked.connect(lambda: self.dashboard_core.delete_script(script))
@@ -210,7 +214,7 @@ class DashboardUI(QMainWindow):
         store_button = QPushButton(" Store" if
                                    self.dashboard_core.script_dir == utils.active_dir
                                    else " Restore")
-        store_button.setFixedWidth(80)
+        store_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         store_button.setIcon(icons.get_icon(icons.store))
         if self.dashboard_core.script_dir == utils.active_dir:
             store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"')
@@ -221,6 +225,7 @@ class DashboardUI(QMainWindow):
 
         # Startup button
         startup_button = self.startup_button(script)
+        startup_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         group_layout.addWidget(startup_button, 0, 2)
 
         self.profile_layout.addWidget(group_box, row, column)
@@ -261,7 +266,6 @@ class DashboardUI(QMainWindow):
                 )
             )
             startup_button.clicked.connect(lambda: self.dashboard_core.add_ahk_to_startup(script))
-        startup_button.setFixedWidth(80)
         return startup_button
 
     def handle_edit(self, script, run_button):

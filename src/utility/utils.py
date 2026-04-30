@@ -145,7 +145,9 @@ def get_ahk_install_dir():
             continue
     return None
 
-ahk_uninstall_path = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk", "UX", "ui-uninstall.ahk")  # pylint: disable=C0301,E0401
+ahk_uninstall_path = (os.path.join(get_ahk_install_dir()
+                                   or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk",
+                                   "UX", "ui-uninstall.ahk"))
 ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")
 
 

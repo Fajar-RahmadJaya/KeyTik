@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMainWindow, QWidget, QVBoxLayout, QGridLayout,
     QFrame, QPushButton, QGroupBox, QLabel, QSizePolicy
 )
-from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtGui import QIcon, QPalette  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 
@@ -48,7 +48,6 @@ class DashboardUI(QMainWindow):
         self.frame_layout = QVBoxLayout(self.frame)
 
         self.profile_frame = QFrame()
-        self.profile_frame.setFixedHeight(400)
         self.profile_layout = QGridLayout(self.profile_frame)
         self.profile_layout.setContentsMargins(0, 0, 0, 10)
         self.profile_layout.setHorizontalSpacing(15)
@@ -71,10 +70,10 @@ class DashboardUI(QMainWindow):
         "Dashboard button widget"
         button_frame = QFrame()
         button_layout = QGridLayout(button_frame)
-        button_layout.setContentsMargins(40, 20, 40, 10)
+        button_layout.setContentsMargins(36, 8, 36, 8)
 
         prev_button = QPushButton()
-        prev_button.setFixedWidth(80)
+        prev_button.setFixedWidth(84)
         prev_button.setIcon(icons.get_icon(icons.prev))
         prev_button.setToolTip("Previous Profile")
         prev_button.clicked.connect(self.dashboard_core.prev_page)
@@ -115,7 +114,7 @@ class DashboardUI(QMainWindow):
         button_layout.addWidget(setting_button, 0, 7)
 
         next_button = QPushButton()
-        next_button.setFixedWidth(80)
+        next_button.setFixedWidth(84)
         next_button.setIcon(icons.get_icon(icons.icon_next))
         next_button.setToolTip("Next Profile")
         next_button.clicked.connect(self.dashboard_core.next_page)
@@ -126,18 +125,18 @@ class DashboardUI(QMainWindow):
     def create_new_button(self, button_layout):
         "Crate new button with dummy label to give it more space"
         dummy_left = QLabel()
-        dummy_left.setFixedWidth(10)
+        dummy_left.setFixedWidth(12)
         button_layout.addWidget(dummy_left, 0, 3)
 
         create_button = QPushButton(" Create New Profile")
         create_button.setIcon(icons.get_icon(icons.plus))
-        create_button.setFixedWidth(150)
-        create_button.setFixedHeight(30)
+        create_button.setFixedWidth(152)
+        create_button.setFixedHeight(36)
         create_button.clicked.connect(lambda: self.profile_ui.edit_script(None, self))
         button_layout.addWidget(create_button, 0, 4)
 
         dummy_right = QLabel()
-        dummy_right.setFixedWidth(10)
+        dummy_right.setFixedWidth(12)
         button_layout.addWidget(dummy_right, 0, 5)
 
     def update_script_list(self):
@@ -154,11 +153,18 @@ class DashboardUI(QMainWindow):
 
         running_scripts = self.dashboard_core.get_running_ahk()
 
-        for index, script in enumerate(scripts_to_display):
+        for index in range(6):
             row = index // 2
             column = index % 2
-
-            self.profile_card(script, row, column, running_scripts)
+            if index < len(scripts_to_display):
+                script = scripts_to_display[index]
+                self.profile_card(script, row, column, running_scripts)
+            else:
+                dummy_box = QGroupBox(" ")
+                window_color = self.palette().color(QPalette.Window)
+                dummy_box.setStyleSheet(
+                    f"QGroupBox {{ background-color: {window_color.name()}; border-radius: 8px; }}")
+                self.profile_layout.addWidget(dummy_box, row, column)
 
     def profile_card(self, script, row, column, running_scripts):
         "Profile action"
@@ -245,8 +251,8 @@ class DashboardUI(QMainWindow):
 
     def startup_button(self, script):
         "Startup button"
+        startup_button = QPushButton(" Startup")
         if self.is_startup(script):
-            startup_button = QPushButton(" Unstartup")
             startup_button.setIcon(icons.get_icon(icons.rocket_fill))
             startup_button.setToolTip(
                 (
@@ -257,7 +263,6 @@ class DashboardUI(QMainWindow):
             startup_button.clicked.connect(
                 lambda: self.dashboard_core.remove_ahk_from_startup(script))
         else:
-            startup_button = QPushButton(" Startup")
             startup_button.setIcon(icons.get_icon(icons.rocket))
             startup_button.setToolTip(
                 (

@@ -51,23 +51,30 @@ class RemapRowCore():
     def load_key_list(self):
         "Load translation from raw key to readable key"
         key_map = {}
-        key, info = self.read_keylist()
-        readable = key
-        raw = info.get("translate", "")
-        if raw:
-            key_map[raw] = readable
-
+        readable_to_raw = self.read_keylist()
+        for readable, raw in readable_to_raw.items():
+            if raw:
+                if len(readable) == 1:
+                    key_map[raw] = readable
+                else:
+                    key_map[raw] = readable.title()
+                return key_map
         return key_map
 
     def read_keylist(self):
         "Open and read key list"
+        key_map = {}
         try:
             with open(constant.keylist_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 for category_dict in data:
                     for _, keys in category_dict.items():
                         for key, info in keys.items():
-                            return key, info
+                            readable_key = key.strip().lower()
+                            translation = info.get("translate", "").strip()
+                            if translation:
+                                key_map[readable_key] = translation
+            return key_map
         except FileNotFoundError as e:
             print(f"Error reading key list: {e}")
-            return None
+            return {}

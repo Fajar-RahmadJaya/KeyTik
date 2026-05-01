@@ -306,6 +306,7 @@ class DashboardCore(QObject):
             show_stored.setToolTip("Show Stored Profile")
             show_stored.setIcon(icons.get_icon(icons.show_stored))
 
+        self.current_page = 0
         self.list_scripts()
         self.update_script_signal.emit()
 

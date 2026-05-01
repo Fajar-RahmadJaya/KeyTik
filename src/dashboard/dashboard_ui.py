@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMainWindow, QWidget, QVBoxLayout, QGridLayout,
     QFrame, QPushButton, QGroupBox, QLabel, QSizePolicy
 )
-from PySide6.QtGui import QIcon, QPalette  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 
@@ -161,9 +161,8 @@ class DashboardUI(QMainWindow):
                 self.profile_card(script, row, column, running_scripts)
             else:
                 dummy_box = QGroupBox(" ")
-                window_color = self.palette().color(QPalette.Window)
                 dummy_box.setStyleSheet(
-                    f"QGroupBox {{ background-color: {window_color.name()}; border-radius: 8px; }}")
+                    "QGroupBox { background: transparent; border-radius: 8px; }")
                 self.profile_layout.addWidget(dummy_box, row, column)
 
     def profile_card(self, script, row, column, running_scripts):

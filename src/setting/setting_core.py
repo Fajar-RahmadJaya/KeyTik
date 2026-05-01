@@ -18,9 +18,6 @@ class SettingCore():
     "Setting logic"
     def change_data_location(self, parent):
         "Change active and stored profile directory for 'change profile location'"
-        # To Do: fix known issue.
-        # Known issue: After successfully change data location, show stored not works
-
         new_path = QFileDialog.getExistingDirectory(
             parent, "Select a New Path for Active and Store Folders"
         )

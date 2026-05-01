@@ -16,7 +16,8 @@ dependencies = [
     "pyside6==6.11.0",
     "pynput (>=1.8.1,<2.0.0)",
     "pywin32 (>=311,<312)",
-    "winshell (>=0.6,<0.7)"
+    "winshell (>=0.6,<0.7)",
+    "win32mica>=3.0",
 ]
 
 [dependency-groups]

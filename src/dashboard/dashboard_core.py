@@ -200,24 +200,31 @@ class DashboardCore(QObject):
 
     def activate_script(self, script_name, button):
         "Run profile"
-        script_path = os.path.join(self.script_dir, script_name)
+        if os.path.isfile(os.path.join(utils.active_dir, script_name)):
+            script_path = os.path.join(utils.active_dir, script_name)
+        else:
+            script_path = os.path.join(utils.store_dir, script_name)
 
         if os.path.isfile(script_path):
 
             os.startfile(script_path)
 
-            button.setText(" Exit")
-            button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"')
-            button.setIcon(icons.get_icon(icons.icon_exit))
-            button.clicked.disconnect()
-            button.clicked.connect(lambda: self.exit_script(script_name,
-                                                            button))
+            if button:
+                button.setText(" Exit")
+                button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"')
+                button.setIcon(icons.get_icon(icons.icon_exit))
+                button.clicked.disconnect()
+                button.clicked.connect(lambda: self.exit_script(script_name,
+                                                                button))
         else:
             QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
     def exit_script(self, script_name, button):
         "Exit profile"
-        script_path = os.path.join(self.script_dir, script_name)
+        if os.path.isfile(os.path.join(utils.active_dir, script_name)):
+            script_path = os.path.join(utils.active_dir, script_name)
+        else:
+            script_path = os.path.join(utils.store_dir, script_name)
 
         if os.path.isfile(script_path):
             try:
@@ -247,17 +254,18 @@ class DashboardCore(QObject):
                 if '^' in exit_combo:
                     keyboard.release(Key.ctrl)
 
-                button.setText(" Run")
-                button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"')
-                button.setIcon(icons.get_icon(icons.run))
-                button.clicked.disconnect()
-                button.clicked.connect(lambda: self.activate_script(
-                    script_name, button))
+                if button:
+                    button.setText(" Run")
+                    button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"')
+                    button.setIcon(icons.get_icon(icons.run))
+                    button.clicked.disconnect()
+                    button.clicked.connect(lambda: self.activate_script(
+                        script_name, button))
 
             except FileNotFoundError as e:
                 QMessageBox.critical(None, "Error", f"Failed to exit script: {e}")
         else:
-            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(None, "Error", f"{script_path} does not exist.")
 
     def store_script(self, script_name):
         "Move profile to store directory"

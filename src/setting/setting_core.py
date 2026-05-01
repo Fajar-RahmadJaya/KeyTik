@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QMessageBox, QFileDialog)  # pylint: disable=E061
 from utility import constant
 from utility import utils
 from utility.diff import Diff, CHECK_UPDATE_LINK
-
+from dashboard.dashboard_core import DashboardCore
 
 class SettingCore():
     "Setting logic"
@@ -20,6 +20,7 @@ class SettingCore():
         "Change active and stored profile directory for 'change profile location'"
         # To Do: fix known issue.
         # Known issue: After successfully change data location, show stored not works
+
         new_path = QFileDialog.getExistingDirectory(
             parent, "Select a New Path for Active and Store Folders"
         )
@@ -28,7 +29,14 @@ class SettingCore():
             print("No directory selected. Operation canceled.")
             return
 
+        dashboard_core = DashboardCore()
+
         try:
+            # Exit all script first to prevent administrator issue
+            running_scripts = dashboard_core.get_running_ahk()
+            for script in running_scripts:
+                dashboard_core.exit_script(script_name=script, button=None)
+
             if not os.path.exists(new_path):
                 print(f"The selected path does not exist: {new_path}")
                 return
@@ -57,6 +65,10 @@ class SettingCore():
             utils.store_dir = new_store_dir
             print(f"Global active_dir updated to: {utils.active_dir}")
             print(f"Global store_dir updated to: {utils.store_dir}")
+
+            # Reactive script after move profile successfully
+            for script in running_scripts:
+                dashboard_core.activate_script(script, button=None)
 
             QMessageBox.information(
                 None, "Change Profile Location",

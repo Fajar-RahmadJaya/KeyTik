@@ -3,7 +3,8 @@ import os
 import json
 import sys
 import winreg
-from PySide6.QtCore import QRect  # pylint: disable=E0611
+from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
+import win32mica
 
 from utility import constant
 
@@ -145,7 +146,11 @@ def get_ahk_install_dir():
             continue
     return None
 
-ahk_uninstall_path = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk", "UX", "ui-uninstall.ahk")  # pylint: disable=C0301,E0401
+ahk_uninstall_path = os.path.join(
+    get_ahk_install_dir()
+    or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk",
+    "UX",
+    "ui-uninstall.ahk")
 ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")
 
 
@@ -160,3 +165,11 @@ def get_geometry(parent_window, width, height):
     x = parent_x + (parent_width - width) // 2
     y = parent_y + (parent_height - height) // 2
     return QRect(x, y, width, height)
+
+def apply_mica(target_window):
+    "Apply mica style on target window using win32mica"
+    target_window.setAttribute(Qt.WA_TranslucentBackground)
+    win32mica.ApplyMica(
+        HWND=int(target_window.winId()),
+        Theme=win32mica.MicaTheme.AUTO,
+        Style=win32mica.MicaStyle.DEFAULT)

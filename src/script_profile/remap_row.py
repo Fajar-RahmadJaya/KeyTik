@@ -11,10 +11,10 @@ from PySide6.QtCore import Qt, Signal, QObject, QTimer, QEvent  # pylint: disabl
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtGui import QCursor  # pylint: disable=E0611
 
-from utility import utils
 from utility import icons
 from utility import constant
 from utility.diff import Diff
+from utility import style
 from script_profile.parse_script import ParseScript
 from script_profile.remap_row_core import RemapRowCore
 from select_key.select_key_ui import SelectKeyUI
@@ -88,6 +88,13 @@ class RemapRow():
         mode_line = lines[0].strip() if lines else "; default"
 
         self.edit_frame = QWidget()
+        self.edit_frame.setObjectName("editFrame")
+        self.edit_frame.setStyleSheet(
+            """QWidget#editFrame {
+            background: transparent;
+            }"""
+        )
+
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.edit_frame.setLayout(self.edit_frame_layout)
 
@@ -172,14 +179,6 @@ class RemapRow():
         else:
             self.remap_row(parent_window=parent_window)
 
-
-        # if parsed_remap_tuple:
-        #     # For edit profile
-        #     self.remap_row(parsed_remap)
-        # else:
-        #     # For create new profile
-        #     self.remap_row()
-
     def remap_title(self):
         "Key remap row tittle label"
         remap_label_layout = QGridLayout()
@@ -208,22 +207,9 @@ class RemapRow():
         # Remap row card
         card_frame = QFrame(self.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
-        if utils.theme == "dark":
-            card_frame.setStyleSheet("""
-            QFrame {
-                background: #313131;
-                border: 1px solid #404040;
-                border-radius: 10px;
-            }
-            """)
-        else:
-            card_frame.setStyleSheet("""
-            QFrame {
-                background: #f8f8f8;
-                border: 1px solid #c9c9c9;
-                border-radius: 10px;
-            }
-            """)
+        card_frame.setObjectName("remapCardFrame")
+        card_frame.setStyleSheet(style.card_style("remapCardFrame"))
+
         card_layout = QVBoxLayout(card_frame)
         card_layout.setContentsMargins(8, 8, 8, 8)
 
@@ -560,22 +546,9 @@ class ShortcutRow():
         # Card frame
         card_frame = QFrame(self.remap_row_comp.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
-        if utils.theme == "dark":
-            card_frame.setStyleSheet("""
-            QFrame {
-                background: #313131;
-                border: 1px solid #404040;
-                border-radius: 10px;
-            }
-            """)
-        else:
-            card_frame.setStyleSheet("""
-            QFrame {
-                background: #f8f8f8;
-                border: 1px solid #c9c9c9;
-                border-radius: 10px;
-            }
-            """)
+        card_frame.setObjectName("shortcutCardFrame")
+        card_frame.setStyleSheet(style.card_style("shortcutCardFrame"))
+
         card_layout = QVBoxLayout(card_frame)
         card_layout.setContentsMargins(8, 8, 8, 8)
         card_layout.setSpacing(0)

@@ -228,31 +228,33 @@ class RemapRow():
         card_layout.setContentsMargins(8, 8, 8, 8)
 
         # Remap row layout
-        row_widget = QWidget(self.edit_frame)
-        row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
+        remap_row_widget = QWidget(self.edit_frame)
+        remap_row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
                                  QSizePolicy.Policy.Fixed)
-        card_layout.addWidget(row_widget)
+        card_layout.addWidget(remap_row_widget)
 
-        row_layout = QGridLayout(row_widget)
-        row_widget.setLayout(row_layout)
-        row_layout.setContentsMargins(16, 0, 16, 4)
-        row_layout.setVerticalSpacing(0)
+        remap_row_layout = QGridLayout(remap_row_widget)
+        remap_row_widget.setLayout(remap_row_layout)
+        remap_row_layout.setContentsMargins(16, 0, 16, 4)
+        remap_row_layout.setVerticalSpacing(0)
 
         # Arrow Widget
         arrow_icon = QSvgWidget(icons.arrow)
         arrow_icon.setFixedSize(32, 24)
-        row_layout.addWidget(arrow_icon, 0, 1)
+        remap_row_layout.addWidget(arrow_icon, 0, 1)
 
         # Separator widget
-        separator_widget, on_plus_click = self.separator_widget(row_widget,
+        separator_widget, on_plus_click = self.separator_widget(remap_row_widget,
                                                                 parent_window=parent_window,
                                                                 row_type="remap row")
         # Set widget and configure key rows tuple
         # Default Key Widget
-        default_key = self.default_key_widget(row_widget, row_layout, parsed_remap, parent_window)
+        default_key = self.default_key_widget(remap_row_widget, remap_row_layout,
+                                              parsed_remap, parent_window)
 
         # Remap Key Widget
-        remap_key = self.remap_key_widget(row_widget, row_layout, parsed_remap, parent_window)
+        remap_key = self.remap_key_widget(remap_row_widget, remap_row_layout,
+                                          parsed_remap, parent_window)
 
         # Add or remove row when entry changed
         default_key.default_key_entry.textChanged.connect(
@@ -265,7 +267,7 @@ class RemapRow():
             default_key=default_key,
             remap_key=remap_key,
             # Option Widget
-            option=self.option_widget(row_widget, row_layout, parsed_remap)))
+            option=self.option_widget(remap_row_widget, remap_row_layout, parsed_remap)))
 
         # The order where the widget will be added
         mapping_row_widgets = []
@@ -293,14 +295,14 @@ class RemapRow():
                 and remap_key.remap_key_entry.text().strip()):
                 on_plus_click(None)
 
-    def default_key_widget(self, row_widget, row_layout, parsed_remap, parent_window):
+    def default_key_widget(self, remap_row_widget, remap_row_layout, parsed_remap, parent_window):
         "Default key widget on remap row"
-        default_key_container = QWidget(row_widget)
+        default_key_container = QWidget(remap_row_widget)
         default_key_container.setContentsMargins(8, 0, 8, 0)
 
         default_key_layout = QGridLayout(default_key_container)
 
-        default_key_select = QPushButton("Select", row_widget)
+        default_key_select = QPushButton("Select", remap_row_widget)
         default_key_select.setToolTip("Press any key or shortcut "
                                         "to capture it automatically")
         default_key_select.clicked.connect(
@@ -326,7 +328,7 @@ class RemapRow():
                 parent_window, default_key_entry, context="default"))
         default_key_layout.addWidget(default_key_choose, 1, 1, 1, 1)
 
-        row_layout.addWidget(default_key_container, 0, 0)
+        remap_row_layout.addWidget(default_key_container, 0, 0)
 
         default_key = DefaultKeyWidget(
             default_key_entry=default_key_entry,
@@ -334,14 +336,14 @@ class RemapRow():
         )
         return default_key
 
-    def remap_key_widget(self, row_widget, row_layout, parsed_remap, parent_window):
+    def remap_key_widget(self, remap_row_widget, remap_row_layout, parsed_remap, parent_window):
         "Remap key widget on remap row"
-        remap_key_container = QWidget(row_widget)
+        remap_key_container = QWidget(remap_row_widget)
         remap_key_container.setContentsMargins(8, 0, 8, 0)
 
         remap_key_layout = QGridLayout(remap_key_container)
 
-        remap_key_select = QPushButton("Select", row_widget)
+        remap_key_select = QPushButton("Select", remap_row_widget)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(lambda:
                                             self.key_listening_comp.key_listening(
@@ -367,7 +369,7 @@ class RemapRow():
                 parent_window, remap_key_entry, context="remap"))
         remap_key_layout.addWidget(remap_key_choose, 1, 1, 1, 1)
 
-        row_layout.addWidget(remap_key_container, 0, 2)
+        remap_row_layout.addWidget(remap_key_container, 0, 2)
 
         remap_key = RemapKeyWidget(
             remap_key_entry=remap_key_entry,
@@ -375,9 +377,9 @@ class RemapRow():
 
         return remap_key
 
-    def option_widget(self, row_widget, row_layout, parsed_remap):
+    def option_widget(self, remap_row_widget, remap_row_layout, parsed_remap):
         "Remap option widget on remap row"
-        options_widget = QWidget(row_widget)
+        options_widget = QWidget(remap_row_widget)
         options_layout = QHBoxLayout(options_widget)
         options_layout.setContentsMargins(0, 5, 0, 0)
 
@@ -431,7 +433,7 @@ class RemapRow():
         self.entries_to_disable.append((hold_interval_entry, None))
         options_layout.addWidget(hold_interval_entry)
 
-        row_layout.addWidget(options_widget, 1, 0, 1, 3)
+        remap_row_layout.addWidget(options_widget, 1, 0, 1, 3)
 
         option = OptionWidget(
             text_format_checkbox=text_format_checkbox,
@@ -442,7 +444,7 @@ class RemapRow():
         )
         return option
 
-    def separator_widget(self, row_widget, row_type, parent_window):
+    def separator_widget(self, remap_row_widget, row_type, parent_window):
         "Remap row separator widget"
         separator_widget = QWidget(self.edit_frame)
         separator_layout = QHBoxLayout(separator_widget)
@@ -485,10 +487,10 @@ class RemapRow():
             left_sep.setVisible(False)
             if row_type == "remap row":
                 self.remap_row(parent_window=parent_window,
-                               insert_after=(row_widget, separator_widget))
+                               insert_after=(remap_row_widget, separator_widget))
             elif row_type == "shortcut row":
                 self.shortcut_row_comp.shortcut_row(
-                    parent_window=parent_window, insert_after=(row_widget, separator_widget))
+                    parent_window=parent_window, insert_after=(remap_row_widget, separator_widget))
 
         plus_label.mousePressEvent = on_plus_click
 

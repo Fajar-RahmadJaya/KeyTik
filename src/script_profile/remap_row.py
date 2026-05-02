@@ -578,23 +578,23 @@ class ShortcutRow():
         card_layout.setContentsMargins(8, 8, 8, 8)
         card_layout.setSpacing(0)
 
-        row_widget = QWidget(self.remap_row_comp.edit_frame)
-        row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
+        shortcut_row_widget = QWidget(self.remap_row_comp.edit_frame)
+        shortcut_row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
                                     QSizePolicy.Policy.Fixed)
-        card_layout.addWidget(row_widget)
+        card_layout.addWidget(shortcut_row_widget)
 
-        row_layout = QGridLayout(row_widget)
-        row_widget.setLayout(row_layout)
-        row_layout.setContentsMargins(10, 5, 10, 5)
-        row_layout.setHorizontalSpacing(10)
-        row_layout.setVerticalSpacing(5)
+        shortcut_row_layout = QGridLayout(shortcut_row_widget)
+        shortcut_row_widget.setLayout(shortcut_row_layout)
+        shortcut_row_layout.setContentsMargins(80, 0, 80, 0)
+        shortcut_row_layout.setVerticalSpacing(0)
 
         # Shortcut Widget
-        self.shortcut_widget(row_widget, row_layout, parsed_shortcut, parent_window)
+        self.shortcut_widget(shortcut_row_widget, shortcut_row_layout,
+                             parsed_shortcut, parent_window)
 
         # Separator widget
         separator_widget, _ = self.remap_row_comp.separator_widget(
-            row_widget, parent_window=parent_window, row_type="shortcut row")
+            shortcut_row_widget, parent_window=parent_window, row_type="shortcut row")
 
         shortcut_row_widgets = []
         if insert_after is not None:
@@ -619,25 +619,23 @@ class ShortcutRow():
         self.remap_row_comp.edit_frame.update()
         self.remap_row_comp.edit_frame.adjustSize()
 
-    def shortcut_widget(self, row_widget, row_layout, parsed_shortcut, parent_window):
+    def shortcut_widget(self, shortcut_row_widget, shortcut_row_layout,
+                        parsed_shortcut, parent_window):
         "Shortcut widget"
-        shortcut_key_select = QPushButton("Select", row_widget)
-        shortcut_key_select.setFixedWidth(280)
+        shortcut_continer = QWidget(shortcut_row_widget)
+        shortcut_layout = QGridLayout(shortcut_continer)
+        # shortcut_layout.setContentsMargins(0, 0, 0, 0)
+        # shortcut_layout.setSpacing(2)
+
+        shortcut_key_select = QPushButton("Select", shortcut_row_widget)
         shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         shortcut_key_select.clicked.connect(lambda:
                                             self.key_listening_comp.key_listening(
                                                 self.shortcut_entry,
                                                 shortcut_key_select))
-        row_layout.addWidget(shortcut_key_select, 0, 0, 1, 4, Qt.AlignCenter)
+        shortcut_layout.addWidget(shortcut_key_select, 0, 0, 1, 2)
 
-        shortcut_widget = QWidget(row_widget)
-        shortcut_layout = QHBoxLayout(shortcut_widget)
-        shortcut_layout.setContentsMargins(0, 0, 0, 0)
-        shortcut_layout.setSpacing(2)
-
-        self.shortcut_entry = QLineEdit(shortcut_widget)
-
-        self.shortcut_entry.setFixedWidth(252)
+        self.shortcut_entry = QLineEdit(shortcut_continer)
         self.shortcut_entry.setToolTip("Shortcut can be "
                                         "a single key, multiple keys, or shortcut specials "
                                         "(See select key)")
@@ -646,18 +644,18 @@ class ShortcutRow():
             self.shortcut_entry.setText(parsed_shortcut)
         self.remap_row_comp.entries_to_disable.append((self.shortcut_entry, None))
         self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
-        shortcut_layout.addWidget(self.shortcut_entry)
+        shortcut_layout.addWidget(self.shortcut_entry, 1, 0)
 
-        shortcut_choose = QPushButton(shortcut_widget)
+        shortcut_choose = QPushButton(shortcut_continer)
         shortcut_choose.setFixedWidth(28)
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
             lambda: self.remap_row_comp.select_key_ui.select_key(
                 parent_window, self.shortcut_entry, context="shortcut"))
-        shortcut_layout.addWidget(shortcut_choose)
+        shortcut_layout.addWidget(shortcut_choose, 1, 1)
 
-        row_layout.addWidget(shortcut_widget, 1, 0, 1, 4, Qt.AlignCenter)
+        shortcut_row_layout.addWidget(shortcut_continer, 0, 0)
 
     def text_mode_widget(self, lines, key_map, parent_window):
         "Text mode frame(to do: fix)"

@@ -49,7 +49,7 @@ class SelectKeyUI():
 
         main_layout = QVBoxLayout(select_key_window)
         # Top part
-        main_layout.addLayout(self.select_key_top(select_key_window, hide_block))
+        main_layout.addLayout(self.select_key_top(select_key_window, hide_block, context))
 
         # Tree view
         main_layout.addWidget(self.tree_view())
@@ -62,7 +62,7 @@ class SelectKeyUI():
 
         select_key_window.exec()
 
-    def select_key_top(self, select_key_window, hide_block):
+    def select_key_top(self, select_key_window, hide_block, context):
         "Top part of select key"
         choose_search_layout = QHBoxLayout()
         choose_search_layout.setContentsMargins(30, 0, 30, 5)
@@ -116,17 +116,19 @@ class SelectKeyUI():
 
         self.search_unicode_checkbox = QCheckBox("Search Unicode")
         self.search_unicode_checkbox.setChecked(False)
-        self.search_unicode_checkbox.setToolTip(
-            "Search key by name and description.\n"
-            "Unicode search may be slow. Enable only if needed.\n"
-            "Letter search needs at least 3 letters."
-        )
-
         self.search_unicode_checkbox.toggled.connect(
-            lambda checked: self.populate_tree(
-                hide_block, search_entry.text()
-            )
-        )
+            lambda: self.populate_tree(hide_block, search_entry.text()))
+        if not context == "remap":
+            self.search_unicode_checkbox.setEnabled(False)
+            self.search_unicode_checkbox.setToolTip(
+                "Unicode only supported on remap key."
+                )
+        else:
+            self.search_unicode_checkbox.setToolTip(
+                "Search key by name and description.\n"
+                "Unicode search may be slow. Enable only if needed.\n"
+                "Letter search needs at least 3 letters."
+                )
 
         choose_search_layout.addWidget(self.search_unicode_checkbox)
 

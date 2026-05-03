@@ -60,7 +60,8 @@ class SelectKeyUI():
         search_entry = QLineEdit()
         search_entry.setPlaceholderText(" Search Key")
         search_entry.setFixedWidth(170)
-        search_entry.textChanged.connect(lambda: self.populate_tree(hide_parents))
+        search_entry.textChanged.connect(
+            lambda: self.populate_tree(hide_parents, search_entry.text()))
         choose_search_layout.addWidget(search_entry)
 
         self.search_unicode_checkbox = QCheckBox("Search Unicode")

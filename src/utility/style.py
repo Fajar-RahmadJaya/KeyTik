@@ -64,3 +64,14 @@ def group_box_style(object_name):
         """
 
     return style_sheet
+
+PROFILE_ROW_LABEL = "font-size: 13px; font-weight: bold;"
+
+PLUS_LABEL = """
+    color: gray;
+    padding: 0 5px;
+    font-size: 14px;
+    font-weight: bold;
+"""
+
+TEXT_BLOCK = "font-family: Consolas; font-size: 10pt;"

@@ -181,24 +181,22 @@ class RemapRow():
 
     def remap_title(self):
         "Key remap row tittle label"
+        remap_label_widget = QWidget(self.edit_frame)
+
         remap_label_layout = QGridLayout()
         remap_label_layout.setContentsMargins(0, 0, 0, 0)
+        remap_label_widget.setLayout(remap_label_layout)
+
         default_key_label = QLabel("Default Key", self.edit_frame)
         default_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        default_key_label.setStyleSheet("""
-            font-size: 13px;
-            font-weight: bold;
-        """)
+        default_key_label.setStyleSheet(style.PROFILE_ROW_LABEL)
+        remap_label_layout.addWidget(default_key_label, 0, 0, 1, 2)
+
         remap_key_label = QLabel("Remap Key", self.edit_frame)
         remap_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        remap_key_label.setStyleSheet("""
-            font-size: 13px;
-            font-weight: bold;
-        """)
-        remap_label_layout.addWidget(default_key_label, 0, 0, 1, 2)
+        remap_key_label.setStyleSheet(style.PROFILE_ROW_LABEL)
         remap_label_layout.addWidget(remap_key_label, 0, 2, 1, 2)
-        remap_label_widget = QWidget(self.edit_frame)
-        remap_label_widget.setLayout(remap_label_layout)
+
         self.edit_frame_layout.addWidget(remap_label_widget)
         return remap_label_widget
 
@@ -447,12 +445,7 @@ class RemapRow():
         separator_layout.addWidget(left_sep)
 
         plus_label = QLabel("+", separator_widget)
-        plus_label.setStyleSheet("""
-            color: gray;
-            padding: 0 5px;
-            font-size: 14px;
-            font-weight: bold;
-        """)
+        plus_label.setStyleSheet(style.PLUS_LABEL)
         plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
         plus_label.setFixedWidth(20)
         plus_label.setFixedHeight(20)
@@ -523,10 +516,7 @@ class ShortcutRow():
         "Shortcuts row tittle label"
         shortcut_label = QLabel("Shortcut", self.remap_row_comp.edit_frame)
         shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        shortcut_label.setStyleSheet("""
-            font-size: 13px;
-            font-weight: bold;
-        """)
+        shortcut_label.setStyleSheet(style.PROFILE_ROW_LABEL)
         self.remap_row_comp.edit_frame_layout.addWidget(shortcut_label)
         return shortcut_label
 
@@ -537,10 +527,7 @@ class ShortcutRow():
         self.text_block is None):
             self.text_block = QTextEdit(self.remap_row_comp.edit_frame)
             self.text_block.setReadOnly(False)
-            self.text_block.setStyleSheet(
-            "font-family: Consolas; "
-            "font-size: 10pt;"
-            )
+            self.text_block.setStyleSheet(style.TEXT_BLOCK)
             self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
 
         # Card frame
@@ -647,10 +634,7 @@ class ShortcutRow():
         self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
         self.text_block.setFontPointSize(10)
         self.text_block.setReadOnly(False)
-        self.text_block.setStyleSheet(
-        "font-family: Consolas; "
-        "font-size: 10pt;"
-        )
+        self.text_block.setStyleSheet(style.TEXT_BLOCK)
         text_content = self.extract_and_filter_content(lines)
         self.text_block.setPlainText(text_content.strip())
         self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)

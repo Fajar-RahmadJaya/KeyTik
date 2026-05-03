@@ -280,18 +280,21 @@ class SelectKeyUI():
         unicode_filtered_data = []
 
         # Search unicode
-        if search_text.isalpha() and all('a' <= c <= 'z' for c in search_text):
-            char_name = search_text
-            char = unicodedata.lookup(char_name)
-            codepoint = ord(char)
-        else:
-            char = search_text
-            char_name = unicodedata.name(search_text)
-            codepoint = ord(search_text)
+        try:
+            if search_text.isalpha() and len(search_text) > 3:
+                char_name = search_text
+                char = unicodedata.lookup(char_name)
+                codepoint = ord(char)
+            else:
+                char = search_text
+                char_name = unicodedata.name(search_text)
+                codepoint = ord(search_text)
 
-        unicode_filtered_data.append((char, char_name))
+            unicode_filtered_data.append((char, char_name))
 
-        return unicode_filtered_data, codepoint
+            return unicode_filtered_data, codepoint
+        except (KeyError, TypeError):
+            return None, None
 
     def get_unicode_block(self, hide_block, filter_block, codepoint):
         "Get unicode block"
@@ -301,7 +304,7 @@ class SelectKeyUI():
             if filter_block and block_name not in filter_block:
                 continue
 
-            if start <= codepoint <= end:
+            if codepoint and start <= codepoint <= end:
                 return block_name
 
         return None

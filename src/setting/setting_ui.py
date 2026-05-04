@@ -12,6 +12,7 @@ from PySide6.QtCore import Qt  # pylint: disable=E0611
 from utility import constant
 from utility import utils
 from utility import diff
+from utility import style
 from setting.setting_core import SettingCore
 from setting.announcement import Announcement
 
@@ -74,30 +75,14 @@ class SettingUI():
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
         card_frame.setObjectName("settingCardFrame")
-
-        if utils.theme == "dark":
-            style_sheet = """
-            QFrame#settingCardFrame {
-                background: rgba(255, 255, 255, 0.052);
-                border-radius: 4;
-            }
-            """
-        else:
-            style_sheet = """
-            QFrame#settingCardFrame {
-                background: rgba(255, 255, 255, 0.60);
-                border-radius: 4;
-            }
-            """
-
-        card_frame.setStyleSheet(style_sheet)
+        card_frame.setStyleSheet(style.setting_card_style())
 
         card_layout = QHBoxLayout(card_frame)
         card_layout.setContentsMargins(16, 16, 16, 16)
 
         theme_label = QLabel(
-            f"<div style='font-size:13px; margin-bottom:2px'> {heading} </div>"
-            f"<div style='font-size:11px; color: rgba(255,255,255,0.8); '> {subheading} </div>"
+            f"<div style='{style.HEADING_STYLE}'> {heading} </div>"
+            f"<div style=' {style.SUBHEADING_STYLE}'> {subheading} </div>"
         )
         card_layout.addWidget(theme_label)
 

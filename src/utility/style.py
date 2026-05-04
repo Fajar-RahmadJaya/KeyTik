@@ -75,3 +75,28 @@ PLUS_LABEL = """
 """
 
 TEXT_BLOCK = "font-family: Consolas; font-size: 10pt;"
+
+def setting_card_style():
+    "Setting card, slightly different than create/edit profile card"
+    if utils.theme == "dark":
+        style_sheet = """
+        QFrame#settingCardFrame {
+            background: rgba(255, 255, 255, 0.052);
+            border-radius: 4;
+        }
+        """
+    else:
+        style_sheet = """
+        QFrame#settingCardFrame {
+            background: rgba(255, 255, 255, 0.60);
+            border-radius: 4;
+        }
+        """
+
+    return style_sheet
+
+
+HEADING_STYLE = "font-size:13px; margin-bottom:2px"
+
+
+SUBHEADING_STYLE = "font-size:11px; color: rgba(255,255,255,0.8);"

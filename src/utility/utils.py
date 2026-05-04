@@ -19,10 +19,8 @@ def load_condition():
                     if isinstance(data, dict) and "path" in data:
                         return data["path"]
                 else:
-                    print("Condition file is empty. Returning None.")
-    except json.JSONDecodeError:
-        print("Error: Condition file is not in valid JSON format.")
-    except FileNotFoundError as e:
+                    return constant.appdata_dir
+    except (json.JSONDecodeError, FileNotFoundError) as e:
         print(f"Error: {e}")
     return None
 
@@ -32,7 +30,6 @@ if path_from_condition:
     active_dir = os.path.join(path_from_condition, 'Active')
     store_dir = os.path.join(path_from_condition, 'Store')
 else:
-
     active_dir = os.path.join(constant.appdata_dir, 'Active')
     store_dir = os.path.join(constant.appdata_dir, 'Store')
 

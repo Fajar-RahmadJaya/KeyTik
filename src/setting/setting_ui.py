@@ -4,8 +4,8 @@ import os
 import webbrowser
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QGroupBox, QPushButton,
-    QHBoxLayout, QCheckBox, QInputDialog, QMessageBox, QScrollArea,
-    QFrame, QWidget, QLabel, QSizePolicy)
+    QHBoxLayout, QCheckBox, QMessageBox, QScrollArea,
+    QFrame, QWidget, QLabel, QSizePolicy, QComboBox)
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 
@@ -90,14 +90,21 @@ class SettingUI():
 
     def appearance(self, settings_window):
         "Appearance widget"
-        theme_button = QPushButton("Change Theme")
-        theme_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        theme_button.setFixedWidth(164)
-        theme_button.clicked.connect(lambda: self.change_theme_dialog(settings_window))
+        theme_combobox = QComboBox()
+        theme_combobox.setFixedWidth(164)
+        theme_combobox.addItems(["Light", "Dark", "System"])
+        theme_combobox.setCurrentText(self.setting_core.read_theme().capitalize())
+        theme_combobox.setEditable(True)
+        theme_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+        theme_combobox.lineEdit().setReadOnly(True)
+        theme_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        theme_combobox.currentTextChanged.connect(
+            lambda: self.setting_core.save_theme(theme=theme_combobox.currentText(),
+                                                 parent=settings_window))
 
         theme_layout, theme_frame = self.setting_card(heading="Appearance",
                                          subheading="Change KeyTik theme")
-        theme_layout.addWidget(theme_button)
+        theme_layout.addWidget(theme_combobox)
 
         return theme_frame
 
@@ -227,25 +234,6 @@ class SettingUI():
             driver_installed))
 
         dialog.exec()
-
-    def change_theme_dialog(self, parent):
-        "Setting to change program theme"
-        options = ["Light", "Dark", "System"]
-        current_theme = self.setting_core.read_theme()
-        if current_theme == "dark":
-            current_index = 1
-        elif current_theme == "light":
-            current_index = 0
-        else:
-            current_index = 2
-        theme, ok = QInputDialog.getItem(
-            parent, "Change Theme", "Select theme:",
-            options, current_index, False)
-        if ok:
-            self.setting_core.save_theme(theme.lower())
-            QMessageBox.information(None,
-                                    "Theme Changed", 
-                                    "Theme will be applied after restarting the app.") 
 
     def update_messagebox(self, show_no_update_message=False):
         "Message when there is update avalible"

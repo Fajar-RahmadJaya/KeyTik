@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (QMessageBox, QFileDialog)  # pylint: disable=E061
 
 from utility import constant
 from utility import utils
-from utility.diff import Diff, CHECK_UPDATE_LINK
+from utility.diff import Diff, CHECK_UPDATE_LINK, PROGRAM_NAME
 from dashboard.dashboard_core import DashboardCore
 
 class SettingCore():
@@ -74,16 +74,23 @@ class SettingCore():
             print(f"An error occurred: {e}")
             QMessageBox.critical(None, "Error", f"An error occurred: {e}")
 
-    def save_theme(self, theme):
+    def save_theme(self, theme, parent):
         "Write theme preference to theme file"
         try:
             with open(constant.theme_path, 'w', encoding='utf-8') as f:
                 if theme == "system":
                     f.write("")
                 else:
-                    f.write(theme)
-        except FileNotFoundError:
-            print("Error: theme_path file not found")
+                    f.write(theme.lower())
+                QMessageBox.information(
+                    parent,
+                    "Success",
+                    f"Theme Changed to {theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
+
+        except FileNotFoundError as error:
+            QMessageBox.error(parent,
+                              "Error",
+                              f"Failed to change theme\n{error}")
 
     def read_theme(self):
         "Read saved theme preference from theme file"

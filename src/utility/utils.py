@@ -8,7 +8,6 @@ import win32mica
 
 from utility import constant
 
-
 def load_condition():
     "Load condition for active and stored profile location"
     try:
@@ -27,9 +26,7 @@ def load_condition():
         print(f"Error: {e}")
     return None
 
-
 path_from_condition = load_condition()
-
 
 if path_from_condition:
     active_dir = os.path.join(path_from_condition, 'Active')
@@ -39,16 +36,13 @@ else:
     active_dir = os.path.join(constant.appdata_dir, 'Active')
     store_dir = os.path.join(constant.appdata_dir, 'Store')
 
-
 if not os.path.exists(active_dir):
     os.makedirs(active_dir)
 
 if not os.path.exists(store_dir):
     os.makedirs(store_dir)
 
-
 script_dir = active_dir
-
 
 def load_pinned_profiles():
     "Load file storing pinned profile"
@@ -68,16 +62,13 @@ def load_pinned_profiles():
         print(f"Error: {e}")
     return []
 
-
 def save_pinned_profiles(pinned_profiles):
     "Write pin profile to file"
     with open(constant.pinned_file, "w", encoding="utf-8") as pin_file:
         json.dump(pinned_profiles, pin_file)
 
-
 if not os.path.exists(constant.appdata_dir):
     os.makedirs(constant.appdata_dir)
-
 
 if not os.path.exists(constant.condition_path):
     with open(constant.condition_path, "w", encoding="utf-8") as f:
@@ -99,7 +90,6 @@ device_finder_path = os.path.join(
     active_dir, "Autohotkey Interception", "find_device.ahk")
 coordinate_path = os.path.join(
     active_dir, "Autohotkey Interception", "Coordinate.ahk")
-
 
 def detect_system_theme():
     "Detecting system theme for Pyside6 default theme handling"
@@ -127,9 +117,7 @@ def get_theme():
     except FileNotFoundError:
         return detect_system_theme()
 
-
 theme = get_theme()
-
 
 def get_ahk_install_dir():
     "Get AutoHotkey installation directory in case not installed via other method"
@@ -152,7 +140,6 @@ ahk_uninstall_path = os.path.join(
     "UX",
     "ui-uninstall.ahk")
 ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")
-
 
 def get_geometry(parent_window, width, height):
     "Get x and y centered relative to parent window"

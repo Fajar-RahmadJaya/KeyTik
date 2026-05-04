@@ -110,14 +110,15 @@ class SettingUI():
 
     def change_profile(self, settings_window):
         "Change profile location widget"
-        change_path_button = QPushButton("Change Profile Location")
+        change_path_button = QPushButton("Change Location")
         change_path_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         change_path_button.setFixedWidth(164)
         change_path_button.clicked.connect(
             lambda: self.setting_core.change_data_location(settings_window))
 
-        change_path_layout, change_path_frame = self.setting_card(heading="Profile Location",
-                                               subheading="Change where profile stored")
+        change_path_layout, change_path_frame = self.setting_card(
+            heading="Profile Location",
+            subheading=utils.load_condition())
         change_path_layout.addWidget(change_path_button)
 
         return change_path_frame

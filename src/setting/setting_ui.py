@@ -3,8 +3,9 @@
 import os
 import webbrowser
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog, QVBoxLayout, QGridLayout, QGroupBox, QPushButton,
-    QHBoxLayout, QCheckBox, QInputDialog, QMessageBox)
+    QDialog, QVBoxLayout, QGroupBox, QPushButton,
+    QHBoxLayout, QCheckBox, QInputDialog, QMessageBox, QScrollArea,
+    QFrame, QWidget, QLabel, QSizePolicy)
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 
@@ -23,70 +24,170 @@ class SettingUI():
 
     def open_settings_window(self, parent):
         "Setting window"
-        announcement = Announcement()  # Composition
-
         settings_window = QDialog(parent)
         settings_window.setWindowTitle("Settings")
-        geometry = utils.get_geometry(parent, 400, 250)
+        geometry = utils.get_geometry(parent, 600, 400)
         settings_window.setGeometry(geometry)
         settings_window.setWindowIcon(QIcon(constant.icon_path))
-        settings_window.setModal(True)
-        settings_window.setWindowFlag(
-            Qt.WindowType.WindowStaysOnTopHint,
-            getattr(self, "is_on_top", False))
 
-        main_layout = QVBoxLayout(settings_window)
-        main_layout.setContentsMargins(10, 10, 10, 10)
+        setting_layout = QVBoxLayout(settings_window)
+        setting_layout.setContentsMargins(12, 12, 12, 12)
 
-        group_box = QGroupBox()
-        group_layout = QGridLayout(group_box)
-        group_layout.setHorizontalSpacing(20)
-        group_layout.setContentsMargins(10, 10, 10, 10)
+        scroll_area = QScrollArea()
+        scroll_area.setObjectName("settingScroll")
+        scroll_area.setStyleSheet("#settingScroll {background-color: transparent;}")
+        scroll_area.setFrameShape(QFrame.NoFrame)
+        scroll_area.setWidgetResizable(True)
 
+        content_widget = QWidget()
+        content_widget.setObjectName("contentWidget")
+        content_widget.setStyleSheet("#contentWidget {background-color: transparent;}")
+        scroll_area.setWidget(content_widget)
+
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setSpacing(8)
+        content_layout.setContentsMargins(8, 8, 8, 8)
+
+        # Theme
+        content_layout.addWidget(self.appearance(settings_window))
+
+        # Change profile location
+        content_layout.addWidget(self.change_profile(settings_window))
+
+        # Check installation
+        content_layout.addWidget(self.installation(settings_window))
+
+        # Check for update
+        content_layout.addWidget(self.check_update())
+
+        # Get KeyTik Pro
+        content_layout.addWidget(self.keytik_pro())
+
+        # Show announcement
+        content_layout.addWidget(self.announcement(settings_window))
+
+        setting_layout.addWidget(scroll_area)
+        settings_window.exec()
+
+    def setting_card(self, heading="", subheading=""):
+        "Card for each setting"
+        card_frame = QFrame()
+        card_frame.setFrameShape(QFrame.NoFrame)
+        card_frame.setObjectName("settingCardFrame")
+
+        if utils.theme == "dark":
+            style_sheet = """
+            QFrame#settingCardFrame {
+                background: rgba(255, 255, 255, 0.052);
+                border-radius: 4;
+            }
+            """
+        else:
+            style_sheet = """
+            QFrame#settingCardFrame {
+                background: rgba(255, 255, 255, 0.60);
+                border-radius: 4;
+            }
+            """
+
+        card_frame.setStyleSheet(style_sheet)
+
+        card_layout = QHBoxLayout(card_frame)
+        card_layout.setContentsMargins(16, 16, 16, 16)
+
+        theme_label = QLabel(
+            f"<div style='font-size:13px; margin-bottom:2px'> {heading} </div>"
+            f"<div style='font-size:11px; color: rgba(255,255,255,0.8); '> {subheading} </div>"
+        )
+        card_layout.addWidget(theme_label)
+
+        return card_layout, card_frame
+
+    def appearance(self, settings_window):
+        "Appearance widget"
         theme_button = QPushButton("Change Theme")
-        theme_button.setFixedHeight(40)
+        theme_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        theme_button.setFixedWidth(164)
         theme_button.clicked.connect(lambda: self.change_theme_dialog(settings_window))
-        group_layout.addWidget(theme_button, 0, 0, 1, 1)
 
+        theme_layout, theme_frame = self.setting_card(heading="Appearance",
+                                         subheading="Change KeyTik theme")
+        theme_layout.addWidget(theme_button)
+
+        return theme_frame
+
+    def change_profile(self, settings_window):
+        "Change profile location widget"
         change_path_button = QPushButton("Change Profile Location")
-        change_path_button.setFixedHeight(40)
+        change_path_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        change_path_button.setFixedWidth(164)
         change_path_button.clicked.connect(
             lambda: self.setting_core.change_data_location(settings_window))
-        group_layout.addWidget(change_path_button, 0, 1, 1, 1)
 
+        change_path_layout, change_path_frame = self.setting_card(heading="Profile Location",
+                                               subheading="Change where profile stored")
+        change_path_layout.addWidget(change_path_button)
+
+        return change_path_frame
+
+    def installation(self, settings_window):
+        "Check installation widget"
         installation_button = QPushButton("Check Installation")
-        installation_button.setFixedHeight(40)
+        installation_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        installation_button.setFixedWidth(164)
         installation_button.clicked.connect(
             lambda: self.show_installation_dialog(settings_window))
-        group_layout.addWidget(installation_button, 1, 0, 1, 1)
 
+        installation_layout, installation_frame = self.setting_card(heading="Installtion",
+                                                subheading="Check installation")
+        installation_layout.addWidget(installation_button)
+
+        return installation_frame
+
+    def check_update(self):
+        "Check update widget"
         check_update_button = QPushButton("Check For Update")
-        check_update_button.setFixedHeight(40)
+        check_update_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        check_update_button.setFixedWidth(164)
         check_update_button.clicked.connect(
             lambda: self.update_messagebox(show_no_update_message=True))
-        group_layout.addWidget(check_update_button, 1, 1, 1, 1)
 
+        check_update_layout, check_update_frame = self.setting_card(heading="Check for update",
+                                                subheading="Check for update")
+        check_update_layout.addWidget(check_update_button)
+
+        return check_update_frame
+
+    def keytik_pro(self):
+        "Get KeyTik pro widget"
         pro_upgrade_button = QPushButton("Get KeyTik Pro")
-        pro_upgrade_button.setFixedHeight(40)
+        pro_upgrade_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        pro_upgrade_button.setFixedWidth(164)
         pro_upgrade_button.clicked.connect(
             lambda: webbrowser.open(
                 "https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
-        group_layout.addWidget(pro_upgrade_button, 2, 0, 1, 1)
+
+        pro_upgrade_layout, pro_upgrade_frame = self.setting_card(heading="Get KeyTik Pro",
+                                               subheading="Support the developer")
+        pro_upgrade_layout.addWidget(pro_upgrade_button)
+
+        return pro_upgrade_frame
+
+    def announcement(self, settings_window):
+        "Announcement widget"
+        announcement = Announcement()  # Composition
 
         readme_button = QPushButton("Announcement")
-        readme_button.setFixedHeight(40)
+        readme_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        readme_button.setFixedWidth(164)
         readme_button.clicked.connect(
             lambda: announcement.show_announcement_window(settings_window))
-        group_layout.addWidget(readme_button, 2, 1, 1, 1)
 
-        group_layout.setRowStretch(0, 1)
-        group_layout.setRowStretch(1, 1)
-        group_layout.setRowStretch(2, 1)
-        group_layout.setColumnStretch(0, 1)
-        group_layout.setColumnStretch(1, 1)
+        readme_layout, readme_frame = self.setting_card(heading="Announcement",
+                                          subheading="Show announcement")
+        readme_layout.addWidget(readme_button)
 
-        main_layout.addWidget(group_box)
-        settings_window.exec()
+        return readme_frame
 
     def show_installation_dialog(self, parent):
         "Setting to check, install, uninstall AutoHotkey and Interception driver installation"

@@ -3,7 +3,6 @@
 import os
 import shutil
 import webbrowser
-import json
 import subprocess
 import ctypes
 import requests
@@ -53,9 +52,11 @@ class SettingCore():
             else:
                 print(f"Store folder does not exist at {utils.store_dir}")
 
-            new_condition_data = {"path": new_path}
-            with open(constant.condition_path, 'w', encoding='utf-8') as f:
-                json.dump(new_condition_data, f)
+            # Save profile path to config
+            config = utils.get_config()
+            config.profile_path = new_path
+            utils.update_config(config)
+
             print(f"Updated condition.json with the new path: {new_path}")
 
             utils.active_dir = new_active_dir
@@ -77,33 +78,18 @@ class SettingCore():
     def save_theme(self, theme, parent):
         "Write theme preference to theme file"
         try:
-            with open(constant.theme_path, 'w', encoding='utf-8') as f:
-                if theme == "system":
-                    f.write("")
-                else:
-                    f.write(theme.lower())
-                QMessageBox.information(
-                    parent,
-                    "Success",
-                    f"Theme Changed to {theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
+            config = utils.get_config()
+            config.theme = theme.lower()
+            utils.update_config(config)
+            QMessageBox.information(
+                parent,
+                "Success",
+                f"Theme Changed to {theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
 
         except FileNotFoundError as error:
             QMessageBox.error(parent,
                               "Error",
                               f"Failed to change theme\n{error}")
-
-    def read_theme(self):
-        "Read saved theme preference from theme file"
-        try:
-            if os.path.exists(constant.theme_path):
-                with open(constant.theme_path, 'r', encoding= 'utf-8') as f:
-                    theme = f.read().strip().lower()
-                if theme in ("dark", "light"):
-                    return theme
-            return "system"
-        except FileNotFoundError:
-            print("Error: theme_path file not found")
-            return "system"
 
     def ahk_action(self, ahk_installed):
         "Uninstall AutoHotkey"

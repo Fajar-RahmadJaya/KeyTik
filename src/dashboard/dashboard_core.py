@@ -1,7 +1,6 @@
 "Main Core (Might be changed to shared later)"
 
 import os
-import json
 import re
 import shutil
 import webbrowser
@@ -30,7 +29,7 @@ class DashboardCore(QObject):
 
         # Variable
         self.current_page = 0
-        self.pinned_profiles = utils.load_pinned_profiles()
+        self.pinned_profiles = utils.get_config().pinned_profile
 
     def import_button_clicked(self, parent):
         "Select AHK script and add necessary line"
@@ -106,24 +105,21 @@ class DashboardCore(QObject):
                 file.write('\n'.join(result_lines) + '\n')
         except FileNotFoundError as e:
             print(f"Error modifying script: {e}")
-            exit_keys = utils.load_exit_keys()
+            exit_keys = utils.get_config().exit_key
 
             if file_name in exit_keys:
                 del exit_keys[file_name]
 
-            try:
-                with open(constant.exit_keys_path, 'w', encoding='utf-8') as f:
-                    json.dump(exit_keys, f)
-
-            except (json.JSONDecodeError, FileNotFoundError) as error:
-                print(f"Error: {error}")
+            config = utils.get_config()
+            config.exit_key = exit_keys
+            utils.update_config(config)
 
     def generate_exit_key(self, script_name, file=None):
         "Generate key for profile exit"
         possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
-        exit_keys = utils.load_exit_keys()
+        exit_keys = utils.get_config().exit_key
 
         used_keys = set(key[-1] for key in exit_keys.values())
         available_keys = [k for k in possible_keys if k not in used_keys]
@@ -136,8 +132,10 @@ class DashboardCore(QObject):
         exit_keys[script_name] = exit_combo
 
         try:
-            with open(constant.exit_keys_path, 'w', encoding='utf-8') as f:
-                json.dump(exit_keys, f)
+            config = utils.get_config()
+            config.exit_key = exit_keys
+            utils.update_config(config)
+
             if file:
                 file.write(f"{exit_combo}::ExitApp\n\n")
 
@@ -220,7 +218,7 @@ class DashboardCore(QObject):
             script_path = os.path.join(utils.store_dir, script_name)
 
         if os.path.isfile(script_path):
-            exit_keys = utils.load_exit_keys()
+            exit_keys = utils.get_config().exit_key
             exit_combo = exit_keys.get(script_name)
             if not exit_combo:
                 QMessageBox.critical(None,
@@ -325,8 +323,11 @@ class DashboardCore(QObject):
         else:
             self.pinned_profiles.insert(0, script)
 
-        with open(constant.pinned_profile_path, "w", encoding="utf-8") as pin_file:
-            json.dump(self.pinned_profiles, pin_file)
+        # Update config
+        config = utils.get_config()
+        config.pinned_profile = self.pinned_profiles
+        utils.update_config(config)
+
         self.update_script_signal.emit()
 
     def list_scripts(self):

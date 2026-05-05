@@ -1,6 +1,5 @@
 "Load online announcement from KeyTik Website"
 
-import json
 import requests
 from markdown import markdown
 from PySide6.QtWidgets import (  # pylint: disable=E0611
@@ -172,7 +171,7 @@ class Announcement():
         button_layout.addWidget(next_button)
 
         dont_show_checkbox = QCheckBox("Don't show again")
-        dont_show_checkbox.setChecked(not utils.load_announcement_condition())
+        dont_show_checkbox.setChecked(not utils.get_config().show_announcement)
         dont_show_checkbox.stateChanged.connect(
             lambda: self.save_announcement_condition(dont_show_checkbox))
         button_layout.addWidget(dont_show_checkbox)
@@ -191,9 +190,7 @@ class Announcement():
     def save_announcement_condition(self, dont_show_checkbox):
         "Save user preference on file when don't show announcement checkbox is checked"
         announcement_condition = not dont_show_checkbox.isChecked()
-        try:
-            with open(constant.dont_show_path, "w", encoding='utf-8') as f:
-                json.dump({"welcome_condition":
-                            announcement_condition}, f)
-        except FileNotFoundError as e:
-            print(f"Error saving condition file: {e}")
+
+        config = utils.get_config()
+        config.show_announcement = announcement_condition
+        utils.update_config(config)

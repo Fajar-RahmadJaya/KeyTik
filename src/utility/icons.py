@@ -18,9 +18,12 @@ def get_icon(path):
 
 
 icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon')
-if utils.theme == "dark":
+
+THEME = utils.get_theme()
+
+if THEME == "dark":
     icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon', 'dark')
-else:
+elif THEME == "light":
     icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon', 'light')
 
 # Profile Icon

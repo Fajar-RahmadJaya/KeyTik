@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 import os
-import json
 import random
 import re
 from PySide6.QtWidgets import (QLineEdit, QCheckBox, QMessageBox)  # pylint: disable=E0611
@@ -236,12 +235,9 @@ class WriteScript():
             self.validate_exit_keys(exit_keys)
 
             # Save the new exit keys back to save file
-            try:
-                with open(constant.exit_keys_path, 'w', encoding='utf-8') as f:
-                    json.dump(exit_keys, f)
-
-            except FileNotFoundError as e:
-                print(f"Error saving exit_keys.json: {e}")
+            config = utils.get_config()
+            config.exit_key = exit_keys
+            utils.update_config(config)
 
         except FileNotFoundError as e:
             print(f"Error in initialize_exit_keys: {e}")
@@ -294,7 +290,7 @@ class WriteScript():
         "Resolve and get exit keys from file"
         # Load the exit keys from save file
         exit_keys = {}
-        exit_keys = utils.load_exit_keys()
+        exit_keys = utils.get_config().exit_key
 
         # Create dictionary containing script and the exit key
         combo_to_scripts = {}

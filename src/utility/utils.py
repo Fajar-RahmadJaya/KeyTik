@@ -10,72 +10,98 @@ import win32mica
 
 from utility import constant
 
-# ------------------------------ Config ------------------------------
-@dataclass
-class Config:
-    "Dataclass to make config usage easier"
-    show_announcement: bool = True
-    theme: str = None
-    profile_path: str = constant.appdata_dir
-    pinned_profile: List[str] = field(default_factory=list)
-    exit_key: Dict[str, str] = field(default_factory=dict)
-
+# ------------------------------ Migrate Old Config ------------------------------
 def migrate_old_config():
-    "Get config"
-    try:
-        # Profile path
-        with open(constant.condition_path, "r", encoding="utf-8") as condition_file:
-            value = json.load(condition_file)
-            profile_path = value.get("path", constant.appdata_dir)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        profile_path = constant.appdata_dir
-
-    try:
-        # Theme
-        with open(constant.theme_path, 'r', encoding="utf-8") as theme_file:
-            theme = theme_file.read().strip().lower()
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        theme = None
-
-    try:
-        # Show announcement
-        with open(constant.dont_show_path, "r", encoding='utf-8') as dont_show_file:
-            value = json.load(dont_show_file)
-            show_announcement = value.get("welcome_condition", True)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        show_announcement = True
-
-    try:
-        # Pinned profile
-        with open(constant.pinned_profile_path, "r", encoding="utf-8") as pin_file:
-            pinned_profile = json.load(pin_file)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        pinned_profile = []
-
-    try:
-        # Exit key
-        with open(constant.exit_keys_path, 'r', encoding='utf-8') as exit_key_file:
-            exit_key = json.load(exit_key_file)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        exit_key = {}
-
+    "Move old config to new centralized one"
     try:
         config_structure = {
-            "show_announcement": show_announcement,
-            "theme": theme,
-            "profile_path": profile_path,
-            "pinned_profile": pinned_profile,
-            "exit_key": exit_key,
+            "show_announcement": load_show_announcement(),
+            "theme": load_theme(),
+            "profile_path": load_profile_path(),
+            "pinned_profile": load_pinned_profile(),
+            "exit_key": load_exit_key(),
         }
         with open(constant.config_path, "w", encoding="utf-8") as config_file:
             json.dump(config_structure, config_file, indent=4, sort_keys=True)
     except (json.JSONDecodeError, FileNotFoundError) as error:
         print(f"Error: {error}")
+
+def load_profile_path():
+    "Load old config profile path"
+    try:
+        condition_path = os.path.join(constant.appdata_dir, "path.json")
+        with open(condition_path, "r", encoding="utf-8") as condition_file:
+            value = json.load(condition_file)
+            profile_path = value.get("path", constant.appdata_dir)
+        os.remove(condition_path)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        profile_path = constant.appdata_dir
+
+    return profile_path
+
+def load_theme():
+    "Load old config theme"
+    try:
+        theme_path = os.path.join(constant.appdata_dir, "theme.json")
+        with open(theme_path, 'r', encoding="utf-8") as theme_file:
+            theme = theme_file.read().strip().lower()
+        os.remove(theme_path)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        theme = None
+
+    return theme
+
+def load_show_announcement():
+    "Load old config show announcement"
+    try:
+        show_announcement_path = os.path.join(constant.appdata_dir, "dont_show.json")
+        with open(show_announcement_path, "r", encoding='utf-8') as dont_show_file:
+            value = json.load(dont_show_file)
+            show_announcement = value.get("welcome_condition", True)
+        os.remove(show_announcement_path)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        show_announcement = True
+
+    return show_announcement
+
+def load_pinned_profile():
+    "Load old config pinned profile"
+    try:
+        pinned_profile_path = os.path.join(constant.appdata_dir, "pinned_profiles.json")
+        with open(pinned_profile_path, "r", encoding="utf-8") as pin_file:
+            pinned_profile = json.load(pin_file)
+        os.remove(pinned_profile_path)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        pinned_profile = []
+
+    return pinned_profile
+
+def load_exit_key():
+    "Load old config exit key"
+    try:
+        exit_keys_path = os.path.join(constant.appdata_dir, "exit_keys.json")
+        with open(exit_keys_path, 'r', encoding='utf-8') as exit_key_file:
+            exit_key = json.load(exit_key_file)
+        os.remove(exit_keys_path)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        exit_key = {}
+
+    return exit_key
+
+# ------------------------------ Config ------------------------------
+@dataclass
+class Config:
+    "Dataclass to make config usage easier"
+    show_announcement: bool = True
+    theme: str = "system"
+    profile_path: str = constant.appdata_dir
+    pinned_profile: List[str] = field(default_factory=list)
+    exit_key: Dict[str, str] = field(default_factory=dict)
 
 def get_config():
     "Get config from json file"
@@ -98,73 +124,26 @@ def get_config():
         print(f"Error: {error}")
     return None
 
-def load_condition():
-    "Load condition for active and stored profile location"
+def update_config(config):
+    "Save config into json file"
     try:
-        with open(constant.condition_path, "r", encoding="utf-8") as condition_file:
-            content = condition_file.read().strip()
-            if content:
-                data = json.loads(content)
-                if isinstance(data, dict) and "path" in data:
-                    return data["path"]
-            else:
-                return constant.appdata_dir
-
+        with open(constant.config_path, "w", encoding="utf-8") as f:
+            json.dump(config.__dict__, f, indent=4, sort_keys=True)
     except (json.JSONDecodeError, FileNotFoundError) as error:
         print(f"Error: {error}")
-    return None
 
 def get_theme():
-    "Get user theme preference"
-    try:
-        with open(constant.theme_path, 'r', encoding="utf-8") as theme_file:
-            theme_pref = theme_file.read().strip().lower()
-        return theme_pref
+    "Add system to the theme"
+    current_theme = get_config().theme
+    if current_theme == "system":
+        theme = detect_system_theme()
+    else:
+        theme = current_theme
 
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return detect_system_theme()
+    return theme
 
-theme = get_theme()  # Cache
-
-def load_announcement_condition():
-    "Load user preference from file, whether to show announcement or not"
-    try:
-        with open(constant.dont_show_path, "r", encoding='utf-8') as file:
-            config = json.load(file)
-            return config.get("welcome_condition", True)
-
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return True
-
-def load_pinned_profiles():
-    "Load file storing pinned profile"
-    try:
-        with open(constant.pinned_profile_path, "r", encoding="utf-8") as pin_file:
-            content = pin_file.read().strip()
-            if content:
-                data = json.loads(content)
-                if isinstance(data, list):
-                    return data
-
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return []
-
-def load_exit_keys():
-    "Load file storing exit keys for each profile"
-    try:
-        with open(constant.exit_keys_path, 'r', encoding='utf-8') as file:
-            exit_keys = json.load(file)
-        return exit_keys
-
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return {}
-
-active_dir = os.path.join(load_condition(), 'Active')
-store_dir = os.path.join(load_condition(), 'Store')
+active_dir = os.path.join(get_config().profile_path, 'Active')
+store_dir = os.path.join(get_config().profile_path, 'Store')
 
 if not os.path.exists(active_dir):
     os.makedirs(active_dir)
@@ -174,19 +153,6 @@ if not os.path.exists(store_dir):
 
 if not os.path.exists(constant.appdata_dir):
     os.makedirs(constant.appdata_dir)
-
-if not os.path.exists(constant.condition_path):
-    with open(constant.condition_path, "w", encoding="utf-8") as f:
-        json.dump({"path": ""}, f)
-
-if not os.path.exists(constant.pinned_profile_path):
-    with open(constant.pinned_profile_path, "w", encoding="UTF-8") as f:
-        json.dump([
-            "Multiple Files Opener.ahk",
-            "Take Coordinate And Copy It For Screen Clicker.ahk",
-            "Screen Clicker.ahk",
-            "Auto Clicker.ahk"
-        ], f)
 
 device_list_path = os.path.join(
     active_dir, "Autohotkey Interception", "shared_device_info.txt")

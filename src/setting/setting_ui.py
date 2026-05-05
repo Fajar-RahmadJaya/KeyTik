@@ -93,7 +93,7 @@ class SettingUI():
         theme_combobox = QComboBox()
         theme_combobox.setFixedWidth(164)
         theme_combobox.addItems(["Light", "Dark", "System"])
-        theme_combobox.setCurrentText(self.setting_core.read_theme().capitalize())
+        theme_combobox.setCurrentText(utils.get_config().theme.capitalize())
         theme_combobox.setEditable(True)
         theme_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         theme_combobox.lineEdit().setReadOnly(True)
@@ -118,7 +118,7 @@ class SettingUI():
 
         change_path_layout, change_path_frame = self.setting_card(
             heading="Profile Location",
-            subheading=utils.load_condition())
+            subheading=utils.get_config().profile_path)
         change_path_layout.addWidget(change_path_button)
 
         return change_path_frame

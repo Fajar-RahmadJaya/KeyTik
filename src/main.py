@@ -13,9 +13,12 @@ from setting.setting_ui import SettingUI
 
 def main():
     "Main function"
-    if utils.theme == "dark":
+    # Set theme for the program
+    theme = utils.get_theme()
+
+    if theme == "dark":
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
-    elif utils.theme == "light":
+    elif theme == "light":
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
 
     app = QApplication(sys.argv)

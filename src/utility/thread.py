@@ -35,7 +35,7 @@ class Thread(QThread):  # pylint: disable=R0903
             self.ahk_not_installed.emit()
 
         # Whether to show announcement or not
-        if utils.load_announcement_condition():
+        if utils.get_config().show_announcement:
             self.show_announcement.emit()
 
         # Check AHI necessary file

@@ -2,10 +2,15 @@
 
 from utility import utils
 
+CURRENT_THEME = utils.get_config().theme
+if CURRENT_THEME == "system":
+    THEME = utils.detect_system_theme()
+else:
+    THEME = CURRENT_THEME
 
 def card_style(object_name):
     "Card like styling"
-    if utils.theme == "dark":
+    if THEME == "dark":
         style_sheet = f"""
         QFrame#{object_name} {{
             background: rgba(255, 255, 255, 0.04);
@@ -25,7 +30,7 @@ def card_style(object_name):
 
 def scroll_area_style(object_name):
     "Style for scroll area"
-    if utils.theme == "dark":
+    if THEME == "dark":
         style_sheet = f"""
         QScrollArea#{object_name} {{
             background: rgba(255, 255, 255, 0.03);
@@ -42,7 +47,7 @@ def scroll_area_style(object_name):
 
 def group_box_style(object_name):
     "Profile card group box styling"
-    if utils.theme == "dark":
+    if THEME == "dark":
         style_sheet = f"""
         QGroupBox#{object_name} {{
              background-color: rgba(255, 255, 255, 0.03);
@@ -78,7 +83,7 @@ TEXT_BLOCK = "font-family: Consolas; font-size: 10pt;"
 
 def setting_card_style():
     "Setting card, slightly different than create/edit profile card"
-    if utils.theme == "dark":
+    if THEME == "dark":
         style_sheet = """
         QFrame#settingCardFrame {
             background: rgba(255, 255, 255, 0.052);

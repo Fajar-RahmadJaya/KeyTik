@@ -2,6 +2,8 @@
 import os
 import json
 import sys
+from dataclasses import dataclass, field
+from typing import List, Dict
 import winreg
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
 import win32mica
@@ -9,6 +11,93 @@ import win32mica
 from utility import constant
 
 # ------------------------------ Config ------------------------------
+@dataclass
+class Config:
+    "Dataclass to make config usage easier"
+    show_announcement: bool = True
+    theme: str = None
+    profile_path: str = constant.appdata_dir
+    pinned_profile: List[str] = field(default_factory=list)
+    exit_key: Dict[str, str] = field(default_factory=dict)
+
+def migrate_old_config():
+    "Get config"
+    try:
+        # Profile path
+        with open(constant.condition_path, "r", encoding="utf-8") as condition_file:
+            value = json.load(condition_file)
+            profile_path = value.get("path", constant.appdata_dir)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        profile_path = constant.appdata_dir
+
+    try:
+        # Theme
+        with open(constant.theme_path, 'r', encoding="utf-8") as theme_file:
+            theme = theme_file.read().strip().lower()
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        theme = None
+
+    try:
+        # Show announcement
+        with open(constant.dont_show_path, "r", encoding='utf-8') as dont_show_file:
+            value = json.load(dont_show_file)
+            show_announcement = value.get("welcome_condition", True)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        show_announcement = True
+
+    try:
+        # Pinned profile
+        with open(constant.pinned_profile_path, "r", encoding="utf-8") as pin_file:
+            pinned_profile = json.load(pin_file)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        pinned_profile = []
+
+    try:
+        # Exit key
+        with open(constant.exit_keys_path, 'r', encoding='utf-8') as exit_key_file:
+            exit_key = json.load(exit_key_file)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+        exit_key = {}
+
+    try:
+        config_structure = {
+            "show_announcement": show_announcement,
+            "theme": theme,
+            "profile_path": profile_path,
+            "pinned_profile": pinned_profile,
+            "exit_key": exit_key,
+        }
+        with open(constant.config_path, "w", encoding="utf-8") as config_file:
+            json.dump(config_structure, config_file, indent=4, sort_keys=True)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+
+def get_config():
+    "Get config from json file"
+    if not os.path.exists(constant.config_path):
+        migrate_old_config()
+
+    try:
+        with open(constant.config_path, "r", encoding="utf-8") as config_file:
+            value = json.load(config_file)
+            config = Config(
+                show_announcement=value["show_announcement"],
+                theme=value["theme"],
+                profile_path=value["profile_path"],
+                pinned_profile=value["pinned_profile"],
+                exit_key=value["exit_key"]
+            )
+        return config
+
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+    return None
+
 def load_condition():
     "Load condition for active and stored profile location"
     try:
@@ -21,19 +110,18 @@ def load_condition():
             else:
                 return constant.appdata_dir
 
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        print(f"Error: {e}")
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
     return None
 
 def get_theme():
     "Get user theme preference"
     try:
-        if os.path.exists(constant.theme_path):
-            with open(constant.theme_path, 'r', encoding="utf-8") as theme_file:
-                theme_pref = theme_file.read().strip().lower()
-            return theme_pref
+        with open(constant.theme_path, 'r', encoding="utf-8") as theme_file:
+            theme_pref = theme_file.read().strip().lower()
+        return theme_pref
 
-    except FileNotFoundError as error:
+    except (json.JSONDecodeError, FileNotFoundError) as error:
         print(f"Error: {error}")
     return detect_system_theme()
 
@@ -53,7 +141,7 @@ def load_announcement_condition():
 def load_pinned_profiles():
     "Load file storing pinned profile"
     try:
-        with open(constant.pinned_file, "r", encoding="utf-8") as pin_file:
+        with open(constant.pinned_profile_path, "r", encoding="utf-8") as pin_file:
             content = pin_file.read().strip()
             if content:
                 data = json.loads(content)
@@ -67,7 +155,7 @@ def load_pinned_profiles():
 def load_exit_keys():
     "Load file storing exit keys for each profile"
     try:
-        with open(constant.exit_keys_file, 'r', encoding='utf-8') as file:
+        with open(constant.exit_keys_path, 'r', encoding='utf-8') as file:
             exit_keys = json.load(file)
         return exit_keys
 
@@ -91,8 +179,8 @@ if not os.path.exists(constant.condition_path):
     with open(constant.condition_path, "w", encoding="utf-8") as f:
         json.dump({"path": ""}, f)
 
-if not os.path.exists(constant.pinned_file):
-    with open(constant.pinned_file, "w", encoding="UTF-8") as f:
+if not os.path.exists(constant.pinned_profile_path):
+    with open(constant.pinned_profile_path, "w", encoding="UTF-8") as f:
         json.dump([
             "Multiple Files Opener.ahk",
             "Take Coordinate And Copy It For Screen Clicker.ahk",

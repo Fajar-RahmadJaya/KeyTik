@@ -1,6 +1,5 @@
 "Load online announcement from KeyTik Website"
 
-import os
 import json
 import requests
 from markdown import markdown
@@ -55,17 +54,6 @@ class Announcement():
     def __init__(self):
         self.current_announcement_index = 0
         self.announcement_thread = AnnouncmentThread()
-
-    def load_announcement_condition(self):
-        "Load user preference from file, whether to show announcement or not"
-        try:
-            if os.path.exists(constant.dont_show_path):
-                with open(constant.dont_show_path, "r", encoding='utf-8') as f:
-                    config = json.load(f)
-                    return config.get("welcome_condition", True)
-        except FileNotFoundError as e:
-            print(f"Error loading condition file: {e}")
-        return True
 
     def show_announcement_window(self, parent):
         "Announcement window"
@@ -184,7 +172,7 @@ class Announcement():
         button_layout.addWidget(next_button)
 
         dont_show_checkbox = QCheckBox("Don't show again")
-        dont_show_checkbox.setChecked(not self.load_announcement_condition())
+        dont_show_checkbox.setChecked(not utils.load_announcement_condition())
         dont_show_checkbox.stateChanged.connect(
             lambda: self.save_announcement_condition(dont_show_checkbox))
         button_layout.addWidget(dont_show_checkbox)

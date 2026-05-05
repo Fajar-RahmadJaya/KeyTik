@@ -339,7 +339,8 @@ class DashboardCore(QObject):
         else:
             self.pinned_profiles.insert(0, script)
 
-        utils.save_pinned_profiles(self.pinned_profiles)
+        with open(constant.pinned_file, "w", encoding="utf-8") as pin_file:
+            json.dump(self.pinned_profiles, pin_file)
         self.update_script_signal.emit()
 
     def list_scripts(self):

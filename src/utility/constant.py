@@ -16,6 +16,7 @@ theme_path = os.path.join(appdata_dir, "theme.json")
 dont_show_path = os.path.join(appdata_dir, "dont_show.json")
 exit_keys_file = os.path.join(appdata_dir, "exit_keys.json")
 pinned_file = os.path.join(appdata_dir, "pinned_profiles.json")
+
 icon_path = os.path.join(data_dir, "icon.ico")
 keylist_path = os.path.join(data_dir, "key_list.json")
 interception_install_path = os.path.join(data_dir, "inter_install.bat")

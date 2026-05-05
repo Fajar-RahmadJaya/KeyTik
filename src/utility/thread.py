@@ -4,7 +4,6 @@ import os
 import keyboard
 from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
-from setting.announcement import Announcement
 from setting.setting_core import SettingCore
 from script_profile.write_script import WriteScript
 from utility import utils
@@ -19,7 +18,6 @@ class Thread(QThread):  # pylint: disable=R0903
     def run(self):
         "Run check update on thread to increase dashborad initialization time"
         # Composition
-        announcement = Announcement()
         write_script = WriteScript()
         setting_core = SettingCore()
         dashboard_core = DashboardCore()
@@ -37,7 +35,7 @@ class Thread(QThread):  # pylint: disable=R0903
             self.ahk_not_installed.emit()
 
         # Whether to show announcement or not
-        if announcement.load_announcement_condition():
+        if utils.load_announcement_condition():
             self.show_announcement.emit()
 
         # Check AHI necessary file

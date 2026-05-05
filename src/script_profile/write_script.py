@@ -239,6 +239,7 @@ class WriteScript():
             try:
                 with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
                     json.dump(exit_keys, f)
+
             except FileNotFoundError as e:
                 print(f"Error saving exit_keys.json: {e}")
 
@@ -293,12 +294,7 @@ class WriteScript():
         "Resolve and get exit keys from file"
         # Load the exit keys from save file
         exit_keys = {}
-        if os.path.exists(constant.exit_keys_file):
-            try:
-                with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
-                    exit_keys = json.load(f)
-            except FileNotFoundError:
-                exit_keys = {}
+        exit_keys = utils.load_exit_keys()
 
         # Create dictionary containing script and the exit key
         combo_to_scripts = {}

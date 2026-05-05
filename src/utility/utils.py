@@ -64,6 +64,17 @@ def load_pinned_profiles():
         print(f"Error: {error}")
     return []
 
+def load_exit_keys():
+    "Load file storing exit keys for each profile"
+    try:
+        with open(constant.exit_keys_file, 'r', encoding='utf-8') as file:
+            exit_keys = json.load(file)
+        return exit_keys
+
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+    return {}
+
 active_dir = os.path.join(load_condition(), 'Active')
 store_dir = os.path.join(load_condition(), 'Store')
 

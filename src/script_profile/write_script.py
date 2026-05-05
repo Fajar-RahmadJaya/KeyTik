@@ -237,7 +237,7 @@ class WriteScript():
 
             # Save the new exit keys back to save file
             try:
-                with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
+                with open(constant.exit_keys_path, 'w', encoding='utf-8') as f:
                     json.dump(exit_keys, f)
 
             except FileNotFoundError as e:

@@ -11,11 +11,12 @@ appdata_dir = os.path.join(os.getenv('APPDATA'), 'KeyTik')
 ahi_dir = os.path.join(data_dir, 'Active', 'AutoHotkey Interception')
 
 # General
+config_path = os.path.join(appdata_dir, "config.json")
 condition_path = os.path.join(appdata_dir, "path.json")
 theme_path = os.path.join(appdata_dir, "theme.json")
 dont_show_path = os.path.join(appdata_dir, "dont_show.json")
-exit_keys_file = os.path.join(appdata_dir, "exit_keys.json")
-pinned_file = os.path.join(appdata_dir, "pinned_profiles.json")
+exit_keys_path = os.path.join(appdata_dir, "exit_keys.json")
+pinned_profile_path = os.path.join(appdata_dir, "pinned_profiles.json")
 
 icon_path = os.path.join(data_dir, "icon.ico")
 keylist_path = os.path.join(data_dir, "key_list.json")

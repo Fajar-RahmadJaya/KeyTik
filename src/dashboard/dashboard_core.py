@@ -112,7 +112,7 @@ class DashboardCore(QObject):
                 del exit_keys[file_name]
 
             try:
-                with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
+                with open(constant.exit_keys_path, 'w', encoding='utf-8') as f:
                     json.dump(exit_keys, f)
 
             except (json.JSONDecodeError, FileNotFoundError) as error:
@@ -136,7 +136,7 @@ class DashboardCore(QObject):
         exit_keys[script_name] = exit_combo
 
         try:
-            with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
+            with open(constant.exit_keys_path, 'w', encoding='utf-8') as f:
                 json.dump(exit_keys, f)
             if file:
                 file.write(f"{exit_combo}::ExitApp\n\n")
@@ -325,7 +325,7 @@ class DashboardCore(QObject):
         else:
             self.pinned_profiles.insert(0, script)
 
-        with open(constant.pinned_file, "w", encoding="utf-8") as pin_file:
+        with open(constant.pinned_profile_path, "w", encoding="utf-8") as pin_file:
             json.dump(self.pinned_profiles, pin_file)
         self.update_script_signal.emit()
 

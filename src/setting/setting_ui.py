@@ -92,14 +92,28 @@ class SettingUI():
 
         return card_layout, card_frame
 
+    def setting_combobox(self):
+        "Unified combobox setting for setting window"
+        setting_combobox = QComboBox()
+        setting_combobox.setFixedWidth(164)
+        setting_combobox.setEditable(True)
+        setting_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+        setting_combobox.lineEdit().setReadOnly(True)
+        setting_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+
+        return setting_combobox
+
+    def setting_button(self):
+        "Unified button setting for setting window"
+        setting_button = QPushButton()
+        setting_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        setting_button.setFixedWidth(164)
+
+        return setting_button
+
     def style(self, settings_window):
         "Appearance widget"
-        style_combobox = QComboBox()
-        style_combobox.setFixedWidth(164)
-        style_combobox.setEditable(True)
-        style_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
-        style_combobox.lineEdit().setReadOnly(True)
-        style_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        style_combobox = self.setting_combobox()
         style_combobox.addItem("Default")
         style_combobox.addItems(QStyleFactory.keys())
         current_style = utils.get_config().style
@@ -117,14 +131,9 @@ class SettingUI():
 
     def theme(self, settings_window):
         "Appearance widget"
-        theme_combobox = QComboBox()
-        theme_combobox.setFixedWidth(164)
+        theme_combobox = self.setting_combobox()
         theme_combobox.addItems(["Light", "Dark", "System"])
         theme_combobox.setCurrentText(utils.get_config().theme.capitalize())
-        theme_combobox.setEditable(True)
-        theme_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
-        theme_combobox.lineEdit().setReadOnly(True)
-        theme_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         theme_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_theme(theme=theme_combobox.currentText(),
                                                  parent=settings_window))
@@ -137,9 +146,8 @@ class SettingUI():
 
     def change_profile(self, settings_window):
         "Change profile location widget"
-        change_path_button = QPushButton("Change Location")
-        change_path_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        change_path_button.setFixedWidth(164)
+        change_path_button = self.setting_button()
+        change_path_button.setText("Change Location")
         change_path_button.clicked.connect(
             lambda: self.setting_core.change_data_location(settings_window))
 
@@ -152,9 +160,8 @@ class SettingUI():
 
     def installation(self, settings_window):
         "Check installation widget"
-        installation_button = QPushButton("Check Installation")
-        installation_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        installation_button.setFixedWidth(164)
+        installation_button = self.setting_button()
+        installation_button.setText("Check Installation")
         installation_button.clicked.connect(
             lambda: self.show_installation_dialog(settings_window))
 
@@ -166,9 +173,8 @@ class SettingUI():
 
     def check_update(self):
         "Check update widget"
-        check_update_button = QPushButton("Check For Update")
-        check_update_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        check_update_button.setFixedWidth(164)
+        check_update_button = self.setting_button()
+        check_update_button.setText("Check For Update")
         check_update_button.clicked.connect(
             lambda: self.update_messagebox(show_no_update_message=True))
 
@@ -180,9 +186,8 @@ class SettingUI():
 
     def keytik_pro(self):
         "Get KeyTik pro widget"
-        pro_upgrade_button = QPushButton("Get KeyTik Pro")
-        pro_upgrade_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        pro_upgrade_button.setFixedWidth(164)
+        pro_upgrade_button = self.setting_button()
+        pro_upgrade_button.setText("Get KeyTik Pro")
         pro_upgrade_button.clicked.connect(
             lambda: webbrowser.open(
                 "https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
@@ -197,9 +202,8 @@ class SettingUI():
         "Announcement widget"
         announcement = Announcement()  # Composition
 
-        readme_button = QPushButton("Announcement")
-        readme_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        readme_button.setFixedWidth(164)
+        readme_button = self.setting_button()
+        readme_button.setText("Announcement")
         readme_button.clicked.connect(
             lambda: announcement.show_announcement_window(settings_window))
 

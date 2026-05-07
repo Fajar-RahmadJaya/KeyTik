@@ -2,11 +2,7 @@
 
 from utility import utils
 
-CURRENT_THEME = utils.get_config().theme
-if CURRENT_THEME == "system":
-    THEME = utils.detect_system_theme()
-else:
-    THEME = CURRENT_THEME
+THEME = utils.get_theme()
 
 def card_style(object_name):
     "Card like styling"

@@ -100,6 +100,7 @@ class SettingUI():
         style_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         style_combobox.lineEdit().setReadOnly(True)
         style_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        style_combobox.addItem("Default")
         style_combobox.addItems(QStyleFactory.keys())
         current_style = utils.get_config().style
         style_combobox.setCurrentText(current_style if current_style

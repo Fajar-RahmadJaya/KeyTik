@@ -95,7 +95,7 @@ class SettingCore():
         "Write style preference to config file"
         try:
             config = utils.get_config()
-            config.style = style.lower()
+            config.style = "" if style == "Default" else style.lower()
             utils.update_config(config)
 
             QMessageBox.information(

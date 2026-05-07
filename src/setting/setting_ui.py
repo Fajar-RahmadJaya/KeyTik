@@ -102,7 +102,7 @@ class SettingUI():
         style_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         style_combobox.addItems(QStyleFactory.keys())
         current_style = utils.get_config().style
-        style_combobox.setCurrentText(current_style.capitalize() if current_style
+        style_combobox.setCurrentText(current_style if current_style
                                       else "Default")
         style_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_style(style=style_combobox.currentText(),

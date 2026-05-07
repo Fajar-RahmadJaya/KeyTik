@@ -2,8 +2,7 @@
 import os
 import json
 import sys
-from dataclasses import dataclass, field
-from typing import List, Dict
+from dataclasses import dataclass
 import winreg
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
 import win32mica
@@ -97,11 +96,12 @@ def load_exit_key():
 @dataclass
 class Config:
     "Dataclass to make config usage easier"
-    show_announcement: bool = True
-    theme: str = "system"
-    profile_path: str = constant.appdata_dir
-    pinned_profile: List[str] = field(default_factory=list)
-    exit_key: Dict[str, str] = field(default_factory=dict)
+    show_announcement: bool
+    style: str
+    theme: str
+    profile_path: str
+    pinned_profile: list
+    exit_key: dict
 
 def get_config():
     "Get config from json file"
@@ -112,11 +112,12 @@ def get_config():
         with open(constant.config_path, "r", encoding="utf-8") as config_file:
             value = json.load(config_file)
             config = Config(
-                show_announcement=value["show_announcement"],
-                theme=value["theme"],
-                profile_path=value["profile_path"],
-                pinned_profile=value["pinned_profile"],
-                exit_key=value["exit_key"]
+                show_announcement=value.get("show_announcement", True),
+                style=value.get("style") or None,
+                theme=value.get("theme") or "system",
+                profile_path=value.get("profile_path") or constant.appdata_dir,
+                pinned_profile=value.get("pinned_profile", []),
+                exit_key=value.get("exit_key", {})
             )
         return config
 

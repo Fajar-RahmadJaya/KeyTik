@@ -76,7 +76,7 @@ class SettingCore():
             QMessageBox.critical(None, "Error", f"An error occurred: {e}")
 
     def save_theme(self, theme, parent):
-        "Write theme preference to theme file"
+        "Write theme preference to config file"
         try:
             config = utils.get_config()
             config.theme = theme.lower()
@@ -87,9 +87,27 @@ class SettingCore():
                 f"Theme Changed to {theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
 
         except FileNotFoundError as error:
-            QMessageBox.error(parent,
+            QMessageBox.critical(parent,
                               "Error",
                               f"Failed to change theme\n{error}")
+
+    def save_style(self, style, parent):
+        "Write style preference to config file"
+        try:
+            config = utils.get_config()
+            config.style = style.lower()
+            utils.update_config(config)
+
+            QMessageBox.information(
+                parent,
+                "Success",
+                f"Style Changed to {style}. \nPlease restart {PROGRAM_NAME} to apply change."
+            )
+
+        except FileNotFoundError as error:
+            QMessageBox.critical(parent,
+                                "Error",
+                                f"Failed to change style\n{error}")
 
     def ahk_action(self, ahk_installed):
         "Uninstall AutoHotkey"

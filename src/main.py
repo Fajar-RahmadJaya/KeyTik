@@ -22,6 +22,8 @@ def main():
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
 
     app = QApplication(sys.argv)
+    app.setStyle(utils.get_config().style)
+
     main_window = DashboardUI()
     announcement = Announcement()
     setting_ui = SettingUI()

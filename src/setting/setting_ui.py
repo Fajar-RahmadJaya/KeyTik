@@ -5,7 +5,8 @@ import webbrowser
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QGroupBox, QPushButton,
     QHBoxLayout, QCheckBox, QMessageBox, QScrollArea,
-    QFrame, QWidget, QLabel, QSizePolicy, QComboBox)
+    QFrame, QWidget, QLabel, QSizePolicy, QComboBox,
+    QStyleFactory)
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 
@@ -49,8 +50,11 @@ class SettingUI():
         content_layout.setSpacing(8)
         content_layout.setContentsMargins(8, 8, 8, 8)
 
+        # Style
+        content_layout.addWidget(self.style(settings_window))
+
         # Theme
-        content_layout.addWidget(self.appearance(settings_window))
+        content_layout.addWidget(self.theme(settings_window))
 
         # Change profile location
         content_layout.addWidget(self.change_profile(settings_window))
@@ -88,7 +92,29 @@ class SettingUI():
 
         return card_layout, card_frame
 
-    def appearance(self, settings_window):
+    def style(self, settings_window):
+        "Appearance widget"
+        style_combobox = QComboBox()
+        style_combobox.setFixedWidth(164)
+        style_combobox.setEditable(True)
+        style_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
+        style_combobox.lineEdit().setReadOnly(True)
+        style_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        style_combobox.addItems(QStyleFactory.keys())
+        current_style = utils.get_config().style
+        style_combobox.setCurrentText(current_style.capitalize() if current_style
+                                      else "Default")
+        style_combobox.currentTextChanged.connect(
+            lambda: self.setting_core.save_style(style=style_combobox.currentText(),
+                                                    parent=settings_window))
+
+        style_layout, style_frame = self.setting_card(heading="Style",
+                                            subheading="Change overall appearance style")
+        style_layout.addWidget(style_combobox)
+
+        return style_frame
+
+    def theme(self, settings_window):
         "Appearance widget"
         theme_combobox = QComboBox()
         theme_combobox.setFixedWidth(164)
@@ -102,7 +128,7 @@ class SettingUI():
             lambda: self.setting_core.save_theme(theme=theme_combobox.currentText(),
                                                  parent=settings_window))
 
-        theme_layout, theme_frame = self.setting_card(heading="Appearance",
+        theme_layout, theme_frame = self.setting_card(heading="Theme",
                                          subheading="Change KeyTik theme")
         theme_layout.addWidget(theme_combobox)
 

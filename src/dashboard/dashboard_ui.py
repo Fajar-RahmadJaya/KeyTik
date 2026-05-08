@@ -111,7 +111,7 @@ class DashboardUI(QMainWindow):
         setting_button.setFixedWidth(30)
         setting_button.setIcon(icons.get_icon(icons.setting))
         setting_button.setToolTip("Setting")
-        setting_button.clicked.connect(lambda: setting_ui.open_settings_window(self))
+        setting_button.clicked.connect(lambda: setting_ui.setting_window(self))
         button_layout.addWidget(setting_button, 0, 7)
 
         next_button = QPushButton()

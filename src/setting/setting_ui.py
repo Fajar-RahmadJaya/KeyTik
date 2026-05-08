@@ -2,6 +2,7 @@
 
 import os
 import webbrowser
+import sys
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QPushButton,
     QHBoxLayout, QMessageBox, QScrollArea,
@@ -82,6 +83,7 @@ class SettingUI():
         geometry = utils.get_geometry(parent, 600, 400)
         settings_window.setGeometry(geometry)
         settings_window.setWindowIcon(QIcon(constant.icon_path))
+        utils.apply_mica(settings_window)
 
         setting_layout = QVBoxLayout(settings_window)
         setting_layout.setContentsMargins(12, 12, 12, 12)
@@ -98,7 +100,7 @@ class SettingUI():
         scroll_area.setWidget(content_widget)
 
         content_layout = QVBoxLayout(content_widget)
-        content_layout.setSpacing(28)
+        content_layout.setSpacing(24)
         content_layout.setContentsMargins(8, 8, 8, 8)
 
         # Pro Version
@@ -181,6 +183,25 @@ class SettingUI():
         theme_layout.addWidget(theme_combobox)
         appearance_layout.addWidget(theme_frame)
 
+        # Mica Effect
+        mica_supported = bool(sys.getwindowsversion().build >= 22000)
+
+        mica_combobox = self.setting_combobox()
+        mica_combobox.addItem("Enable", True)
+        mica_combobox.addItem("Disable", False)
+        mica_combobox.setCurrentIndex(0 if utils.get_config().mica_effect
+                                      else 1)
+        mica_combobox.currentTextChanged.connect(
+            lambda: self.setting_core.save_mica_effect(
+                mica_effect=mica_combobox.currentData(),
+                parent=settings_window))
+
+        mica_layout, mica_frame = self.setting_card(heading="Mica Effect",
+                                            subheading="Enable/Disable Mica Effect")
+        mica_layout.addWidget(mica_combobox)
+        if mica_supported:
+            appearance_layout.addWidget(mica_frame)
+
         return appearance_widget
 
     def general(self, settings_window):
@@ -233,6 +254,7 @@ class SettingUI():
 
         # AutoHotkey Installation
         ahk_installed = os.path.exists(utils.ahkv2_dir)
+
         ahk_button = self.setting_button()
         ahk_button.setDisabled(bool(ahk_installed))
         ahk_button.setText(
@@ -251,6 +273,7 @@ class SettingUI():
 
         # Interception Driver Installation
         interception_installed = os.path.exists(constant.DRIVER_PATH)
+
         interception_button = self.setting_button()
         interception_button.setDisabled(bool(interception_installed))
         interception_button.setText(

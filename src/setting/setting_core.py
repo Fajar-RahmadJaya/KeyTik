@@ -109,6 +109,29 @@ class SettingCore():
                                 "Error",
                                 f"Failed to change style\n{error}")
 
+    def save_mica_effect(self, mica_effect, parent):
+        "Write style preference to config file"
+        try:
+            config = utils.get_config()
+            config.mica_effect = mica_effect
+            utils.update_config(config)
+
+            if mica_effect:
+                mica_condition = "Enabled"
+            else:
+                mica_condition = "Disabled"
+
+            QMessageBox.information(
+                parent,
+                "Success",
+                f"Mica effect {mica_condition}. \nPlease restart {PROGRAM_NAME} to apply change."
+            )
+
+        except FileNotFoundError as error:
+            QMessageBox.critical(parent,
+                                "Error",
+                                f"Failed to change style\n{error}")
+
     def ahk_action(self, ahk_installed):
         "Uninstall AutoHotkey"
         if ahk_installed:

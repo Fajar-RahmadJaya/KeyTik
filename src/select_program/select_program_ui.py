@@ -31,6 +31,7 @@ class SelectProgramUI():
         select_program_window.setModal(True)
         select_program_window.setAttribute(
             Qt.WidgetAttribute.WA_DeleteOnClose)
+        utils.apply_mica(select_program_window)
 
         main_layout = QVBoxLayout(select_program_window)
 

@@ -42,6 +42,7 @@ class SelectDevice():
         device_selection_window.setModal(True)
         device_selection_window.setAttribute(
             Qt.WidgetAttribute.WA_DeleteOnClose)
+        utils.apply_mica(device_selection_window)
 
         main_layout = QVBoxLayout(device_selection_window)
 

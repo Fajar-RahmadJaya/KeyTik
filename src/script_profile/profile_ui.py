@@ -58,6 +58,7 @@ class ProfileUI():
         self.edit_window.setWindowIcon(QIcon(constant.icon_path))
         geometry = utils.get_geometry(parent, 640, 480)
         self.edit_window.setGeometry(geometry)
+        utils.apply_mica(self.edit_window)
 
         # Composition
         remap_row_comp = RemapRow()

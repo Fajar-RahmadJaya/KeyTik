@@ -99,6 +99,7 @@ class Config:
     show_announcement: bool
     style: str
     theme: str
+    mica_effect: bool
     profile_path: str
     pinned_profile: list
     exit_key: dict
@@ -115,6 +116,7 @@ def get_config():
                 show_announcement=value.get("show_announcement", True),
                 style=value.get("style") or None,
                 theme=value.get("theme") or "system",
+                mica_effect=value.get("mica_effect", True),
                 profile_path=value.get("profile_path") or constant.appdata_dir,
                 pinned_profile=value.get("pinned_profile", []),
                 exit_key=value.get("exit_key", {})
@@ -212,8 +214,9 @@ def get_geometry(parent_window, width, height):
 
 def apply_mica(target_window):
     "Apply mica style on target window using win32mica"
-    target_window.setAttribute(Qt.WA_TranslucentBackground)
-    win32mica.ApplyMica(
-        HWND=int(target_window.winId()),
-        Theme=win32mica.MicaTheme.AUTO,
-        Style=win32mica.MicaStyle.DEFAULT)
+    if get_config().mica_effect:
+        target_window.setAttribute(Qt.WA_TranslucentBackground)
+        win32mica.ApplyMica(
+            HWND=int(target_window.winId()),
+            Theme=win32mica.MicaTheme.AUTO,
+            Style=win32mica.MicaStyle.DEFAULT)

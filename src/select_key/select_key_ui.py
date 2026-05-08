@@ -46,6 +46,7 @@ class SelectKeyUI():
         select_key_window.setWindowIcon(QIcon(constant.icon_path))
         geometry = utils.get_geometry(parent_window, 400, 430)
         select_key_window.setGeometry(geometry)
+        utils.apply_mica(select_key_window)
 
         main_layout = QVBoxLayout(select_key_window)
         # Top part

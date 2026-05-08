@@ -3,8 +3,8 @@
 import os
 import webbrowser
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog, QVBoxLayout, QGroupBox, QPushButton,
-    QHBoxLayout, QCheckBox, QMessageBox, QScrollArea,
+    QDialog, QVBoxLayout, QPushButton,
+    QHBoxLayout, QMessageBox, QScrollArea,
     QFrame, QWidget, QLabel, QSizePolicy, QComboBox,
     QStyleFactory)
 from PySide6.QtGui import QIcon, QFont  # pylint: disable=E0611
@@ -111,7 +111,7 @@ class SettingUI():
         content_layout.addWidget(self.general(settings_window))
 
         # Advanced
-        content_layout.addWidget(self.installation(settings_window))
+        content_layout.addWidget(self.installation())
 
         setting_layout.addWidget(scroll_area)
         settings_window.exec()

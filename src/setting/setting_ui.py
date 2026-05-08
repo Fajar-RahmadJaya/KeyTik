@@ -75,7 +75,7 @@ class SettingUI():
 
         return setting_header_label
 
-    # ------------------------------ UI ------------------------------
+    # ------------------------------ Window ------------------------------
     def setting_window(self, parent):
         "Setting window"
         settings_window = QDialog(parent)
@@ -104,7 +104,8 @@ class SettingUI():
         content_layout.setContentsMargins(8, 8, 8, 8)
 
         # Pro Version
-        content_layout.addWidget(self.pro_version())
+        if diff.PROGRAM_NAME != "KeyTik Pro":
+            content_layout.addWidget(self.pro_version())
 
         # Appearance
         content_layout.addWidget(self.appearance(settings_window))
@@ -118,6 +119,7 @@ class SettingUI():
         setting_layout.addWidget(scroll_area)
         settings_window.exec()
 
+    # ------------------------------ Pro Version ------------------------------
     def pro_version(self):
         "Pro version setting"
         pro_version_widget = QWidget()
@@ -143,6 +145,7 @@ class SettingUI():
 
         return pro_version_widget
 
+    # ------------------------------ Appearance ------------------------------
     def appearance(self, settings_window):
         "Appearance setting"
         appearance_widget = QWidget()
@@ -155,6 +158,20 @@ class SettingUI():
         appearance_layout.addWidget(appearance_label)
 
         # Style
+        appearance_layout.addWidget(self.style(settings_window))
+
+        # Theme
+        appearance_layout.addWidget(self.theme(settings_window))
+
+        # Mica Effect
+        mica_supported = bool(sys.getwindowsversion().build >= 22000)
+        if mica_supported:
+            appearance_layout.addWidget(self.mica_effect(settings_window))
+
+        return appearance_widget
+
+    def style(self, settings_window):
+        "Style Widget"
         style_combobox = self.setting_combobox()
         style_combobox.addItem("Default")
         style_combobox.addItems(QStyleFactory.keys())
@@ -168,29 +185,31 @@ class SettingUI():
         style_layout, style_frame = self.setting_card(heading="Style",
                                             subheading="Change appearance style")
         style_layout.addWidget(style_combobox)
-        appearance_layout.addWidget(style_frame)
 
-        # Theme
+        return style_frame
+
+    def theme(self, settings_window):
+        "Theme Widget"
         theme_combobox = self.setting_combobox()
         theme_combobox.addItems(["Light", "Dark", "System"])
         theme_combobox.setCurrentText(utils.get_config().theme.capitalize())
         theme_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_theme(theme=theme_combobox.currentText(),
-                                                 parent=settings_window))
+                                                    parent=settings_window))
 
         theme_layout, theme_frame = self.setting_card(heading="Theme",
-                                         subheading="Change appearance theme")
+                                            subheading="Change appearance theme")
         theme_layout.addWidget(theme_combobox)
-        appearance_layout.addWidget(theme_frame)
 
-        # Mica Effect
-        mica_supported = bool(sys.getwindowsversion().build >= 22000)
+        return theme_frame
 
+    def mica_effect(self, settings_window):
+        "Mica Effect Widge"
         mica_combobox = self.setting_combobox()
         mica_combobox.addItem("Enable", True)
         mica_combobox.addItem("Disable", False)
         mica_combobox.setCurrentIndex(0 if utils.get_config().mica_effect
-                                      else 1)
+                                        else 1)
         mica_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_mica_effect(
                 mica_effect=mica_combobox.currentData(),
@@ -199,11 +218,10 @@ class SettingUI():
         mica_layout, mica_frame = self.setting_card(heading="Mica Effect",
                                             subheading="Enable/Disable Mica Effect")
         mica_layout.addWidget(mica_combobox)
-        if mica_supported:
-            appearance_layout.addWidget(mica_frame)
 
-        return appearance_widget
+        return mica_frame
 
+    # ------------------------------ General ------------------------------
     def general(self, settings_window):
         "General setting"
         general_widget = QWidget()
@@ -216,6 +234,15 @@ class SettingUI():
         general_layout.addWidget(general_label)
 
         # Profile Location
+        general_layout.addWidget(self.profile_location(settings_window=()))
+
+        # Announcement
+        general_layout.addWidget(self.announcement(settings_window))
+
+        return general_widget
+
+    def profile_location(self, settings_window):
+        "Profile Location Widget"
         profile_location_button = self.setting_button()
         profile_location_button.setText("Change Location")
         profile_location_button.clicked.connect(
@@ -225,9 +252,11 @@ class SettingUI():
             heading="Profile Location",
             subheading=utils.get_config().profile_path)
         profile_location_layout.addWidget(profile_location_button)
-        general_layout.addWidget(profile_location_frame)
 
-        # Announcement
+        return profile_location_frame
+
+    def announcement(self, settings_window):
+        "Announcement Widget"
         announcement = Announcement()  # Composition
         announcement_button = self.setting_button()
         announcement_button.setText("Announcement")
@@ -237,10 +266,10 @@ class SettingUI():
         announcement_layout, announcement_frame = self.setting_card(heading="Announcement",
                                             subheading="Show announcement")
         announcement_layout.addWidget(announcement_button)
-        general_layout.addWidget(announcement_frame)
 
-        return general_widget
+        return announcement_frame
 
+    # ------------------------------ Installation ------------------------------
     def installation(self):
         "Advanced setting"
         installation_widget = QWidget()
@@ -253,6 +282,18 @@ class SettingUI():
         installation_layout.addWidget(installaation_label)
 
         # AutoHotkey Installation
+        installation_layout.addWidget(self.ahk_installation())
+
+        # Interception Driver Installation
+        installation_layout.addWidget(self.interception_installation())
+
+        # Check for Update
+        installation_layout.addWidget(self.check_update())
+
+        return installation_widget
+
+    def ahk_installation(self):
+        "AutoHotkey Installation Widget"
         ahk_installed = os.path.exists(utils.ahkv2_dir)
 
         ahk_button = self.setting_button()
@@ -269,9 +310,11 @@ class SettingUI():
             subheading=("AutoHotkey is installed" if ahk_installed
                         else "AutoHotkey not installed"))
         ahk_layout.addWidget(ahk_button)
-        installation_layout.addWidget(ahk_frame)
 
-        # Interception Driver Installation
+        return ahk_frame
+
+    def interception_installation(self):
+        "Interception Driver Installation"
         interception_installed = os.path.exists(constant.DRIVER_PATH)
 
         interception_button = self.setting_button()
@@ -288,9 +331,11 @@ class SettingUI():
             subheading=("Interception Driver is Installed" if interception_installed
                         else "Interception Driver not Installed"))
         interception_layout.addWidget(interception_button)
-        installation_layout.addWidget(interception_frame)
 
-        # Check for Update
+        return interception_frame
+
+    def check_update(self):
+        "Check for Update Widget"
         check_update_button = self.setting_button()
         check_update_button.setText("Check For Update")
         check_update_button.clicked.connect(
@@ -299,9 +344,8 @@ class SettingUI():
         check_update_layout, check_update_frame = self.setting_card(heading="Check for update",
                                                 subheading="Check for update")
         check_update_layout.addWidget(check_update_button)
-        installation_layout.addWidget(check_update_frame)
 
-        return installation_widget
+        return check_update_frame
 
     def update_messagebox(self, show_no_update_message=False):
         "Message when there is update avalible"

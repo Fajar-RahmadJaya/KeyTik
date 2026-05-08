@@ -134,8 +134,8 @@ class SettingUI():
             lambda: webbrowser.open(
                 "https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
 
-        pro_upgrade_layout, pro_upgrade_frame = self.setting_card(heading="Get KeyTik Pro",
-                                                subheading="Support the developer")
+        pro_upgrade_layout, pro_upgrade_frame = self.setting_card(heading="KeyTik Pro",
+                                                subheading="Pro version available at $20")
         pro_upgrade_layout.addWidget(pro_upgrade_button)
         pro_version_layout.addWidget(pro_upgrade_frame)
 
@@ -164,7 +164,7 @@ class SettingUI():
                                                     parent=settings_window))
 
         style_layout, style_frame = self.setting_card(heading="Style",
-                                            subheading="Change overall appearance style")
+                                            subheading="Change appearance style")
         style_layout.addWidget(style_combobox)
         appearance_layout.addWidget(style_frame)
 
@@ -177,7 +177,7 @@ class SettingUI():
                                                  parent=settings_window))
 
         theme_layout, theme_frame = self.setting_card(heading="Theme",
-                                         subheading="Change KeyTik theme")
+                                         subheading="Change appearance theme")
         theme_layout.addWidget(theme_combobox)
         appearance_layout.addWidget(theme_frame)
 
@@ -237,7 +237,7 @@ class SettingUI():
         installation_button.clicked.connect(
             lambda: self.show_installation_dialog(settings_window))
 
-        installation_layout, installation_frame = self.setting_card(heading="Installtion",
+        installation_layout, installation_frame = self.setting_card(heading="Installation",
                                                 subheading="Check installation")
         installation_layout.addWidget(installation_button)
         advanced_layout.addWidget(installation_frame)

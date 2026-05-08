@@ -111,7 +111,7 @@ class SettingUI():
         content_layout.addWidget(self.general(settings_window))
 
         # Advanced
-        content_layout.addWidget(self.advanced(settings_window))
+        content_layout.addWidget(self.installation(settings_window))
 
         setting_layout.addWidget(scroll_area)
         settings_window.exec()
@@ -220,27 +220,52 @@ class SettingUI():
 
         return general_widget
 
-    def advanced(self, settings_window):
+    def installation(self):
         "Advanced setting"
-        advanced_widget = QWidget()
-        advanced_layout = QVBoxLayout(advanced_widget)
-        advanced_layout.setContentsMargins(0, 0, 0, 0)
+        installation_widget = QWidget()
+        installation_layout = QVBoxLayout(installation_widget)
+        installation_layout.setContentsMargins(0, 0, 0, 0)
 
         # Header
-        advanced_label = self.setting_header_label()
-        advanced_label.setText("Advanced")
-        advanced_layout.addWidget(advanced_label)
+        installaation_label = self.setting_header_label()
+        installaation_label.setText("Advanced")
+        installation_layout.addWidget(installaation_label)
 
-        # Installation
-        installation_button = self.setting_button()
-        installation_button.setText("Check Installation")
-        installation_button.clicked.connect(
-            lambda: self.show_installation_dialog(settings_window))
+        # AutoHotkey Installation
+        ahk_installed = os.path.exists(utils.ahkv2_dir)
+        ahk_button = self.setting_button()
+        ahk_button.setDisabled(bool(ahk_installed))
+        ahk_button.setText(
+            "Uninstall AutoHotkey"
+            if ahk_installed
+            else "Install AutoHotkey")
+        ahk_button.clicked.connect(
+            lambda: self.setting_core.ahk_action(ahk_installed))
 
-        installation_layout, installation_frame = self.setting_card(heading="Installation",
-                                                subheading="Check installation")
-        installation_layout.addWidget(installation_button)
-        advanced_layout.addWidget(installation_frame)
+        ahk_layout, ahk_frame = self.setting_card(
+            heading="AutoHotkey Installation",
+            subheading=("AutoHotkey is installed" if ahk_installed
+                        else "AutoHotkey not installed"))
+        ahk_layout.addWidget(ahk_button)
+        installation_layout.addWidget(ahk_frame)
+
+        # Interception Driver Installation
+        interception_installed = os.path.exists(constant.DRIVER_PATH)
+        interception_button = self.setting_button()
+        interception_button.setDisabled(bool(interception_installed))
+        interception_button.setText(
+                                "Uninstall Interception Driver"
+                                if interception_installed
+                                else "Install Interception Driver")
+        interception_button.clicked.connect(
+            lambda: self.setting_core.driver_action(interception_installed))
+
+        interception_layout, interception_frame = self.setting_card(
+            heading="Interception Driver Installation",
+            subheading=("Interception Driver is Installed" if interception_installed
+                        else "Interception Driver not Installed"))
+        interception_layout.addWidget(interception_button)
+        installation_layout.addWidget(interception_frame)
 
         # Check for Update
         check_update_button = self.setting_button()
@@ -251,63 +276,9 @@ class SettingUI():
         check_update_layout, check_update_frame = self.setting_card(heading="Check for update",
                                                 subheading="Check for update")
         check_update_layout.addWidget(check_update_button)
-        advanced_layout.addWidget(check_update_frame)
+        installation_layout.addWidget(check_update_frame)
 
-        return advanced_widget
-
-    def show_installation_dialog(self, parent):
-        "Setting to check, install, uninstall AutoHotkey and Interception driver installation"
-        dialog = QDialog(parent)
-        dialog.setWindowTitle("Installation Manager")
-        dialog.setWindowIcon(QIcon(constant.icon_path))
-        geometry = utils.get_geometry(parent, 380, 180)
-        dialog.setGeometry(geometry)
-        layout = QVBoxLayout(dialog)
-        layout.setContentsMargins(20, 20, 20, 20)
-
-        install_group = QGroupBox()
-        install_group_layout = QHBoxLayout(install_group)
-        install_group_layout.setContentsMargins(10, 10, 10, 10)
-
-        ahk_vbox = QVBoxLayout()
-        ahk_checkbox = QCheckBox("AutoHotkey", dialog)
-        ahk_installed = os.path.exists(utils.ahkv2_dir)
-        ahk_checkbox.setChecked(ahk_installed)
-        ahk_checkbox.setEnabled(False)
-        ahk_button = QPushButton(dialog)
-        ahk_button.setText(
-            "Uninstall AutoHotkey"
-            if ahk_installed
-            else "Install AutoHotkey")
-        ahk_vbox.addWidget(
-            ahk_checkbox, alignment=Qt.AlignmentFlag.AlignHCenter)
-        ahk_vbox.addWidget(ahk_button)
-
-        driver_vbox = QVBoxLayout()
-        driver_checkbox = QCheckBox("Interception Driver", dialog)
-        driver_installed = os.path.exists(constant.DRIVER_PATH)
-        driver_checkbox.setChecked(driver_installed)
-        driver_checkbox.setEnabled(False)
-        driver_button = QPushButton(dialog)
-        driver_button.setText(
-            "Uninstall Interception Driver"
-            if driver_installed
-            else "Install Interception Driver")
-        driver_vbox.addWidget(
-            driver_checkbox, alignment=Qt.AlignmentFlag.AlignHCenter)
-        driver_vbox.addWidget(driver_button)
-
-        install_group_layout.addLayout(ahk_vbox)
-        install_group_layout.addLayout(driver_vbox)
-
-        layout.addWidget(install_group)
-
-        ahk_button.clicked.connect(lambda: self.setting_core.ahk_action(
-            ahk_installed))
-        driver_button.clicked.connect(lambda: self.setting_core.driver_action(
-            driver_installed))
-
-        dialog.exec()
+        return installation_widget
 
     def update_messagebox(self, show_no_update_message=False):
         "Message when there is update avalible"

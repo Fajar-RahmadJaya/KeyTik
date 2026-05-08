@@ -228,7 +228,7 @@ class SettingUI():
 
         # Header
         installaation_label = self.setting_header_label()
-        installaation_label.setText("Advanced")
+        installaation_label.setText("Installation")
         installation_layout.addWidget(installaation_label)
 
         # AutoHotkey Installation

@@ -22,12 +22,13 @@ def main():
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
     elif theme == "light":
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
-    else:
-        qt_themes.set_theme(theme, style)
-        print(qt_themes.get_theme())
 
     app = QApplication(sys.argv)
-    app.setStyle(style)
+
+    if theme in ("dark", "light"):
+        app.setStyle(style)
+    else:
+        qt_themes.set_theme(theme, style)
 
     main_window = DashboardUI()
     announcement = Announcement()

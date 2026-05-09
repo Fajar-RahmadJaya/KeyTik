@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QFrame, QWidget, QLabel, QSizePolicy, QComboBox,
     QStyleFactory)
 from PySide6.QtGui import QIcon, QFont  # pylint: disable=E0611
+import qt_themes
 
 from utility import constant
 from utility import utils
@@ -190,10 +191,19 @@ class SettingUI():
     def theme(self, settings_window):
         "Theme Widget"
         theme_combobox = self.setting_combobox()
-        theme_combobox.addItems(["Light", "Dark", "System"])
-        theme_combobox.setCurrentText(utils.get_config().theme.capitalize())
+
+        # Default theme
+        theme_combobox.addItem("Light", "light")
+        theme_combobox.addItem("Dark", "dark")
+        theme_combobox.addItem("System", "system")
+        # qt-themes theme
+        qt_themes_dict = qt_themes.get_themes()
+        for theme, _ in qt_themes_dict.items():
+            theme_combobox.addItem(theme.replace('_', ' ').title(), theme)
+
+        theme_combobox.setCurrentText(utils.get_config().theme.replace('_', ' ').title())
         theme_combobox.currentTextChanged.connect(
-            lambda: self.setting_core.save_theme(theme=theme_combobox.currentText(),
+            lambda: self.setting_core.save_theme(theme=theme_combobox.currentData(),
                                                     parent=settings_window))
 
         theme_layout, theme_frame = self.setting_card(heading="Theme",

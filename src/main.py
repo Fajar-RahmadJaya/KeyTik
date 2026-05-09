@@ -2,6 +2,7 @@
 import os
 import sys
 from PySide6.QtWidgets import (QApplication) # pylint: disable=E0611
+import qt_themes
 
 from utility import utils
 from utility import thread
@@ -13,16 +14,23 @@ from setting.setting_ui import SettingUI
 
 def main():
     "Main function"
-    # Set theme for the program
-    theme = utils.get_theme()
-
-    if theme == "dark":
-        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
-    elif theme == "light":
-        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
-
     app = QApplication(sys.argv)
-    app.setStyle(utils.get_config().style)
+
+    # Set Appearance
+    theme = utils.get_theme()
+    config_theme = utils.get_config().theme
+    style = utils.get_config().style
+
+    if config_theme in ("dark", "light", "system"):
+        print(theme)
+        if theme == "dark":
+            os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
+        elif theme == "light":
+            os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
+
+        app.setStyle(style)
+    else:
+        qt_themes.set_theme(theme, style)
 
     main_window = DashboardUI()
     announcement = Announcement()

@@ -79,7 +79,7 @@ class SettingCore():
         "Write theme preference to config file"
         try:
             config = utils.get_config()
-            config.theme = theme.lower()
+            config.theme = theme
             utils.update_config(config)
             QMessageBox.information(
                 parent,

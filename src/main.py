@@ -14,22 +14,20 @@ from setting.setting_ui import SettingUI
 
 def main():
     "Main function"
-    app = QApplication(sys.argv)
-
     # Set Appearance
     theme = utils.get_theme()
-    config_theme = utils.get_config().theme
     style = utils.get_config().style
 
-    if config_theme in ("dark", "light", "system"):
-        if theme == "dark":
-            os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
-        elif theme == "light":
-            os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
-
-        app.setStyle(style)
+    if theme == "dark":
+        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
+    elif theme == "light":
+        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
     else:
         qt_themes.set_theme(theme, style)
+        print(qt_themes.get_theme())
+
+    app = QApplication(sys.argv)
+    app.setStyle(style)
 
     main_window = DashboardUI()
     announcement = Announcement()

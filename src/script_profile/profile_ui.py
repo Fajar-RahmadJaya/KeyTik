@@ -4,7 +4,7 @@ import os
 import traceback
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
-    QComboBox, QGridLayout, QMessageBox
+    QComboBox, QGridLayout, QMessageBox, QFrame
 )
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
@@ -12,7 +12,6 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from utility import constant
 from utility.diff import (mode_item, mode_map)
 from utility import utils
-from utility import style
 from select_program.select_program_ui import SelectProgramUI
 from select_device.select_device import SelectDevice
 from script_profile.remap_row import RemapRow
@@ -153,7 +152,8 @@ class ProfileUI():
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         edit_scroll.setObjectName("editScroll")
-        edit_scroll.setStyleSheet(style.scroll_area_style("editScroll"))
+        edit_scroll.setFrameShape(QFrame.NoFrame)
+        edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
 
         edit_frame = remap_row_comp.handle_parser(lines, first_line, self.edit_window)
         edit_scroll.setWidget(edit_frame)

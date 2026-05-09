@@ -2,15 +2,16 @@
 
 from utility import utils
 
+# ---------------------------- Variables ----------------------------
 THEME = utils.get_theme()
 
+# ---------------------------- Create/Edit Profile ----------------------------
 def card_style(object_name):
     "Card like styling"
     if THEME == "dark":
         style_sheet = f"""
         QFrame#{object_name} {{
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.052);
             border-radius: 8;
         }}
         """
@@ -24,29 +25,13 @@ def card_style(object_name):
         """
     return style_sheet
 
-def scroll_area_style(object_name):
-    "Style for scroll area"
-    if THEME == "dark":
-        style_sheet = f"""
-        QScrollArea#{object_name} {{
-            background: rgba(255, 255, 255, 0.03);
-        }}
-        """
-    else:
-        style_sheet = f"""
-        QScrollArea#{object_name} {{
-            background: rgba(255, 255, 255, 0.02);
-        }}
-        """
-
-    return style_sheet
-
+# ---------------------------- Dashboard ----------------------------
 def group_box_style(object_name):
     "Profile card group box styling"
     if THEME == "dark":
         style_sheet = f"""
         QGroupBox#{object_name} {{
-             background-color: rgba(255, 255, 255, 0.03);
+             background-color: rgba(255, 255, 255, 0.052);
              border: 1px solid rgba(255, 255, 255, 0.18);
              border-radius: 8;
              margin-top: 1.5ex;
@@ -77,6 +62,7 @@ PLUS_LABEL = """
 
 TEXT_BLOCK = "font-family: Consolas; font-size: 10pt;"
 
+# ---------------------------- Setting ----------------------------
 def setting_card_style():
     "Setting card, slightly different than create/edit profile card"
     if THEME == "dark":
@@ -96,8 +82,6 @@ def setting_card_style():
 
     return style_sheet
 
-
 HEADING_STYLE = "font-size:13px; margin-bottom:2px"
-
 
 SUBHEADING_STYLE = "font-size:11px; color: rgba(255,255,255,0.8);"

@@ -848,8 +848,6 @@ class KeyListening(QObject):
         local_pos = self.remap_row_comp.edit_frame.mapFromGlobal(QCursor.pos())
         widget = self.remap_row_comp.edit_frame.childAt(local_pos)
         if isinstance(widget, (QPushButton, QLineEdit, QCheckBox)):
-            print("true")
             return True
 
-        print("false")
         return False

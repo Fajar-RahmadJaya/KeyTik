@@ -8,7 +8,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QFrame, QWidget, QLabel, QSizePolicy, QComboBox,
     QStyleFactory)
 from PySide6.QtGui import QIcon, QFont  # pylint: disable=E0611
-from PySide6.QtCore import Qt  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils
@@ -52,10 +51,7 @@ class SettingUI():
         "Setting combobox template"
         setting_combobox = SettingCombobox()
         setting_combobox.setFixedWidth(164)
-        setting_combobox.setEditable(True)
-        setting_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
-        setting_combobox.lineEdit().setReadOnly(True)
-        setting_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        setting_combobox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
 
         return setting_combobox
 

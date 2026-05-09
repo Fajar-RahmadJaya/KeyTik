@@ -84,7 +84,7 @@ class SettingCore():
             QMessageBox.information(
                 parent,
                 "Success",
-                f"Theme Changed to {theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
+                f"Theme changed to {theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,
@@ -101,7 +101,7 @@ class SettingCore():
             QMessageBox.information(
                 parent,
                 "Success",
-                f"Style Changed to {style}. \nPlease restart {PROGRAM_NAME} to apply change."
+                f"Style changed to {style}. \nPlease restart {PROGRAM_NAME} to apply change."
             )
 
         except FileNotFoundError as error:
@@ -113,18 +113,14 @@ class SettingCore():
         "Write style preference to config file"
         try:
             config = utils.get_config()
-            config.mica_effect = mica_effect
+            config.mica_effect = mica_effect.lower()
             utils.update_config(config)
-
-            if mica_effect:
-                mica_condition = "Enabled"
-            else:
-                mica_condition = "Disabled"
 
             QMessageBox.information(
                 parent,
                 "Success",
-                f"Mica effect {mica_condition}. \nPlease restart {PROGRAM_NAME} to apply change."
+                f"""Mica effect changed to {mica_effect}.
+                \nPlease restart {PROGRAM_NAME} to apply change."""
             )
 
         except FileNotFoundError as error:

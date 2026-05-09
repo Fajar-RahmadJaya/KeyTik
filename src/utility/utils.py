@@ -99,7 +99,7 @@ class Config:
     show_announcement: bool
     style: str
     theme: str
-    mica_effect: bool
+    mica_effect: str
     profile_path: str
     pinned_profile: list
     exit_key: dict
@@ -116,7 +116,7 @@ def get_config():
                 show_announcement=value.get("show_announcement", True),
                 style=value.get("style") or None,
                 theme=value.get("theme") or "system",
-                mica_effect=value.get("mica_effect", True),
+                mica_effect=value.get("mica_effect") or "default",
                 profile_path=value.get("profile_path") or constant.appdata_dir,
                 pinned_profile=value.get("pinned_profile", []),
                 exit_key=value.get("exit_key", {})
@@ -134,16 +134,6 @@ def update_config(config):
             json.dump(config.__dict__, f, indent=4, sort_keys=True)
     except (json.JSONDecodeError, FileNotFoundError) as error:
         print(f"Error: {error}")
-
-def get_theme():
-    "Add system to the theme"
-    current_theme = get_config().theme
-    if current_theme == "system":
-        theme = detect_system_theme()
-    else:
-        theme = current_theme
-
-    return theme
 
 active_dir = os.path.join(get_config().profile_path, 'Active')
 store_dir = os.path.join(get_config().profile_path, 'Store')
@@ -163,6 +153,16 @@ device_finder_path = os.path.join(
     active_dir, "Autohotkey Interception", "find_device.ahk")
 coordinate_path = os.path.join(
     active_dir, "Autohotkey Interception", "Coordinate.ahk")
+
+def get_theme():
+    "Add system to the theme"
+    current_theme = get_config().theme
+    if current_theme == "system":
+        theme = detect_system_theme()
+    else:
+        theme = current_theme
+
+    return theme
 
 def detect_system_theme():
     "Detecting system theme for Pyside6 default theme handling"
@@ -212,11 +212,17 @@ def get_geometry(parent_window, width, height):
     y = parent_y + (parent_height - height) // 2
     return QRect(x, y, width, height)
 
+mica_supported = bool(sys.getwindowsversion().build >= 22000)
+
 def apply_mica(target_window):
     "Apply mica style on target window using win32mica"
-    if get_config().mica_effect:
+    theme = get_theme().upper()
+    mica_effect = get_config().mica_effect.upper()
+
+    if mica_effect != "DISABLE" and mica_supported:
         target_window.setAttribute(Qt.WA_TranslucentBackground)
         win32mica.ApplyMica(
             HWND=int(target_window.winId()),
-            Theme=win32mica.MicaTheme.AUTO,
-            Style=win32mica.MicaStyle.DEFAULT)
+            Theme=getattr(win32mica.MicaTheme, theme),
+            Style=getattr(win32mica.MicaStyle, mica_effect)
+        )

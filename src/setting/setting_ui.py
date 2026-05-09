@@ -2,7 +2,6 @@
 
 import os
 import webbrowser
-import sys
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog, QVBoxLayout, QPushButton,
     QHBoxLayout, QMessageBox, QScrollArea,
@@ -18,6 +17,11 @@ from utility import style
 from setting.setting_core import SettingCore
 from setting.announcement import Announcement
 
+class SettingCombobox(QComboBox):  # pylint: disable=R0903
+    "Ignore Wheel Event"
+    def wheelEvent(self, event):  # pylint: disable=C0103
+        "Override wheelEvent"
+        event.ignore()
 
 class SettingUI():
     "Setting UI"
@@ -46,7 +50,7 @@ class SettingUI():
 
     def setting_combobox(self):
         "Setting combobox template"
-        setting_combobox = QComboBox()
+        setting_combobox = SettingCombobox()
         setting_combobox.setFixedWidth(164)
         setting_combobox.setEditable(True)
         setting_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -164,8 +168,7 @@ class SettingUI():
         appearance_layout.addWidget(self.theme(settings_window))
 
         # Mica Effect
-        mica_supported = bool(sys.getwindowsversion().build >= 22000)
-        if mica_supported:
+        if utils.mica_supported:
             appearance_layout.addWidget(self.mica_effect(settings_window))
 
         return appearance_widget
@@ -204,15 +207,13 @@ class SettingUI():
         return theme_frame
 
     def mica_effect(self, settings_window):
-        "Mica Effect Widge"
+        "Mica Effect Widget"
         mica_combobox = self.setting_combobox()
-        mica_combobox.addItem("Enable", True)
-        mica_combobox.addItem("Disable", False)
-        mica_combobox.setCurrentIndex(0 if utils.get_config().mica_effect
-                                        else 1)
+        mica_combobox.addItems(["Default", "Alt", "Disable"])
+        mica_combobox.setCurrentText(utils.get_config().mica_effect.capitalize())
         mica_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_mica_effect(
-                mica_effect=mica_combobox.currentData(),
+                mica_effect=mica_combobox.currentText(),
                 parent=settings_window))
 
         mica_layout, mica_frame = self.setting_card(heading="Mica Effect",

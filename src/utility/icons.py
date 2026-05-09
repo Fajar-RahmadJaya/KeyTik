@@ -1,30 +1,37 @@
 "Centralize all icon initialization"
 
 import os
-from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtSvg import QSvgRenderer  # pylint: disable=E0611
+from PySide6.QtGui import QPixmap, QPainter, QColor, QIcon, QPalette  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 
-from utility import utils
 from utility import constant
 
 
 icon_cache = {}
 
-
 def get_icon(path):
     "Cache icon"
+    # Get palette
+    palette = QApplication.palette()
+    text_palette = palette.color(QPalette.Text).name()
+
+    # Apply color
     if path not in icon_cache:
-        icon_cache[path] = QIcon(path)
+        renderer = QSvgRenderer(path)
+        pixmap = QPixmap(32, 32)
+        pixmap.fill(Qt.transparent)
+        painter = QPainter(pixmap)
+        renderer.render(painter)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+        painter.fillRect(pixmap.rect(), QColor(text_palette))
+        painter.end()
+
+        icon_cache[path] = QIcon(pixmap)
     return icon_cache[path]
 
-
 icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon')
-
-THEME = utils.get_theme()
-
-if THEME == "dark":
-    icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon', 'dark')
-elif THEME == "light":
-    icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon', 'light')
 
 # Profile Icon
 run = os.path.join(icon_dir, "run.svg")

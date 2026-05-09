@@ -22,7 +22,6 @@ def main():
     style = utils.get_config().style
 
     if config_theme in ("dark", "light", "system"):
-        print(theme)
         if theme == "dark":
             os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
         elif theme == "light":

@@ -18,7 +18,6 @@ def main():
     # Set Appearance
     theme = style.get_theme()
     style_config = utils.get_config().style
-    mica_effect = utils.get_config().mica_effect
 
     if theme == "dark":
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
@@ -30,8 +29,7 @@ def main():
     if theme in ("dark", "light"):
         app.setStyle(style_config)
     else:
-        if mica_effect not in ("default", "alt"):
-            qt_themes.set_theme(theme, style_config)
+        qt_themes.set_theme(theme, style_config)
 
     main_window = DashboardUI()
     announcement = Announcement()

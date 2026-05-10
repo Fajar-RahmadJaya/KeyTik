@@ -26,11 +26,17 @@ mica_supported = bool(sys.getwindowsversion().build >= 22000)
 
 def get_theme():
     "Add system to the theme"
-    current_theme = utils.get_config().theme
-    if current_theme == "system":
+    config = utils.get_config()
+
+    if config.theme == "system":
         theme = detect_system_theme()
+    elif config.theme in ("light", "dark"):
+        theme = config.theme
     else:
-        theme = current_theme
+        if config.mica_effect != "disable":
+            theme = detect_system_theme()
+        else:
+            theme = config.theme
 
     return theme
 

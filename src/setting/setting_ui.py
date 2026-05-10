@@ -81,10 +81,10 @@ class SettingUI():
         "Setting window"
         settings_window = QDialog(parent)
         settings_window.setWindowTitle("Settings")
-        geometry = utils.get_geometry(parent, 600, 400)
+        geometry = style.get_geometry(parent, 600, 400)
         settings_window.setGeometry(geometry)
         settings_window.setWindowIcon(QIcon(constant.icon_path))
-        utils.apply_mica(settings_window)
+        style.apply_mica(settings_window)
 
         setting_layout = QVBoxLayout(settings_window)
         setting_layout.setContentsMargins(12, 12, 12, 12)
@@ -165,7 +165,7 @@ class SettingUI():
         appearance_layout.addWidget(self.theme(settings_window))
 
         # Mica Effect
-        if utils.mica_supported:
+        if style.mica_supported:
             appearance_layout.addWidget(self.mica_effect(settings_window))
 
         return appearance_widget

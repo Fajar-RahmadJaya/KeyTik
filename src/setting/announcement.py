@@ -11,6 +11,7 @@ from PySide6.QtCore import Qt, QThread, Signal  # pylint: disable=E0611
 from utility import constant
 from utility import diff
 from utility import utils
+from utility import style
 
 
 class AnnouncmentThread(QThread):  # pylint: disable=R0903
@@ -62,7 +63,7 @@ class Announcement():
             announcement_dialog = QDialog(parent)
             announcement_dialog.setWindowTitle("Announcement")
 
-            geometry = utils.get_geometry(parent, 525, 290)
+            geometry = style.get_geometry(parent, 525, 290)
             announcement_dialog.setGeometry(geometry)
             announcement_dialog.setWindowIcon(QIcon(constant.icon_path))
             announcement_dialog.setModal(True)

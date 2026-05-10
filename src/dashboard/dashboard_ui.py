@@ -37,7 +37,7 @@ class DashboardUI(QMainWindow):
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        utils.apply_mica(self)
+        style.apply_mica(self)
 
         # Startup
         self.create_ui()

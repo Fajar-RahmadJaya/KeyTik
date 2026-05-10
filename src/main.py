@@ -6,6 +6,7 @@ import qt_themes
 
 from utility import utils
 from utility import thread
+from utility import style
 from dashboard.dashboard_ui import DashboardUI
 from dashboard.dashboard_core import DashboardCore
 from setting.announcement import Announcement
@@ -15,8 +16,9 @@ from setting.setting_ui import SettingUI
 def main():
     "Main function"
     # Set Appearance
-    theme = utils.get_theme()
-    style = utils.get_config().style
+    theme = style.get_theme()
+    style_config = utils.get_config().style
+    mica_effect = utils.get_config().mica_effect
 
     if theme == "dark":
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
@@ -26,9 +28,10 @@ def main():
     app = QApplication(sys.argv)
 
     if theme in ("dark", "light"):
-        app.setStyle(style)
+        app.setStyle(style_config)
     else:
-        qt_themes.set_theme(theme, style)
+        if mica_effect not in ("default", "alt"):
+            qt_themes.set_theme(theme, style_config)
 
     main_window = DashboardUI()
     announcement = Announcement()

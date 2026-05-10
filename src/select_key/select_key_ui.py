@@ -11,7 +11,7 @@ from PySide6.QtCore import Qt, QPoint  # pylint: disable=E0611
 
 from utility import constant
 from utility import icons
-from utility import utils
+from utility import style
 from select_key.select_key_core import SelectKeyCore
 
 
@@ -44,9 +44,9 @@ class SelectKeyUI():
         select_key_window = QDialog(parent_window)
         select_key_window.setWindowTitle("Select Key")
         select_key_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = utils.get_geometry(parent_window, 400, 430)
+        geometry = style.get_geometry(parent_window, 400, 430)
         select_key_window.setGeometry(geometry)
-        utils.apply_mica(select_key_window)
+        style.apply_mica(select_key_window)
 
         main_layout = QVBoxLayout(select_key_window)
         # Top part

@@ -12,6 +12,7 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import utils
 from utility import constant
+from utility import style
 
 
 class SelectDevice():
@@ -37,12 +38,12 @@ class SelectDevice():
         device_selection_window = QDialog(parent)
         device_selection_window.setWindowTitle("Select Device")
         device_selection_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = utils.get_geometry(parent, 620, 300)
+        geometry = style.get_geometry(parent, 620, 300)
         device_selection_window.setGeometry(geometry)
         device_selection_window.setModal(True)
         device_selection_window.setAttribute(
             Qt.WidgetAttribute.WA_DeleteOnClose)
-        utils.apply_mica(device_selection_window)
+        style.apply_mica(device_selection_window)
 
         main_layout = QVBoxLayout(device_selection_window)
 

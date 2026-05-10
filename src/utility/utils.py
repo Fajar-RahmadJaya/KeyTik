@@ -1,11 +1,9 @@
 "Utility module"
 import os
 import json
-import sys
 from dataclasses import dataclass
 import winreg
-from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
-import win32mica
+
 
 from utility import constant
 
@@ -154,30 +152,6 @@ device_finder_path = os.path.join(
 coordinate_path = os.path.join(
     active_dir, "Autohotkey Interception", "Coordinate.ahk")
 
-def get_theme():
-    "Add system to the theme"
-    current_theme = get_config().theme
-    if current_theme == "system":
-        theme = detect_system_theme()
-    else:
-        theme = current_theme
-
-    return theme
-
-def detect_system_theme():
-    "Detecting system theme for Pyside6 default theme handling"
-    if sys.platform == "win32":
-        try:
-            registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
-            theme_registry = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-            key = winreg.OpenKey(registry, theme_registry)
-            value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
-            winreg.CloseKey(key)
-            return "dark" if value == 0 else "light"
-        except FileNotFoundError:
-            print("Theme registry not found.")
-    return "light"
-
 def get_ahk_install_dir():
     "Get AutoHotkey installation directory in case not installed via other method"
     reg_paths = [
@@ -199,30 +173,3 @@ ahk_uninstall_path = os.path.join(
     "UX",
     "ui-uninstall.ahk")
 ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")
-
-def get_geometry(parent_window, width, height):
-    "Get x and y centered relative to parent window"
-    parent_geometry = parent_window.geometry()
-    parent_x = parent_geometry.x()
-    parent_y = parent_geometry.y()
-    parent_width = parent_geometry.width()
-    parent_height = parent_geometry.height()
-
-    x = parent_x + (parent_width - width) // 2
-    y = parent_y + (parent_height - height) // 2
-    return QRect(x, y, width, height)
-
-mica_supported = bool(sys.getwindowsversion().build >= 22000)
-
-def apply_mica(target_window):
-    "Apply mica style on target window using win32mica"
-    theme = get_theme().upper()
-    mica_effect = get_config().mica_effect.upper()
-
-    if mica_effect != "DISABLE" and mica_supported:
-        target_window.setAttribute(Qt.WA_TranslucentBackground)
-        win32mica.ApplyMica(
-            HWND=int(target_window.winId()),
-            Theme=getattr(win32mica.MicaTheme, theme),
-            Style=getattr(win32mica.MicaStyle, mica_effect)
-        )

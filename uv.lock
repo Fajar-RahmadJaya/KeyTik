@@ -162,6 +162,7 @@ dependencies = [
     { name = "qt-themes" },
     { name = "requests" },
     { name = "win32mica" },
+    { name = "winaccent" },
     { name = "winshell" },
 ]
 
@@ -184,6 +185,7 @@ requires-dist = [
     { name = "qt-themes", specifier = ">=0.4.0" },
     { name = "requests", specifier = ">=2.33.1,<3.0.0" },
     { name = "win32mica", specifier = ">=3.0" },
+    { name = "winaccent", specifier = ">=2.1.0" },
     { name = "winshell", specifier = ">=0.6,<0.7" },
 ]
 
@@ -3042,6 +3044,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9c/91/8aecf60b274ac4192f88ded4b4f6c9b3ed4868eecc845b5479b49337dc92/win32mica-3.0.tar.gz", hash = "sha256:87dcbd7d098bc9e778bd7035a81831ddd952e37ac7eafbc82105fc316a629945", size = 5854, upload-time = "2023-08-31T21:29:59.362Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/44/37/fe689f99ebaf08c082fd0fce61f38b92d88b047e9270d58f4f04caae9a0f/win32mica-3.0-py3-none-any.whl", hash = "sha256:8e4c0454f886aad095197adfcc24c58bc83b5f26bb951c461dc1509448600b9d", size = 5625, upload-time = "2023-08-31T21:29:57.923Z" },
+]
+
+[[package]]
+name = "winaccent"
+version = "2.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/cc/5e65bcec8918da4e1758da8220ef1029a77eda5e316db695c3c6a9a0a182/winaccent-2.1.0.tar.gz", hash = "sha256:ced57c42ae0ce768ee45ca6d38bc3cc3a80603eddbc6ce4d8597275a9d296fa1", size = 18644, upload-time = "2025-06-24T16:36:09.303Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2e/d7/0f2a069e8c6f5f279b3136e1e02f479a1e742ad7a03b16182e9d540129b2/winaccent-2.1.0-py3-none-any.whl", hash = "sha256:91595b7a1586a37332590744fba6028130f06291ff0c302bca56779edb9ace42", size = 17033, upload-time = "2025-06-24T16:36:08.335Z" },
 ]
 
 [[package]]

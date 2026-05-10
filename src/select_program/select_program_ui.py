@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt, QTimer  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
-from utility import utils
+from utility import style
 from select_program.select_program_core import SelectProgramCore
 
 
@@ -26,12 +26,12 @@ class SelectProgramUI():
         select_program_window = QDialog(parent)
         select_program_window.setWindowTitle("Select Programs")
         select_program_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = utils.get_geometry(parent, 620, 300)
+        geometry = style.get_geometry(parent, 620, 300)
         select_program_window.setGeometry(geometry)
         select_program_window.setModal(True)
         select_program_window.setAttribute(
             Qt.WidgetAttribute.WA_DeleteOnClose)
-        utils.apply_mica(select_program_window)
+        style.apply_mica(select_program_window)
 
         main_layout = QVBoxLayout(select_program_window)
 

@@ -1,6 +1,7 @@
 "Contain styling code"
 
 import qt_themes
+from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 
 from utility import utils
 
@@ -69,6 +70,26 @@ def setting_card_style():
     QFrame#settingCardFrame {{
         background: {SURFACE0};
         border-radius: 4;
+    }}
+    """
+
+    return style_sheet
+
+def button_highlight(button):
+    "Highlighted button, use accent color"
+    accent = button.palette().color(QPalette.Accent)
+    button_text = button.palette().color(QPalette.ButtonText)
+    invert_button_text = QColor(255 - button_text.red(), 255 - button_text.green(),
+                                255 - button_text.blue(), button_text.alpha())
+
+    style_sheet = f"""
+    QPushButton {{
+        background-color: {accent.name()};
+        color: {invert_button_text.name()};
+    }}
+    QPushButton:hover {{
+        background-color: {accent.setAlphaF(0.85)};
+        color: {invert_button_text.name()};
     }}
     """
 

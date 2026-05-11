@@ -33,11 +33,15 @@ class ProfileUI():
 
     def edit_script(self, script_name, parent):
         "Create/edit profile window"
-        # Handle create new profile
-        is_new_profile = not script_name
-        if is_new_profile:
+        self.edit_window = QDialog(parent)
+        # Handle Create New Profile
+        if not script_name:
             script_path = None
             lines = ["; default\n"]
+            first_line = lines[0].strip()
+
+            self.edit_window.setWindowTitle("Create New Profile")
+        # Handle Edit Profile
         else:
             script_path = os.path.join(self.main_core.script_dir, script_name)
             with open(script_path, 'r', encoding='utf-8') as file:
@@ -46,14 +50,8 @@ class ProfileUI():
             if not lines:
                 return
 
-        first_line = lines[0].strip()
-
-        # Edit window
-        self.edit_window = QDialog(parent)
-        if is_new_profile:
-            self.edit_window.setWindowTitle("Create New Profile")
-        else:
             self.edit_window.setWindowTitle("Edit Profile")
+
         self.edit_window.setWindowIcon(QIcon(constant.icon_path))
         geometry = style.get_geometry(parent, 640, 480)
         self.edit_window.setGeometry(geometry)

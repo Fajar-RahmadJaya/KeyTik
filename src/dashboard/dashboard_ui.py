@@ -320,7 +320,7 @@ class DashboardUI(QMainWindow):
         if was_running:
             self.dashboard_core.exit_script(script)
 
-        # Pass scrtip for editing script
+        # Pass script for editing script
         self.profile_ui.edit_script(script, self)
 
         if was_running:

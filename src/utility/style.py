@@ -110,7 +110,7 @@ def apply_pallette():
         color_role.append(role)
 
     for role, color in zip(color_role, active_colors):
-        palette.setColor(palette.ColorGroup.Active, role, QColor("#ffffff"))
+        palette.setColor(palette.ColorGroup.Active, role, color)
 
     for role, color in zip(color_role, inactive_colors):
         palette.setColor(palette.ColorGroup.Inactive, role, color)

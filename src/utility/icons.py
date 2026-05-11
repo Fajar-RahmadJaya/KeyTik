@@ -7,29 +7,37 @@ from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 
 from utility import constant
+from utility import style
 
 
 icon_cache = {}
 
-def get_icon(path):
+def get_icon(path, highlighted=False):
     "Cache icon"
     # Get palette
     palette = QApplication.palette()
-    text_palette = palette.color(QPalette.Text).name()
+    text_palette = palette.color(QPalette.Text)
+    invert_text_palette = style.invert_color(text_palette)
+
+    if highlighted:
+        color = invert_text_palette.name()
+    else:
+        color = text_palette.name()
 
     # Apply color
-    if path not in icon_cache:
+    cache_key = (path, color)
+    if cache_key not in icon_cache:
         renderer = QSvgRenderer(path)
         pixmap = QPixmap(32, 32)
         pixmap.fill(Qt.transparent)
         painter = QPainter(pixmap)
         renderer.render(painter)
         painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-        painter.fillRect(pixmap.rect(), QColor(text_palette))
+        painter.fillRect(pixmap.rect(), QColor(color))
         painter.end()
+        icon_cache[cache_key] = QIcon(pixmap)
 
-        icon_cache[path] = QIcon(pixmap)
-    return icon_cache[path]
+    return icon_cache[cache_key]
 
 icon_dir = os.path.join(constant.script_dir, '_internal', 'Data', 'icon')
 

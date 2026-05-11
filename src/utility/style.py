@@ -140,6 +140,8 @@ def setting_card_style():
 def button_highlight(button):
     "Highlighted button, use accent color"
     accent = button.palette().color(QPalette.Accent)
+    accent_hover = f"rgba({accent.red()}, {accent.green()}, {accent.blue()}, 0.85)"
+
     button_text = button.palette().color(QPalette.ButtonText)
     invert_button_text = QColor(255 - button_text.red(), 255 - button_text.green(),
                                 255 - button_text.blue(), button_text.alpha())
@@ -150,7 +152,7 @@ def button_highlight(button):
         color: {invert_button_text.name()};
     }}
     QPushButton:hover {{
-        background-color: {accent.setAlphaF(0.85)};
+        background-color: {accent_hover};
         color: {invert_button_text.name()};
     }}
     """

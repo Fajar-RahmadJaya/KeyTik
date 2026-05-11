@@ -5,6 +5,7 @@ import re
 import winreg
 from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
+from PySide6.QtWidgets import QPushButton  # pylint: disable=E0611
 import qt_themes
 import win32mica
 
@@ -120,6 +121,15 @@ def apply_pallette():
 
     return palette
 
+def color_rgba(color: QColor, alpha: float):
+    "Transform QColor into RGBA"
+    red = color.red()
+    green = color.green()
+    blue = color.blue()
+
+    rgba = f"rgba({red}, {green}, {blue}, {alpha})"
+    return rgba
+
 # ---------------------------- Variables ----------------------------
 THEME = get_theme()
 
@@ -136,6 +146,28 @@ else:
     SURFACE0 = qt_theme_dict.surface0.name()
     MANTLE = qt_theme_dict.mantle.name()
     SUBTEXT0 = qt_theme_dict.subtext0.name()
+
+# ---------------------------- Shared ----------------------------------------
+def win11_button(button: QPushButton):
+    "Style mimicking windows11 style since windows 11 overwrite palette"
+    palette = button.palette()
+    background = palette.color(QPalette.Button)
+    border = palette.color(QPalette.Midlight)
+
+    style_sheet = f"""
+    QPushButton{{
+        background-color: {color_rgba(background, alpha=0.7)};
+        border: 1px solid {color_rgba(border, alpha=0.4)};
+        border-radius: 4px;
+        margin: 2px;
+        }}
+
+        QPushButton:hover {{
+            background-color: {color_rgba(background, alpha=0.95)};
+        }}
+    """
+
+    return style_sheet
 
 # ---------------------------- Create/Edit Profile ----------------------------
 def card_style(object_name):

@@ -5,7 +5,7 @@ import winshell
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMainWindow, QWidget, QVBoxLayout, QGridLayout,
     QFrame, QPushButton, QGroupBox, QLabel, QSizePolicy)
-from PySide6.QtGui import QIcon, QPalette, QColor  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 
@@ -249,35 +249,7 @@ class DashboardUI(QMainWindow):
         edit_button.setToolTip(f'Adjust "{os.path.splitext(script)[0]}"')
         edit_button.clicked.connect(lambda: self.handle_edit(script))
 
-        palette = edit_button.palette()
-        background = palette.color(QPalette.Button)
-        border = palette.color(QPalette.Midlight)
-        edit_button.setStyleSheet(f"""
-                                  QPushButton{{
-                                  background-color: {self.qcolor_to_rgba(
-                                      background, 0.7)};
-                                  border: 1px solid {self.qcolor_to_rgba(
-                                                        border, 0.4)};
-                                  border-radius: 4px;
-                                  margin: 2px;
-                                  }}
-
-                                QPushButton:hover {{
-                                    background-color: {self.qcolor_to_rgba(
-                                        background, 0.95)};
-                                }}
-
-                                """)
-
         return edit_button
-
-    def qcolor_to_rgba(self, color: QColor, alpha: float):
-        red = color.red()
-        green = color.green()
-        blue = color.blue()
-
-        rgba = f"rgba({red}, {green}, {blue}, {alpha})"
-        return rgba
 
     def startup_button(self, script):
         "Profile card startup button"

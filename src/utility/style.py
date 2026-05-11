@@ -124,13 +124,13 @@ def apply_pallette():
 THEME = get_theme()
 
 if THEME == "dark":
-    SURFACE0 = "rgba(255, 255, 255, 0.052)"
-    MANTLE = "rgba(255, 255, 255, 0.18)"
-    SUBTEXT0 = "rgba(255,255,255,0.8)"
+    SURFACE0 = "rgba(255, 255, 255, 0.06)"
+    MANTLE = "rgba(255, 255, 255, 0.1)"
+    SUBTEXT0 = "rgba(255, 255, 255, 0.566)"
 elif THEME == "light":
-    SURFACE0 = "rgba(255, 255, 255, 0.60)"
-    MANTLE = "rgba(0, 0, 0, 0.08)"
-    SUBTEXT0 = "rgba(255,255,255,0.8)"
+    SURFACE0 = "rgba(255, 255, 255, 0.7)"
+    MANTLE = "rgba(0, 0, 0, 0.06)"
+    SUBTEXT0 = "rgba(0, 0, 0, 0.6)"
 else:
     qt_theme_dict = qt_themes.get_theme(get_theme())
     SURFACE0 = qt_theme_dict.surface0.name()

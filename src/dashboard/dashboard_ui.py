@@ -131,7 +131,8 @@ class DashboardUI(QMainWindow):
         button_layout.addWidget(dummy_left, 0, 3)
 
         create_button = QPushButton(" Create New Profile")
-        create_button.setIcon(icons.get_icon(icons.plus))
+        create_button.setStyleSheet(style.button_highlight(create_button))
+        create_button.setIcon(icons.get_icon(icons.plus, highlighted=True))
         create_button.setFixedWidth(152)
         create_button.setFixedHeight(36)
         create_button.clicked.connect(lambda: self.profile_ui.edit_script(None, self))

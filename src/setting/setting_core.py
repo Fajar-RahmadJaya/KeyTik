@@ -31,7 +31,7 @@ class SettingCore():
             # Exit all script first to prevent administrator issue
             running_scripts = dashboard_core.get_running_ahk()
             for script in running_scripts:
-                dashboard_core.exit_script(script_name=script, button=None)
+                dashboard_core.exit_script(script_name=script)
 
             if not os.path.exists(new_path):
                 print(f"The selected path does not exist: {new_path}")
@@ -66,7 +66,7 @@ class SettingCore():
 
             # Reactive script after move profile successfully
             for script in running_scripts:
-                dashboard_core.activate_script(script, button=None)
+                dashboard_core.activate_script(script)
 
             QMessageBox.information(
                 None, "Change Profile Location",

@@ -189,7 +189,7 @@ class DashboardCore(QObject):
             QMessageBox.warning(None, "Error",
                                 f"{script_name} does not exist.")
 
-    def activate_script(self, script_name, button):
+    def activate_script(self, script_name):
         "Run profile"
         if os.path.isfile(os.path.join(utils.active_dir, script_name)):
             script_path = os.path.join(utils.active_dir, script_name)
@@ -199,18 +199,10 @@ class DashboardCore(QObject):
         if os.path.isfile(script_path):
 
             os.startfile(script_path)
-
-            if button:
-                button.setText(" Exit")
-                button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"')
-                button.setIcon(icons.get_icon(icons.icon_exit))
-                button.clicked.disconnect()
-                button.clicked.connect(lambda: self.exit_script(script_name,
-                                                                button))
         else:
             QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
-    def exit_script(self, script_name, button):
+    def exit_script(self, script_name):
         "Exit profile"
         if os.path.isfile(os.path.join(utils.active_dir, script_name)):
             script_path = os.path.join(utils.active_dir, script_name)
@@ -240,14 +232,6 @@ class DashboardCore(QObject):
                 keyboard.release(Key.alt)
             if '^' in exit_combo:
                 keyboard.release(Key.ctrl)
-
-            if button:
-                button.setText(" Run")
-                button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"')
-                button.setIcon(icons.get_icon(icons.run))
-                button.clicked.disconnect()
-                button.clicked.connect(lambda: self.activate_script(
-                    script_name, button))
         else:
             QMessageBox.critical(None, "Error", f"{script_path} does not exist.")
 
@@ -271,21 +255,6 @@ class DashboardCore(QObject):
                 QMessageBox.critical(None, "Error", f"Failed to move the script: {e}")
         else:
             QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
-
-    def toggle_run_exit(self, script_name, button):
-        "Switch between run/exit on profile"
-        if button.text() == " Run":
-            self.activate_script(script_name, button)
-
-            button.clicked.disconnect()
-            button.clicked.connect(lambda checked=False: self.toggle_run_exit(
-                script_name, button))
-        else:
-            self.exit_script(script_name, button)
-
-            button.clicked.disconnect()
-            button.clicked.connect(lambda checked=False: self.toggle_run_exit(
-                script_name, button))
 
     def toggle_script_dir(self, show_stored):
         "Change current directory based on store/active profile"

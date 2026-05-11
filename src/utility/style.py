@@ -67,6 +67,13 @@ def apply_mica(target_window):
             Style=getattr(win32mica.MicaStyle, mica_effect)
         )
 
+def invert_color(color):
+    "Change color to the oposite of it"
+    inverted_color = QColor(255 - color.red(), 255 - color.green(),
+    255 - color.blue(), color.alpha())
+
+    return inverted_color
+
 # ---------------------------- Variables ----------------------------
 THEME = get_theme()
 
@@ -143,8 +150,7 @@ def button_highlight(button):
     accent_hover = f"rgba({accent.red()}, {accent.green()}, {accent.blue()}, 0.85)"
 
     button_text = button.palette().color(QPalette.ButtonText)
-    invert_button_text = QColor(255 - button_text.red(), 255 - button_text.green(),
-                                255 - button_text.blue(), button_text.alpha())
+    invert_button_text = invert_color(button_text)
 
     style_sheet = f"""
     QPushButton {{

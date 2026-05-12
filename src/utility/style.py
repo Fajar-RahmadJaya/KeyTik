@@ -81,13 +81,13 @@ def get_palette():
         surface = "rgba(255, 255, 255, 0.7)"
         mantle = "rgba(0, 0, 0, 0.06)"
         subtext = "rgba(0, 0, 0, 0.6)"
-        overlay = "rgba(255, 255, 255, 0.085)"
+        overlay = "rgba(0, 0, 0, 0.04)"
     else:
         qt_theme_dict = qt_themes.get_theme(THEME)
         surface = qt_theme_dict.surface0.name()
         mantle = qt_theme_dict.mantle.name()
         subtext = qt_theme_dict.subtext0.name()
-        overlay = "rgba(255, 255, 255, 0.085)"
+        overlay = qt_theme_dict.overlay0.name()
 
     palette = Palette(
         surface=surface,

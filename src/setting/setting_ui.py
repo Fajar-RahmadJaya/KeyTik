@@ -34,8 +34,8 @@ class SettingUI():
         "Setting card template"
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
-        card_frame.setObjectName("settingCardFrame")
-        card_frame.setStyleSheet(style.setting_card_style())
+        card_frame.setObjectName("setting")
+        card_frame.setStyleSheet(style.card("setting"))
 
         card_layout = QHBoxLayout(card_frame)
         card_layout.setContentsMargins(16, 16, 16, 16)

@@ -1,46 +1,34 @@
 "Contain styling code"
 
+from dataclasses import dataclass
 import sys
 import re
 import winreg
 from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
 from PySide6.QtWidgets import QPushButton  # pylint: disable=E0611
+
 import qt_themes
 import win32mica
 
 from utility import utils
 
-# ---------------------------- Utility ------------------------------
-def get_geometry(parent_window, width, height):
-    "Get x and y centered relative to parent window"
-    parent_geometry = parent_window.geometry()
-    parent_x = parent_geometry.x()
-    parent_y = parent_geometry.y()
-    parent_width = parent_geometry.width()
-    parent_height = parent_geometry.height()
+# ---------------------------- Palatte ------------------------------
+def color_rgba(color: QColor, alpha: float):
+    "Transform QColor into RGBA"
+    red = color.red()
+    green = color.green()
+    blue = color.blue()
 
-    x = parent_x + (parent_width - width) // 2
-    y = parent_y + (parent_height - height) // 2
-    return QRect(x, y, width, height)
+    rgba = f"rgba({red}, {green}, {blue}, {alpha})"
+    return rgba
 
-mica_supported = bool(sys.getwindowsversion().build >= 22000)
+def invert_color(color):
+    "Change color to the oposite of it"
+    inverted_color = QColor(255 - color.red(), 255 - color.green(),
+    255 - color.blue(), color.alpha())
 
-def get_theme():
-    "Add system to the theme"
-    config = utils.get_config()
-
-    if config.theme == "system":
-        theme = detect_system_theme()
-    elif config.theme in ("light", "dark"):
-        theme = config.theme
-    else:
-        if config.mica_effect != "disable":
-            theme = detect_system_theme()
-        else:
-            theme = config.theme
-
-    return theme
+    return inverted_color
 
 def detect_system_theme():
     "Detecting system theme for Pyside6 default theme handling"
@@ -56,25 +44,74 @@ def detect_system_theme():
             print("Theme registry not found.")
     return "light"
 
+def get_theme():
+    "Add system to the theme"
+    config = utils.get_config()
+
+    if config.theme == "system":
+        current_theme = detect_system_theme()
+    elif config.theme in ("light", "dark"):
+        current_theme = config.theme
+    else:
+        if config.mica_effect != "disable":
+            current_theme = detect_system_theme()
+        else:
+            current_theme = config.theme
+
+    return current_theme
+
+THEME = get_theme()
+
+@dataclass
+class Palette:
+    "Dataclass to hold palette used on styling"
+    surface: str
+    mantle: str
+    subtext: str
+    overlay: str
+
+def get_palette():
+    "Get color palette on various theme"
+    if THEME == "dark":
+        surface = "rgba(255, 255, 255, 0.06)"
+        mantle = "rgba(255, 255, 255, 0.11)"
+        subtext = "rgba(255, 255, 255, 0.566)"
+        overlay = "rgba(255, 255, 255, 0.085)"
+    elif THEME == "light":
+        surface = "rgba(255, 255, 255, 0.7)"
+        mantle = "rgba(0, 0, 0, 0.06)"
+        subtext = "rgba(0, 0, 0, 0.6)"
+        overlay = "rgba(255, 255, 255, 0.085)"
+    else:
+        qt_theme_dict = qt_themes.get_theme(THEME)
+        surface = qt_theme_dict.surface0.name()
+        mantle = qt_theme_dict.mantle.name()
+        subtext = qt_theme_dict.subtext0.name()
+        overlay = "rgba(255, 255, 255, 0.085)"
+
+    palette = Palette(
+        surface=surface,
+        mantle=mantle,
+        subtext=subtext,
+        overlay=overlay
+    )
+
+    return palette
+
+PALETTE = get_palette()
+
+mica_supported = bool(sys.getwindowsversion().build >= 22000)
 def apply_mica(target_window):
     "Apply mica style on target window using win32mica"
-    theme = get_theme().upper()
     mica_effect = utils.get_config().mica_effect.upper()
 
     if mica_effect != "DISABLE" and mica_supported:
         target_window.setAttribute(Qt.WA_TranslucentBackground)
         win32mica.ApplyMica(
             HWND=int(target_window.winId()),
-            Theme=getattr(win32mica.MicaTheme, theme),
+            Theme=getattr(win32mica.MicaTheme, THEME.upper()),
             Style=getattr(win32mica.MicaStyle, mica_effect)
         )
-
-def invert_color(color):
-    "Change color to the oposite of it"
-    inverted_color = QColor(255 - color.red(), 255 - color.green(),
-    255 - color.blue(), color.alpha())
-
-    return inverted_color
 
 def apply_pallette():
     "Use conf from qtct as pallate"
@@ -121,108 +158,79 @@ def apply_pallette():
 
     return palette
 
-def color_rgba(color: QColor, alpha: float):
-    "Transform QColor into RGBA"
-    red = color.red()
-    green = color.green()
-    blue = color.blue()
+# ---------------------------- Styling ------------------------------
+def get_geometry(parent_window, width, height):
+    "Get x and y centered relative to parent window"
+    parent_geometry = parent_window.geometry()
+    parent_x = parent_geometry.x()
+    parent_y = parent_geometry.y()
+    parent_width = parent_geometry.width()
+    parent_height = parent_geometry.height()
 
-    rgba = f"rgba({red}, {green}, {blue}, {alpha})"
-    return rgba
+    x = parent_x + (parent_width - width) // 2
+    y = parent_y + (parent_height - height) // 2
+    return QRect(x, y, width, height)
 
-# ---------------------------- Variables ----------------------------
-THEME = get_theme()
+# -------------------- Shared --------------------
+WIN11_BUTTON = f"""
+QPushButton{{
+    background-color: {PALETTE.surface};
+    border: 1px solid {PALETTE.mantle};
+    border-radius: 4px;
+    margin: 2px;
+}}
 
-if THEME == "dark":
-    SURFACE0 = "rgba(255, 255, 255, 0.06)"
-    MANTLE = "rgba(255, 255, 255, 0.1)"
-    SUBTEXT0 = "rgba(255, 255, 255, 0.566)"
-elif THEME == "light":
-    SURFACE0 = "rgba(255, 255, 255, 0.7)"
-    MANTLE = "rgba(0, 0, 0, 0.06)"
-    SUBTEXT0 = "rgba(0, 0, 0, 0.6)"
-else:
-    qt_theme_dict = qt_themes.get_theme(get_theme())
-    SURFACE0 = qt_theme_dict.surface0.name()
-    MANTLE = qt_theme_dict.mantle.name()
-    SUBTEXT0 = qt_theme_dict.subtext0.name()
+QPushButton:hover {{
+    background-color: {PALETTE.overlay};
+}}
+"""
 
-# ---------------------------- Shared ----------------------------------------
-def win11_button(button: QPushButton):
-    "Style mimicking windows11 style since windows 11 overwrite palette"
-    palette = button.palette()
-    background = palette.color(QPalette.Button)
-    border = palette.color(QPalette.Midlight)
-
-    style_sheet = f"""
-    QPushButton{{
-        background-color: {color_rgba(background, alpha=0.7)};
-        border: 1px solid {color_rgba(border, alpha=0.4)};
-        border-radius: 4px;
-        margin: 2px;
-        }}
-
-        QPushButton:hover {{
-            background-color: {color_rgba(background, alpha=0.95)};
-        }}
-    """
-
-    return style_sheet
-
-# ---------------------------- Create/Edit Profile ----------------------------
-def card_style(object_name):
+def card(object_name=None):
     "Card like styling"
-    style_sheet = f"""
-    QFrame#{object_name} {{
-        background: {SURFACE0};
-        border-radius: 8;
-    }}
-    """
-    return style_sheet
+    if object_name == "setting":
+        border_radius = 4
+        widget = f"QFrame#{object_name}"
+    else:
+        border_radius = 8
+        widget = "QFrame"
 
-# ---------------------------- Dashboard ----------------------------
-def group_box_style(object_name):
-    "Profile card group box styling"
     style_sheet = f"""
-    QGroupBox#{object_name} {{
-            background-color: {SURFACE0};
-            border: 1px solid {MANTLE};
-            border-radius: 8;
-            margin-top: 1.5ex;
-    }}
-    QGroupBox:title#{object_name} {{
-        subcontrol-origin: margin;
-        subcontrol-position: top left;
-        left: 8px;
+    {widget} {{
+        background: {PALETTE.surface};
+        border-radius: {border_radius};
     }}
     """
 
     return style_sheet
 
+# -------------------- Dashboard --------------------
 PROFILE_ROW_LABEL = "font-size: 13px; font-weight: bold;"
-
+TEXT_BLOCK = "font-family: Consolas; font-size: 10pt;"
 PLUS_LABEL = """
     color: gray;
     padding: 0 5px;
     font-size: 14px;
     font-weight: bold;
 """
+GROUP_BOX = f"""
+QGroupBox {{
+    background-color: {PALETTE.surface};
+    border: 1px solid {PALETTE.mantle};
+    border-radius: 8;
+    margin-top: 1.5ex;
+}}
 
-TEXT_BLOCK = "font-family: Consolas; font-size: 10pt;"
+QGroupBox:title {{
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 8px;
+}}"""
 
-# ---------------------------- Setting ----------------------------
-def setting_card_style():
-    "Setting card, slightly different than create/edit profile card"
-    style_sheet = f"""
-    QFrame#settingCardFrame {{
-        background: {SURFACE0};
-        border-radius: 4;
-    }}
-    """
+# -------------------- Setting --------------------
+HEADING_STYLE = "font-size:13px; margin-bottom:2px"
+SUBHEADING_STYLE = f"font-size:11px; color: {PALETTE.subtext};"
 
-    return style_sheet
-
-def button_highlight(button):
+def button_highlight(button: QPushButton):
     "Highlighted button, use accent color"
     accent = button.palette().color(QPalette.Accent)
     accent_hover = f"rgba({accent.red()}, {accent.green()}, {accent.blue()}, 0.85)"
@@ -242,7 +250,3 @@ def button_highlight(button):
     """
 
     return style_sheet
-
-HEADING_STYLE = "font-size:13px; margin-bottom:2px"
-
-SUBHEADING_STYLE = f"font-size:11px; color: {SUBTEXT0};"

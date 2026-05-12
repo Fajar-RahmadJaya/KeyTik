@@ -168,8 +168,7 @@ class DashboardUI(QMainWindow):
     def profile_card(self, script, row, column):
         "Profile action"
         group_box = QGroupBox(os.path.splitext(script)[0])
-        group_box.setObjectName("groupBox")
-        group_box.setStyleSheet(style.group_box_style("groupBox"))
+        group_box.setStyleSheet(style.GROUP_BOX)
 
         group_layout = QGridLayout(group_box)
         group_layout.setContentsMargins(12, 14, 12, 12)
@@ -248,6 +247,7 @@ class DashboardUI(QMainWindow):
         edit_button.setIcon(icons.get_icon(icons.edit))
         edit_button.setToolTip(f'Adjust "{os.path.splitext(script)[0]}"')
         edit_button.clicked.connect(lambda: self.handle_edit(script))
+        edit_button.setStyleSheet(style.WIN11_BUTTON)
 
         return edit_button
 

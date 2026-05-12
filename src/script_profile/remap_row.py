@@ -205,8 +205,7 @@ class RemapRow():
         # Remap row card
         card_frame = QFrame(self.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
-        card_frame.setObjectName("remapCardFrame")
-        card_frame.setStyleSheet(style.card_style("remapCardFrame"))
+        card_frame.setStyleSheet(style.card())
 
         card_layout = QVBoxLayout(card_frame)
         card_layout.setContentsMargins(8, 8, 8, 8)
@@ -533,8 +532,7 @@ class ShortcutRow():
         # Card frame
         card_frame = QFrame(self.remap_row_comp.edit_frame)
         card_frame.setFrameShape(QFrame.NoFrame)
-        card_frame.setObjectName("shortcutCardFrame")
-        card_frame.setStyleSheet(style.card_style("shortcutCardFrame"))
+        card_frame.setStyleSheet(style.card())
 
         card_layout = QVBoxLayout(card_frame)
         card_layout.setContentsMargins(8, 8, 8, 8)

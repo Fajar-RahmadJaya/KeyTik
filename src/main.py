@@ -18,9 +18,8 @@ def main():
     "Main function"
     # Set Appearance
     theme = style.get_theme()
-    style_config = utils.get_config().style
-    config = utils.get_config()
 
+    # Set normal dark and light theme
     if theme == "dark":
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
     elif theme == "light":
@@ -28,6 +27,8 @@ def main():
 
     app = QApplication(sys.argv)
 
+    # Only set accent palatte if mica enabled and using qt-themes
+    config = utils.get_config()
     if (config.mica_effect != "disabled"
         and config.theme not in ("light", "dark", "system")):
         accent_palette = qt_themes.get_theme(config.theme).secondary
@@ -37,17 +38,20 @@ def main():
 
         app.setPalette(palette)
 
+    # Set the style and theme
+    style_config = utils.get_config().style
     if theme in ("dark", "light"):
         app.setStyle(style_config)
     else:
         qt_themes.set_theme(theme, style_config)
 
     main_window = DashboardUI()
+    main_window.show()
+
+    # Thread
     announcement = Announcement()
     setting_ui = SettingUI()
     dashboad_core = DashboardCore()
-
-    main_window.show()
 
     main_window.startup_worker = thread.Thread(main_window)
     # Connect signal from thread

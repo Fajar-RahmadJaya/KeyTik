@@ -247,7 +247,6 @@ class DashboardUI(QMainWindow):
         edit_button.setIcon(icons.get_icon(icons.edit))
         edit_button.setToolTip(f'Adjust "{os.path.splitext(script)[0]}"')
         edit_button.clicked.connect(lambda: self.handle_edit(script))
-        edit_button.setStyleSheet(style.WIN11_BUTTON)
 
         return edit_button
 

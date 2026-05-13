@@ -210,7 +210,8 @@ class SettingUI():
             catppuccin_theme = file.replace('.conf', '')
             theme_combobox.addItem(catppuccin_theme.replace('-', ' ').title(), catppuccin_theme)
 
-        theme_combobox.setCurrentText(utils.get_config().theme.replace('_', ' ').title())
+        current_text = utils.get_config().theme.replace('_', ' ').replace('-', ' ').title()
+        theme_combobox.setCurrentText(current_text)
         theme_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_theme(theme=theme_combobox.currentData(),
                                                     parent=settings_window))

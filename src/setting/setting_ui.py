@@ -201,17 +201,9 @@ class SettingUI():
         # qt-themes theme
         qt_themes_dict = qt_themes.get_themes()
         for theme, _ in qt_themes_dict.items():
-            if not theme.startswith("catppuccin"):
-                theme_combobox.addItem(theme.replace('_', ' ').title(), theme)
+            theme_combobox.addItem(theme.replace('_', ' ').title(), theme)
 
-        # conf theme
-        conf_list = self.setting_core.catppuccin_conf()
-        for file in conf_list:
-            catppuccin_theme = file.replace('.conf', '')
-            theme_combobox.addItem(catppuccin_theme.replace('-', ' ').title(), catppuccin_theme)
-
-        current_text = utils.get_config().theme.replace('_', ' ').replace('-', ' ').title()
-        theme_combobox.setCurrentText(current_text)
+        theme_combobox.setCurrentText(utils.get_config().theme.replace('_', ' ').title())
         theme_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_theme(theme=theme_combobox.currentData(),
                                                     parent=settings_window))

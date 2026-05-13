@@ -2,9 +2,7 @@
 
 from dataclasses import dataclass
 import sys
-import re
 import winreg
-import os
 from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
 from PySide6.QtWidgets import QPushButton, QApplication  # pylint: disable=E0611
@@ -13,7 +11,6 @@ import qt_themes
 import win32mica
 
 from utility import utils
-from utility import constant
 
 # ---------------------------- Palatte ------------------------------
 def color_rgba(color: QColor, alpha: float):
@@ -107,40 +104,6 @@ def apply_mica(target_window):
             Style=getattr(win32mica.MicaStyle, mica_effect.upper())
         )
 
-def apply_pallette(conf_name):
-    "Apply global palatte from qtct conf file"
-    conf_path = os.path.join(constant.data_dir, 'conf', 'catppuccin', conf_name + '.conf')
-
-    try:
-        with open(conf_path, "r", encoding="utf-8") as file:
-            color_scheme = file.read()
-    except FileNotFoundError as error:
-        print(f"Error: {error}")
-
-    # Set palette
-    palette = QPalette()
-
-    active = [c.strip() for c in
-              re.search(r"active_colors=(.*)", color_scheme).group(1).split(",")]
-    disabled = [c.strip() for c in
-                re.search(r"disabled_colors=(.*)", color_scheme).group(1).split(",")]
-    inactive = [c.strip() for c in
-                re.search(r"inactive_colors=(.*)", color_scheme).group(1).split(",")]
-
-    for (role, active_color,
-         disabled_color, inactive_color) in zip(palette.ColorRole, active,
-                                                disabled, inactive ):
-        # Active Color
-        palette.setColor(palette.ColorGroup.Active, role, active_color)
-
-        # Disabled Color
-        palette.setColor(palette.ColorGroup.Disabled, role, disabled_color)
-
-        # Inactive Color
-        palette.setColor(palette.ColorGroup.Inactive, role, inactive_color)
-
-    return palette
-
 def set_appearance(app: QApplication):
     "Set global appearance based on user config using palette and style"
     # Variables
@@ -152,24 +115,14 @@ def set_appearance(app: QApplication):
     if (config.mica_effect != "disable"
         and config.theme not in ("light", "dark", "system")):
 
-        if any(theme in theme_name for theme_name, _ in qt_themes_dict.items()):
-            print(theme)
-            accent_palette = qt_themes.get_theme(config.theme).secondary
-        else:
-            conf_palette = apply_pallette(config.theme)
-            accent_palette = conf_palette.color(QPalette.Accent)
-
         palette = QPalette()
+        accent_palette = qt_themes.get_theme(config.theme).secondary
         palette.setColor(QPalette.ColorRole.Accent, QColor(accent_palette))
         app.setPalette(palette)
 
     # Set the style and theme
     style_config = utils.get_config().style
     if theme in ("dark", "light"):
-        app.setStyle(style_config)
-    elif theme.startswith("catppuccin"):
-        conf_palette = apply_pallette(config.theme)
-        app.setPalette(conf_palette)
         app.setStyle(style_config)
     elif any(theme in theme_name for theme_name, _ in qt_themes_dict.items()):
         qt_themes.set_theme(theme, style_config)

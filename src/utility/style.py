@@ -25,7 +25,7 @@ def color_rgba(color: QColor, alpha: float):
     rgba = f"rgba({red}, {green}, {blue}, {alpha})"
     return rgba
 
-def invert_color(color):
+def invert_color(color: QColor):
     "Change color to the oposite of it"
     inverted_color = QColor(255 - color.red(), 255 - color.green(),
     255 - color.blue(), color.alpha())
@@ -46,24 +46,6 @@ def detect_system_theme():
             print("Theme registry not found.")
     return "light"
 
-def get_theme():
-    "Add system to the theme"
-    config = utils.get_config()
-
-    if config.theme == "system":
-        current_theme = detect_system_theme()
-    elif config.theme in ("light", "dark"):
-        current_theme = config.theme
-    else:
-        if config.mica_effect != "disable":
-            current_theme = detect_system_theme()
-        else:
-            current_theme = config.theme
-
-    return current_theme
-
-THEME = get_theme()
-
 @dataclass
 class Palette:
     "Dataclass to hold palette used on styling"
@@ -74,23 +56,26 @@ class Palette:
 
 def get_palette():
     "Get color palette on various theme"
-    if THEME == "dark":
+    config = utils.get_config()
+    theme = detect_system_theme() if config.theme == "system" else config.theme
+
+    if theme == "dark":
         surface = "rgba(255, 255, 255, 0.06)"
         mantle = "rgba(255, 255, 255, 0.11)"
         subtext = "rgba(255, 255, 255, 0.566)"
         overlay = "rgba(255, 255, 255, 0.085)"
-    elif THEME == "light":
+    elif theme == "light":
         surface = "rgba(255, 255, 255, 0.7)"
         mantle = "rgba(0, 0, 0, 0.06)"
         subtext = "rgba(0, 0, 0, 0.6)"
         overlay = "rgba(0, 0, 0, 0.04)"
-    elif THEME.startswith("catppuccin"):
+    elif theme.startswith("catppuccin"):
         surface = "rgba(76, 79, 105, 0.7)"
         mantle = "rgba(76, 79, 105, 0.06)"
         subtext = "rgba(76, 79, 105, 0.6)"
         overlay = "rgba(76, 79, 105, 0.04)"
     else:
-        qt_theme_dict = qt_themes.get_theme(THEME)
+        qt_theme_dict = qt_themes.get_theme(theme)
         surface = qt_theme_dict.surface0.name()
         mantle = qt_theme_dict.mantle.name()
         subtext = qt_theme_dict.subtext0.name()
@@ -110,14 +95,16 @@ PALETTE = get_palette()
 mica_supported = bool(sys.getwindowsversion().build >= 22000)
 def apply_mica(target_window):
     "Apply mica style on target window using win32mica"
-    mica_effect = utils.get_config().mica_effect.upper()
+    config = utils.get_config()
+    mica_effect = config.mica_effect
+    theme = detect_system_theme() if config.theme not in ("dark", "light") else config.theme
 
-    if mica_effect != "DISABLE" and mica_supported:
+    if mica_effect != "disable" and mica_supported:
         target_window.setAttribute(Qt.WA_TranslucentBackground)
         win32mica.ApplyMica(
             HWND=int(target_window.winId()),
-            Theme=getattr(win32mica.MicaTheme, THEME.upper()),
-            Style=getattr(win32mica.MicaStyle, mica_effect)
+            Theme=getattr(win32mica.MicaTheme, theme.upper()),
+            Style=getattr(win32mica.MicaStyle, mica_effect.upper())
         )
 
 def apply_pallette(conf_name):
@@ -130,39 +117,27 @@ def apply_pallette(conf_name):
     except FileNotFoundError as error:
         print(f"Error: {error}")
 
-    # Active Color
-    active_line = re.search(r"active_colors=(.*)", color_scheme)
-    active_colors = []
-    for color in active_line.group(1).split(","):
-        active_colors.append(QColor(color.strip()))
-
-    # Inactive Color
-    inactive_line = re.search(r"inactive_colors=(.*)", color_scheme)
-    inactive_colors = []
-    for color in inactive_line.group(1).split(","):
-        inactive_colors.append(QColor(color.strip()))
-
-    # Disabled Color
-    disabled_line = re.search(r"disabled_colors=(.*)", color_scheme)
-    disabled_colors = []
-    for color in disabled_line.group(1).split(","):
-        disabled_colors.append(QColor(color.strip()))
-
     # Set palette
     palette = QPalette()
 
-    color_role = []
-    for role in palette.ColorRole:
-        color_role.append(role)
+    active = [c.strip() for c in
+              re.search(r"active_colors=(.*)", color_scheme).group(1).split(",")]
+    disabled = [c.strip() for c in
+                re.search(r"disabled_colors=(.*)", color_scheme).group(1).split(",")]
+    inactive = [c.strip() for c in
+                re.search(r"inactive_colors=(.*)", color_scheme).group(1).split(",")]
 
-    for role, color in zip(color_role, active_colors):
-        palette.setColor(palette.ColorGroup.Active, role, color)
+    for (role, active_color,
+         disabled_color, inactive_color) in zip(palette.ColorRole, active,
+                                                disabled, inactive ):
+        # Active Color
+        palette.setColor(palette.ColorGroup.Active, role, active_color)
 
-    for role, color in zip(color_role, inactive_colors):
-        palette.setColor(palette.ColorGroup.Inactive, role, color)
+        # Disabled Color
+        palette.setColor(palette.ColorGroup.Disabled, role, disabled_color)
 
-    for role, color in zip(color_role, disabled_colors):
-        palette.setColor(palette.ColorGroup.Disabled, role, color)
+        # Inactive Color
+        palette.setColor(palette.ColorGroup.Inactive, role, inactive_color)
 
     return palette
 

@@ -108,18 +108,18 @@ def set_appearance(app: QApplication):
     accent = config.accent
     style = config.style
 
-    # set accent
-    if accent != "system":
-        palette = QPalette()
-        palette.setColor(QPalette.ColorRole.Accent, QColor(accent))
-        app.setPalette(palette)
-
     if theme in ("dark", "light"):
         # Set style only since dark and light theme assignment Done by os environ
         app.setStyle(style)
     elif any(theme in theme_name for theme_name, _ in qt_themes_dict.items()):
         # Set style and theme on qt-themes
         qt_themes.set_theme(theme, style)
+
+    # set accent
+    if accent != "default":
+        palette = QPalette()
+        palette.setColor(QPalette.ColorRole.Accent, QColor(accent))
+        app.setPalette(palette)
 
 # ---------------------------- Styling ------------------------------
 def get_geometry(parent_window, width, height):

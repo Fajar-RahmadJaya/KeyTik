@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QStyleFactory)
 from PySide6.QtGui import QIcon, QFont  # pylint: disable=E0611
 import qt_themes
+from catppuccin import PALETTE as catppuccin_palette
 
 from utility import constant
 from utility import utils
@@ -219,14 +220,27 @@ class SettingUI():
 
     def accent(self, settings_window):
         "Theme Widget"
+        config = utils.get_config()
         accent_combobox = self.setting_combobox()
 
         # Item data should be the color hex
         accent_combobox.addItem("Default", "default")
+        # Catppuccin Accent
+        for flavor in catppuccin_palette:
+            for color in flavor.colors:
+                if color.accent:
+                    accent_name = f"Catppuccin {flavor.name} {color.name}".title()
+                    accent_combobox.addItem(accent_name, color.hex)
+
+                if color.hex == config.accent:
+                    accent_name = f"Catppuccin {flavor.name} {color.name}".title()
+                    accent_combobox.setCurrentText(accent_name)
+
         accent_combobox.setCurrentText(utils.get_config().accent.title())
         accent_combobox.currentTextChanged.connect(
-            lambda: self.setting_core.save_theme(theme=accent_combobox.currentData().lower(),
-                                                    parent=settings_window))
+            lambda: self.setting_core.save_accent(
+                accent=accent_combobox.currentData().lower(),
+                parent=settings_window))
 
         accent_layout, accent_frame = self.setting_card(
             heading="Accent",

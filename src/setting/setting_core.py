@@ -172,3 +172,13 @@ class SettingCore():
         except requests.exceptions.ConnectionError:
             pass
         return None
+
+    def catppuccin_conf(self):
+        "List all catppuccin palette config file"
+        conf_folder = os.path.join(constant.data_dir, "conf", "catppuccin")
+        catppuccin_theme = []
+
+        for file in os.listdir(conf_folder):
+            catppuccin_theme.append(file)
+
+        return catppuccin_theme

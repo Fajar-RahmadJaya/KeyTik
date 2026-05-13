@@ -51,7 +51,7 @@ class SettingUI():
     def setting_combobox(self):
         "Setting combobox template"
         setting_combobox = SettingCombobox()
-        setting_combobox.setFixedWidth(164)
+        setting_combobox.setMinimumWidth(164)
         setting_combobox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
 
         return setting_combobox
@@ -197,10 +197,18 @@ class SettingUI():
         theme_combobox.addItem("Light", "light")
         theme_combobox.addItem("Dark", "dark")
         theme_combobox.addItem("System", "system")
+
         # qt-themes theme
         qt_themes_dict = qt_themes.get_themes()
         for theme, _ in qt_themes_dict.items():
-            theme_combobox.addItem(theme.replace('_', ' ').title(), theme)
+            if not theme.startswith("catppuccin"):
+                theme_combobox.addItem(theme.replace('_', ' ').title(), theme)
+
+        # conf theme
+        conf_list = self.setting_core.catppuccin_conf()
+        for file in conf_list:
+            catppuccin_theme = file.replace('.conf', '')
+            theme_combobox.addItem(catppuccin_theme.replace('-', ' ').title(), catppuccin_theme)
 
         theme_combobox.setCurrentText(utils.get_config().theme.replace('_', ' ').title())
         theme_combobox.currentTextChanged.connect(

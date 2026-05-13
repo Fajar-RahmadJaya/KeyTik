@@ -66,11 +66,6 @@ def get_palette():
         mantle = "rgba(0, 0, 0, 0.06)"
         subtext = "rgba(0, 0, 0, 0.6)"
         overlay = "rgba(0, 0, 0, 0.04)"
-    elif theme.startswith("catppuccin"):
-        surface = "rgba(76, 79, 105, 0.7)"
-        mantle = "rgba(76, 79, 105, 0.06)"
-        subtext = "rgba(76, 79, 105, 0.6)"
-        overlay = "rgba(76, 79, 105, 0.04)"
     else:
         qt_theme_dict = qt_themes.get_theme(theme)
         surface = qt_theme_dict.surface0.name()

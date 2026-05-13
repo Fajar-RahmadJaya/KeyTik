@@ -52,7 +52,7 @@ class SettingUI():
         "Setting combobox template"
         setting_combobox = SettingCombobox()
         setting_combobox.setFixedWidth(164)
-        setting_combobox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        setting_combobox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
 
         return setting_combobox
 

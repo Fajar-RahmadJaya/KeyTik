@@ -4,14 +4,16 @@ from dataclasses import dataclass
 import sys
 import re
 import winreg
+import os
 from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
-from PySide6.QtWidgets import QPushButton  # pylint: disable=E0611
+from PySide6.QtWidgets import QPushButton, QApplication  # pylint: disable=E0611
 
 import qt_themes
 import win32mica
 
 from utility import utils
+from utility import constant
 
 # ---------------------------- Palatte ------------------------------
 def color_rgba(color: QColor, alpha: float):
@@ -82,6 +84,11 @@ def get_palette():
         mantle = "rgba(0, 0, 0, 0.06)"
         subtext = "rgba(0, 0, 0, 0.6)"
         overlay = "rgba(0, 0, 0, 0.04)"
+    elif THEME.startswith("catppuccin"):
+        surface = "rgba(76, 79, 105, 0.7)"
+        mantle = "rgba(76, 79, 105, 0.06)"
+        subtext = "rgba(76, 79, 105, 0.6)"
+        overlay = "rgba(76, 79, 105, 0.04)"
     else:
         qt_theme_dict = qt_themes.get_theme(THEME)
         surface = qt_theme_dict.surface0.name()
@@ -113,14 +120,15 @@ def apply_mica(target_window):
             Style=getattr(win32mica.MicaStyle, mica_effect)
         )
 
-def apply_pallette():
-    "Use conf from qtct as pallate"
-    color_scheme = """
-    [ColorScheme]
-    active_colors=  #ffcdd6f4,     #ff45475a, #ff585b70, #ff313244, #ff11111b, #ff181825, #ffcdd6f4,     #ffcdd6f4,  #ffcdd6f4,     #ff1e1e2e, #ff181825, #ff11111b, #fff9e2af, #ff11111b,    #ff89b4fa,     #ffb4befe,   #ff181825, #ffffffff, #ff1e1e2e, #ffcdd6f4, #806c7086, #fff9e2af
-    inactive_colors=#ff7f849c, #ff1e1e2e,     #ff45475a, #ff313244, #ff11111b, #ff181825, #ff7f849c, #ffcdd6f4,  #ff7f849c, #ff1e1e2e, #ff181825, #ff11111b, #ff313244,              #ff7f849c, #ff7f849c, #ff7f849c,   #ff181825, #ffffffff, #ff1e1e2e, #ffcdd6f4, #806c7086, #ff313244
-    disabled_colors=#ff6c7086, #ff313244, #ff45475a, #ff313244, #ff11111b, #ff181825, #ff6c7086, #ffcdd6f4,  #ff6c7086, #ff1e1e2e, #ff181825, #ff11111b, #ff181825,                #ff6c7086, #ffa9bcdb,   #ffc7cceb, #ff181825, #ffffffff, #ff1e1e2e, #ffcdd6f4, #806c7086, #ff181825
-    """
+def apply_pallette(conf_name):
+    "Apply global palatte from qtct conf file"
+    conf_path = os.path.join(constant.data_dir, 'conf', 'catppuccin', conf_name + '.conf')
+
+    try:
+        with open(conf_path, "r", encoding="utf-8") as file:
+            color_scheme = file.read()
+    except FileNotFoundError as error:
+        print(f"Error: {error}")
 
     # Active Color
     active_line = re.search(r"active_colors=(.*)", color_scheme)

@@ -166,6 +166,39 @@ def apply_pallette(conf_name):
 
     return palette
 
+def set_appearance(app: QApplication):
+    "Set global appearance based on user config using palette and style"
+    # Variables
+    config = utils.get_config()
+    theme = config.theme
+
+    # Only set accent palatte if mica enabled and using qt-themes
+    qt_themes_dict = qt_themes.get_themes()
+    if (config.mica_effect != "disable"
+        and config.theme not in ("light", "dark", "system")):
+
+        if any(theme in theme_name for theme_name, _ in qt_themes_dict.items()):
+            print(theme)
+            accent_palette = qt_themes.get_theme(config.theme).secondary
+        else:
+            conf_palette = apply_pallette(config.theme)
+            accent_palette = conf_palette.color(QPalette.Accent)
+
+        palette = QPalette()
+        palette.setColor(QPalette.ColorRole.Accent, QColor(accent_palette))
+        app.setPalette(palette)
+
+    # Set the style and theme
+    style_config = utils.get_config().style
+    if theme in ("dark", "light"):
+        app.setStyle(style_config)
+    elif theme.startswith("catppuccin"):
+        conf_palette = apply_pallette(config.theme)
+        app.setPalette(conf_palette)
+        app.setStyle(style_config)
+    elif any(theme in theme_name for theme_name, _ in qt_themes_dict.items()):
+        qt_themes.set_theme(theme, style_config)
+
 # ---------------------------- Styling ------------------------------
 def get_geometry(parent_window, width, height):
     "Get x and y centered relative to parent window"

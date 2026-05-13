@@ -2,8 +2,6 @@
 import os
 import sys
 from PySide6.QtWidgets import (QApplication) # pylint: disable=E0611
-from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
-import qt_themes
 
 from utility import utils
 from utility import thread
@@ -17,7 +15,7 @@ from setting.setting_ui import SettingUI
 def main():
     "Main function"
     # Set Appearance
-    theme = style.get_theme()
+    theme = utils.get_config().theme
 
     # Set normal dark and light theme
     if theme == "dark":
@@ -26,24 +24,7 @@ def main():
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
 
     app = QApplication(sys.argv)
-
-    # Only set accent palatte if mica enabled and using qt-themes
-    config = utils.get_config()
-    if (config.mica_effect != "disabled"
-        and config.theme not in ("light", "dark", "system")):
-        accent_palette = qt_themes.get_theme(config.theme).secondary
-
-        palette = QPalette()
-        palette.setColor(QPalette.ColorRole.Accent, QColor(accent_palette))
-
-        app.setPalette(palette)
-
-    # Set the style and theme
-    style_config = utils.get_config().style
-    if theme in ("dark", "light"):
-        app.setStyle(style_config)
-    else:
-        qt_themes.set_theme(theme, style_config)
+    style.set_appearance(app)
 
     main_window = DashboardUI()
     main_window.show()

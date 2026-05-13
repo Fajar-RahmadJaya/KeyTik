@@ -165,6 +165,9 @@ class SettingUI():
         # Theme
         appearance_layout.addWidget(self.theme(settings_window))
 
+        # Accent
+        appearance_layout.addWidget(self.accent(settings_window))
+
         # Mica Effect
         if style.mica_supported:
             appearance_layout.addWidget(self.mica_effect(settings_window))
@@ -214,6 +217,24 @@ class SettingUI():
 
         return theme_frame
 
+    def accent(self, settings_window):
+        "Theme Widget"
+        accent_combobox = self.setting_combobox()
+
+        # Item data should be the color hex
+        accent_combobox.addItem("Default", "default")
+        accent_combobox.setCurrentText(utils.get_config().accent.title())
+        accent_combobox.currentTextChanged.connect(
+            lambda: self.setting_core.save_theme(theme=accent_combobox.currentData().lower(),
+                                                    parent=settings_window))
+
+        accent_layout, accent_frame = self.setting_card(
+            heading="Accent",
+            subheading="Accent color")
+        accent_layout.addWidget(accent_combobox)
+
+        return accent_frame
+
     def mica_effect(self, settings_window):
         "Mica Effect Widget"
         mica_combobox = self.setting_combobox()
@@ -222,7 +243,8 @@ class SettingUI():
         mica_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_mica_effect(
                 mica_effect=mica_combobox.currentText(),
-                parent=settings_window))
+                parent=settings_window,
+                mica_combobox=mica_combobox))
 
         mica_layout, mica_frame = self.setting_card(heading="Mica Effect",
                                             subheading="Enable/Disable Mica Effect")

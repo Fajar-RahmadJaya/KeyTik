@@ -92,11 +92,12 @@ def load_exit_key():
 
 # ------------------------------ Config ------------------------------
 @dataclass
-class Config:
+class Config:  # pylint: disable=R0902
     "Dataclass to make config usage easier"
     show_announcement: bool
     style: str
     theme: str
+    accent: str
     mica_effect: str
     profile_path: str
     pinned_profile: list
@@ -114,6 +115,7 @@ def get_config():
                 show_announcement=value.get("show_announcement", True),
                 style=value.get("style") or None,
                 theme=value.get("theme") or "system",
+                accent=value.get("accent") or "default",
                 mica_effect=value.get("mica_effect") or "default",
                 profile_path=value.get("profile_path") or constant.appdata_dir,
                 pinned_profile=value.get("pinned_profile", []),

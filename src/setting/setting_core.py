@@ -6,7 +6,7 @@ import webbrowser
 import subprocess
 import ctypes
 import requests
-from PySide6.QtWidgets import (QMessageBox, QFileDialog)  # pylint: disable=E0611
+from PySide6.QtWidgets import (QMessageBox, QFileDialog, QComboBox)  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils
@@ -91,6 +91,22 @@ class SettingCore():
                               "Error",
                               f"Failed to change theme\n{error}")
 
+    def save_accent(self, accent, parent):
+        "Write accent preference to config file"
+        try:
+            config = utils.get_config()
+            config.accent = accent
+            utils.update_config(config)
+            QMessageBox.information(
+                parent,
+                "Success",
+                f"Accent changed to {accent}. \nPlease restart {PROGRAM_NAME} to apply change.")
+
+        except FileNotFoundError as error:
+            QMessageBox.critical(parent,
+                                "Error",
+                                f"Failed to change Accent\n{error}")
+
     def save_style(self, style, parent):
         "Write style preference to config file"
         try:
@@ -109,19 +125,31 @@ class SettingCore():
                                 "Error",
                                 f"Failed to change style\n{error}")
 
-    def save_mica_effect(self, mica_effect, parent):
+    def save_mica_effect(self, mica_effect, parent, mica_combobox: QComboBox):
         "Write style preference to config file"
         try:
             config = utils.get_config()
-            config.mica_effect = mica_effect.lower()
-            utils.update_config(config)
 
-            QMessageBox.information(
-                parent,
-                "Success",
-                f"""Mica effect changed to {mica_effect}.
-                \nPlease restart {PROGRAM_NAME} to apply change."""
-            )
+            if config.theme not in ("light", "dark", "system"):
+                mica_combobox.blockSignals(True)
+                mica_combobox.setCurrentText("Disable")
+                mica_combobox.blockSignals(False)
+                QMessageBox.warning(
+                    parent,
+                    "Warnig",
+                    """Mica effect not applied.
+                    \nMica effect currently only support dark, light, and system only."""
+                )
+            else:
+                config.mica_effect = mica_effect.lower()
+                utils.update_config(config)
+
+                QMessageBox.information(
+                    parent,
+                    "Success",
+                    f"""Mica effect changed to {mica_effect}.
+                    \nPlease restart {PROGRAM_NAME} to apply change."""
+                )
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,

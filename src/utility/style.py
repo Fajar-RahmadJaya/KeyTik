@@ -102,25 +102,24 @@ def apply_mica(target_window):
 def set_appearance(app: QApplication):
     "Set global appearance based on user config using palette and style"
     # Variables
+    qt_themes_dict = qt_themes.get_themes()
     config = utils.get_config()
     theme = config.theme
+    accent = config.accent
+    style = config.style
 
-    # Only set accent palatte if mica enabled and using qt-themes
-    qt_themes_dict = qt_themes.get_themes()
-    if (config.mica_effect != "disable"
-        and config.theme not in ("light", "dark", "system")):
-
+    # set accent
+    if accent != "system":
         palette = QPalette()
-        accent_palette = qt_themes.get_theme(config.theme).secondary
-        palette.setColor(QPalette.ColorRole.Accent, QColor(accent_palette))
+        palette.setColor(QPalette.ColorRole.Accent, QColor(accent))
         app.setPalette(palette)
 
-    # Set the style and theme
-    style_config = utils.get_config().style
     if theme in ("dark", "light"):
-        app.setStyle(style_config)
+        # Set style only since dark and light theme assignment Done by os environ
+        app.setStyle(style)
     elif any(theme in theme_name for theme_name, _ in qt_themes_dict.items()):
-        qt_themes.set_theme(theme, style_config)
+        # Set style and theme on qt-themes
+        qt_themes.set_theme(theme, style)
 
 # ---------------------------- Styling ------------------------------
 def get_geometry(parent_window, width, height):

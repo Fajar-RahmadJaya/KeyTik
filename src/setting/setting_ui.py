@@ -51,8 +51,8 @@ class SettingUI():
     def setting_combobox(self):
         "Setting combobox template"
         setting_combobox = SettingCombobox()
-        setting_combobox.setMinimumWidth(164)
-        setting_combobox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        setting_combobox.setFixedWidth(164)
+        setting_combobox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         return setting_combobox
 

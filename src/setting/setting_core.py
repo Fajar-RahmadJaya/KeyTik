@@ -96,16 +96,16 @@ Please restart {PROGRAM_NAME} to apply change.""")
                               "Error",
                               f"Failed to change theme\n{error}")
 
-    def save_accent(self, accent, parent):
+    def save_accent(self, accent: list, parent):
         "Write accent preference to config file"
         try:
             config = utils.get_config()
-            config.accent = accent
+            config.accent = accent[1]
             utils.update_config(config)
             QMessageBox.information(
                 parent,
                 "Success",
-                f"Accent changed to {accent}. \nPlease restart {PROGRAM_NAME} to apply change.")
+                f"Accent changed to {accent[0]}. \nPlease restart {PROGRAM_NAME} to apply change.")
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,

@@ -9,6 +9,7 @@ script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 data_dir = os.path.join(script_dir, '_internal', 'Data')
 appdata_dir = os.path.join(os.getenv('APPDATA'), 'KeyTik')
 ahi_dir = os.path.join(data_dir, 'Active', 'AutoHotkey Interception')
+theme_dir = os.path.join(data_dir, "theme")
 
 # General
 config_path = os.path.join(appdata_dir, "config.json")

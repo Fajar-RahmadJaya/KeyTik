@@ -75,16 +75,20 @@ class SettingCore():
             print(f"An error occurred: {e}")
             QMessageBox.critical(None, "Error", f"An error occurred: {e}")
 
-    def save_theme(self, theme, parent):
+    def save_theme(self, theme: dict, parent):
         "Write theme preference to config file"
         try:
             config = utils.get_config()
-            config.theme = theme
+
+            config.theme_type = theme.get("type")
+            config.theme = theme.get("value")
+
             utils.update_config(config)
+
             QMessageBox.information(
                 parent,
                 "Success",
-                f"Theme changed to {theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
+                f"Theme changed to {config.theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,
@@ -201,12 +205,11 @@ class SettingCore():
             pass
         return None
 
-    def catppuccin_conf(self):
-        "List all catppuccin palette config file"
-        conf_folder = os.path.join(constant.data_dir, "conf", "catppuccin")
-        catppuccin_theme = []
+    def get_custom_theme(self) -> list[str]:
+        "Return list containing custom theme"
+        theme_file = []
 
-        for file in os.listdir(conf_folder):
-            catppuccin_theme.append(file)
+        for file in os.listdir(constant.theme_dir):
+            theme_file.append(file)
 
-        return catppuccin_theme
+        return theme_file

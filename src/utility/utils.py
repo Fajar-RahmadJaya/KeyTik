@@ -96,7 +96,8 @@ class Config:  # pylint: disable=R0902
     "Dataclass to make config usage easier"
     show_announcement: bool
     style: str
-    theme: str
+    theme_type: str
+    theme: dict
     accent: str
     mica_effect: str
     profile_path: str
@@ -114,6 +115,7 @@ def get_config():
             config = Config(
                 show_announcement=value.get("show_announcement", True),
                 style=value.get("style") or None,
+                theme_type=value.get("theme_type") or "default",
                 theme=value.get("theme") or "system",
                 accent=value.get("accent") or "default",
                 mica_effect=value.get("mica_effect") or "default",

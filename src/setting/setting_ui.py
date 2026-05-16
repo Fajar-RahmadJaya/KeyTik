@@ -198,14 +198,38 @@ class SettingUI():
         theme_combobox = self.setting_combobox()
 
         # Default theme
-        theme_combobox.addItem("Light", "light")
-        theme_combobox.addItem("Dark", "dark")
-        theme_combobox.addItem("System", "system")
+        theme_combobox.addItem("Light", {
+            "type": "default",
+            "value": "light"
+        })
+        theme_combobox.addItem("Dark", {
+            "type": "default",
+            "value": "dark"
+        })
+        theme_combobox.addItem("System", {
+            "type": "default",
+            "value": "system"
+        })
+
+        # Custom theme
+        for custom_theme in self.setting_core.get_custom_theme():
+            theme_name = custom_theme.replace(".json", "")
+            theme_combobox.addItem(theme_name.replace("_", " ").title(),
+                                   {
+                                       "type": "custom",
+                                       "value": theme_name
+                                    })
 
         # qt-themes theme
         qt_themes_dict = qt_themes.get_themes()
-        for theme, _ in qt_themes_dict.items():
-            theme_combobox.addItem(theme.replace('_', ' ').title(), theme)
+        for qt_theme, _ in qt_themes_dict.items():
+            # Remove catppuccin
+            if not qt_theme.startswith("catppuccin"):
+                theme_combobox.addItem(qt_theme.replace('_', ' ').title(),
+                                       {
+                                           "type": "qt_theme",
+                                           "value": qt_theme
+                                        })
 
         theme_combobox.setCurrentText(utils.get_config().theme.replace('_', ' ').title())
         theme_combobox.currentTextChanged.connect(

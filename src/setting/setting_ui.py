@@ -165,7 +165,7 @@ class SettingUI():
         appearance_layout.addWidget(appearance_label)
 
         # Style
-        appearance_layout.addWidget(self.style(settings_window))
+        appearance_layout.addWidget(self.style())
 
         # Theme
         appearance_layout.addWidget(self.theme(settings_window))

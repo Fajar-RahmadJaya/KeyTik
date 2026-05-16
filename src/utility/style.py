@@ -101,8 +101,8 @@ def apply_mica(target_window):
             Style=getattr(win32mica.MicaStyle, mica_effect.upper())
         )
 
-def custom_palette() -> QPalette:
-    "Apply custom theme using QPalette"
+def set_custom_palette(palette: QPalette):
+    "Apply custom theme to QPalette"
     config = utils.get_config()
     theme_file = os.path.join(constant.theme_dir, config.theme + ".json")
 
@@ -114,7 +114,6 @@ def custom_palette() -> QPalette:
         theme_dict = None
 
     # Create palette
-    palette = QPalette()
     for color_group, color_role in theme_dict.items():
         if color_group != "attribution":
             for role, color in color_role.items():
@@ -133,31 +132,40 @@ def custom_palette() -> QPalette:
 
     return palette
 
+def set_accent(palette: QPalette):
+    "Apply accent to QPalette"
+    accent = utils.get_config().accent
+
+    if accent != "default":
+        palette.setColor(QPalette.ColorRole.Accent, QColor(accent))
+
 def set_appearance(app: QApplication):
     "Set global appearance based on user config using palette and style"
     # Variables
     config = utils.get_config()
     theme_type = config.theme_type
     theme = config.theme
-    accent = config.accent
     style = config.style
 
-    # Set style and theme
+    # Apply palette
+    palette = QPalette()
     if theme_type == "default":
-        # Set style only since dark and light theme assignment Done by os environ
-        app.setStyle(style)
+        set_accent(palette)
     elif theme_type == "qt-themes":
-        # Set style and theme on qt-themes
-        qt_themes.set_theme(theme, style)
+        qt_theme = qt_themes.get_theme(theme)
+        # Apply qt_themes palette
+        qt_themes.update_palette(palette=palette, theme=qt_theme)
+        # Overwrite qt-themes accent palette
+        set_accent(palette)
     elif theme_type == "custom":
-        app.setStyle(style)
-        app.setPalette(custom_palette())
+        set_custom_palette(palette)
+        set_accent(palette)
 
-    # set accent
-    if accent != "default":
-        palette = QPalette()
-        palette.setColor(QPalette.ColorRole.Accent, QColor(accent))
-        app.setPalette(palette)
+    # Set theme
+    app.setPalette(palette)
+
+    # Set style
+    app.setStyle(style)
 
 # ---------------------------- Styling ------------------------------
 def get_geometry(parent_window, width, height):

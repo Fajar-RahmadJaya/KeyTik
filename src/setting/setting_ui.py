@@ -246,6 +246,7 @@ class SettingUI():
         "Theme Widget"
         config = utils.get_config()
         accent_combobox = self.setting_combobox()
+        accent_combobox.view().setFixedWidth(200)
 
         # Item data should be the color name and color hex
         accent_combobox.addItem("Default", ["Default", "default"])
@@ -261,6 +262,7 @@ class SettingUI():
                     accent_combobox.setCurrentText(accent_name)
 
         accent_combobox.setCurrentText(utils.get_config().accent.title())
+        accent_combobox.setToolTip(accent_combobox.currentText())
         accent_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_accent(
                 accent=accent_combobox.currentData(),

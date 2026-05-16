@@ -3,14 +3,16 @@
 from dataclasses import dataclass
 import sys
 import winreg
+import os
+import json
 from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
 from PySide6.QtWidgets import QPushButton, QApplication  # pylint: disable=E0611
-
 import qt_themes
 import win32mica
 
 from utility import utils
+from utility import constant
 
 # ---------------------------- Palatte ------------------------------
 def color_rgba(color: QColor, alpha: float):
@@ -99,21 +101,57 @@ def apply_mica(target_window):
             Style=getattr(win32mica.MicaStyle, mica_effect.upper())
         )
 
+def custom_palette() -> QPalette:
+    "Apply custom theme using QPalette"
+    config = utils.get_config()
+    theme_file = os.path.join(constant.theme_dir, config.theme + ".json")
+
+    try:
+        with open (theme_file, "r", encoding="utf-8") as file:
+            theme_dict = json.load(file)
+    except FileNotFoundError as error:
+        print(f"Error: {error}")
+        theme_dict = None
+
+    # Create palette
+    palette = QPalette()
+    for color_group, color_role in theme_dict.items():
+        if color_group != "attribution":
+            for role, color in color_role.items():
+                palette.setColor(
+                    getattr(palette.ColorGroup, color_group),
+                    getattr(palette.ColorRole, role),
+                    QColor(color)
+                )
+
+                # Set color goup inactive the same as active
+                palette.setColor(
+                    palette.ColorGroup.Inactive,
+                    getattr(palette.ColorRole, role),
+                    QColor(color)
+                )
+
+    return palette
+
 def set_appearance(app: QApplication):
     "Set global appearance based on user config using palette and style"
     # Variables
-    qt_themes_dict = qt_themes.get_themes()
     config = utils.get_config()
+    theme_type = config.theme_type
     theme = config.theme
     accent = config.accent
     style = config.style
 
-    if theme in ("dark", "light"):
+    # Set style and theme
+    if theme_type == "default":
         # Set style only since dark and light theme assignment Done by os environ
         app.setStyle(style)
-    elif any(theme in theme_name for theme_name, _ in qt_themes_dict.items()):
+    elif theme_type == "qt-themes":
         # Set style and theme on qt-themes
         qt_themes.set_theme(theme, style)
+    elif theme_type == "custom":
+        app.setStyle(style)
+        app.setPalette(custom_palette())
 
     # set accent
     if accent != "default":

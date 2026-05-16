@@ -227,7 +227,7 @@ class SettingUI():
             if not qt_theme.startswith("catppuccin"):
                 theme_combobox.addItem(qt_theme.replace('_', ' ').title(),
                                        {
-                                           "type": "qt_theme",
+                                           "type": "qt-themes",
                                            "value": qt_theme
                                         })
 

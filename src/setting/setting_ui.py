@@ -228,7 +228,7 @@ class SettingUI():
         qt_themes_dict = qt_themes.get_themes()
         for qt_theme, _ in qt_themes_dict.items():
             # Remove catppuccin
-            if not qt_theme.startswith("catppuccin"):
+            if not qt_theme.startswith("catppuccin") or not qt_theme.startswith("dracula"):
                 theme_combobox.addItem(qt_theme.replace('_', ' ').title(),
                                        {
                                            "type": "qt-themes",
@@ -284,6 +284,7 @@ class SettingUI():
         "Circle showing accent color"
         if color_hex in self.circle_cache:
             return self.circle_cache[color_hex]
+
         pixmap = QPixmap(16, 16)
         pixmap.fill(Qt.transparent)
         painter = QPainter(pixmap)

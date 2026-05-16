@@ -188,8 +188,8 @@ class SettingUI():
         style_combobox.setCurrentText(current_style if current_style
                                         else "Default")
         style_combobox.currentTextChanged.connect(
-            lambda: self.setting_core.save_style(style=style_combobox.currentText(),
-                                                    parent=settings_window))
+            lambda: self.setting_core.save_style(
+                updated_style=style_combobox.currentText()))
 
         style_layout, style_frame = self.setting_card(heading="Style",
                                             subheading="Change appearance style")

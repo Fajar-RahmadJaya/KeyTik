@@ -6,7 +6,7 @@ import webbrowser
 import subprocess
 import ctypes
 import requests
-from PySide6.QtWidgets import (QMessageBox, QFileDialog, QComboBox)  # pylint: disable=E0611
+from PySide6.QtWidgets import (QMessageBox, QFileDialog, QComboBox, QApplication)  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils
@@ -112,23 +112,18 @@ Please restart {PROGRAM_NAME} to apply change.""")
                                 "Error",
                                 f"Failed to change Accent\n{error}")
 
-    def save_style(self, style, parent):
+    def save_style(self, updated_style):
         "Write style preference to config file"
         try:
             config = utils.get_config()
-            config.style = "" if style == "Default" else style
+            config.style = "" if updated_style == "Default" else updated_style
             utils.update_config(config)
 
-            QMessageBox.information(
-                parent,
-                "Success",
-                f"Style changed to {style}. \nPlease restart {PROGRAM_NAME} to apply change."
-            )
+            # Update style
+            QApplication.setStyle(updated_style)
 
         except FileNotFoundError as error:
-            QMessageBox.critical(parent,
-                                "Error",
-                                f"Failed to change style\n{error}")
+            print(f"Error: {error}")
 
     def save_mica_effect(self, mica_effect, parent, mica_combobox: QComboBox):
         "Write style preference to config file"

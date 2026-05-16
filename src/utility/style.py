@@ -155,6 +155,11 @@ def get_color():
         mantle = "rgba(255, 255, 255, 0.11)"
         subtext = "rgba(255, 255, 255, 0.566)"
         overlay = "rgba(255, 255, 255, 0.085)"
+    else:
+        surface = None
+        mantle = None
+        subtext = None
+        overlay = None
 
     color = Color(
         surface=surface,

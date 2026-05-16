@@ -26,7 +26,8 @@
         "Mid": "#303446",
         "Dark": "#292c3c",
         "Shadow": "#232634",
-        "PlaceholderText": "#949cbb"
+        "PlaceholderText": "#949cbb",
+        "Accent": "#ca9ee6"
     },
 
     "Disabled": {

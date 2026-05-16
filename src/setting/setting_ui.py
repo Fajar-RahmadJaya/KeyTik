@@ -179,7 +179,7 @@ class SettingUI():
 
         return appearance_widget
 
-    def style(self, settings_window):
+    def style(self):
         "Style Widget"
         style_combobox = self.setting_combobox()
         style_combobox.addItem("Default")

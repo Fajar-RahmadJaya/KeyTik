@@ -88,7 +88,8 @@ class SettingCore():
             QMessageBox.information(
                 parent,
                 "Success",
-                f"Theme changed to {config.theme}. \nPlease restart {PROGRAM_NAME} to apply change.")
+                f"""Theme changed to {config.theme}.
+Please restart {PROGRAM_NAME} to apply change.""")
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,

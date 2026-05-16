@@ -254,6 +254,9 @@ class SettingUI():
 
         # Item data should be the color name and color hex
         accent_combobox.addItem("Default", ["Default", "default"])
+        # Dracula accent
+        accent_combobox.addItem(self.color_circle("#BD93F9"), "Dracula",
+                                ["Dracula", "#BD93F9"])
         # Catppuccin Accent
         for flavor in catppuccin_palette:
             for color in flavor.colors:

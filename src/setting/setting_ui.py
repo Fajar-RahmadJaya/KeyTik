@@ -7,7 +7,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QHBoxLayout, QMessageBox, QScrollArea,
     QFrame, QWidget, QLabel, QSizePolicy, QComboBox,
     QStyleFactory)
-from PySide6.QtGui import QIcon, QFont  # pylint: disable=E0611
+from PySide6.QtGui import QIcon, QFont, QColor, QPixmap, QPainter  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
 import qt_themes
 from catppuccin import PALETTE as catppuccin_palette
 
@@ -29,6 +30,9 @@ class SettingUI():
     def __init__(self):
         # Composition
         self.setting_core = SettingCore()
+
+        # Cache
+        self.circle_cache = {}
 
     # ------------------------------ Template ------------------------------
     def setting_card(self, heading="", subheading=""):
@@ -255,7 +259,8 @@ class SettingUI():
             for color in flavor.colors:
                 if color.accent:
                     accent_name = f"Catppuccin {flavor.name} {color.name}".title()
-                    accent_combobox.addItem(accent_name, [accent_name, color.hex])
+                    accent_combobox.addItem(self.color_circle(color.hex),
+                                            accent_name, [accent_name, color.hex])
 
                 if color.hex == config.accent:
                     accent_name = f"Catppuccin {flavor.name} {color.name}".title()
@@ -274,6 +279,23 @@ class SettingUI():
         accent_layout.addWidget(accent_combobox)
 
         return accent_frame
+
+    def color_circle(self, color_hex):
+        "Circle showing accent color"
+        if color_hex in self.circle_cache:
+            return self.circle_cache[color_hex]
+        pixmap = QPixmap(16, 16)
+        pixmap.fill(Qt.transparent)
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QColor(color_hex))
+        painter.setPen(Qt.NoPen)
+        painter.drawEllipse(0, 0, 16, 16)
+        painter.end()
+        icon = QIcon(pixmap)
+        self.circle_cache[color_hex] = icon
+
+        return icon
 
     def mica_effect(self, settings_window):
         "Mica Effect Widget"

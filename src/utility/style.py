@@ -7,7 +7,7 @@ import os
 import json
 from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
-from PySide6.QtWidgets import QPushButton, QApplication  # pylint: disable=E0611
+from PySide6.QtWidgets import QPushButton  # pylint: disable=E0611
 import qt_themes
 import win32mica
 
@@ -31,6 +31,15 @@ def invert_color(color: QColor):
 
     return inverted_color
 
+def is_light(color: QColor) -> bool:
+    "Determine whether the color is dark or light"
+    r = color.red() / 255.0
+    g = color.green() / 255.0
+    b = color.blue() / 255.0
+    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    return luminance > 0.5
+
 def detect_system_theme():
     "Detecting system theme for Pyside6 default theme handling"
     if sys.platform == "win32":
@@ -44,47 +53,6 @@ def detect_system_theme():
         except FileNotFoundError:
             print("Theme registry not found.")
     return "light"
-
-@dataclass
-class Palette:
-    "Dataclass to hold palette used on styling"
-    surface: str
-    mantle: str
-    subtext: str
-    overlay: str
-
-def get_palette():
-    "Get color palette on various theme"
-    config = utils.get_config()
-    theme = detect_system_theme() if config.theme == "system" else config.theme
-
-    if theme == "dark":
-        surface = "rgba(255, 255, 255, 0.06)"
-        mantle = "rgba(255, 255, 255, 0.11)"
-        subtext = "rgba(255, 255, 255, 0.566)"
-        overlay = "rgba(255, 255, 255, 0.085)"
-    elif theme == "light":
-        surface = "rgba(255, 255, 255, 0.7)"
-        mantle = "rgba(0, 0, 0, 0.06)"
-        subtext = "rgba(0, 0, 0, 0.6)"
-        overlay = "rgba(0, 0, 0, 0.04)"
-    else:
-        qt_theme_dict = qt_themes.get_theme(theme)
-        surface = qt_theme_dict.surface0.name()
-        mantle = qt_theme_dict.mantle.name()
-        subtext = qt_theme_dict.subtext0.name()
-        overlay = qt_theme_dict.overlay0.name()
-
-    palette = Palette(
-        surface=surface,
-        mantle=mantle,
-        subtext=subtext,
-        overlay=overlay
-    )
-
-    return palette
-
-PALETTE = get_palette()
 
 mica_supported = bool(sys.getwindowsversion().build >= 22000)
 def apply_mica(target_window):
@@ -139,13 +107,12 @@ def set_accent(palette: QPalette):
     if accent != "default":
         palette.setColor(QPalette.ColorRole.Accent, QColor(accent))
 
-def set_appearance(app: QApplication):
+def get_palette() -> QPalette:
     "Set global appearance based on user config using palette and style"
     # Variables
     config = utils.get_config()
     theme_type = config.theme_type
     theme = config.theme
-    style = config.style
 
     # Apply palette
     palette = QPalette()
@@ -161,11 +128,44 @@ def set_appearance(app: QApplication):
         set_custom_palette(palette)
         set_accent(palette)
 
-    # Set theme
-    app.setPalette(palette)
+    return palette
 
-    # Set style
-    app.setStyle(style)
+PALETTE = get_palette()
+IS_BASE_LIGHT = is_light(PALETTE.color(QPalette.Base))
+
+@dataclass
+class Color:
+    "Dataclass to hold palette used on styling"
+    surface: str
+    mantle: str
+    subtext: str
+    overlay: str
+
+def get_color():
+    "Get color palette on various theme"
+    config = utils.get_config()
+    theme = config.theme
+    if theme == "light" or IS_BASE_LIGHT:
+        surface = "rgba(255, 255, 255, 0.7)"
+        mantle = "rgba(0, 0, 0, 0.06)"
+        subtext = "rgba(0, 0, 0, 0.6)"
+        overlay = "rgba(0, 0, 0, 0.04)"
+    elif theme == "dark" or not IS_BASE_LIGHT:
+        surface = "rgba(255, 255, 255, 0.06)"
+        mantle = "rgba(255, 255, 255, 0.11)"
+        subtext = "rgba(255, 255, 255, 0.566)"
+        overlay = "rgba(255, 255, 255, 0.085)"
+
+    color = Color(
+        surface=surface,
+        mantle=mantle,
+        subtext=subtext,
+        overlay=overlay
+    )
+
+    return color
+
+COLOR = get_color()
 
 # ---------------------------- Styling ------------------------------
 def get_geometry(parent_window, width, height):
@@ -183,14 +183,14 @@ def get_geometry(parent_window, width, height):
 # -------------------- Shared --------------------
 WIN11_BUTTON = f"""
 QPushButton{{
-    background-color: {PALETTE.surface};
-    border: 1px solid {PALETTE.mantle};
+    background-color: {COLOR.surface};
+    border: 1px solid {COLOR.mantle};
     border-radius: 4px;
     margin: 2px;
 }}
 
 QPushButton:hover {{
-    background-color: {PALETTE.overlay};
+    background-color: {COLOR.overlay};
 }}
 """
 
@@ -205,7 +205,7 @@ def card(object_name=None):
 
     style_sheet = f"""
     {widget} {{
-        background: {PALETTE.surface};
+        background: {COLOR.surface};
         border-radius: {border_radius};
     }}
     """
@@ -223,8 +223,8 @@ PLUS_LABEL = """
 """
 GROUP_BOX = f"""
 QGroupBox {{
-    background-color: {PALETTE.surface};
-    border: 1px solid {PALETTE.mantle};
+    background-color: {COLOR.surface};
+    border: 1px solid {COLOR.mantle};
     border-radius: 8;
     margin-top: 1.5ex;
 }}
@@ -237,7 +237,7 @@ QGroupBox:title {{
 
 # -------------------- Setting --------------------
 HEADING_STYLE = "font-size:13px; margin-bottom:2px"
-SUBHEADING_STYLE = f"font-size:11px; color: {PALETTE.subtext};"
+SUBHEADING_STYLE = f"font-size:11px; color: {COLOR.subtext};"
 
 def button_highlight(button: QPushButton):
     "Highlighted button, use accent color"

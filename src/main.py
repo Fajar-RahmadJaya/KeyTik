@@ -15,16 +15,19 @@ from setting.setting_ui import SettingUI
 def main():
     "Main function"
     # Set Appearance
-    theme = utils.get_config().theme
+    config = utils.get_config()
+    style_config = config.style
+    theme = config.theme
 
     # Set normal dark and light theme
-    if theme == "dark":
-        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
-    elif theme == "light":
+    if theme == "light" or style.IS_BASE_LIGHT:
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
+    elif theme == "dark" or not style.IS_BASE_LIGHT:
+        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
 
     app = QApplication(sys.argv)
-    style.set_appearance(app)
+    app.setStyle(style_config)
+    app.setPalette(style.PALETTE)
 
     main_window = DashboardUI()
     main_window.show()

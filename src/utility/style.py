@@ -7,7 +7,6 @@ import os
 import json
 from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
-from PySide6.QtWidgets import QPushButton  # pylint: disable=E0611
 import qt_themes
 import win32mica
 
@@ -244,21 +243,24 @@ QGroupBox:title {{
 HEADING_STYLE = "font-size:13px; margin-bottom:2px"
 SUBHEADING_STYLE = f"font-size:11px; color: {COLOR.subtext};"
 
-def button_highlight(button: QPushButton):
-    "Highlighted button, use accent color"
-    accent = button.palette().color(QPalette.Accent)
-    accent_hover = f"rgba({accent.red()}, {accent.green()}, {accent.blue()}, 0.85)"
+def button_highlight(style_sheet=False):
+    "Pass empty parameter to get object name only"
+    if not style_sheet:
+        return "ButtonHighlight"
 
-    button_text = button.palette().color(QPalette.ButtonText)
+    palette = get_palette()
+    accent = palette.color(QPalette.Accent)
+
+    button_text = palette.color(QPalette.ButtonText)
     invert_button_text = invert_color(button_text)
 
     style_sheet = f"""
-    QPushButton {{
+    QPushButton#ButtonHighlight {{
         background-color: {accent.name()};
         color: {invert_button_text.name()};
     }}
-    QPushButton:hover {{
-        background-color: {accent_hover};
+    QPushButton#ButtonHighlight::hover {{
+        background-color: {color_rgba(accent, 0.85)};
         color: {invert_button_text.name()};
     }}
     """

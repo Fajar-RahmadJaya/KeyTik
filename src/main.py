@@ -28,6 +28,8 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle(style_config)
     app.setPalette(style.PALETTE)
+    # Set accent button highlight stylesheet
+    app.setStyleSheet(style.button_highlight(style_sheet=True))
 
     main_window = DashboardUI()
     main_window.show()

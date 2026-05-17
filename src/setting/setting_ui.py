@@ -143,7 +143,7 @@ class SettingUI():
         pro_upgrade_button.clicked.connect(
             lambda: webbrowser.open(
                 "https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
-        pro_upgrade_button.setStyleSheet(style.button_highlight(pro_upgrade_button))
+        pro_upgrade_button.setObjectName(style.button_highlight())
 
         pro_upgrade_layout, pro_upgrade_frame = self.setting_card(heading="KeyTik Pro",
                                                 subheading="Pro version available at $20")

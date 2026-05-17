@@ -7,7 +7,7 @@ import subprocess
 import ctypes
 import requests
 from PySide6.QtWidgets import (QMessageBox, QFileDialog, QComboBox, QApplication)  # pylint: disable=E0611
-from PySide6.QtGui import QPalette  # pylint: disable=E0611
+from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
 from utility import constant
 from utility import utils
 from utility import style
@@ -112,10 +112,12 @@ Please restart {PROGRAM_NAME} to apply change.""")
             config = utils.get_config()
             config.accent = accent[1]
             utils.update_config(config)
-            QMessageBox.information(
-                parent,
-                "Success",
-                f"Accent changed to {accent[0]}. \nPlease restart {PROGRAM_NAME} to apply change.")
+
+            # Update accent palette and button highlight stylesheet
+            QApplication.setPalette(style.get_palette())
+            QApplication.setStyleSheet(
+                QApplication.instance(),
+                style.button_highlight(style_sheet=True))
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,

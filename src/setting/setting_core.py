@@ -159,13 +159,10 @@ Please restart {PROGRAM_NAME} to apply change.""")
             else:
                 config.mica_effect = mica_effect.lower()
                 utils.update_config(config)
-
-                QMessageBox.information(
-                    parent,
-                    "Success",
-                    f"""Mica effect changed to {mica_effect}.
-                    \nPlease restart {PROGRAM_NAME} to apply change."""
-                )
+                # Apply mica on setting window
+                style.apply_mica(parent)
+                # Apply mica on main window
+                style.apply_mica(parent.window().parentWidget())
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,

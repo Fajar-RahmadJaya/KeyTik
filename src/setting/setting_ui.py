@@ -237,8 +237,9 @@ class SettingUI():
 
         theme_combobox.setCurrentText(utils.get_config().theme.replace('_', ' ').title())
         theme_combobox.currentTextChanged.connect(
-            lambda: self.setting_core.save_theme(theme=theme_combobox.currentData(),
-                                                    parent=settings_window))
+            lambda: self.setting_core.save_theme(
+                theme=theme_combobox.currentData(),
+                parent=settings_window))
 
         theme_layout, theme_frame = self.setting_card(heading="Theme",
                                             subheading="Change appearance theme")

@@ -7,9 +7,10 @@ import subprocess
 import ctypes
 import requests
 from PySide6.QtWidgets import (QMessageBox, QFileDialog, QComboBox, QApplication)  # pylint: disable=E0611
-
+from PySide6.QtGui import QPalette  # pylint: disable=E0611
 from utility import constant
 from utility import utils
+from utility import style
 from utility.diff import Diff, CHECK_UPDATE_LINK, PROGRAM_NAME
 from dashboard.dashboard_core import DashboardCore
 
@@ -82,14 +83,23 @@ class SettingCore():
 
             config.theme_type = theme.get("type")
             config.theme = theme.get("value")
-
             utils.update_config(config)
 
-            QMessageBox.information(
-                parent,
-                "Success",
-                f"""Theme changed to {config.theme}.
+            # Apply palette directly when theme is in the same default color
+            palette = style.get_palette()
+            base_light = style.is_light(palette.color(QPalette.Base))
+            default_theme_light = os.environ.get("QT_QPA_PLATFORM") == "windows:darkmode=1"
+
+            # Palette with different default theme need restart
+            if (base_light != default_theme_light
+                or theme.get("type") == "default"):
+                QMessageBox.information(
+                    parent,
+                    "Success",
+                    f"""Theme changed to {config.theme}.
 Please restart {PROGRAM_NAME} to apply change.""")
+            else:
+                QApplication.setPalette(palette)
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,

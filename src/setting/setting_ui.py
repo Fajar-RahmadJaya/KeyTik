@@ -395,7 +395,6 @@ class SettingUI():
         ahk_installed = os.path.exists(utils.ahkv2_dir)
 
         ahk_button = self.setting_button()
-        ahk_button.setDisabled(bool(ahk_installed))
         ahk_button.setText(
             "Uninstall AutoHotkey"
             if ahk_installed
@@ -416,7 +415,6 @@ class SettingUI():
         interception_installed = os.path.exists(constant.DRIVER_PATH)
 
         interception_button = self.setting_button()
-        interception_button.setDisabled(bool(interception_installed))
         interception_button.setText(
                                 "Uninstall Interception Driver"
                                 if interception_installed

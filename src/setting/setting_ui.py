@@ -312,9 +312,8 @@ class SettingUI():
         mica_combobox.setCurrentText(utils.get_config().mica_effect.capitalize())
         mica_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_mica_effect(
-                mica_effect=mica_combobox.currentText(),
-                parent=settings_window,
-                mica_combobox=mica_combobox))
+                new_mica=mica_combobox.currentText(),
+                parent=settings_window))
 
         mica_layout, mica_frame = self.setting_card(
             heading="Mica Effect",

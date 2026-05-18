@@ -141,17 +141,27 @@ Please restart {PROGRAM_NAME} to apply change.""")
         except FileNotFoundError as error:
             print(f"Error: {error}")
 
-    def save_mica_effect(self, mica_effect, parent, mica_combobox: QComboBox):
+    def save_mica_effect(self, new_mica, parent):
         "Write style preference to config file"
         try:
             config = utils.get_config()
-            config.mica_effect = mica_effect.lower()
-            utils.update_config(config)
-            # Apply mica on setting window
-            style.apply_mica(parent)
-            # Apply mica on main window
-            style.apply_mica(parent.window().parentWidget())
+            prev_mica = config.mica_effect
 
+            # Update config
+            config.mica_effect = new_mica.lower()
+            utils.update_config(config)
+
+            # setting widget to be translucent pr remove it need restart
+            if prev_mica == "disable" or new_mica.lower() == "disable":
+                QMessageBox.information(
+                    parent,
+                    "Success",
+                    f"Mica effect enabled. Please restart {PROGRAM_NAME} to apply change.")
+            else:
+                # Apply mica on setting window
+                style.apply_mica(parent)
+                # Apply mica on main window
+                style.apply_mica(parent.window().parentWidget())
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,

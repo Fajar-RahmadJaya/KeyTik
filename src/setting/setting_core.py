@@ -6,7 +6,7 @@ import webbrowser
 import subprocess
 import ctypes
 import requests
-from PySide6.QtWidgets import (QMessageBox, QFileDialog, QComboBox, QApplication)  # pylint: disable=E0611
+from PySide6.QtWidgets import (QMessageBox, QFileDialog, QApplication)  # pylint: disable=E0611
 from PySide6.QtGui import QPalette  # pylint: disable=E0611
 from utility import constant
 from utility import utils

@@ -150,7 +150,6 @@ class ProfileUI():
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         edit_scroll.setObjectName("editScroll")
-        edit_scroll.setFrameShape(QFrame.NoFrame)
         edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
 
         edit_frame = remap_row_comp.handle_parser(lines, first_line, self.edit_window)

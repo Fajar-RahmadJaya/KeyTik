@@ -45,10 +45,16 @@ class SettingUI():
         card_layout = QHBoxLayout(card_frame)
         card_layout.setContentsMargins(16, 16, 16, 16)
 
-        theme_label = QLabel(
-            f"<div style='{style.HEADING_STYLE}'> {heading} </div>"
-            f"<div style=' {style.SUBHEADING_STYLE}'> {subheading} </div>"
-        )
+        if subheading:
+            theme_label = QLabel(
+                f"<div style='{style.HEADING_STYLE}'> {heading} </div>"
+                f"<div style=' {style.SUBHEADING_STYLE}'> {subheading} </div>"
+            )
+        else:
+            theme_label = QLabel(
+                f"<div style='{style.HEADING_STYLE}'> {heading} </div>"
+            )
+
         card_layout.addWidget(theme_label)
 
         return card_layout, card_frame
@@ -278,8 +284,8 @@ class SettingUI():
                 parent=settings_window))
 
         accent_layout, accent_frame = self.setting_card(
-            heading="Accent",
-            subheading="Accent color")
+            heading="Accent Color",
+            subheading=None)
         accent_layout.addWidget(accent_combobox)
 
         return accent_frame
@@ -313,8 +319,9 @@ class SettingUI():
                 parent=settings_window,
                 mica_combobox=mica_combobox))
 
-        mica_layout, mica_frame = self.setting_card(heading="Mica Effect",
-                                            subheading="Enable/Disable Mica Effect")
+        mica_layout, mica_frame = self.setting_card(
+            heading="Mica Effect",
+            subheading="Windows and surfaces appear translucent")
         mica_layout.addWidget(mica_combobox)
 
         return mica_frame

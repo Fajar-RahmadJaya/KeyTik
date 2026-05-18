@@ -240,7 +240,7 @@ QGroupBox:title {{
 }}"""
 
 # -------------------- Setting --------------------
-HEADING_STYLE = "font-size:13px; margin-bottom:2px"
+HEADING_STYLE = "font-size:13px;"
 SUBHEADING_STYLE = f"font-size:11px; color: {COLOR.subtext};"
 
 def button_highlight(style_sheet=False):

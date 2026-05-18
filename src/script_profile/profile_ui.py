@@ -4,7 +4,7 @@ import os
 import traceback
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
-    QComboBox, QGridLayout, QMessageBox, QFrame
+    QComboBox, QGridLayout, QMessageBox
 )
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611

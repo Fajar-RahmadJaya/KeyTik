@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (QApplication) # pylint: disable=E0611
 
 from utility import utils
 from utility import thread
+from utility import style
 from dashboard.dashboard_ui import DashboardUI
 from dashboard.dashboard_core import DashboardCore
 from setting.announcement import Announcement
@@ -13,18 +14,30 @@ from setting.setting_ui import SettingUI
 
 def main():
     "Main function"
-    if utils.theme == "dark":
-        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
-    elif utils.theme == "light":
+    # Set Appearance
+    config = utils.get_config()
+    style_config = config.style
+    theme = config.theme
+
+    # Set normal dark and light theme
+    if theme == "light" or style.IS_BASE_LIGHT:
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
+    elif theme == "dark" or not style.IS_BASE_LIGHT:
+        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
 
     app = QApplication(sys.argv)
+    app.setStyle(style_config)
+    app.setPalette(style.PALETTE)
+    # Set accent button highlight stylesheet
+    app.setStyleSheet(style.button_highlight(style_sheet=True))
+
     main_window = DashboardUI()
+    main_window.show()
+
+    # Thread
     announcement = Announcement()
     setting_ui = SettingUI()
     dashboad_core = DashboardCore()
-
-    main_window.show()
 
     main_window.startup_worker = thread.Thread(main_window)
     # Connect signal from thread

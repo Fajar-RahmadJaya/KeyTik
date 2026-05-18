@@ -1,0 +1,41 @@
+{
+    "attribution": {
+        "repository": "https://github.com/catppuccin/qbittorrent",
+        "license": "MIT",
+        "license-link": "https://github.com/catppuccin/qbittorrent?tab=MIT-1-ov-file",
+        "file": "https://github.com/catppuccin/qbittorrent/blob/main/src/catppuccin-frappe/config.json"
+    },
+
+    "Active": {
+        "Window": "#303446",
+        "WindowText": "#c6d0f5",
+        "Base": "#232634",
+        "AlternateBase": "#292c3c",
+        "Text": "#c6d0f5",
+        "ToolTipBase": "#414559",
+        "ToolTipText": "#c6d0f5",
+        "BrightText": "#ca9ee6",
+        "Highlight": "#8caaee",
+        "HighlightedText": "#232634",
+        "Button": "#414559",
+        "ButtonText": "#c6d0f5",
+        "Link": "#8caaee",
+        "LinkVisited": "#babbf1",
+        "Light": "#626880",
+        "Midlight": "#51576d",
+        "Mid": "#303446",
+        "Dark": "#292c3c",
+        "Shadow": "#232634",
+        "PlaceholderText": "#949cbb",
+        "Accent": "#ca9ee6"
+    },
+
+    "Disabled": {
+        "WindowText": "#838ba7",
+        "Text": "#838ba7",
+        "ToolTipText": "#838ba7",
+        "BrightText": "#838ba7",
+        "HighlightedText": "#838ba7",
+        "ButtonText": "#838ba7"
+    }
+  }

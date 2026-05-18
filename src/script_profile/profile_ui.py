@@ -11,7 +11,7 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
 from utility.diff import (mode_item, mode_map)
-from utility import utils
+from utility import style
 from select_program.select_program_ui import SelectProgramUI
 from select_device.select_device import SelectDevice
 from script_profile.remap_row import RemapRow
@@ -33,11 +33,15 @@ class ProfileUI():
 
     def edit_script(self, script_name, parent):
         "Create/edit profile window"
-        # Handle create new profile
-        is_new_profile = not script_name
-        if is_new_profile:
+        self.edit_window = QDialog(parent)
+        # Handle Create New Profile
+        if not script_name:
             script_path = None
             lines = ["; default\n"]
+            first_line = lines[0].strip()
+
+            self.edit_window.setWindowTitle("Create New Profile")
+        # Handle Edit Profile
         else:
             script_path = os.path.join(self.main_core.script_dir, script_name)
             with open(script_path, 'r', encoding='utf-8') as file:
@@ -46,17 +50,12 @@ class ProfileUI():
             if not lines:
                 return
 
-        first_line = lines[0].strip()
-
-        # Edit window
-        self.edit_window = QDialog(parent)
-        if is_new_profile:
-            self.edit_window.setWindowTitle("Create New Profile")
-        else:
             self.edit_window.setWindowTitle("Edit Profile")
+
         self.edit_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = utils.get_geometry(parent, 600, 460)
+        geometry = style.get_geometry(parent, 640, 480)
         self.edit_window.setGeometry(geometry)
+        style.apply_mica(self.edit_window)
 
         # Composition
         remap_row_comp = RemapRow()
@@ -148,9 +147,10 @@ class ProfileUI():
     def edit_middle(self, lines, first_line, edit_layout, remap_row_comp):
         "Middle part of profile manager"
         edit_scroll = QScrollArea(self.edit_window)
-        edit_scroll.setFixedSize(535, 305)
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        edit_scroll.setObjectName("editScroll")
+        edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
 
         edit_frame = remap_row_comp.handle_parser(lines, first_line, self.edit_window)
         edit_scroll.setWidget(edit_frame)
@@ -168,6 +168,7 @@ class ProfileUI():
         save_button.clicked.connect(
             lambda: self.save_changes(mode_combobox, self.keyboard_entry,
                                       self.program_entry, remap_row_comp))
+        save_button.setFixedHeight(28)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
@@ -180,6 +181,7 @@ class ProfileUI():
             lambda index: remap_row_comp.handle_mode_changed(index, self.edit_window))
         default_index = mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
+        mode_combobox.setFixedHeight(28)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
 
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)

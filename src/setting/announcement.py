@@ -1,7 +1,5 @@
 "Load online announcement from KeyTik Website"
 
-import os
-import json
 import requests
 from markdown import markdown
 from PySide6.QtWidgets import (  # pylint: disable=E0611
@@ -12,6 +10,8 @@ from PySide6.QtCore import Qt, QThread, Signal  # pylint: disable=E0611
 
 from utility import constant
 from utility import diff
+from utility import utils
+from utility import style
 
 
 class AnnouncmentThread(QThread):  # pylint: disable=R0903
@@ -55,17 +55,6 @@ class Announcement():
         self.current_announcement_index = 0
         self.announcement_thread = AnnouncmentThread()
 
-    def load_announcement_condition(self):
-        "Load user preference from file, whether to show announcement or not"
-        try:
-            if os.path.exists(constant.dont_show_path):
-                with open(constant.dont_show_path, "r", encoding='utf-8') as f:
-                    config = json.load(f)
-                    return config.get("welcome_condition", True)
-        except FileNotFoundError as e:
-            print(f"Error loading condition file: {e}")
-        return True
-
     def show_announcement_window(self, parent):
         "Announcement window"
         try:
@@ -73,12 +62,13 @@ class Announcement():
 
             announcement_dialog = QDialog(parent)
             announcement_dialog.setWindowTitle("Announcement")
-            announcement_dialog.setFixedSize(525, 290)
+
+            geometry = style.get_geometry(parent, 525, 290)
+            announcement_dialog.setGeometry(geometry)
             announcement_dialog.setWindowIcon(QIcon(constant.icon_path))
             announcement_dialog.setModal(True)
             announcement_dialog.setWindowModality(
                 Qt.WindowModality.WindowModal)
-            announcement_dialog.setFixedSize(525, 290)
 
             main_layout = QVBoxLayout(announcement_dialog)
             main_layout.setContentsMargins(10, 10, 10, 10)
@@ -182,7 +172,7 @@ class Announcement():
         button_layout.addWidget(next_button)
 
         dont_show_checkbox = QCheckBox("Don't show again")
-        dont_show_checkbox.setChecked(not self.load_announcement_condition())
+        dont_show_checkbox.setChecked(not utils.get_config().show_announcement)
         dont_show_checkbox.stateChanged.connect(
             lambda: self.save_announcement_condition(dont_show_checkbox))
         button_layout.addWidget(dont_show_checkbox)
@@ -201,9 +191,7 @@ class Announcement():
     def save_announcement_condition(self, dont_show_checkbox):
         "Save user preference on file when don't show announcement checkbox is checked"
         announcement_condition = not dont_show_checkbox.isChecked()
-        try:
-            with open(constant.dont_show_path, "w", encoding='utf-8') as f:
-                json.dump({"welcome_condition":
-                            announcement_condition}, f)
-        except FileNotFoundError as e:
-            print(f"Error saving condition file: {e}")
+
+        config = utils.get_config()
+        config.show_announcement = announcement_condition
+        utils.update_config(config)

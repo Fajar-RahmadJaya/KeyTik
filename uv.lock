@@ -29,6 +29,15 @@ wheels = [
 ]
 
 [[package]]
+name = "catppuccin"
+version = "2.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/31/87c3ca25d29678e076e1f0d151ef8792f0557b26a8dc865035b5f1fa96c4/catppuccin-2.5.0.tar.gz", hash = "sha256:3035f3bf35bc2369d1cb4c754272a494708592a1e62d42655a371863ac7c6834", size = 1918017, upload-time = "2025-08-03T20:06:40.089Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c8/9c/7908f34009eec72884fe9448a62188423a3621f04ee58e2abaec379c9cc0/catppuccin-2.5.0-py3-none-any.whl", hash = "sha256:74a1f1db79d527905225f1afce1c8858d06e2dd1231e4300a72a812797cdb572", size = 19600, upload-time = "2025-08-03T20:06:38.912Z" },
+]
+
+[[package]]
 name = "certifi"
 version = "2026.2.25"
 source = { registry = "https://pypi.org/simple" }
@@ -153,14 +162,17 @@ name = "keytik"
 version = "2.3.5"
 source = { virtual = "." }
 dependencies = [
+    { name = "catppuccin" },
     { name = "keyboard" },
     { name = "markdown" },
     { name = "psutil" },
     { name = "pynput" },
     { name = "pyside6" },
     { name = "pywin32" },
+    { name = "qt-themes" },
     { name = "requests" },
     { name = "win32mica" },
+    { name = "winaccent" },
     { name = "winshell" },
 ]
 
@@ -174,13 +186,17 @@ pyinstaller = [
 
 [package.metadata]
 requires-dist = [
+    { name = "catppuccin", specifier = ">=2.5.0" },
     { name = "keyboard", specifier = ">=0.13.5,<0.14.0" },
     { name = "markdown", specifier = ">=3.10.2,<4.0.0" },
     { name = "psutil", specifier = ">=7.2.2,<8.0.0" },
     { name = "pynput", specifier = ">=1.8.2,<2.0.0" },
     { name = "pyside6", specifier = "==6.11.1" },
     { name = "pywin32", specifier = ">=311,<312" },
+    { name = "qt-themes", specifier = ">=0.4.0" },
     { name = "requests", specifier = ">=2.34.2,<3.0.0" },
+    { name = "win32mica", specifier = ">=3.0" },
+    { name = "winaccent", specifier = ">=2.1.0" },
     { name = "win32mica", specifier = ">=3.0" },
     { name = "winshell", specifier = ">=0.6,<0.7" },
 ]
@@ -2927,6 +2943,15 @@ wheels = [
 ]
 
 [[package]]
+name = "qt-themes"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ad/ec/8b966d8021e908a80dea7fe8a89641b2b950efdc02fd5d506f26fd71e8d4/qt_themes-0.4.0.tar.gz", hash = "sha256:81f5fad08338d54654cd914eec6cc42e8701cbcd1595900b98ae32d48f615237", size = 8569, upload-time = "2025-12-06T21:32:45.713Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ac/b4/8d2276d1ff41e7178cb8bfd374977614ed90eb2b1da3ac7a4d872932c73f/qt_themes-0.4.0-py3-none-any.whl", hash = "sha256:ff754bd5ecd0bd54caf49260939c9d1454d2967240bd6973420bd3fb9ef32c1e", size = 11331, upload-time = "2025-12-06T21:32:44.435Z" },
+]
+
+[[package]]
 name = "requests"
 version = "2.34.2"
 source = { registry = "https://pypi.org/simple" }
@@ -3032,6 +3057,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9c/91/8aecf60b274ac4192f88ded4b4f6c9b3ed4868eecc845b5479b49337dc92/win32mica-3.0.tar.gz", hash = "sha256:87dcbd7d098bc9e778bd7035a81831ddd952e37ac7eafbc82105fc316a629945", size = 5854, upload-time = "2023-08-31T21:29:59.362Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/44/37/fe689f99ebaf08c082fd0fce61f38b92d88b047e9270d58f4f04caae9a0f/win32mica-3.0-py3-none-any.whl", hash = "sha256:8e4c0454f886aad095197adfcc24c58bc83b5f26bb951c461dc1509448600b9d", size = 5625, upload-time = "2023-08-31T21:29:57.923Z" },
+]
+
+[[package]]
+name = "winaccent"
+version = "2.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/cc/5e65bcec8918da4e1758da8220ef1029a77eda5e316db695c3c6a9a0a182/winaccent-2.1.0.tar.gz", hash = "sha256:ced57c42ae0ce768ee45ca6d38bc3cc3a80603eddbc6ce4d8597275a9d296fa1", size = 18644, upload-time = "2025-06-24T16:36:09.303Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2e/d7/0f2a069e8c6f5f279b3136e1e02f479a1e742ad7a03b16182e9d540129b2/winaccent-2.1.0-py3-none-any.whl", hash = "sha256:91595b7a1586a37332590744fba6028130f06291ff0c302bca56779edb9ace42", size = 17033, upload-time = "2025-06-24T16:36:08.335Z" },
 ]
 
 [[package]]

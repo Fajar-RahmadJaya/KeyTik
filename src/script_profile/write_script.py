@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 import os
-import json
 import random
 import re
 from PySide6.QtWidgets import (QLineEdit, QCheckBox, QMessageBox)  # pylint: disable=E0611
@@ -31,7 +30,10 @@ class WriteScript():
     "Write script based on profile input"
     def __init__(self, remap_row_comp=None):
         self.remap_row_comp = remap_row_comp
+
+        # Composition
         self.dashboard_core = DashboardCore()
+        self.remap_row_core = RemapRowCore()
 
     def check_key_integrity(self):
         "Make sure there is no conflict on profile input"
@@ -93,7 +95,7 @@ class WriteScript():
     def handle_write(self, script_name, mode, keyboard_entry, program_entry):
         "Action when saving profile (Can be moved)"
         output_path = os.path.join(self.dashboard_core.script_dir, script_name)
-        key_translations = self.load_key_translations()
+        key_translations = self.remap_row_core.read_keylist()
         diff = Diff()  # Composition
         write_default = WriteDefault(self)  # Composition
 
@@ -223,18 +225,6 @@ class WriteScript():
             file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
             hotif_conditions.append("cm1.IsActive")
 
-    def load_key_translations(self):
-        "Load translation from readable key to raw key"
-        remap_row_core = RemapRowCore()
-        key_translations = {}
-        key, info = remap_row_core.read_keylist()
-        readable_key = key.strip().lower()
-        translation = info.get("translate", "").strip()
-        if translation:
-            key_translations[readable_key] = translation
-
-        return key_translations
-
     def initialize_exit_keys(self):
         "Make sure there is no duplicate exit key usage on each script"
         try:
@@ -245,11 +235,9 @@ class WriteScript():
             self.validate_exit_keys(exit_keys)
 
             # Save the new exit keys back to save file
-            try:
-                with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
-                    json.dump(exit_keys, f)
-            except FileNotFoundError as e:
-                print(f"Error saving exit_keys.json: {e}")
+            config = utils.get_config()
+            config.exit_key = exit_keys
+            utils.update_config(config)
 
         except FileNotFoundError as e:
             print(f"Error in initialize_exit_keys: {e}")
@@ -302,12 +290,7 @@ class WriteScript():
         "Resolve and get exit keys from file"
         # Load the exit keys from save file
         exit_keys = {}
-        if os.path.exists(constant.exit_keys_file):
-            try:
-                with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
-                    exit_keys = json.load(f)
-            except FileNotFoundError:
-                exit_keys = {}
+        exit_keys = utils.get_config().exit_key
 
         # Create dictionary containing script and the exit key
         combo_to_scripts = {}
@@ -350,11 +333,10 @@ class WriteScript():
         keys = key.split('+')
         translated_keys = []
 
-        key_translations = self.load_key_translations()
+        key_translations = self.remap_row_core.read_keylist()
 
         for single_key in keys:
-            translated_key = key_translations.get(single_key.strip().lower(),
-                                                    single_key.strip())
+            translated_key = key_translations.get(single_key.strip().lower())
             translated_keys.append(translated_key)
 
         return " & ".join(translated_keys)

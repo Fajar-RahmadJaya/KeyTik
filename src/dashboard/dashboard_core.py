@@ -1,7 +1,6 @@
 "Main Core (Might be changed to shared later)"
 
 import os
-import json
 import re
 import shutil
 import webbrowser
@@ -30,7 +29,7 @@ class DashboardCore(QObject):
 
         # Variable
         self.current_page = 0
-        self.pinned_profiles = utils.load_pinned_profiles()
+        self.pinned_profiles = utils.get_config().pinned_profile
 
     def import_button_clicked(self, parent):
         "Select AHK script and add necessary line"
@@ -94,8 +93,7 @@ class DashboardCore(QObject):
                 new_lines = [lines[0] + f"{exit_key}::ExitApp\n",
                                 "\n"] + lines[1:]
 
-            content = ''.join(new_lines)
-            content_lines = content.splitlines()
+            content_lines = ''.join(new_lines).splitlines()
             content_lines = [line for line in content_lines if
                                 line.strip() not in ["; Text mode start",
                                                         "; Text mode end"]]
@@ -107,52 +105,45 @@ class DashboardCore(QObject):
                 file.write('\n'.join(result_lines) + '\n')
         except FileNotFoundError as e:
             print(f"Error modifying script: {e}")
-            try:
-                if os.path.exists(constant.exit_keys_file):
-                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
-                        exit_keys = json.load(f)
-                    if file_name in exit_keys:
-                        del exit_keys[file_name]
-                    with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
-                        json.dump(exit_keys, f)
-            except FileNotFoundError:
-                pass
+            exit_keys = utils.get_config().exit_key
+
+            if file_name in exit_keys:
+                del exit_keys[file_name]
+
+            config = utils.get_config()
+            config.exit_key = exit_keys
+            utils.update_config(config)
 
     def generate_exit_key(self, script_name, file=None):
         "Generate key for profile exit"
         possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
+        exit_keys = utils.get_config().exit_key
+
+        used_keys = set(key[-1] for key in exit_keys.values())
+        available_keys = [k for k in possible_keys if k not in used_keys]
+
+        if not available_keys:
+            available_keys = possible_keys
+
+        exit_combo = f"^!{random.choice(available_keys)}"
+
+        exit_keys[script_name] = exit_combo
+
         try:
-            if os.path.exists(constant.exit_keys_file):
-                try:
-                    with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
-                        exit_keys = json.load(f)
-                except json.JSONDecodeError:
-                    exit_keys = {}
-            else:
-                exit_keys = {}
+            config = utils.get_config()
+            config.exit_key = exit_keys
+            utils.update_config(config)
 
-            used_keys = set(key[-1] for key in exit_keys.values())
-            available_keys = [k for k in possible_keys if k not in used_keys]
-
-            if not available_keys:
-                available_keys = possible_keys
-
-            exit_combo = f"^!{random.choice(available_keys)}"
-
-            exit_keys[script_name] = exit_combo
-            with open(constant.exit_keys_file, 'w', encoding='utf-8') as f:
-                json.dump(exit_keys, f)
-
-            if file is not None:
+            if file:
                 file.write(f"{exit_combo}::ExitApp\n\n")
 
             return exit_combo
 
         except FileNotFoundError as e:
             print(f"Error handling exit key: {e}")
-            if file is not None:
+            if file:
                 file.write("^!p::ExitApp\n\n")
             return "^!p"
 
@@ -198,66 +189,51 @@ class DashboardCore(QObject):
             QMessageBox.warning(None, "Error",
                                 f"{script_name} does not exist.")
 
-    def activate_script(self, script_name, button):
+    def activate_script(self, script_name):
         "Run profile"
-        script_path = os.path.join(self.script_dir, script_name)
+        if os.path.isfile(os.path.join(utils.active_dir, script_name)):
+            script_path = os.path.join(utils.active_dir, script_name)
+        else:
+            script_path = os.path.join(utils.store_dir, script_name)
 
         if os.path.isfile(script_path):
 
             os.startfile(script_path)
-
-            button.setText(" Exit")
-            button.setToolTip(f'Stop "{os.path.splitext(script_name)[0]}"')
-            button.setIcon(icons.get_icon(icons.icon_exit))
-            button.clicked.disconnect()
-            button.clicked.connect(lambda: self.exit_script(script_name,
-                                                            button))
         else:
             QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
-    def exit_script(self, script_name, button):
+    def exit_script(self, script_name):
         "Exit profile"
-        script_path = os.path.join(self.script_dir, script_name)
+        if os.path.isfile(os.path.join(utils.active_dir, script_name)):
+            script_path = os.path.join(utils.active_dir, script_name)
+        else:
+            script_path = os.path.join(utils.store_dir, script_name)
 
         if os.path.isfile(script_path):
-            try:
+            exit_keys = utils.get_config().exit_key
+            exit_combo = exit_keys.get(script_name)
+            if not exit_combo:
+                QMessageBox.critical(None,
+                                        "Error",
+                                        f"No exit key found for {script_name}")
+                return
 
-                with open(constant.exit_keys_file, 'r', encoding='utf-8') as f:
-                    exit_keys = json.load(f)
+            keyboard = Controller()
+            if '^' in exit_combo:
+                keyboard.press(Key.ctrl)
+            if '!' in exit_combo:
+                keyboard.press(Key.alt)
 
-                exit_combo = exit_keys.get(script_name)
-                if not exit_combo:
-                    QMessageBox.critical(None,
-                                         "Error", 
-                                         f"No exit key found for {script_name}")
-                    return
+            final_key = exit_combo[-1]
+            keyboard.press(final_key)
+            keyboard.release(final_key)
 
-                keyboard = Controller()
-                if '^' in exit_combo:
-                    keyboard.press(Key.ctrl)
-                if '!' in exit_combo:
-                    keyboard.press(Key.alt)
-
-                final_key = exit_combo[-1]
-                keyboard.press(final_key)
-                keyboard.release(final_key)
-
-                if '!' in exit_combo:
-                    keyboard.release(Key.alt)
-                if '^' in exit_combo:
-                    keyboard.release(Key.ctrl)
-
-                button.setText(" Run")
-                button.setToolTip(f'Start "{os.path.splitext(script_name)[0]}"')
-                button.setIcon(icons.get_icon(icons.run))
-                button.clicked.disconnect()
-                button.clicked.connect(lambda: self.activate_script(
-                    script_name, button))
-
-            except FileNotFoundError as e:
-                QMessageBox.critical(None, "Error", f"Failed to exit script: {e}")
+            if '!' in exit_combo:
+                keyboard.release(Key.alt)
+            if '^' in exit_combo:
+                keyboard.release(Key.ctrl)
         else:
-            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(None, "Error", f"{script_path} does not exist.")
 
     def store_script(self, script_name):
         "Move profile to store directory"
@@ -280,21 +256,6 @@ class DashboardCore(QObject):
         else:
             QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
 
-    def toggle_run_exit(self, script_name, button):
-        "Switch between run/exit on profile"
-        if button.text() == " Run":
-            self.activate_script(script_name, button)
-
-            button.clicked.disconnect()
-            button.clicked.connect(lambda checked=False: self.toggle_run_exit(
-                script_name, button))
-        else:
-            self.exit_script(script_name, button)
-
-            button.clicked.disconnect()
-            button.clicked.connect(lambda checked=False: self.toggle_run_exit(
-                script_name, button))
-
     def toggle_script_dir(self, show_stored):
         "Change current directory based on store/active profile"
         if self.script_dir == utils.active_dir:
@@ -306,6 +267,7 @@ class DashboardCore(QObject):
             show_stored.setToolTip("Show Stored Profile")
             show_stored.setIcon(icons.get_icon(icons.show_stored))
 
+        self.current_page = 0
         self.list_scripts()
         self.update_script_signal.emit()
 
@@ -330,7 +292,11 @@ class DashboardCore(QObject):
         else:
             self.pinned_profiles.insert(0, script)
 
-        utils.save_pinned_profiles(self.pinned_profiles)
+        # Update config
+        config = utils.get_config()
+        config.pinned_profile = self.pinned_profiles
+        utils.update_config(config)
+
         self.update_script_signal.emit()
 
     def list_scripts(self):

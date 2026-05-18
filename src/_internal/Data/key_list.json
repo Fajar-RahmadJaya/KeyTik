@@ -85,11 +85,11 @@
         },
 
         "Modifier Keys":{
-            "Left Win":{
+            "Left Windows":{
                 "translate": "LWin",
                 "description": "Left Win"
             }, 
-            "Right Win":{
+            "Right Windows":{
                 "translate": "RWin",
                 "description": "Right Win"
             }, 

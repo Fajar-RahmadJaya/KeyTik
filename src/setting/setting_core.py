@@ -3,23 +3,21 @@
 import os
 import shutil
 import webbrowser
-import json
 import subprocess
 import ctypes
 import requests
-from PySide6.QtWidgets import (QMessageBox, QFileDialog)  # pylint: disable=E0611
-
+from PySide6.QtWidgets import (QMessageBox, QFileDialog, QApplication)  # pylint: disable=E0611
+from PySide6.QtGui import QPalette  # pylint: disable=E0611
 from utility import constant
 from utility import utils
-from utility.diff import Diff, CHECK_UPDATE_LINK
-
+from utility import style
+from utility.diff import Diff, CHECK_UPDATE_LINK, PROGRAM_NAME
+from dashboard.dashboard_core import DashboardCore
 
 class SettingCore():
     "Setting logic"
     def change_data_location(self, parent):
         "Change active and stored profile directory for 'change profile location'"
-        # To Do: fix known issue.
-        # Known issue: After successfully change data location, show stored not works
         new_path = QFileDialog.getExistingDirectory(
             parent, "Select a New Path for Active and Store Folders"
         )
@@ -28,7 +26,14 @@ class SettingCore():
             print("No directory selected. Operation canceled.")
             return
 
+        dashboard_core = DashboardCore()
+
         try:
+            # Exit all script first to prevent administrator issue
+            running_scripts = dashboard_core.get_running_ahk()
+            for script in running_scripts:
+                dashboard_core.exit_script(script_name=script)
+
             if not os.path.exists(new_path):
                 print(f"The selected path does not exist: {new_path}")
                 return
@@ -48,15 +53,21 @@ class SettingCore():
             else:
                 print(f"Store folder does not exist at {utils.store_dir}")
 
-            new_condition_data = {"path": new_path}
-            with open(constant.condition_path, 'w', encoding='utf-8') as f:
-                json.dump(new_condition_data, f)
+            # Save profile path to config
+            config = utils.get_config()
+            config.profile_path = new_path
+            utils.update_config(config)
+
             print(f"Updated condition.json with the new path: {new_path}")
 
             utils.active_dir = new_active_dir
             utils.store_dir = new_store_dir
             print(f"Global active_dir updated to: {utils.active_dir}")
             print(f"Global store_dir updated to: {utils.store_dir}")
+
+            # Reactive script after move profile successfully
+            for script in running_scripts:
+                dashboard_core.activate_script(script)
 
             QMessageBox.information(
                 None, "Change Profile Location",
@@ -65,29 +76,97 @@ class SettingCore():
             print(f"An error occurred: {e}")
             QMessageBox.critical(None, "Error", f"An error occurred: {e}")
 
-    def save_theme(self, theme):
-        "Write theme preference to theme file"
+    def save_theme(self, theme: dict, parent):
+        "Write theme preference to config file"
         try:
-            with open(constant.theme_path, 'w', encoding='utf-8') as f:
-                if theme == "system":
-                    f.write("")
-                else:
-                    f.write(theme)
-        except FileNotFoundError:
-            print("Error: theme_path file not found")
+            config = utils.get_config()
 
-    def read_theme(self):
-        "Read saved theme preference from theme file"
+            config.theme_type = theme.get("type")
+            config.theme = theme.get("value")
+            utils.update_config(config)
+
+            # Apply palette directly when theme is in the same default color
+            palette = style.get_palette()
+            base_light = style.is_light(palette.color(QPalette.Base))
+            default_theme_light = os.environ.get("QT_QPA_PLATFORM") == "windows:darkmode=1"
+
+            # Palette with different default theme need restart
+            if (base_light != default_theme_light
+                or theme.get("value") in ("light", "dark")):
+                QMessageBox.information(
+                    parent,
+                    "Success",
+                    f"""Theme changed to {config.theme}.
+Please restart {PROGRAM_NAME} to apply change.""")
+            else:
+                # Set palette
+                QApplication.setPalette(palette)
+                QApplication.setStyleSheet(
+                    QApplication.instance(),
+                    style.button_highlight(style_sheet=True))
+
+        except FileNotFoundError as error:
+            QMessageBox.critical(parent,
+                              "Error",
+                              f"Failed to change theme\n{error}")
+
+    def save_accent(self, accent: list, parent):
+        "Write accent preference to config file"
         try:
-            if os.path.exists(constant.theme_path):
-                with open(constant.theme_path, 'r', encoding= 'utf-8') as f:
-                    theme = f.read().strip().lower()
-                if theme in ("dark", "light"):
-                    return theme
-            return "system"
-        except FileNotFoundError:
-            print("Error: theme_path file not found")
-            return "system"
+            config = utils.get_config()
+            config.accent = accent[1]
+            utils.update_config(config)
+
+            # Update accent palette and button highlight stylesheet
+            QApplication.setPalette(style.get_palette())
+            QApplication.setStyleSheet(
+                QApplication.instance(),
+                style.button_highlight(style_sheet=True))
+
+        except FileNotFoundError as error:
+            QMessageBox.critical(parent,
+                                "Error",
+                                f"Failed to change Accent\n{error}")
+
+    def save_style(self, updated_style):
+        "Write style preference to config file"
+        try:
+            config = utils.get_config()
+            config.style = "" if updated_style == "Default" else updated_style
+            utils.update_config(config)
+
+            # Update style
+            QApplication.setStyle(updated_style)
+
+        except FileNotFoundError as error:
+            print(f"Error: {error}")
+
+    def save_mica_effect(self, new_mica, parent):
+        "Write style preference to config file"
+        try:
+            config = utils.get_config()
+            prev_mica = config.mica_effect
+
+            # Update config
+            config.mica_effect = new_mica.lower()
+            utils.update_config(config)
+
+            # setting widget to be translucent pr remove it need restart
+            if prev_mica == "disable" or new_mica.lower() == "disable":
+                QMessageBox.information(
+                    parent,
+                    "Success",
+                    f"Mica effect enabled. Please restart {PROGRAM_NAME} to apply change.")
+            else:
+                # Apply mica on setting window
+                style.apply_mica(parent)
+                # Apply mica on main window
+                style.apply_mica(parent.window().parentWidget())
+
+        except FileNotFoundError as error:
+            QMessageBox.critical(parent,
+                                "Error",
+                                f"Failed to change style\n{error}")
 
     def ahk_action(self, ahk_installed):
         "Uninstall AutoHotkey"
@@ -133,3 +212,12 @@ class SettingCore():
         except requests.exceptions.ConnectionError:
             pass
         return None
+
+    def get_custom_theme(self) -> list[str]:
+        "Return list containing custom theme"
+        theme_file = []
+
+        for file in os.listdir(constant.theme_dir):
+            theme_file.append(file)
+
+        return theme_file

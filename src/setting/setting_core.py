@@ -145,24 +145,13 @@ Please restart {PROGRAM_NAME} to apply change.""")
         "Write style preference to config file"
         try:
             config = utils.get_config()
+            config.mica_effect = mica_effect.lower()
+            utils.update_config(config)
+            # Apply mica on setting window
+            style.apply_mica(parent)
+            # Apply mica on main window
+            style.apply_mica(parent.window().parentWidget())
 
-            if config.theme not in ("light", "dark", "system"):
-                mica_combobox.blockSignals(True)
-                mica_combobox.setCurrentText("Disable")
-                mica_combobox.blockSignals(False)
-                QMessageBox.warning(
-                    parent,
-                    "Warnig",
-                    """Mica effect not applied.
-                    \nMica effect currently only support dark, light, and system only."""
-                )
-            else:
-                config.mica_effect = mica_effect.lower()
-                utils.update_config(config)
-                # Apply mica on setting window
-                style.apply_mica(parent)
-                # Apply mica on main window
-                style.apply_mica(parent.window().parentWidget())
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent,

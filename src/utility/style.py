@@ -58,13 +58,15 @@ def apply_mica(target_window):
     "Apply mica style on target window using win32mica"
     config = utils.get_config()
     mica_effect = config.mica_effect
-    theme = detect_system_theme() if config.theme not in ("dark", "light") else config.theme
+    palette = get_palette()
+    is_base_light = is_light(palette.color(QPalette.ColorRole.Base))
+    theme = "LIGHT" if is_base_light else "DARK"
 
     if mica_effect != "disable" and mica_supported:
         target_window.setAttribute(Qt.WA_TranslucentBackground)
         win32mica.ApplyMica(
             HWND=int(target_window.winId()),
-            Theme=getattr(win32mica.MicaTheme, theme.upper()),
+            Theme=getattr(win32mica.MicaTheme, theme),
             Style=getattr(win32mica.MicaStyle, mica_effect.upper())
         )
 

@@ -92,7 +92,7 @@ class SettingCore():
 
             # Palette with different default theme need restart
             if (base_light != default_theme_light
-                or theme.get("value") == "light"):
+                or theme.get("value") in ("light", "dark")):
                 QMessageBox.information(
                     parent,
                     "Success",

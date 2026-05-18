@@ -45,15 +45,10 @@ class SettingUI():
         card_layout = QHBoxLayout(card_frame)
         card_layout.setContentsMargins(16, 16, 16, 16)
 
-        if subheading:
-            theme_label = QLabel(
-                f"<div style='{style.HEADING_STYLE}'> {heading} </div>"
-                f"<div style=' {style.SUBHEADING_STYLE}'> {subheading} </div>"
-            )
-        else:
-            theme_label = QLabel(
-                f"<div style='{style.HEADING_STYLE}'> {heading} </div>"
-            )
+        theme_label = QLabel(
+            f"<div style='{style.HEADING_STYLE}'> {heading} </div>"
+            f"<div style=' {style.SUBHEADING_STYLE}'> {subheading} </div>"
+        )
 
         card_layout.addWidget(theme_label)
 
@@ -197,8 +192,9 @@ class SettingUI():
             lambda: self.setting_core.save_style(
                 updated_style=style_combobox.currentText()))
 
-        style_layout, style_frame = self.setting_card(heading="Style",
-                                            subheading="Change appearance style")
+        style_layout, style_frame = self.setting_card(
+            heading="Style",
+            subheading="Change widget style")
         style_layout.addWidget(style_combobox)
 
         return style_frame
@@ -247,8 +243,9 @@ class SettingUI():
                 theme=theme_combobox.currentData(),
                 parent=settings_window))
 
-        theme_layout, theme_frame = self.setting_card(heading="Theme",
-                                            subheading="Change appearance theme")
+        theme_layout, theme_frame = self.setting_card(
+            heading="Theme",
+            subheading="Change widget palette")
         theme_layout.addWidget(theme_combobox)
 
         return theme_frame
@@ -285,7 +282,7 @@ class SettingUI():
 
         accent_layout, accent_frame = self.setting_card(
             heading="Accent Color",
-            subheading=None)
+            subheading="Change highlighted widget color")
         accent_layout.addWidget(accent_combobox)
 
         return accent_frame

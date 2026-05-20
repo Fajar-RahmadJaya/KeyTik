@@ -28,6 +28,9 @@ lint = [
     "pylint>=4.0.5",
     "ruff>=0.15.13",
 ]
+pre-commit = [
+    "pre-commit>=4.6.0",
+]
 pyinstaller = [
     "pyinstaller>=6.20.0",
 ]

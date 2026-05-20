@@ -19,10 +19,10 @@
 <br>
 
 <div align="center">
-  
+
 ## Overview
 
-KeyTik is a Python program that uses AutoHotkey to handle many things, including a powerful key mapper and various macros such as clickers and more. It comes with comprehensive [key support](https://keytik.com/docs/getting-started/key-list/keyboard), such as ASCII, ANSI, Unicode, Scan Code, Virtual Keyboard Code, and more. 
+KeyTik is a Python program that uses AutoHotkey to handle many things, including a powerful key mapper and various macros such as clickers and more. It comes with comprehensive [key support](https://keytik.com/docs/getting-started/key-list/keyboard), such as ASCII, ANSI, Unicode, Scan Code, Virtual Keyboard Code, and more.
 
 KeyTik is also packed with [features](#features) like Bind to Programs and Devices, Assign Shortcuts, Text Format, Hold Format, and more.
 
@@ -39,7 +39,7 @@ KeyTik is also packed with [features](#features) like Bind to Programs and Devic
 
 </div>
 
-KeyTik Pro version is available at Gumroad at $20 for lifetime purchase. Check out KeyTik Pro at [https://fajarrahmadjaya.gumroad.com/l/keytik-pro](https://fajarrahmadjaya.gumroad.com/l/keytik-pro). 
+KeyTik Pro version is available at Gumroad at $20 for lifetime purchase. Check out KeyTik Pro at [https://fajarrahmadjaya.gumroad.com/l/keytik-pro](https://fajarrahmadjaya.gumroad.com/l/keytik-pro).
 
 Pro version has additional features compared to the normal version while not overwhelming it. Think of Pro version as a way to support the developer or as a more user-friendly version of the normal version. Pro version consists of additional UI for the auto clicker, file opener, screen clicker, and additional automation tools such as window manager, easy always-on-top, and multi copy-paste.
 
@@ -48,7 +48,7 @@ Pro version has additional features compared to the normal version while not ove
 <div align="center">
 <img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="500" />
 </div>
-  
+
 <br>
 <details>
   <summary><b>Click to see more</b></div></summary>
@@ -147,7 +147,7 @@ KeyTik is available at the following platforms:
 <br>
 
 <div align="center">
-  
+
 ## Table Of Content
 </div>
 
@@ -172,7 +172,7 @@ KeyTik is available at the following platforms:
 <br>
 
 <div align="center">
-  
+
 ## Screenshots Preview
 
 </div>
@@ -208,7 +208,7 @@ KeyTik is available at the following platforms:
 <br>
 
 <div align="center">
-  
+
 ## Features
 
 </div>
@@ -249,7 +249,7 @@ KeyTik is available at the following platforms:
 <br>
 
 <div align="center">
-  
+
 ## Have a Suggestion or Question?
 
 </div>
@@ -265,7 +265,7 @@ If you have any suggestions or question, don't hesitate to submit it on the issu
 <br>
 
 <div align="center">
-  
+
 ## License
 This project is licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). You can freely use, modify, and distribute this code under the terms of the license.
 
@@ -274,7 +274,7 @@ This project is licensed under the [Apache License 2.0](http://www.apache.org/li
 <br>
 
 <div align="center">
-  
+
 ## Contributing
 Pull requests are welcome! We welcome contributions of all kinds, including bug fixes, features, improvements, documentation improvement and more. Check out the [Contribution Guidelines](https://github.com/Fajar-RahmadJaya/KeyTik/blob/main/CONTRIBUTING.md) for more info.
 
@@ -283,7 +283,7 @@ Pull requests are welcome! We welcome contributions of all kinds, including bug 
 <br>
 
 <div align="center">
-  
+
 ## Star History
 
 </div>

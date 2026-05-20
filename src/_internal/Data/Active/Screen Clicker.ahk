@@ -2,12 +2,12 @@
 ^!p::ExitApp
 
 #SingleInstance Force
-toggle := false 
+toggle := false
 
 q & e:: ; Change this to toogle screen clicker on or off
-{ 
+{
 global
-    toggle := !toggle 
+    toggle := !toggle
 
     if (toggle) {
         SetTimer(ClickLoop,100)
@@ -15,17 +15,17 @@ global
         SetTimer(ClickLoop,0)
     }
     return
-} 
+}
 
 ClickLoop()
-{ 
-global 
+{
+global
     coordinates := [[500, 300], [600, 400], [700, 500]] ; Change the interval to your preference
 
     Loop coordinates.Length != 0 ? coordinates.Length : ""
     {
-        x := coordinates[A_Index][1] 
-        y := coordinates[A_Index][2] 
+        x := coordinates[A_Index][1]
+        y := coordinates[A_Index][2]
 
         MouseMove(x, y)
         Click()
@@ -35,4 +35,4 @@ global
         Sleep(interval)
     }
     return
-} 
+}

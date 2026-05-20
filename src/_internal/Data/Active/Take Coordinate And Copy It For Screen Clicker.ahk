@@ -7,7 +7,7 @@
 Persistent
 SetTitleMatchMode(2)
 
-Space:: ; Change this for script to take coordinate 
+Space:: ; Change this for script to take coordinate
 {
     MouseGetPos(&mouseX, &mouseY)
 
@@ -23,9 +23,9 @@ Space:: ; Change this for script to take coordinate
 }
 
 RemoveToolTip()
-{ 
-global 
+{
+global
     ToolTip()
     return
-} 
+}
 ; Text mode end

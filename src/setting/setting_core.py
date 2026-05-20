@@ -179,8 +179,8 @@ Please restart {diff_comp.program_name} to apply change.""")
             except FileNotFoundError:
                 QMessageBox.critical(
                     None,
-                    "Error", 
-                    "Failed to uninstall: AutoHotkey installation path not found") 
+                    "Error",
+                    "Failed to uninstall: AutoHotkey installation path not found")
         else:
             webbrowser.open("https://www.autohotkey.com")
 
@@ -200,8 +200,8 @@ Please restart {diff_comp.program_name} to apply change.""")
         except FileNotFoundError:
             QMessageBox.critical(
                 None,
-                "Error", 
-                "Failed to uninstall: inter_uninstall.bat not found") 
+                "Error",
+                "Failed to uninstall: inter_uninstall.bat not found")
 
     def check_for_update(self):
         "Check for update comparing current version and latest version from GitHub API"

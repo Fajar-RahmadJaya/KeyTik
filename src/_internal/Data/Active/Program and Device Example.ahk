@@ -1,5 +1,5 @@
 ; default
-^!p::ExitApp 
+^!p::ExitApp
 
 #SingleInstance force
 Persistent

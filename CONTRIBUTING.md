@@ -1,7 +1,7 @@
 # Contributing to KeyTik
 
 Pull requests are welcome!
-We welcome contributions of all kinds, including bug fixes, features, improvements, documentation improvement and more. 
+We welcome contributions of all kinds, including bug fixes, features, improvements, documentation improvement and more.
 
 ## Setting up Workplace
 1. Download and install Python on your machine.

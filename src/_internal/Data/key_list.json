@@ -54,7 +54,7 @@
             "Wheel Right":{
                 "translate": "WheelRight",
                 "description": "Scroll to the rigt. These can be used as hotkeys with some (but not all) mice which have a second wheel or support tilting the wheel to either side. In some cases, software bundled with the mouse must instead be used to control this feature. Regardless of the particular mouse."
-            }                                                    
+            }
         },
 
         "General Keys":{
@@ -69,15 +69,15 @@
             "Tab":{
                 "translate": "Tab",
                 "description": "Tab (tabulator key)"
-            }, 
+            },
             "Enter":{
                 "translate": "Enter",
                 "description": ""
-            }, 
+            },
             "Esc":{
                 "translate": "Esc",
                 "description": ""
-            }, 
+            },
             "Backspace":{
                 "translate": "Backspace",
                 "description": ""
@@ -88,47 +88,47 @@
             "Left Windows":{
                 "translate": "LWin",
                 "description": "Left Win"
-            }, 
+            },
             "Right Windows":{
                 "translate": "RWin",
                 "description": "Right Win"
-            }, 
+            },
             "Ctrl":{
                 "translate": "Ctrl",
                 "description": "Control (or Ctrl)"
-            }, 
+            },
             "Left Ctrl ":{
                 "translate": "LCtrl ",
                 "description": "Left Control (or Ctrl)"
-            }, 
+            },
             "Right Ctrl":{
                 "translate": "RCtrl",
                 "description": "Right Control (or Ctrl)"
-            }, 
+            },
             "Alt":{
                 "translate": "Alt",
                 "description": ""
-            }, 
+            },
             "Alt gr":{
                 "translate": "<^>!",
                 "description": "AltGr (alternate graph, or alternate graphic)"
-            }, 
+            },
             "Left Alt":{
                 "translate": "LAlt",
                 "description": "Left Alt"
-            }, 
+            },
             "Right Alt":{
                 "translate": "RAlt",
                 "description": "Right Alt"
-            }, 
+            },
             "Shift":{
                 "translate": "Shift",
                 "description": ""
-            }, 
+            },
             "Left Shift":{
                 "translate": "LShift",
                 "description": "Left Shift"
-            }, 
+            },
             "Right Shift":{
                 "translate": "RShift",
                 "description": "Right Shift"
@@ -139,43 +139,43 @@
             "Scroll Lock":{
                 "translate": "ScrollLock",
                 "description": "ScrollLock (scroll lock key). While Ctrl is held down, ScrollLock produces the key code of CtrlBreak, but can be differentiated from Pause by scan code (SC)."
-            }, 
+            },
             "Delete":{
                 "translate": "Delete",
                 "description": "Del"
-            }, 
+            },
             "Insert":{
                 "translate": "Insert",
                 "description": "Ins"
-            }, 
+            },
             "Home":{
                 "translate": "Home",
                 "description": ""
-            }, 
+            },
             "End":{
                 "translate": "End",
                 "description": ""
-            }, 
+            },
             "Page Up":{
                 "translate": "PgUp",
                 "description": "PgUp (page up key)"
-            }, 
+            },
             "Page Down":{
                 "translate": "PgDn",
                 "description": "PgDn (page down key)"
-            }, 
+            },
             "Up":{
                 "translate": "Up",
                 "description": "↑ (up arrow key)"
-            }, 
+            },
             "Down":{
                 "translate": "Down",
                 "description": "↓ (down arrow key)"
-            }, 
+            },
             "Left":{
                 "translate": "Left",
                 "description": "← (left arrow key)"
-            }, 
+            },
             "Right":{
                 "translate": "Right",
                 "description": "→ (right arrow key)"
@@ -288,7 +288,7 @@
             "Num Lock": {
                 "translate": "NumLock",
                 "description": "NumLock (number lock key). While Ctrl is held down, NumLock produces the key code of Pause, so use Pause in hotkeys instead of NumLock."
-            }, 
+            },
             "Numpad 0": {
                 "translate": "Numpad0",
                 "description": "(NumLock ON) 0"

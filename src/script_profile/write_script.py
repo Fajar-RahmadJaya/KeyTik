@@ -9,7 +9,7 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
 from utility import utils
-from utility.diff import Diff
+from utility.diff import diff_comp
 from select_key.select_key_core import SelectKeyCore
 from dashboard.dashboard_core import DashboardCore
 from script_profile.remap_row_core import RemapRowCore
@@ -96,7 +96,6 @@ class WriteScript():
         "Action when saving profile (Can be moved)"
         output_path = os.path.join(self.dashboard_core.script_dir, script_name)
         key_translations = self.remap_row_core.read_keylist()
-        diff = Diff()  # Composition
         write_default = WriteDefault(self)  # Composition
 
         with open(output_path, 'w', encoding='utf-8') as file:
@@ -105,7 +104,7 @@ class WriteScript():
             elif mode == "default mode":
                 write_default.handle_default_mode(file, keyboard_entry, program_entry)
             else:
-                diff.pro_write(file, mode, key_translations)
+                diff_comp.pro_write(file, mode, key_translations)
 
     def handle_text_mode(self, file, keyboard_entry, program_entry):
         "Write text mode"

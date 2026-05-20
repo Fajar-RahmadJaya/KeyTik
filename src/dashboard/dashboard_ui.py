@@ -12,7 +12,7 @@ from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from utility import constant
 from utility import utils
 from utility import icons
-from utility import diff
+from utility.diff import diff_comp
 from utility import style
 from dashboard.dashboard_core import DashboardCore
 from script_profile.profile_ui import ProfileUI
@@ -31,7 +31,7 @@ class DashboardUI(QMainWindow):
         self.dashboard_core.update_script_signal.connect(self.update_script_list)
 
         # UI initialization
-        self.setWindowTitle(diff.PROGRAM_NAME)
+        self.setWindowTitle(diff_comp.program_name)
         self.setFixedSize(660, 500)
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()

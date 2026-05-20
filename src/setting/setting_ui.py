@@ -14,7 +14,7 @@ from catppuccin import PALETTE as catppuccin_palette
 
 from utility import constant
 from utility import utils
-from utility import diff
+from utility.diff import diff_comp
 from utility import style
 from setting.setting_core import SettingCore
 from setting.announcement import Announcement
@@ -111,7 +111,7 @@ class SettingUI():
         content_layout.setContentsMargins(8, 8, 8, 8)
 
         # Pro Version
-        if diff.PROGRAM_NAME != "KeyTik Pro":
+        if diff_comp.program_name != "KeyTik Pro":
             content_layout.addWidget(self.pro_version())
 
         # Appearance
@@ -453,13 +453,13 @@ class SettingUI():
             reply = QMessageBox.question(
                 None, "Update Available",
                 (
-                f"New update available: {diff.PROGRAM_NAME} {latest_version}\n\n"
+                f"New update available: {diff_comp.program_name} {latest_version}\n\n"
                 "Would you like to go to the update page?"
                 ),
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
             )
             if reply == QMessageBox.StandardButton.Yes:
-                webbrowser.open(diff.RELEASE_LINK)
+                webbrowser.open(diff_comp.release_link)
         else:
             if show_no_update_message:
                 QMessageBox.information(

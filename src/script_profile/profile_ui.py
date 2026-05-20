@@ -10,7 +10,7 @@ from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
 from utility import constant
-from utility.diff import (mode_item, mode_map)
+from utility.diff import diff_comp
 from utility import style
 from select_program.select_program_ui import SelectProgramUI
 from select_device.select_device import SelectDevice
@@ -172,14 +172,14 @@ class ProfileUI():
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
-        mode_combobox.addItems(mode_item)
+        mode_combobox.addItems(diff_comp.mode_item)
         mode_combobox.setEditable(True)
         mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         mode_combobox.lineEdit().setReadOnly(True)
         mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         mode_combobox.currentIndexChanged.connect(
             lambda index: remap_row_comp.handle_mode_changed(index, self.edit_window))
-        default_index = mode_map.get(first_line.lower(), 0)
+        default_index = diff_comp.mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
         mode_combobox.setFixedHeight(28)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)

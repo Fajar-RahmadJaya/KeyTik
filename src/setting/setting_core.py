@@ -11,7 +11,7 @@ from PySide6.QtGui import QPalette  # pylint: disable=E0611
 from utility import constant
 from utility import utils
 from utility import style
-from utility.diff import Diff, CHECK_UPDATE_LINK, PROGRAM_NAME
+from utility.diff import diff_comp
 from dashboard.dashboard_core import DashboardCore
 
 class SettingCore():
@@ -97,7 +97,7 @@ class SettingCore():
                     parent,
                     "Success",
                     f"""Theme changed to {config.theme}.
-Please restart {PROGRAM_NAME} to apply change.""")
+Please restart {diff_comp.program_name} to apply change.""")
             else:
                 # Set palette
                 QApplication.setPalette(palette)
@@ -156,7 +156,8 @@ Please restart {PROGRAM_NAME} to apply change.""")
                 QMessageBox.information(
                     parent,
                     "Success",
-                    f"Mica effect enabled. Please restart {PROGRAM_NAME} to apply change.")
+                    f"""Mica effect enabled.
+Please restart {diff_comp.program_name} to apply change.""")
             else:
                 # Apply mica on setting window
                 style.apply_mica(parent)
@@ -204,11 +205,10 @@ Please restart {PROGRAM_NAME} to apply change.""")
 
     def check_for_update(self):
         "Check for update comparing current version and latest version from GitHub API"
-        diff = Diff()  # Composition
         try:
-            response = requests.get(CHECK_UPDATE_LINK, timeout=5)
+            response = requests.get(diff_comp.check_update_link, timeout=5)
             if response.status_code == 200:
-                return diff.parse_update_response(response)
+                return diff_comp.parse_update_response(response)
         except requests.exceptions.ConnectionError:
             pass
         return None

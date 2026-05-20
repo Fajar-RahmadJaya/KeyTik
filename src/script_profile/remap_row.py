@@ -13,7 +13,7 @@ from PySide6.QtGui import QCursor  # pylint: disable=E0611
 
 from utility import icons
 from utility import constant
-from utility.diff import Diff
+from utility.diff import diff_comp
 from utility import style
 from script_profile.parse_script import ParseScript
 from script_profile.remap_row_core import RemapRowCore
@@ -105,8 +105,7 @@ class RemapRow():
             self.shortcut_row_comp.text_mode_widget(lines, key_map, parent_window)
 
         else:
-            diff = Diff()
-            diff.pro_parser(lines, first_line)
+            diff_comp.pro_parser(lines, first_line)
 
         return self.edit_frame
 
@@ -143,8 +142,7 @@ class RemapRow():
                                             QSizePolicy.Expanding))
 
         else:
-            diff = Diff()
-            diff.pro_mode(index)
+            diff_comp.pro_mode(index)
 
     def default_mode_widget(self, lines, key_map, parent_window):
         "Default mode frame"

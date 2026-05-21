@@ -75,7 +75,7 @@ class ProfileUI():
         self.edit_top(script_name, lines, edit_layout, remap_row_comp)
 
         # Middle part of profile manager
-        self.edit_middle(lines, first_line, edit_layout, remap_row_comp)
+        self.edit_middle(lines, edit_layout, remap_row_comp)
 
         # Bottom part of profile manager
         self.edit_bottom(first_line, edit_layout, remap_row_comp)
@@ -144,7 +144,7 @@ class ProfileUI():
 
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
-    def edit_middle(self, lines, first_line, edit_layout, remap_row_comp):
+    def edit_middle(self, lines, edit_layout, remap_row_comp):
         "Middle part of profile manager"
         edit_scroll = QScrollArea(self.edit_window)
         edit_scroll.setWidgetResizable(True)
@@ -152,7 +152,7 @@ class ProfileUI():
         edit_scroll.setObjectName("editScroll")
         edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
 
-        edit_frame = remap_row_comp.handle_parser(lines, first_line, self.edit_window)
+        edit_frame = remap_row_comp.handle_parser(lines, self.edit_window)
         edit_scroll.setWidget(edit_frame)
 
         edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)

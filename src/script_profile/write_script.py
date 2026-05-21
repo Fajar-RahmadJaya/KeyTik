@@ -146,6 +146,7 @@ class WriteScript():
             condition= f"SetTitleMatchMode 2 \n#HotIf {' && '.join(hotif_conditions)}\n"
             condition_string = shortcut_string + device_string + condition
             return condition_string
+
         return None
 
     def shortcuts_condition(self, hotif_conditions, write_shortcuts=False):
@@ -178,11 +179,12 @@ class WriteScript():
                 if normal_shortcuts:
                     for shortcut in normal_shortcuts:
                         translated_shortcut = self.translate_key(shortcut)
+                        hotif_conditions.append("toggle")
+
                         return f"""\ntoggle := false
 ~{translated_shortcut}:: ; Shortcuts
 {{\n    global toggle\n    toggle := !toggle\n}}\n"""
 
-                    hotif_conditions.append("toggle")
                 elif caps_shortcuts:
                     hotif_conditions.append(" || ".join(caps_shortcuts))
         return ""

@@ -74,7 +74,8 @@ class ParseScript():
                     translated = [self.replace_raw_keys(key, key_map) for key in keys]
                     shortcuts_key = " + ".join(translated)
                 else:
-                    shortcuts_key = self.replace_raw_keys(shortcuts_key, key_map)
+                    shortcuts_key = self.replace_raw_keys(shortcuts_line, key_map)
+
                 shortcuts.append(shortcuts_key)
 
         return shortcuts

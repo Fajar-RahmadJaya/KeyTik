@@ -65,18 +65,16 @@ class ParseScript():
                 elif '!GetKeyState("NumLock", "T")' in line:
                     shortcuts.append("NumLock OFF")
                 continue
+
             if ":: ; Shortcuts" in line:
                 parts = line.split("::")
-                shortcuts_key = parts[0].strip()
-                shortcuts_key = shortcuts_key.replace("~", "").replace("*", "")
-                if " & " in shortcuts_key:
-                    keys = [k.strip() for k in shortcuts_key.split(" & ")]
-                    translated = [self.replace_raw_keys(
-                        k, key_map) for k in keys]
+                shortcuts_line = parts[0].strip().replace("~", "").replace("*", "")
+                if " & " in shortcuts_line:
+                    keys = [k.strip() for k in shortcuts_line.split(" & ")]
+                    translated = [self.replace_raw_keys(key, key_map) for key in keys]
                     shortcuts_key = " + ".join(translated)
                 else:
-                    shortcuts_key = self.replace_raw_keys(
-                        shortcuts_key, key_map)
+                    shortcuts_key = self.replace_raw_keys(shortcuts_key, key_map)
                 shortcuts.append(shortcuts_key)
 
         return shortcuts

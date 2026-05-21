@@ -81,7 +81,7 @@ class RemapRow():
         self.edit_frame = QWidget()
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
 
-    def handle_parser(self, lines, first_line, parent_window):
+    def handle_parser(self, lines, parent_window):
         "Action when editing profile (Can be moved)"
         remap_row_core = RemapRowCore()
         key_map = remap_row_core.load_key_list()
@@ -98,6 +98,9 @@ class RemapRow():
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.edit_frame.setLayout(self.edit_frame_layout)
 
+        # Spacer to coupled row tightly
+        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
         if mode_line == "; default":
             self.default_mode_widget(lines, key_map, parent_window)
 
@@ -105,23 +108,22 @@ class RemapRow():
             self.shortcut_row_comp.text_mode_widget(lines, key_map, parent_window)
 
         else:
-            diff_comp.pro_parser(lines, first_line)
+            diff_comp.pro_parser(lines, self.shortcut_row_comp, parent_window)
+            self.edit_frame_layout.addItem(spacer)
 
         return self.edit_frame
 
     def handle_mode_changed(self, index, parent_window):
         "Action when mode changed from combobox (can be moved)"
+        # Clear Layout
         while self.edit_frame_layout.count():
             item = self.edit_frame_layout.takeAt(0)
             widget = item.widget()
             if widget:
                 widget.setParent(None)
 
-        self.key_rows = []
-        self.shortcut_row_comp.shortcut_rows = []
-        if hasattr(self, "text_block"):
-            self.shortcut_row_comp.text_block = None
-        self.shortcut_row_comp.is_text_mode = False
+        # Spacer to coupled row tightly
+        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         if index == 0:
             self.shortcut_row_comp.is_text_mode = False
@@ -129,29 +131,28 @@ class RemapRow():
             self.shortcut_row_comp.shortcut_row(parent_window)
             self.remap_title()
             self.remap_row(parent_window=parent_window)
-            self.edit_frame_layout.addItem(QSpacerItem(20, 40,
-                                            QSizePolicy.Minimum,
-                                            QSizePolicy.Expanding))
+            self.edit_frame_layout.addItem(spacer)
 
         elif index == 1:
             self.shortcut_row_comp.is_text_mode = True
             self.shortcut_row_comp.shortcut_title()
             self.shortcut_row_comp.shortcut_row(parent_window)
-            self.edit_frame_layout.addItem(QSpacerItem(20, 40,
-                                            QSizePolicy.Minimum,
-                                            QSizePolicy.Expanding))
+            self.edit_frame_layout.addItem(spacer)
 
         else:
-            diff_comp.pro_mode(index)
+            diff_comp.pro_mode(index, self.shortcut_row_comp, parent_window)
+            self.edit_frame_layout.addItem(spacer)
 
     def default_mode_widget(self, lines, key_map, parent_window):
         "Default mode frame"
         parse_script = ParseScript()  # Composition
         self.shortcut_row_comp.shortcut_title()
 
-        if parse_script.parse_shortcuts(lines, key_map):
-            for parsed_shortcut in parse_script.parse_shortcuts(lines, key_map):
-                self.shortcut_row_comp.shortcut_row(parsed_shortcut)
+        parsed_shortcuts_list = parse_script.parse_shortcuts(lines, key_map)
+
+        if parsed_shortcuts_list:
+            for parsed_shortcut in parsed_shortcuts_list:
+                self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcut)
         else:
             self.shortcut_row_comp.shortcut_row(parent_window)
 

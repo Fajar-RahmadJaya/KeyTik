@@ -98,23 +98,27 @@ class WriteScript():
         key_translations = self.remap_row_core.read_keylist()
         write_default = WriteDefault(self)  # Composition
 
+        condition_string = self.write_condition(
+            keyboard_entry=keyboard_entry,
+            program_entry=program_entry, write_shortcuts=True)
+
         with open(output_path, 'w', encoding='utf-8') as file:
             if mode == "text mode":
-                self.handle_text_mode(file, keyboard_entry, program_entry)
+                self.handle_text_mode(file, condition_string)
             elif mode == "default mode":
-                write_default.handle_default_mode(file, keyboard_entry, program_entry)
+                write_default.handle_default_mode(file, condition_string)
             else:
                 diff_comp.pro_write(file, mode, key_translations)
 
-    def handle_text_mode(self, file, keyboard_entry, program_entry):
+    def handle_text_mode(self, file, condition_string):
         "Write text mode"
         file.write("; text\n")
         self.dashboard_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
-        write_hotif = self.write_condition(
-            file, keyboard_entry, program_entry, write_shortcuts=True)
+        if condition_string:
+            file.write(condition_string)
 
         text_content = self.remap_row_comp.text_block.toPlainText().strip()
         if text_content:
@@ -122,29 +126,29 @@ class WriteScript():
             file.write(text_content + '\n')
             file.write("; Text mode end\n")
 
-        if write_hotif:
+        if condition_string:
             file.write("#HotIf\n")
 
-    def write_condition(self, file, keyboard_entry, program_entry, write_shortcuts=False):
+    def write_condition(self, keyboard_entry, program_entry, write_shortcuts=False):
         "Write Hotif condition for shortcuts, device, program in one hotif line"
         hotif_conditions = []
 
         # Shortcuts condition
-        self.shortcuts_condition(file, hotif_conditions, write_shortcuts)
+        shortcut_string = self.shortcuts_condition(hotif_conditions, write_shortcuts)
 
         # Device condition
-        self.device_condition(file, hotif_conditions, keyboard_entry)
+        device_string = self.device_condition(hotif_conditions, keyboard_entry)
 
         # Program condition
         self.get_program_condition(hotif_conditions, program_entry)
 
         if hotif_conditions:
-            file.write("SetTitleMatchMode 2\n")
-            file.write(f"#HotIf {' && '.join(hotif_conditions)}\n")
-            return True
-        return False
+            condition= f"SetTitleMatchMode 2 \n#HotIf {' && '.join(hotif_conditions)}\n"
+            condition_string = shortcut_string + device_string + condition
+            return condition_string
+        return None
 
-    def shortcuts_condition(self, file, hotif_conditions, write_shortcuts=False):
+    def shortcuts_condition(self, hotif_conditions, write_shortcuts=False):
         "Shortcuts condition"
         shortcuts = None
         if write_shortcuts:
@@ -172,14 +176,16 @@ class WriteScript():
                     else:
                         normal_shortcuts.append(shortcut)
                 if normal_shortcuts:
-                    file.write("toggle := false\n\n")
                     for shortcut in normal_shortcuts:
                         translated_shortcut = self.translate_key(shortcut)
-                        file.write(f"~{translated_shortcut}:: ; Shortcuts\n")
-                        file.write("{\n    global toggle\n    toggle := !toggle\n}\n\n")
+                        return f"""\ntoggle := false
+~{translated_shortcut}:: ; Shortcuts
+{{\n    global toggle\n    toggle := !toggle\n}}\n"""
+
                     hotif_conditions.append("toggle")
                 elif caps_shortcuts:
                     hotif_conditions.append(" || ".join(caps_shortcuts))
+        return ""
 
     def get_program_condition(self, hotif_conditions, program_entry):
         "Get program binding value from entry"
@@ -199,7 +205,7 @@ class WriteScript():
                     conditions.append(f'WinActive("{value}")')
             hotif_conditions.append(" || ".join(conditions))
 
-    def device_condition(self, file, hotif_conditions, keyboard_entry):
+    def device_condition(self, hotif_conditions, keyboard_entry):
         "Device condition"
         device = keyboard_entry.text().strip()
         if device:
@@ -212,17 +218,16 @@ class WriteScript():
                 is_mouse = False
             else:
                 raise ValueError(f"Unknown device type: {device_type}")
-            file.write("Persistent\n")
-            file.write("#include AutoHotkey Interception\\Lib\\AutoHotInterception.ahk\n\n")
-            file.write("AHI := AutoHotInterception()\n")
-            file.write(
-                (
-                f'id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, '
-                f'"{vid_pid_or_handle}")\n'
-                )
-            )
-            file.write("cm1 := AHI.CreateContextManager(id1)\n\n")
+
             hotif_conditions.append("cm1.IsActive")
+
+            return f"""\nPersistent
+#include AutoHotkey Interception\\Lib\\AutoHotInterception.ahk\n
+AHI := AutoHotInterception()
+id1 := AHI.GetDeviceIdFromHandle({str(is_mouse).lower()}, "{vid_pid_or_handle}")
+cm1 := AHI.CreateContextManager(id1)\n
+"""
+        return ""
 
     def initialize_exit_keys(self):
         "Make sure there is no duplicate exit key usage on each script"
@@ -358,7 +363,7 @@ class WriteDefault():
         # Composition
         self.remap_widget = RemapWidget()
 
-    def handle_default_mode(self, file, keyboard_entry, program_entry):
+    def handle_default_mode(self, file, condition_string):
         "Write default mode"
         dashboard_core = DashboardCore()  # Composition
 
@@ -367,12 +372,12 @@ class WriteDefault():
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
 
-        write_hotif = self.write_script.write_condition(
-            file, keyboard_entry, program_entry, write_shortcuts=True)
+        if condition_string:
+            file.write(condition_string)
 
         self.process_key_remaps(file)
 
-        if write_hotif:
+        if condition_string:
             file.write("#HotIf\n")
 
     def process_key_remaps(self, file):

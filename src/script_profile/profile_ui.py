@@ -33,9 +33,6 @@ class ProfileUI():
         self.remap_row_comp = None
 
         # UI
-        self.script_name_entry = None
-        self.program_entry = None
-        self.keyboard_entry = None
         self.edit_window = None
         self.edit_frame = QWidget()
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
@@ -70,18 +67,21 @@ class ProfileUI():
         edit_layout.setContentsMargins(30, 10, 30, 10)
 
         # Top part of profile manager
-        entries_to_disable = self.edit_top(script_name, lines, edit_layout)
+        top_widget, entries_to_disable = self.edit_top(script_name, lines)
+        edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
         # Middle part of profile manager
-        self.edit_middle(lines, edit_layout, entries_to_disable)
+        edit_scroll = self.edit_middle(lines, entries_to_disable)
+        edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
 
         # Bottom part of profile manager
-        self.edit_bottom(first_line, edit_layout, entries_to_disable)
+        bottom_widget = self.edit_bottom(first_line, entries_to_disable)
+        edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()
 
-    def edit_top(self, script_name, lines, edit_layout):
+    def edit_top(self, script_name, lines):
         "Top part of profile manager"
         parse_script = ParseScript()  # Composition
 
@@ -95,58 +95,54 @@ class ProfileUI():
         script_name_label.setFixedWidth(90)
         top_layout.addWidget(script_name_label, 0, 0, 1, 1)
 
-        self.script_name_entry = QLineEdit(top_widget)
+        script_name_entry = QLineEdit(top_widget)
         if script_name:
-            self.script_name_entry.setText(script_name.replace('.ahk', ''))
-            self.script_name_entry.setReadOnly(True)
+            script_name_entry.setText(script_name.replace('.ahk', ''))
+            script_name_entry.setReadOnly(True)
         else:
-            self.script_name_entry.setText("")
-            self.script_name_entry.setReadOnly(False)
-        entries_to_disable.append((self.script_name_entry, None))
-        top_layout.addWidget(self.script_name_entry, 0, 1, 1, 3)
+            script_name_entry.setText("")
+            script_name_entry.setReadOnly(False)
+        entries_to_disable.append((script_name_entry, None))
+        top_layout.addWidget(script_name_entry, 0, 1, 1, 3)
 
+        # Select program to bind
         program_label = QLabel("Program", top_widget)
         program_label.setFixedWidth(90)
         top_layout.addWidget(program_label, 1, 0, 1, 1)
 
-        self.program_entry = QLineEdit(top_widget)
+        program_entry = QLineEdit(top_widget)
         if parse_script.parse_program(lines):
-            self.program_entry.setText(parse_script.parse_program(lines))
-        entries_to_disable.append((self.program_entry, None))
-        top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
+            program_entry.setText(parse_script.parse_program(lines))
+        entries_to_disable.append((program_entry, None))
+        top_layout.addWidget(program_entry, 1, 1, 1, 2)
 
-        # Select program to bind
-        select_program_ui = SelectProgramUI()  # Composition
         program_select_button = QPushButton("Select Program", top_widget)
         program_select_button.setToolTip("Choose program and bind profile to it")
         program_select_button.clicked.connect(
-            lambda: select_program_ui.program_window(self.program_entry, self.edit_window))
+            lambda: SelectProgramUI().program_window(program_entry, self.edit_window))
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
+        # Select keyboard/mouse to bind
         keyboard_label = QLabel("Device ID", top_widget)
         keyboard_label.setFixedWidth(90)
         top_layout.addWidget(keyboard_label, 2, 0, 1, 1)
 
-        self.keyboard_entry = QLineEdit(top_widget)
+        keyboard_entry = QLineEdit(top_widget)
         if parse_script.parse_device(lines):
-            self.keyboard_entry.setText(parse_script.parse_device(lines))
-        entries_to_disable.append((self.keyboard_entry, None))
-        top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
+            keyboard_entry.setText(parse_script.parse_device(lines))
+        entries_to_disable.append((keyboard_entry, None))
+        top_layout.addWidget(keyboard_entry, 2, 1, 1, 2)
 
-        # Select keyboard/mouse to bind
-        select_device = SelectDevice()  # Composition
         keyboard_select_button = QPushButton("Select Device", top_widget)
         keyboard_select_button.setToolTip("Choose device and bind profile to it")
         keyboard_select_button.clicked.connect(
-            lambda: select_device.open_device_selection(
-                self.edit_window, self.keyboard_entry))
+            lambda: SelectDevice().open_device_selection(
+                self.edit_window, keyboard_entry))
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
-        edit_layout.addWidget(top_widget, 0, 0, 1, 4)
+        return top_widget, entries_to_disable
 
-        return entries_to_disable
-
-    def edit_middle(self, lines, edit_layout, entries_to_disable):
+    def edit_middle(self, lines, entries_to_disable):
         "Middle part of profile manager"
 
         edit_scroll = QScrollArea(self.edit_window)
@@ -187,9 +183,9 @@ class ProfileUI():
 
         edit_scroll.setWidget(self.edit_frame)
 
-        edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
+        return edit_scroll
 
-    def edit_bottom(self, first_line, edit_layout, entries_to_disable):
+    def edit_bottom(self, first_line, entries_to_disable):
         "Bottom part of profile manager"
         bottom_widget = QWidget(self.edit_window)
         bottom_layout = QGridLayout(bottom_widget)
@@ -198,8 +194,7 @@ class ProfileUI():
 
         save_button = QPushButton("Save Changes", self.edit_window)
         save_button.clicked.connect(
-            lambda: self.save_changes(mode_combobox, self.keyboard_entry,
-                                      self.program_entry))
+            lambda: self.save_changes(mode_combobox, entries_to_disable))
         save_button.setFixedHeight(28)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
@@ -218,7 +213,7 @@ class ProfileUI():
         mode_combobox.setFixedHeight(28)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
 
-        edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
+        return bottom_widget
 
     def handle_mode_changed(self, index, parent_window, entries_to_disable):
         "Action when mode changed from combobox (can be moved)"
@@ -253,10 +248,10 @@ class ProfileUI():
             diff_comp.pro_mode(index, shortcut_row_comp, parent_window)
             self.edit_frame_layout.addItem(spacer)
 
-    def save_changes(self, mode_combobox, keyboard_entry, program_entry):
+    def save_changes(self, mode_combobox, entries_to_disable):
         "Write script"
         write_script = WriteScript(self.remap_row_comp)
-        script_name = self.get_script_name()
+        script_name = self.get_script_name(entries_to_disable[0])
         if not script_name:
             return
 
@@ -265,7 +260,10 @@ class ProfileUI():
 
         try:
             mode = mode_combobox.currentText().strip().lower()
-            write_script.handle_write(script_name, mode, keyboard_entry, program_entry)
+            write_script.handle_write(
+                script_name, mode,
+                program_entry=entries_to_disable[1],
+                keyboard_entry=entries_to_disable[2])
             self.main_core.update_script_signal.emit()
             self.edit_window.destroy()
 
@@ -273,9 +271,9 @@ class ProfileUI():
             print(f"Error writing script: {e}")
             traceback.print_exc()
 
-    def get_script_name(self):
+    def get_script_name(self, script_name_entry):
         "Get profile name from entry"
-        script_name = self.script_name_entry.text().strip()
+        script_name = script_name_entry.text().strip()
         if not script_name:
             QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
             return None

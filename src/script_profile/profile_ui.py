@@ -4,7 +4,8 @@ import os
 import traceback
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
-    QComboBox, QGridLayout, QMessageBox
+    QComboBox, QGridLayout, QMessageBox, QVBoxLayout, QSpacerItem,
+    QSizePolicy
 )
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
@@ -15,6 +16,7 @@ from utility import style
 from select_program.select_program_ui import SelectProgramUI
 from select_device.select_device import SelectDevice
 from script_profile.remap_row import RemapRow
+from script_profile.remap_row_core import RemapRowCore
 from script_profile.write_script import WriteScript
 from script_profile.parse_script import ParseScript
 
@@ -25,11 +27,18 @@ class ProfileUI():
         # Parameter
         self.main_core = main_core
 
+        # Composition
+        # Used for save change since it need for
+        # current remap row composition (Mode changed or edit middle)
+        self.remap_row_comp = None
+
         # UI
         self.script_name_entry = None
         self.program_entry = None
         self.keyboard_entry = None
         self.edit_window = None
+        self.edit_frame = QWidget()
+        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
 
     def edit_script(self, script_name, parent):
         "Create/edit profile window"
@@ -57,35 +66,26 @@ class ProfileUI():
         self.edit_window.setGeometry(geometry)
         style.apply_mica(self.edit_window)
 
-        # Composition
-        remap_row_comp = RemapRow()
-        shortcut_row_comp = remap_row_comp.shortcut_row_comp
-        key_listening = remap_row_comp.key_listening_comp
-
         edit_layout = QGridLayout(self.edit_window)
         edit_layout.setContentsMargins(30, 10, 30, 10)
 
-        # Clear row
-        key_listening.copas_rows.clear()
-        remap_row_comp.key_rows.clear()
-        shortcut_row_comp.shortcut_rows.clear()
-        shortcut_row_comp.is_text_mode = False
-
         # Top part of profile manager
-        self.edit_top(script_name, lines, edit_layout, remap_row_comp)
+        entries_to_disable = self.edit_top(script_name, lines, edit_layout)
 
         # Middle part of profile manager
-        self.edit_middle(lines, edit_layout, remap_row_comp)
+        self.edit_middle(lines, edit_layout, entries_to_disable)
 
         # Bottom part of profile manager
-        self.edit_bottom(first_line, edit_layout, remap_row_comp)
+        self.edit_bottom(first_line, edit_layout, entries_to_disable)
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()
 
-    def edit_top(self, script_name, lines, edit_layout, remap_row_comp):
+    def edit_top(self, script_name, lines, edit_layout):
         "Top part of profile manager"
         parse_script = ParseScript()  # Composition
+
+        entries_to_disable =  []  # Used for remap row
 
         top_widget = QWidget(self.edit_window)
         top_layout = QGridLayout(top_widget)
@@ -102,7 +102,7 @@ class ProfileUI():
         else:
             self.script_name_entry.setText("")
             self.script_name_entry.setReadOnly(False)
-        remap_row_comp.entries_to_disable.append((self.script_name_entry, None))
+        entries_to_disable.append((self.script_name_entry, None))
         top_layout.addWidget(self.script_name_entry, 0, 1, 1, 3)
 
         program_label = QLabel("Program", top_widget)
@@ -112,7 +112,7 @@ class ProfileUI():
         self.program_entry = QLineEdit(top_widget)
         if parse_script.parse_program(lines):
             self.program_entry.setText(parse_script.parse_program(lines))
-        remap_row_comp.entries_to_disable.append((self.program_entry, None))
+        entries_to_disable.append((self.program_entry, None))
         top_layout.addWidget(self.program_entry, 1, 1, 1, 2)
 
         # Select program to bind
@@ -130,7 +130,7 @@ class ProfileUI():
         self.keyboard_entry = QLineEdit(top_widget)
         if parse_script.parse_device(lines):
             self.keyboard_entry.setText(parse_script.parse_device(lines))
-        remap_row_comp.entries_to_disable.append((self.keyboard_entry, None))
+        entries_to_disable.append((self.keyboard_entry, None))
         top_layout.addWidget(self.keyboard_entry, 2, 1, 1, 2)
 
         # Select keyboard/mouse to bind
@@ -144,20 +144,52 @@ class ProfileUI():
 
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
-    def edit_middle(self, lines, edit_layout, remap_row_comp):
+        return entries_to_disable
+
+    def edit_middle(self, lines, edit_layout, entries_to_disable):
         "Middle part of profile manager"
+
         edit_scroll = QScrollArea(self.edit_window)
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         edit_scroll.setObjectName("editScroll")
         edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
 
-        edit_frame = remap_row_comp.handle_parser(lines, self.edit_window)
-        edit_scroll.setWidget(edit_frame)
+        self.remap_row_comp = RemapRowCore()
+        key_map = self.remap_row_comp.load_key_list()
+        mode_line = lines[0].strip() if lines else "; default"
+
+        self.edit_frame = QWidget()
+        self.edit_frame.setObjectName("editFrame")
+        self.edit_frame.setStyleSheet(
+            """QWidget#editFrame {
+            background: transparent;
+            }"""
+        )
+
+        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+        self.edit_frame.setLayout(self.edit_frame_layout)
+
+        # Spacer to coupled row tightly
+        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        # Add profile mode widget
+        self.remap_row_comp = RemapRow(self.edit_frame, self.edit_frame_layout, entries_to_disable)
+        if mode_line == "; default":
+            self.remap_row_comp.default_mode_widget(lines, key_map, self.edit_window)
+
+        elif mode_line == "; text":
+            self.remap_row_comp.shortcut_row_comp.text_mode_widget(lines, key_map, self.edit_window)
+
+        else:
+            diff_comp.pro_parser(lines, self.remap_row_comp.shortcut_row_comp, self.edit_window)
+            self.edit_frame_layout.addItem(spacer)
+
+        edit_scroll.setWidget(self.edit_frame)
 
         edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
 
-    def edit_bottom(self, first_line, edit_layout, remap_row_comp):
+    def edit_bottom(self, first_line, edit_layout, entries_to_disable):
         "Bottom part of profile manager"
         bottom_widget = QWidget(self.edit_window)
         bottom_layout = QGridLayout(bottom_widget)
@@ -167,7 +199,7 @@ class ProfileUI():
         save_button = QPushButton("Save Changes", self.edit_window)
         save_button.clicked.connect(
             lambda: self.save_changes(mode_combobox, self.keyboard_entry,
-                                      self.program_entry, remap_row_comp))
+                                      self.program_entry))
         save_button.setFixedHeight(28)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
@@ -181,16 +213,49 @@ class ProfileUI():
         mode_combobox.setCurrentIndex(default_index)
 
         mode_combobox.currentIndexChanged.connect(
-            lambda index: remap_row_comp.handle_mode_changed(index, self.edit_window))
+            lambda index: self.handle_mode_changed(index, self.edit_window, entries_to_disable))
 
         mode_combobox.setFixedHeight(28)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
 
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
-    def save_changes(self, mode_combobox, keyboard_entry, program_entry, remap_row_comp):
+    def handle_mode_changed(self, index, parent_window, entries_to_disable):
+        "Action when mode changed from combobox (can be moved)"
+        # Clear Layout
+        while self.edit_frame_layout.count():
+            item = self.edit_frame_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)
+
+        # Spacer to coupled row tightly
+        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        # Add profile widget
+        self.remap_row_comp = RemapRow(self.edit_frame, self.edit_frame_layout, entries_to_disable)
+        shortcut_row_comp = self.remap_row_comp.shortcut_row_comp
+        if index == 0:
+            shortcut_row_comp.is_text_mode = False
+            shortcut_row_comp.shortcut_title()
+            shortcut_row_comp.shortcut_row(parent_window)
+            self.remap_row_comp.remap_title()
+            self.remap_row_comp.remap_row(parent_window=parent_window)
+            self.edit_frame_layout.addItem(spacer)
+
+        elif index == 1:
+            shortcut_row_comp.is_text_mode = True
+            shortcut_row_comp.shortcut_title()
+            shortcut_row_comp.shortcut_row(parent_window)
+            self.edit_frame_layout.addItem(spacer)
+
+        else:
+            diff_comp.pro_mode(index, shortcut_row_comp, parent_window)
+            self.edit_frame_layout.addItem(spacer)
+
+    def save_changes(self, mode_combobox, keyboard_entry, program_entry):
         "Write script"
-        write_script = WriteScript(remap_row_comp)
+        write_script = WriteScript(self.remap_row_comp)
         script_name = self.get_script_name()
         if not script_name:
             return

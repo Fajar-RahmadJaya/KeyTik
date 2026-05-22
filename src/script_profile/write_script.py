@@ -25,6 +25,12 @@ class RemapWidget:
     hold_interval_entry: QLineEdit = None
     first_key_checkbox: QCheckBox = None
 
+@dataclass
+class ConditionString:
+    "Dataclass containing processed condition string"
+    shortcut_string: str = None
+    device_string: str = None
+    hotif_string: str = None
 
 class WriteScript():
     "Write script based on profile input"
@@ -95,12 +101,11 @@ class WriteScript():
     def handle_write(self, script_name, mode, keyboard_entry, program_entry):
         "Action when saving profile (Can be moved)"
         output_path = os.path.join(self.dashboard_core.script_dir, script_name)
-        key_translations = self.remap_row_core.read_keylist()
         write_default = WriteDefault(self)  # Composition
 
         condition_string = self.write_condition(
             keyboard_entry=keyboard_entry,
-            program_entry=program_entry, write_shortcuts=True)
+            program_entry=program_entry)
 
         with open(output_path, 'w', encoding='utf-8') as file:
             if mode == "text mode":
@@ -108,9 +113,9 @@ class WriteScript():
             elif mode == "default mode":
                 write_default.handle_default_mode(file, condition_string)
             else:
-                diff_comp.pro_write(file, mode, key_translations)
+                diff_comp.pro_write(file, mode, condition_string)
 
-    def handle_text_mode(self, file, condition_string):
+    def handle_text_mode(self, file, condition_string: ConditionString):
         "Write text mode"
         file.write("; text\n")
         self.dashboard_core.generate_exit_key(os.path.basename(file.name), file)
@@ -118,7 +123,9 @@ class WriteScript():
         file.write("#Requires AutoHotkey v2.0\n")
 
         if condition_string:
-            file.write(condition_string)
+            file.write(condition_string.shortcut_string)
+            file.write(condition_string.device_string)
+            file.write(condition_string.hotif_string)
 
         text_content = self.remap_row_comp.text_block.toPlainText().strip()
         if text_content:
@@ -129,12 +136,12 @@ class WriteScript():
         if condition_string:
             file.write("#HotIf\n")
 
-    def write_condition(self, keyboard_entry, program_entry, write_shortcuts=False):
+    def write_condition(self, keyboard_entry, program_entry):
         "Write Hotif condition for shortcuts, device, program in one hotif line"
         hotif_conditions = []
 
         # Shortcuts condition
-        shortcut_string = self.shortcuts_condition(hotif_conditions, write_shortcuts)
+        shortcut_string = self.shortcuts_condition(hotif_conditions)
 
         # Device condition
         device_string = self.device_condition(hotif_conditions, keyboard_entry)
@@ -143,22 +150,24 @@ class WriteScript():
         self.get_program_condition(hotif_conditions, program_entry)
 
         if hotif_conditions:
-            condition= f"SetTitleMatchMode 2 \n#HotIf {' && '.join(hotif_conditions)}\n"
-            condition_string = shortcut_string + device_string + condition
-            return condition_string
+            hotif = f"SetTitleMatchMode 2 \n#HotIf {' && '.join(hotif_conditions)}\n"
+
+            return ConditionString(
+                shortcut_string=shortcut_string,
+                device_string=device_string,
+                hotif_string=hotif)
 
         return None
 
-    def shortcuts_condition(self, hotif_conditions, write_shortcuts=False):
+
+    def shortcuts_condition(self, hotif_conditions):
         "Shortcuts condition"
-        shortcuts = None
-        if write_shortcuts:
-            shortcuts = [
-                shortcut_row[0].text().strip()
-                for shortcut_row in self.remap_row_comp.shortcut_row_comp.shortcut_rows
-                if self.is_widget_valid(shortcut_row)
-                and shortcut_row[0].text().strip()
-            ] or None
+        shortcuts = [
+            shortcut_row[0].text().strip()
+            for shortcut_row in self.remap_row_comp.shortcut_row_comp.shortcut_rows
+            if self.is_widget_valid(shortcut_row)
+            and shortcut_row[0].text().strip()
+        ]
 
         if shortcuts:
             valid_shortcuts = [s for s in shortcuts if s]
@@ -365,7 +374,7 @@ class WriteDefault():
         # Composition
         self.remap_widget = RemapWidget()
 
-    def handle_default_mode(self, file, condition_string):
+    def handle_default_mode(self, file, condition_string: ConditionString):
         "Write default mode"
         dashboard_core = DashboardCore()  # Composition
 
@@ -375,7 +384,9 @@ class WriteDefault():
         file.write("#Requires AutoHotkey v2.0\n")
 
         if condition_string:
-            file.write(condition_string)
+            file.write(condition_string.shortcut_string)
+            file.write(condition_string.device_string)
+            file.write(condition_string.hotif_string)
 
         self.process_key_remaps(file)
 

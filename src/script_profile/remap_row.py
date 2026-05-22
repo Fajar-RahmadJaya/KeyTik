@@ -5,7 +5,7 @@ import pynput
 import keyboard
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLabel, QPushButton, QCheckBox, QLineEdit, QFrame, QHBoxLayout,
-    QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit, QSpacerItem
+    QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit
 )
 from PySide6.QtCore import Qt, Signal, QObject, QTimer, QEvent  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
@@ -13,7 +13,6 @@ from PySide6.QtGui import QCursor  # pylint: disable=E0611
 
 from utility import icons
 from utility import constant
-from utility.diff import diff_comp
 from utility import style
 from script_profile.parse_script import ParseScript
 from script_profile.remap_row_core import RemapRowCore
@@ -66,7 +65,7 @@ class KeyWidget:
 
 class RemapRow():
     "Remap row on profile creation"
-    def __init__(self):
+    def __init__(self, edit_frame, edit_frame_layout, entries_to_disable):
         super().__init__()
         # Composition
         self.select_key_ui = SelectKeyUI()
@@ -74,74 +73,10 @@ class RemapRow():
         self.key_listening_comp = self.shortcut_row_comp.key_listening_comp
 
         # Variables
-        self.entries_to_disable = []
+        self.entries_to_disable = entries_to_disable
         self.key_rows = []
-
-        # UI
-        self.edit_frame = QWidget()
-        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-
-    def handle_parser(self, lines, parent_window):
-        "Action when editing profile (Can be moved)"
-        remap_row_core = RemapRowCore()
-        key_map = remap_row_core.load_key_list()
-        mode_line = lines[0].strip() if lines else "; default"
-
-        self.edit_frame = QWidget()
-        self.edit_frame.setObjectName("editFrame")
-        self.edit_frame.setStyleSheet(
-            """QWidget#editFrame {
-            background: transparent;
-            }"""
-        )
-
-        self.edit_frame_layout = QVBoxLayout(self.edit_frame)
-        self.edit_frame.setLayout(self.edit_frame_layout)
-
-        # Spacer to coupled row tightly
-        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        if mode_line == "; default":
-            self.default_mode_widget(lines, key_map, parent_window)
-
-        elif mode_line == "; text":
-            self.shortcut_row_comp.text_mode_widget(lines, key_map, parent_window)
-
-        else:
-            diff_comp.pro_parser(lines, self.shortcut_row_comp, parent_window)
-            self.edit_frame_layout.addItem(spacer)
-
-        return self.edit_frame
-
-    def handle_mode_changed(self, index, parent_window):
-        "Action when mode changed from combobox (can be moved)"
-        # Clear Layout
-        while self.edit_frame_layout.count():
-            item = self.edit_frame_layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.setParent(None)
-
-        # Spacer to coupled row tightly
-        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        if index == 0:
-            self.shortcut_row_comp.is_text_mode = False
-            self.shortcut_row_comp.shortcut_title()
-            self.shortcut_row_comp.shortcut_row(parent_window)
-            self.remap_title()
-            self.remap_row(parent_window=parent_window)
-            self.edit_frame_layout.addItem(spacer)
-
-        elif index == 1:
-            self.shortcut_row_comp.is_text_mode = True
-            self.shortcut_row_comp.shortcut_title()
-            self.shortcut_row_comp.shortcut_row(parent_window)
-            self.edit_frame_layout.addItem(spacer)
-
-        else:
-            diff_comp.pro_mode(index, self.shortcut_row_comp, parent_window)
-            self.edit_frame_layout.addItem(spacer)
+        self.edit_frame = edit_frame
+        self.edit_frame_layout = edit_frame_layout
 
     def default_mode_widget(self, lines, key_map, parent_window):
         "Default mode frame"
@@ -780,6 +715,8 @@ class KeyListening(QObject):
                 self.remap_row_comp.entries_to_disable.append((paste_entry, None))
 
             # Install disable widget event filter
+            for widget in self.remap_row_comp.entries_to_disable:
+                print(widget)
             for entry_tuple in self.remap_row_comp.entries_to_disable:
                 entry = entry_tuple[0]
                 if entry is not None:

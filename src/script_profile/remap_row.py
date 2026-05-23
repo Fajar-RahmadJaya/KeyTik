@@ -20,18 +20,6 @@ from select_key.select_key_ui import SelectKeyUI
 
 
 @dataclass
-class ParsedRemap:
-    "Data class containing parsed remap"
-    default_key: str
-    remap_key: str
-    hold_interval: int
-    is_hold_format: bool
-    is_first_key: bool
-    is_sc: bool
-    is_text_format: bool
-
-
-@dataclass
 class OptionWidget:
     "Data class containing option widget"
     text_format_checkbox: QCheckBox = None
@@ -98,22 +86,10 @@ class RemapRow():
         self.edit_frame_layout.addWidget(remap_title_widget)
 
         # Remap row
-        if parse_script.parse_default_mode(lines, key_map):
+        parsed_remap_list = parse_script.parse_default_mode(lines, key_map)
+        if parsed_remap_list:
             # Unpack tuple
-            for (default_key, remap_key, is_text_format,
-                 is_hold_format, hold_interval, is_first_key,
-                 is_sc) in parse_script.parse_default_mode(lines, key_map):
-
-                # Add unpacked tople to dataclass
-                parsed_remap = ParsedRemap(
-                    default_key = default_key,
-                    remap_key = remap_key,
-                    is_text_format = is_text_format,
-                    is_hold_format = is_hold_format,
-                    hold_interval = hold_interval,
-                    is_first_key = is_first_key,
-                    is_sc = is_sc
-                    )
+            for parsed_remap in parsed_remap_list:
                 self.remap_row(parsed_remap=parsed_remap)
         else:
             self.remap_row(parent_window=parent_window)

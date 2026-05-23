@@ -1,7 +1,18 @@
 "Parse profile from AHK script"
 
 import re
+from dataclasses import dataclass
 
+@dataclass
+class ParsedRemap:
+    "Data class containing parsed remap"
+    default_key: str
+    remap_key: str
+    hold_interval: int
+    is_hold_format: bool
+    is_first_key: bool
+    is_sc: bool
+    is_text_format: bool
 
 class ParseScript():
     "Parse AutoHotkey script"
@@ -99,8 +110,8 @@ class ParseScript():
                 if line == "}":
                     in_block = False
                     block_text = " ".join(current_block)
-                    self.parse_double_click(default_key, block_text,
-                                            remaps, key_map)
+                    remaps.append(
+                        self.parse_double_click(default_key, block_text,key_map))
                     current_block = []
                     continue
 
@@ -115,7 +126,7 @@ class ParseScript():
 
             if ("::" in line and "::{" not in line and ":: ; Shortcuts"
                     not in line):
-                self.parse_remap_key(line, key_map, remaps)
+                remaps.append(self.parse_remap_key(line, key_map))
 
         return remaps
 
@@ -130,13 +141,13 @@ class ParseScript():
             key = self.replace_raw_keys(key, key_map)
         return key
 
-    def parse_remap_key(self, line, key_map, remaps):
+    def parse_remap_key(self, line, key_map):
         "Parse remap key line"
         parts = line.split("::")
         default_key = parts[0].strip()
         remap_or_action = parts[1].strip() if len(parts) > 1 else ""
 
-        defaults_key = self.parse_default_key(default_key, key_map)
+        default_key = self.parse_default_key(default_key, key_map)
 
         if remap_or_action:
             is_text_format = False
@@ -167,10 +178,17 @@ class ParseScript():
 
             remap_key = self.replace_raw_keys(remap_key, key_map)
 
-            remaps.append((defaults_key, remap_key, is_text_format,
-                           is_hold_format, hold_interval, is_first_key, is_sc))
+            return ParsedRemap(
+                default_key=default_key,
+                remap_key=remap_key,
+                hold_interval=hold_interval,
+                is_hold_format=is_hold_format,
+                is_first_key=is_first_key,
+                is_sc=is_sc,
+                is_text_format=is_text_format)
+        return None
 
-    def parse_double_click(self, default_key, block_text, remaps, key_map):
+    def parse_double_click(self, default_key, block_text, key_map):
         "Parse double click mode from default key"
         is_text_format = False
         is_hold_format = False
@@ -202,9 +220,15 @@ class ParseScript():
                 else:
                     remap_key = ""
 
-        remaps.append((f"{default_key} + {default_key}",
-                        remap_key, is_text_format,
-                        is_hold_format, hold_interval, is_first_key, is_sc))
+        return ParsedRemap(
+            default_key=f"{default_key} + {default_key}",
+            remap_key=remap_key,
+            is_hold_format=is_hold_format,
+            hold_interval=hold_interval,
+            is_first_key=is_first_key,
+            is_sc=is_sc,
+            is_text_format=is_text_format,
+        )
 
     def get_unicode(self, text):
         'Parse Unicode fron SendInput'

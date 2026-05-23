@@ -117,7 +117,7 @@ class RemapRow():
     def remap_row(self, parent_window=None, parsed_remap=None):
         "Remap row"
         # Remap row card
-        card_frame = QFrame(self.edit_frame)
+        card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
         card_frame.setStyleSheet(style.card())
 
@@ -125,7 +125,7 @@ class RemapRow():
         card_layout.setContentsMargins(8, 8, 8, 8)
 
         # Remap row layout
-        remap_row_widget = QWidget(self.edit_frame)
+        remap_row_widget = QWidget(card_frame)
         remap_row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
                                  QSizePolicy.Policy.Fixed)
         card_layout.addWidget(remap_row_widget)
@@ -167,15 +167,68 @@ class RemapRow():
             option=self.option_widget(remap_row_widget, remap_row_layout, parsed_remap)))
 
         # The order where the widget will be added
-        mapping_row_widgets = []
         self.edit_frame_layout.addWidget(card_frame)
-        self.edit_frame_layout.addWidget(separator_widget)
-        mapping_row_widgets.append((card_frame, separator_widget))
-        self.update_plus_visibility(mapping_row_widgets=mapping_row_widgets)
 
-        self.edit_frame.setUpdatesEnabled(True)
-        self.edit_frame.update()
-        self.edit_frame.adjustSize()
+        # Hide old separator then add a new one
+        self.hide_old_separator()
+        self.edit_frame_layout.addWidget(separator_widget)
+
+    def separator_widget(self, remap_row_widget, row_type, parent_window):
+        "Remap row separator widget"
+        separator_widget = QWidget(self.edit_frame)
+        separator_layout = QHBoxLayout(separator_widget)
+        separator_widget.setLayout(separator_layout)
+        separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
+                                        QSizePolicy.Policy.Fixed)
+        separator_widget.setObjectName("SeparatorWidget")
+        separator_layout.setContentsMargins(0, 0, 0, 0)
+        separator_layout.setSpacing(0)
+
+        left_sep = QFrame(separator_widget)
+        left_sep.setObjectName("left_sep")
+        left_sep.setFrameShape(QFrame.Shape.HLine)
+        left_sep.setFrameShadow(QFrame.Shadow.Sunken)
+        separator_layout.addWidget(left_sep)
+
+        plus_label = QLabel("+", separator_widget)
+        plus_label.setStyleSheet(style.PLUS_LABEL)
+        plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
+        plus_label.setFixedWidth(20)
+        plus_label.setFixedHeight(20)
+        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        separator_layout.addWidget(plus_label)
+
+        right_sep = QFrame(separator_widget)
+        right_sep.setObjectName("right_sep")
+        right_sep.setFrameShape(QFrame.Shape.HLine)
+        right_sep.setFrameShadow(QFrame.Shadow.Sunken)
+        separator_layout.addWidget(right_sep)
+
+        # Add row below when pressing plus
+        def on_plus_click(_):
+            "Pressing tow will add a new row below via insert after"
+            if row_type == "remap row":
+                self.remap_row(parent_window=parent_window)
+            elif row_type == "shortcut row":
+                self.shortcut_row_comp.shortcut_row(
+                    parent_window=parent_window, insert_after=(remap_row_widget, separator_widget))
+
+        plus_label.mousePressEvent = on_plus_click
+
+        return separator_widget, on_plus_click
+
+    def hide_old_separator(self, parent_widget=None):
+        "Make sure + only showed up only on the last row"
+        if not parent_widget:
+            parent_widget = self.edit_frame
+
+        separator_widget_list = parent_widget.findChildren(QWidget, "SeparatorWidget")
+
+        for i, widget in enumerate(separator_widget_list):
+            is_last = i == len(separator_widget_list) - 1
+
+            if not is_last:
+                widget.setVisible(False)
 
     def auto_add_row(self, default_key, remap_key, on_plus_click):
         "Auto add row if all entry have text"
@@ -335,73 +388,6 @@ class RemapRow():
         )
         return option
 
-    def separator_widget(self, remap_row_widget, row_type, parent_window):
-        "Remap row separator widget"
-        separator_widget = QWidget(self.edit_frame)
-        separator_layout = QHBoxLayout(separator_widget)
-        separator_widget.setLayout(separator_layout)
-        separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
-                                        QSizePolicy.Policy.Fixed)
-        separator_layout.setContentsMargins(0, 0, 0, 0)
-        separator_layout.setSpacing(0)
-
-        left_sep = QFrame(separator_widget)
-        left_sep.setObjectName("left_sep")
-        left_sep.setFrameShape(QFrame.Shape.HLine)
-        left_sep.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(left_sep)
-
-        plus_label = QLabel("+", separator_widget)
-        plus_label.setStyleSheet(style.PLUS_LABEL)
-        plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        plus_label.setFixedWidth(20)
-        plus_label.setFixedHeight(20)
-        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        separator_layout.addWidget(plus_label)
-
-        right_sep = QFrame(separator_widget)
-        right_sep.setObjectName("right_sep")
-        right_sep.setFrameShape(QFrame.Shape.HLine)
-        right_sep.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(right_sep)
-
-        # Add row below when pressing plus
-        def on_plus_click(_):
-            "Pressing tow will add a new row below via insert after"
-            plus_label.setVisible(False)
-            right_sep.setVisible(False)
-            left_sep.setVisible(False)
-            if row_type == "remap row":
-                self.remap_row(parent_window=parent_window)
-            elif row_type == "shortcut row":
-                self.shortcut_row_comp.shortcut_row(
-                    parent_window=parent_window, insert_after=(remap_row_widget, separator_widget))
-
-        plus_label.mousePressEvent = on_plus_click
-
-        return separator_widget, on_plus_click
-
-    def update_plus_visibility(self, mapping_row_widgets=None, shortcut_row_widgets=None):
-        "Make sure + only showed up only on the last row"
-        if mapping_row_widgets:
-            widgets = mapping_row_widgets
-        elif shortcut_row_widgets:
-            widgets = shortcut_row_widgets
-        else:
-            return
-
-        for i, (_, sw) in enumerate(widgets):
-            plus = sw.findChild(QLabel, None)
-            left_sep = sw.findChild(QFrame, "left_sep")
-            right_sep = sw.findChild(QFrame, "right_sep")
-            is_last = i == len(widgets) - 1
-            if plus:
-                plus.setVisible(is_last)
-            if left_sep:
-                left_sep.setVisible(is_last)
-            if right_sep:
-                right_sep.setVisible(is_last)
-
 class ShortcutRow():
     "Shortcut row on profile creation"
     def __init__(self, remap_row_comp):
@@ -481,7 +467,7 @@ class ShortcutRow():
 
             self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
 
-        self.remap_row_comp.update_plus_visibility(shortcut_row_widgets=shortcut_row_widgets)
+        self.remap_row_comp.hide_old_separator()
         self.remap_row_comp.edit_frame.setUpdatesEnabled(True)
         self.remap_row_comp.edit_frame.update()
         self.remap_row_comp.edit_frame.adjustSize()

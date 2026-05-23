@@ -261,7 +261,6 @@ class RemapRow:
                                         "multiple keys, or a double key (eg. double-click)")
         if parsed_remap:
             default_key_entry.setText(parsed_remap.default_key)
-        self.entries_to_disable.append((default_key_entry, None))
         default_key_layout.addWidget(default_key_entry, 1, 0, 1, 1)
 
         default_key_choose = QPushButton(default_key_container)
@@ -302,7 +301,6 @@ class RemapRow:
         remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if parsed_remap:
             remap_key_entry.setText(parsed_remap.remap_key)
-        self.entries_to_disable.append((remap_key_entry, None))
         remap_key_layout.addWidget(remap_key_entry, 1, 0, 1, 1)
 
         remap_key_choose = QPushButton(remap_key_container)
@@ -375,7 +373,6 @@ class RemapRow:
                                     if hold_interval_float.is_integer()
                                     else str(hold_interval_float))
             hold_interval_entry.setText(hold_interval_str)
-        self.entries_to_disable.append((hold_interval_entry, None))
         options_layout.addWidget(hold_interval_entry)
 
         remap_row_layout.addWidget(options_widget, 1, 0, 1, 3)
@@ -502,7 +499,6 @@ class ShortcutRow():
         self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if parsed_shortcut:
             self.shortcut_entry.setText(parsed_shortcut)
-        self.remap_row_comp.entries_to_disable.append((self.shortcut_entry, None))
         self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
         shortcut_layout.addWidget(self.shortcut_entry, 1, 0)
 
@@ -579,22 +575,20 @@ class KeyListening(QObject):
 
     def toggle_other_buttons(self, target_button, other_button_enabled: bool):
         "Change the state of non selected button"
-        all_button_list = self.remap_row_comp.edit_frame.findChildren(QPushButton)
-
-        for button in all_button_list:
+        button_list = self.remap_row_comp.edit_frame.findChildren(QPushButton)
+        for button in button_list:
             if button != target_button:
                 button.setEnabled(other_button_enabled)
 
-    def setup_event_filter(self, install: bool):
-        "Install or remove event filter"
-        # Install disable widget event filter
-        for entry_tuple in self.remap_row_comp.entries_to_disable:
-            entry = entry_tuple[0]
-            if entry is not None:
-                if install:
-                    entry.installEventFilter(self)
-                else:
+    def toggle_other_entry(self, target_entry, other_entry_enabled: bool):
+        "Install or remove event filter to enable/disable entry"
+        entry_list = self.remap_row_comp.edit_frame.findChildren(QLineEdit)
+        for entry in entry_list:
+            if entry != target_entry:
+                if other_entry_enabled:
                     entry.removeEventFilter(self)
+                else:
+                    entry.installEventFilter(self)
 
     def key_listening(self, target_entry, target_button):
         "Get and Listen to key press"
@@ -611,15 +605,8 @@ class KeyListening(QObject):
             self.remap_row_core.pressed_keys = []
             self.remap_row_core.last_combination = ""
 
-            # Append entries to disable widget
-            # Part of pro version code
-            for copas_row in self.copas_rows:
-                copy_entry, paste_entry, _, _, _, _ = copas_row
-                self.remap_row_comp.entries_to_disable.append((copy_entry, None))
-                self.remap_row_comp.entries_to_disable.append((paste_entry, None))
-
-            # Install event filter
-            self.setup_event_filter(install=True)
+            # Dsiable other entry
+            self.toggle_other_entry(target_entry, other_entry_enabled=False)
 
             # Disbale other button
             self.toggle_other_buttons(target_button, other_button_enabled=False)
@@ -636,8 +623,8 @@ class KeyListening(QObject):
             self.remap_row_core.active_entry = None
             self.remap_row_core.pressed_keys = []
 
-            # Remove disable widget event filter
-            self.setup_event_filter(install=False)
+            # Enable other entry
+            self.toggle_other_entry(target_entry, other_entry_enabled=True)
 
             # Enable other button
             self.toggle_other_buttons(target_button, other_button_enabled=True)

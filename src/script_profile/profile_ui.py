@@ -177,7 +177,8 @@ class ProfileUI():
             self.remap_row_comp.default_mode_widget(lines, key_map, self.edit_window)
 
         elif mode_line == "; text":
-            self.remap_row_comp.shortcut_row_comp.text_mode_widget(lines, key_map, self.edit_window)
+            text_block = self.remap_row_comp.shortcut_row_comp.text_block(lines)
+            self.edit_frame_layout.addWidget(text_block)
 
         else:
             diff_comp.pro_parser(lines, self.remap_row_comp.shortcut_row_comp, self.edit_window)
@@ -238,7 +239,7 @@ class ProfileUI():
             shortcut_row_comp.shortcut_row(parent_window)
             remap_title_widget = self.remap_row_comp.remap_title()
             self.edit_frame_layout.addWidget(remap_title_widget)
-            self.remap_row_comp.remap_row(parent_window=parent_window)
+            self.remap_row_comp.remap_row(parent_window)
             self.edit_frame_layout.addItem(spacer)
 
         elif index == 1:

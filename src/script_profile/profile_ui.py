@@ -30,6 +30,7 @@ class ProfileUI():
         # Used for save change since it need for
         # current remap row composition (Mode changed or edit middle)
         self.remap_row_comp = None
+        self.shortcut_row_comp = None
 
         # UI
         self.edit_window = None
@@ -198,9 +199,9 @@ class ProfileUI():
         "Default mode frame"
         parse_script = ParseScript()  # Composition
 
-        shortcut_row_comp = ShortcutRow(self.edit_frame)
+        self.shortcut_row_comp = ShortcutRow(self.edit_frame)
         parsed_shortcuts_list = parse_script.parse_shortcuts(lines)
-        shortcut_widget = shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
+        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
         self.edit_frame_layout.addWidget(shortcut_widget)
 
         self.remap_row_comp = RemapRow(self.edit_frame)
@@ -270,10 +271,12 @@ class ProfileUI():
 
     def save_changes(self, mode_combobox, top_widget: QWidget):
         "Write script"
-        write_script = WriteScript(self.remap_row_comp)
+        write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
 
-        script_name = top_widget.findChild(QLineEdit, "ScriptNameEntry")
+        script_name_entry = top_widget.findChild(QLineEdit, "ScriptNameEntry")
+        script_name = script_name_entry.text().strip() + ".ahk"
         if not script_name:
+            QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
             return
 
         if not write_script.check_key_integrity():
@@ -293,15 +296,3 @@ class ProfileUI():
         except ValueError as e:
             print(f"Error writing script: {e}")
             traceback.print_exc()
-
-    def get_script_name(self, script_name_entry):
-        "Get profile name from entry"
-        script_name = script_name_entry.text().strip()
-        if not script_name:
-            QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
-            return None
-
-        if not script_name.endswith('.ahk'):
-            script_name += '.ahk'
-
-        return script_name

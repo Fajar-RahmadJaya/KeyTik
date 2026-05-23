@@ -34,8 +34,9 @@ class ConditionString:
 
 class WriteScript():
     "Write script based on profile input"
-    def __init__(self, remap_row_comp=None):
+    def __init__(self, remap_row_comp=None, shortcut_row_comp=None):
         self.remap_row_comp = remap_row_comp
+        self.shortcut_row_comp = shortcut_row_comp
 
         # Composition
         self.dashboard_core = DashboardCore()
@@ -48,7 +49,7 @@ class WriteScript():
         caps_off_present = False
         num_on_present = False
         num_off_present = False
-        for shortcut_row in self.remap_row_comp.shortcut_row_comp.shortcut_rows:
+        for shortcut_row in self.shortcut_row_comp.shortcut_rows:
             if self.is_widget_valid(shortcut_row):
                 shortcut = shortcut_row[0].text().strip()
                 if shortcut:
@@ -164,7 +165,7 @@ class WriteScript():
         "Shortcuts condition"
         shortcuts = [
             shortcut_row[0].text().strip()
-            for shortcut_row in self.remap_row_comp.shortcut_row_comp.shortcut_rows
+            for shortcut_row in self.shortcut_row_comp.shortcut_rows
             if self.is_widget_valid(shortcut_row)
             and shortcut_row[0].text().strip()
         ]

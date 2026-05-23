@@ -76,27 +76,15 @@ class RemapRow():
         # default_layout = QVBoxLayout(default_widget)
         # default_layout.setContentsMargins(0, 0, 0, 0)
 
-        # Shortcut
-        shortcut_widget = QWidget()
-        shortcut_widget.setContentsMargins(0, 0, 0, 0)
-        shortcut_layout = QVBoxLayout(shortcut_widget)
-        shortcut_layout.setContentsMargins(0, 0, 0, 0)
-        self.edit_frame_layout.addWidget(shortcut_widget)
-        # Shortcut title
-        shortcut_title = self.shortcut_row_comp.shortcut_title()
-        shortcut_layout.addWidget(shortcut_title)
-        # Shortcut row
         parsed_shortcuts_list = parse_script.parse_shortcuts(lines, key_map)
-        if parsed_shortcuts_list:
-            for parsed_shortcut in parsed_shortcuts_list:
-                self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcut)
-        else:
-            self.shortcut_row_comp.shortcut_row(parent_window)
+        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
+        self.edit_frame_layout.addWidget(shortcut_widget)
 
-        remap_widget = self.remap_row(parse_script, parent_window, lines, key_map)
+        parsed_remap_list = parse_script.parse_default_mode(lines, key_map)
+        remap_widget = self.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)
 
-    def remap_row(self, parse_script: ParseScript, parent_window, lines, key_map):
+    def remap_row(self, parent_window, parsed_remap_list: list):
         "Build remap row"
         # Remap
         remap_widget = QWidget()
@@ -107,7 +95,6 @@ class RemapRow():
         remap_title_widget = self.remap_title()
         remap_layout.addWidget(remap_title_widget)
         # Remap row
-        parsed_remap_list = parse_script.parse_default_mode(lines, key_map)
         def add_empty_row(_):
             "Add empty remap row and separator"
             # Add empty row
@@ -404,7 +391,7 @@ class RemapRow():
 
 class ShortcutRow():
     "Shortcut row on profile creation"
-    def __init__(self, remap_row_comp):
+    def __init__(self, remap_row_comp: RemapRow):
         # Variable
         self.is_text_mode = None
         self.shortcut_rows = []
@@ -418,6 +405,45 @@ class ShortcutRow():
         self.text_block = None
         self.shortcut_entry = None
 
+    def shortcut_row(self, parent_window, parsed_shortcuts_list: list):
+        "Build shortcut row"
+        # Widget and layout
+        shortcut_widget = QWidget()
+        shortcut_widget.setContentsMargins(0, 0, 0, 0)
+        shortcut_layout = QVBoxLayout(shortcut_widget)
+        shortcut_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Shortcut title
+        shortcut_title = self.shortcut_title()
+        shortcut_layout.addWidget(shortcut_title)
+
+        def add_empty_row(_):
+            "Add empty shortcut row"
+            # Shortcut row without passing parsed shortcut list
+            shortcut_row_widget = self.shortcut_card(parent_window)
+            shortcut_layout.addWidget(shortcut_row_widget)
+
+            # Separator widget
+            separator_widget = self.remap_row_comp.separator_widget(
+                add_empty_row, shortcut_widget)
+            shortcut_layout.addWidget(separator_widget)
+
+        # Shortcut row
+        if parsed_shortcuts_list:
+            for parsed_shortcut in parsed_shortcuts_list:
+                # Shortcut row
+                shortcut_row_widget = self.shortcut_card(parent_window, parsed_shortcut)
+                shortcut_layout.addWidget(shortcut_row_widget)
+
+                # Separator widget
+                separator_widget = self.remap_row_comp.separator_widget(
+                    add_empty_row, shortcut_widget)
+                shortcut_layout.addWidget(separator_widget)
+        else:
+            add_empty_row(None)
+
+        return shortcut_widget
+
     def shortcut_title(self):
         "Shortcuts row tittle label"
         shortcut_label = QLabel("Shortcut")
@@ -425,7 +451,7 @@ class ShortcutRow():
         shortcut_label.setStyleSheet(style.PROFILE_ROW_LABEL)
         return shortcut_label
 
-    def shortcut_row(self, parent_window, parsed_shortcut=None, insert_after=None):
+    def shortcut_card(self, parent_window, parsed_shortcut=None):
         "Shortcut row"
         # For text mode
         if self.is_text_mode and (not hasattr(self, 'text_block') or
@@ -436,7 +462,7 @@ class ShortcutRow():
             self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
 
         # Card frame
-        card_frame = QFrame(self.remap_row_comp.edit_frame)
+        card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
         card_frame.setStyleSheet(style.card())
 
@@ -444,9 +470,9 @@ class ShortcutRow():
         card_layout.setContentsMargins(8, 8, 8, 8)
         card_layout.setSpacing(0)
 
-        shortcut_row_widget = QWidget(self.remap_row_comp.edit_frame)
-        shortcut_row_widget.setSizePolicy(QSizePolicy.Policy.Preferred,
-                                    QSizePolicy.Policy.Fixed)
+        shortcut_row_widget = QWidget(card_frame)
+        shortcut_row_widget.setSizePolicy(
+            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         card_layout.addWidget(shortcut_row_widget)
 
         shortcut_row_layout = QGridLayout(shortcut_row_widget)
@@ -458,32 +484,13 @@ class ShortcutRow():
         self.shortcut_widget(shortcut_row_widget, shortcut_row_layout,
                              parsed_shortcut, parent_window)
 
-        def plus_event():
-            "Action when pressing plus on separator"
-            self.shortcut_row(
-                parent_window=parent_window)
-
-        # Separator widget
-        separator_widget = self.remap_row_comp.separator_widget(
-            plus_event, self.remap_row_comp.edit_frame)
-
-        shortcut_row_widgets = []
-        if insert_after is not None:
-            idx = self.remap_row_comp.edit_frame_layout.indexOf(insert_after[1]) + 1
-            self.remap_row_comp.edit_frame_layout.insertWidget(idx, card_frame)
-            self.remap_row_comp.edit_frame_layout.insertWidget(idx + 1, separator_widget)
-            shortcut_row_widgets.insert(idx // 2, (card_frame,
-                                                        separator_widget))
-        else:
-            self.remap_row_comp.edit_frame_layout.addWidget(card_frame)
-            self.remap_row_comp.edit_frame_layout.addWidget(separator_widget)
-            shortcut_row_widgets.append((card_frame, separator_widget))
-
         if (self.is_text_mode and
             hasattr(self, 'text_block') and
             self.text_block is not None):
 
             self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
+
+        return card_frame
 
     def shortcut_widget(self, shortcut_row_widget, shortcut_row_layout,
                         parsed_shortcut, parent_window):
@@ -525,13 +532,13 @@ class ShortcutRow():
 
     def text_mode_widget(self, lines, key_map, parent_window):
         "Text mode frame(to do: fix)"
-        shortcuts = self.remap_row_comp.parse_script.parse_shortcuts(lines, key_map)
+        # shortcuts = self.remap_row_comp.parse_script.parse_shortcuts(lines, key_map)
 
-        if not shortcuts:
-            self.shortcut_row(parent_window)
-        else:
-            for shortcut in shortcuts:
-                self.shortcut_row(shortcut)
+        # if not shortcuts:
+        #     self.shortcut_row(parent_window)
+        # else:
+        #     for shortcut in shortcuts:
+        #         self.shortcut_row(shortcut)
 
         self.text_block = QTextEdit(self.remap_row_comp.edit_frame)
         self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)

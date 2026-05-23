@@ -119,7 +119,7 @@ class WriteScript():
         if condition_string:
             file.write("#HotIf\n")
 
-    def write_condition(self, keyboard_entry, program_entry):
+    def write_condition(self, top_widget):
         "Write Hotif condition for shortcuts, device, program in one hotif line"
         hotif_conditions = []
 
@@ -127,9 +127,11 @@ class WriteScript():
         shortcut_string = self.shortcuts_condition(hotif_conditions)
 
         # Device condition
+        keyboard_entry = top_widget.findChild(QLineEdit, "KeyboardEntry")
         device_string = self.device_condition(hotif_conditions, keyboard_entry)
 
         # Program condition
+        program_entry = top_widget.findChild(QLineEdit, "ProgramEntry")
         self.get_program_condition(hotif_conditions, program_entry)
 
         if hotif_conditions:

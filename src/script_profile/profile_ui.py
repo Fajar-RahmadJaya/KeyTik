@@ -280,14 +280,9 @@ class ProfileUI():
         # if not write_script.check_key_integrity():
         #     return
 
-        program_entry = top_widget.findChild(QLineEdit, "ProgramEntry")
-        keyboard_entry = top_widget.findChild(QLineEdit, "KeyboardEntry")
         try:
             mode = mode_combobox.currentText().strip().lower()
-            self.handle_write(
-                script_name, mode,
-                program_entry=program_entry,
-                keyboard_entry=keyboard_entry)
+            self.handle_write(script_name, mode, top_widget)
             self.main_core.update_script_signal.emit()
             self.edit_window.destroy()
 
@@ -295,16 +290,14 @@ class ProfileUI():
             print(f"Error writing script: {e}")
             traceback.print_exc()
 
-    def handle_write(self, script_name, mode, keyboard_entry, program_entry):
-        "Action when saving profile (Can be moved)"
+    def handle_write(self, script_name, mode, top_widget):
+        "Action when saving profile"
         output_path = os.path.join(self.main_core.script_dir, script_name)
 
         write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
 
         with open(output_path, 'w', encoding='utf-8') as file:
-            condition_string = write_script.write_condition(
-                keyboard_entry=keyboard_entry,
-                program_entry=program_entry)
+            condition_string = write_script.write_condition(top_widget)
 
             if mode == "text mode":
                 write_script.handle_text_mode(file, condition_string)

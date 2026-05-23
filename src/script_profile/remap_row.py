@@ -577,27 +577,13 @@ class KeyListening(QObject):
             return True
         return False
 
-    def toggle_other_buttons(self, state, button):
+    def toggle_other_buttons(self, target_button, other_button_enabled: bool):
         "Change the state of non selected button"
-        for key_widget in self.remap_row_comp.key_rows:
-            orig_button = key_widget.default_key.default_key_select
-            remap_button = key_widget.remap_key.remap_key_select
-            if orig_button != button and orig_button is not None:
-                orig_button.setEnabled(state)
-            if remap_button != button and remap_button is not None:
-                remap_button.setEnabled(state)
+        all_button_list = self.remap_row_comp.edit_frame.findChildren(QPushButton)
 
-        for copas_row in self.copas_rows:
-            (_, _, copy_button, paste_button, _, _) = copas_row
-
-            if copy_button != button and copy_button is not None:
-                copy_button.setEnabled(state)
-            if paste_button != button and paste_button is not None:
-                paste_button.setEnabled(state)
-
-        for _, shortcut_button in self.shortcut_row_comp.shortcut_rows:
-            if shortcut_button != button and shortcut_button is not None:
-                shortcut_button.setEnabled(state)
+        for button in all_button_list:
+            if button != target_button:
+                button.setEnabled(other_button_enabled)
 
     def setup_event_filter(self, install: bool):
         "Install or remove event filter"
@@ -636,7 +622,7 @@ class KeyListening(QObject):
             self.setup_event_filter(install=True)
 
             # Disbale other button
-            self.toggle_other_buttons(False, target_button)
+            self.toggle_other_buttons(target_button, other_button_enabled=False)
 
             self.remap_row_core.set_timer = QTimer()
             self.remap_row_core.set_timer.setSingleShot(True)
@@ -654,7 +640,7 @@ class KeyListening(QObject):
             self.setup_event_filter(install=False)
 
             # Enable other button
-            self.toggle_other_buttons(True, target_button)
+            self.toggle_other_buttons(target_button, other_button_enabled=True)
 
     def multi_key_event(self, event, entry_widget, button):
         "Action when multiple key is pressed, set timer before saving the key"

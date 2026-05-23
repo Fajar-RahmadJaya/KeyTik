@@ -152,7 +152,6 @@ class ProfileUI():
         edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
 
         self.remap_row_comp = RemapRowCore()
-        key_map = self.remap_row_comp.load_key_list()
         mode_line = lines[0].strip() if lines else "; default"
 
         self.edit_frame = QWidget()
@@ -174,7 +173,7 @@ class ProfileUI():
 
         # Default mode
         if mode_line == "; default":
-            self.remap_row_comp.default_mode_widget(lines, key_map, self.edit_window)
+            self.remap_row_comp.default_mode_widget(lines, self.edit_window)
 
         elif mode_line == "; text":
             text_block = self.remap_row_comp.shortcut_row_comp.text_block(lines)
@@ -234,7 +233,6 @@ class ProfileUI():
         self.remap_row_comp = RemapRow(self.edit_frame, self.edit_frame_layout, entries_to_disable)
         shortcut_row_comp = self.remap_row_comp.shortcut_row_comp
         if index == 0:
-            shortcut_row_comp.is_text_mode = False
             shortcut_row_comp.shortcut_title()
             shortcut_row_comp.shortcut_row(parent_window)
             remap_title_widget = self.remap_row_comp.remap_title()
@@ -243,9 +241,8 @@ class ProfileUI():
             self.edit_frame_layout.addItem(spacer)
 
         elif index == 1:
-            shortcut_row_comp.is_text_mode = True
-            shortcut_row_comp.shortcut_title()
-            shortcut_row_comp.shortcut_row(parent_window)
+            text_block = self.remap_row_comp.shortcut_row_comp.text_block()
+            self.edit_frame_layout.addWidget(text_block)
             self.edit_frame_layout.addItem(spacer)
 
         else:

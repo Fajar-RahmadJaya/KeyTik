@@ -51,7 +51,50 @@ class KeyWidget:
     option: OptionWidget = None
 
 
-class RemapRow():
+class SharedRow:  # pylint: disable=R0903
+    "Shared row for remap and shortcut row"
+    def separator_widget(self, plus_event, parent_widget: QWidget):
+        "Remap row separator widget"
+        separator_widget = QWidget()
+        separator_layout = QHBoxLayout(separator_widget)
+        separator_widget.setLayout(separator_layout)
+        separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
+                                        QSizePolicy.Policy.Fixed)
+        separator_widget.setObjectName("SeparatorWidget")
+        separator_layout.setContentsMargins(0, 0, 0, 0)
+        separator_layout.setSpacing(0)
+
+        left_sep = QFrame(separator_widget)
+        left_sep.setObjectName("left_sep")
+        left_sep.setFrameShape(QFrame.Shape.HLine)
+        left_sep.setFrameShadow(QFrame.Shadow.Sunken)
+        separator_layout.addWidget(left_sep)
+
+        plus_label = QLabel("+", separator_widget)
+        plus_label.setStyleSheet(style.PLUS_LABEL)
+        plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
+        plus_label.setFixedWidth(20)
+        plus_label.setFixedHeight(20)
+        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        separator_layout.addWidget(plus_label)
+
+        right_sep = QFrame(separator_widget)
+        right_sep.setObjectName("right_sep")
+        right_sep.setFrameShape(QFrame.Shape.HLine)
+        right_sep.setFrameShadow(QFrame.Shadow.Sunken)
+        separator_layout.addWidget(right_sep)
+
+        plus_label.mousePressEvent = plus_event
+
+        # Hide old separator
+        prev_separator_list = parent_widget.findChildren(QWidget, "SeparatorWidget")
+        if prev_separator_list:
+            last_separator = prev_separator_list[-1]
+            last_separator.setVisible(False)
+
+        return separator_widget
+
+class RemapRow:
     "Remap row on profile creation"
     def __init__(self, edit_frame, edit_frame_layout, entries_to_disable):
         super().__init__()
@@ -84,16 +127,20 @@ class RemapRow():
         remap_widget = self.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)
 
-    def remap_row(self, parent_window, parsed_remap_list: list):
+    def remap_row(self, parent_window, parsed_remap_list: list=None):
         "Build remap row"
         # Remap
         remap_widget = QWidget()
         remap_widget.setContentsMargins(0, 0, 0, 0)
         remap_layout = QVBoxLayout(remap_widget)
         remap_layout.setContentsMargins(0, 0, 0, 0)
+
         # Remap title
         remap_title_widget = self.remap_title()
         remap_layout.addWidget(remap_title_widget)
+
+        shared_row = SharedRow()
+
         # Remap row
         def add_empty_row(_):
             "Add empty remap row and separator"
@@ -102,7 +149,7 @@ class RemapRow():
             remap_layout.addWidget(remap_row_widget)
 
             # Add separator
-            separator_widget = self.separator_widget(add_empty_row, remap_widget)
+            separator_widget = shared_row.separator_widget(add_empty_row, remap_widget)
             remap_layout.addWidget(separator_widget)
 
         if parsed_remap_list:
@@ -113,7 +160,7 @@ class RemapRow():
                 remap_layout.addWidget(remap_row_widget)
 
                 # Separator
-                separator_widget = self.separator_widget(add_empty_row, remap_widget)
+                separator_widget = shared_row.separator_widget(add_empty_row, remap_widget)
                 remap_layout.addWidget(separator_widget)
         else:
             add_empty_row(None)
@@ -190,55 +237,14 @@ class RemapRow():
 
         return card_frame
 
-    def separator_widget(self, plus_event, parent_widget: QWidget):
-        "Remap row separator widget"
-        separator_widget = QWidget()
-        separator_layout = QHBoxLayout(separator_widget)
-        separator_widget.setLayout(separator_layout)
-        separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding,
-                                        QSizePolicy.Policy.Fixed)
-        separator_widget.setObjectName("SeparatorWidget")
-        separator_layout.setContentsMargins(0, 0, 0, 0)
-        separator_layout.setSpacing(0)
-
-        left_sep = QFrame(separator_widget)
-        left_sep.setObjectName("left_sep")
-        left_sep.setFrameShape(QFrame.Shape.HLine)
-        left_sep.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(left_sep)
-
-        plus_label = QLabel("+", separator_widget)
-        plus_label.setStyleSheet(style.PLUS_LABEL)
-        plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        plus_label.setFixedWidth(20)
-        plus_label.setFixedHeight(20)
-        plus_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        separator_layout.addWidget(plus_label)
-
-        right_sep = QFrame(separator_widget)
-        right_sep.setObjectName("right_sep")
-        right_sep.setFrameShape(QFrame.Shape.HLine)
-        right_sep.setFrameShadow(QFrame.Shadow.Sunken)
-        separator_layout.addWidget(right_sep)
-
-        plus_label.mousePressEvent = plus_event
-
-        # Hide old separator
-        prev_separator_list = parent_widget.findChildren(QWidget, "SeparatorWidget")
-        if prev_separator_list:
-            last_separator = prev_separator_list[-1]
-            last_separator.setVisible(False)
-
-        return separator_widget
-
-    def auto_add_row(self, default_key, remap_key, on_plus_click):
-        "Auto add row if all entry have text"
-        if (self.key_rows
-            and default_key.default_key_entry == self.key_rows[-1].default_key.default_key_entry
-            and remap_key.remap_key_entry == self.key_rows[-1].remap_key.remap_key_entry):
-            if (default_key.default_key_entry.text().strip()
-                and remap_key.remap_key_entry.text().strip()):
-                on_plus_click(None)
+    # def auto_add_row(self, default_key, remap_key, on_plus_click):
+    #     "Auto add row if all entry have text"
+    #     if (self.key_rows
+    #         and default_key.default_key_entry == self.key_rows[-1].default_key.default_key_entry
+    #         and remap_key.remap_key_entry == self.key_rows[-1].remap_key.remap_key_entry):
+    #         if (default_key.default_key_entry.text().strip()
+    #             and remap_key.remap_key_entry.text().strip()):
+    #             on_plus_click(None)
 
     def default_key_widget(self, remap_row_widget, remap_row_layout, parsed_remap, parent_window):
         "Default key widget on remap row"
@@ -402,10 +408,9 @@ class ShortcutRow():
             shortcut_row_comp=self, remap_row_comp=self.remap_row_comp)
 
         # UI
-        self.text_block = None
         self.shortcut_entry = None
 
-    def shortcut_row(self, parent_window, parsed_shortcuts_list: list):
+    def shortcut_row(self, parent_window, parsed_shortcuts_list: list=None):
         "Build shortcut row"
         # Widget and layout
         shortcut_widget = QWidget()
@@ -417,6 +422,9 @@ class ShortcutRow():
         shortcut_title = self.shortcut_title()
         shortcut_layout.addWidget(shortcut_title)
 
+        # Shortcut row
+        shared_row = SharedRow()
+
         def add_empty_row(_):
             "Add empty shortcut row"
             # Shortcut row without passing parsed shortcut list
@@ -424,11 +432,10 @@ class ShortcutRow():
             shortcut_layout.addWidget(shortcut_row_widget)
 
             # Separator widget
-            separator_widget = self.remap_row_comp.separator_widget(
+            separator_widget = shared_row.separator_widget(
                 add_empty_row, shortcut_widget)
             shortcut_layout.addWidget(separator_widget)
 
-        # Shortcut row
         if parsed_shortcuts_list:
             for parsed_shortcut in parsed_shortcuts_list:
                 # Shortcut row
@@ -436,7 +443,7 @@ class ShortcutRow():
                 shortcut_layout.addWidget(shortcut_row_widget)
 
                 # Separator widget
-                separator_widget = self.remap_row_comp.separator_widget(
+                separator_widget = shared_row.separator_widget(
                     add_empty_row, shortcut_widget)
                 shortcut_layout.addWidget(separator_widget)
         else:
@@ -453,14 +460,6 @@ class ShortcutRow():
 
     def shortcut_card(self, parent_window, parsed_shortcut=None):
         "Shortcut row"
-        # For text mode
-        if self.is_text_mode and (not hasattr(self, 'text_block') or
-        self.text_block is None):
-            self.text_block = QTextEdit(self.remap_row_comp.edit_frame)
-            self.text_block.setReadOnly(False)
-            self.text_block.setStyleSheet(style.TEXT_BLOCK)
-            self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
-
         # Card frame
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -483,12 +482,6 @@ class ShortcutRow():
         # Shortcut Widget
         self.shortcut_widget(shortcut_row_widget, shortcut_row_layout,
                              parsed_shortcut, parent_window)
-
-        if (self.is_text_mode and
-            hasattr(self, 'text_block') and
-            self.text_block is not None):
-
-            self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
 
         return card_frame
 
@@ -530,27 +523,18 @@ class ShortcutRow():
 
         shortcut_row_layout.addWidget(shortcut_continer, 0, 0)
 
-    def text_mode_widget(self, lines, key_map, parent_window):
+    def text_block(self, lines):
         "Text mode frame(to do: fix)"
-        # shortcuts = self.remap_row_comp.parse_script.parse_shortcuts(lines, key_map)
-
-        # if not shortcuts:
-        #     self.shortcut_row(parent_window)
-        # else:
-        #     for shortcut in shortcuts:
-        #         self.shortcut_row(shortcut)
-
-        self.text_block = QTextEdit(self.remap_row_comp.edit_frame)
-        self.text_block.setLineWrapMode(QTextEdit.WidgetWidth)
-        self.text_block.setFixedHeight(14 * self.text_block.fontMetrics().height())
-        self.text_block.setFontPointSize(10)
-        self.text_block.setReadOnly(False)
-        self.text_block.setStyleSheet(style.TEXT_BLOCK)
+        text_block = QTextEdit()
+        text_block.setLineWrapMode(QTextEdit.WidgetWidth)
+        text_block.setFixedHeight(14 * text_block.fontMetrics().height())
+        text_block.setFontPointSize(10)
+        text_block.setReadOnly(False)
+        text_block.setStyleSheet(style.TEXT_BLOCK)
         text_content = self.extract_and_filter_content(lines)
-        self.text_block.setPlainText(text_content.strip())
-        self.remap_row_comp.edit_frame_layout.addWidget(self.text_block)
+        text_block.setPlainText(text_content.strip())
 
-        self.remap_row_comp.update_plus_visibility('shortcut')
+        return text_block
 
     def extract_and_filter_content(self, lines):
         "Get text block value from the marker"

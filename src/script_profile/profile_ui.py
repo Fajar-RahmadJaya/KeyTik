@@ -152,7 +152,6 @@ class ProfileUI():
         edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
 
         self.remap_row_comp = RemapRowCore()
-        mode_line = lines[0].strip() if lines else "; default"
 
         self.edit_frame = QWidget()
         self.edit_frame.setObjectName("editFrame")
@@ -166,26 +165,43 @@ class ProfileUI():
         self.edit_frame.setLayout(self.edit_frame_layout)
 
         # Spacer to coupled row tightly
-        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        # spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         # Add profile mode widget
         self.remap_row_comp = RemapRow(self.edit_frame, self.edit_frame_layout, entries_to_disable)
 
-        # Default mode
-        if mode_line == "; default":
-            self.remap_row_comp.default_mode_widget(lines, self.edit_window)
-
-        elif mode_line == "; text":
-            text_block = self.remap_row_comp.shortcut_row_comp.text_block(lines)
-            self.edit_frame_layout.addWidget(text_block)
-
-        else:
-            diff_comp.pro_parser(lines, self.remap_row_comp.shortcut_row_comp, self.edit_window)
-            self.edit_frame_layout.addItem(spacer)
+        index = diff_comp.mode_map.get(lines[0].strip())
+        self.build_profile(index, entries_to_disable, lines=lines)
 
         edit_scroll.setWidget(self.edit_frame)
 
         return edit_scroll
+
+    def build_profile(self, index, entries_to_disable, lines=None):
+        "Add profile into layout"
+        # Clear Layout
+        while self.edit_frame_layout.count():
+            item = self.edit_frame_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)
+
+        # Spacer to coupled row tightly
+        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        # Add profile widget
+        self.remap_row_comp = RemapRow(self.edit_frame, self.edit_frame_layout, entries_to_disable)
+        shortcut_row_comp = self.remap_row_comp.shortcut_row_comp
+        if index == 0:
+            self.remap_row_comp.default_mode_widget(self.edit_window, lines)
+
+        elif index == 1:
+            text_block = self.remap_row_comp.shortcut_row_comp.text_block(lines)
+            self.edit_frame_layout.addWidget(text_block)
+
+        else:
+            diff_comp.pro_mode(index, shortcut_row_comp, self.edit_window)
+            self.edit_frame_layout.addItem(spacer)
 
     def edit_bottom(self, first_line, entries_to_disable):
         "Bottom part of profile manager"
@@ -210,44 +226,12 @@ class ProfileUI():
         mode_combobox.setCurrentIndex(default_index)
 
         mode_combobox.currentIndexChanged.connect(
-            lambda index: self.handle_mode_changed(index, self.edit_window, entries_to_disable))
+            lambda index: self.build_profile(index, entries_to_disable))
 
         mode_combobox.setFixedHeight(28)
         bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
 
         return bottom_widget
-
-    def handle_mode_changed(self, index, parent_window, entries_to_disable):
-        "Action when mode changed from combobox (can be moved)"
-        # Clear Layout
-        while self.edit_frame_layout.count():
-            item = self.edit_frame_layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.setParent(None)
-
-        # Spacer to coupled row tightly
-        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        # Add profile widget
-        self.remap_row_comp = RemapRow(self.edit_frame, self.edit_frame_layout, entries_to_disable)
-        shortcut_row_comp = self.remap_row_comp.shortcut_row_comp
-        if index == 0:
-            shortcut_row_comp.shortcut_title()
-            shortcut_row_comp.shortcut_row(parent_window)
-            remap_title_widget = self.remap_row_comp.remap_title()
-            self.edit_frame_layout.addWidget(remap_title_widget)
-            self.remap_row_comp.remap_row(parent_window)
-            self.edit_frame_layout.addItem(spacer)
-
-        elif index == 1:
-            text_block = self.remap_row_comp.shortcut_row_comp.text_block()
-            self.edit_frame_layout.addWidget(text_block)
-            self.edit_frame_layout.addItem(spacer)
-
-        else:
-            diff_comp.pro_mode(index, shortcut_row_comp, parent_window)
-            self.edit_frame_layout.addItem(spacer)
 
     def save_changes(self, mode_combobox, entries_to_disable):
         "Write script"

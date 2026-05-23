@@ -109,21 +109,15 @@ class RemapRow:
         self.edit_frame = edit_frame
         self.edit_frame_layout = edit_frame_layout
 
-    def default_mode_widget(self, lines, key_map, parent_window):
+    def default_mode_widget(self, lines, parent_window):
         "Default mode frame"
         parse_script = ParseScript()  # Composition
 
-        # # Default mode widget and layout
-        # default_widget = QWidget()
-        # default_widget.setContentsMargins(0, 0, 0, 0)
-        # default_layout = QVBoxLayout(default_widget)
-        # default_layout.setContentsMargins(0, 0, 0, 0)
-
-        parsed_shortcuts_list = parse_script.parse_shortcuts(lines, key_map)
+        parsed_shortcuts_list = parse_script.parse_shortcuts(lines)
         shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
         self.edit_frame_layout.addWidget(shortcut_widget)
 
-        parsed_remap_list = parse_script.parse_default_mode(lines, key_map)
+        parsed_remap_list = parse_script.parse_default_mode(lines)
         remap_widget = self.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)
 
@@ -523,7 +517,7 @@ class ShortcutRow():
 
         shortcut_row_layout.addWidget(shortcut_continer, 0, 0)
 
-    def text_block(self, lines):
+    def text_block(self, lines=None):
         "Text mode frame(to do: fix)"
         text_block = QTextEdit()
         text_block.setLineWrapMode(QTextEdit.WidgetWidth)
@@ -540,16 +534,18 @@ class ShortcutRow():
         "Get text block value from the marker"
         inside = False
         result_lines = []
-        for line in lines:
-            stripped = line.strip()
-            if stripped == "; Text mode start":
-                inside = True
-                continue
-            if stripped == "; Text mode end":
-                inside = False
-                continue
-            if inside:
-                result_lines.append(line)
+        if lines:
+            for line in lines:
+                stripped = line.strip()
+                if stripped == "; Text mode start":
+                    inside = True
+                    continue
+                if stripped == "; Text mode end":
+                    inside = False
+                    continue
+                if inside:
+                    result_lines.append(line)
+
         return ''.join(result_lines)
 
 class KeyListening(QObject):

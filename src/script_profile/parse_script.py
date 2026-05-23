@@ -3,6 +3,8 @@
 import re
 from dataclasses import dataclass
 
+from script_profile.remap_row_core import RemapRowCore
+
 @dataclass
 class ParsedRemap:
     "Data class containing parsed remap"
@@ -16,6 +18,9 @@ class ParsedRemap:
 
 class ParseScript():
     "Parse AutoHotkey script"
+    def __init__(self):
+        self.key_map = RemapRowCore().load_key_list()
+
     def parse_device(self, lines):
         "Parse device type for device binding"
         device_id = None
@@ -59,7 +64,7 @@ class ParseScript():
                         programs.append(f"[Tittle, {tittle}]")
         return " ".join(programs)
 
-    def parse_shortcuts(self, lines, key_map):
+    def parse_shortcuts(self, lines):
         "Parse shortcuts"
         shortcuts = []
         in_hotif_block = False
@@ -82,16 +87,16 @@ class ParseScript():
                 shortcuts_line = parts[0].strip().replace("~", "").replace("*", "")
                 if " & " in shortcuts_line:
                     keys = [k.strip() for k in shortcuts_line.split(" & ")]
-                    translated = [self.replace_raw_keys(key, key_map) for key in keys]
+                    translated = [self.key_map.get(key, key) for key in keys]
                     shortcuts_key = " + ".join(translated)
                 else:
-                    shortcuts_key = self.replace_raw_keys(shortcuts_line, key_map)
+                    shortcuts_key = self.key_map.get(shortcuts_line, shortcuts_line)
 
                 shortcuts.append(shortcuts_key)
 
         return shortcuts
 
-    def parse_default_mode(self, lines, key_map):
+    def parse_default_mode(self, lines):
         "Parse default mode"
         remaps = []
         in_block = False
@@ -111,7 +116,7 @@ class ParseScript():
                     in_block = False
                     block_text = " ".join(current_block)
                     remaps.append(
-                        self.parse_double_click(default_key, block_text,key_map))
+                        self.parse_double_click(default_key, block_text))
                     current_block = []
                     continue
 
@@ -126,28 +131,28 @@ class ParseScript():
 
             if ("::" in line and "::{" not in line and ":: ; Shortcuts"
                     not in line):
-                remaps.append(self.parse_remap_key(line, key_map))
+                remaps.append(self.parse_remap_key(line))
 
         return remaps
 
-    def parse_default_key(self, default_key, key_map):
+    def parse_default_key(self, default_key):
         "Parse default key line"
         key = default_key.replace("~", "").replace("*", "")
         if " & " in key:
             keys = [k.strip() for k in key.split(" & ")]
-            translated = [self.replace_raw_keys(k, key_map) for k in keys]
+            translated = [self.key_map.get(k, k) for k in keys]
             key = " + ".join(translated)
         else:
-            key = self.replace_raw_keys(key, key_map)
+            key = self.key_map.get(key, key)
         return key
 
-    def parse_remap_key(self, line, key_map):
+    def parse_remap_key(self, line):
         "Parse remap key line"
         parts = line.split("::")
         default_key = parts[0].strip()
         remap_or_action = parts[1].strip() if len(parts) > 1 else ""
 
-        default_key = self.parse_default_key(default_key, key_map)
+        default_key = self.parse_default_key(default_key)
 
         if remap_or_action:
             is_text_format = False
@@ -171,12 +176,11 @@ class ParseScript():
                 is_hold_format = True
             elif (remap_or_action.startswith('Send') or
                   remap_or_action.startswith('SendInput')):
-                remap_key = self.parse_send_remap(
-                    remap_or_action, key_map)
+                remap_key = self.parse_send_remap(remap_or_action)
             else:
                 remap_key = remap_or_action
 
-            remap_key = self.replace_raw_keys(remap_key, key_map)
+            remap_key = self.key_map.get(remap_key, remap_key)
 
             return ParsedRemap(
                 default_key=default_key,
@@ -188,7 +192,7 @@ class ParseScript():
                 is_text_format=is_text_format)
         return None
 
-    def parse_double_click(self, default_key, block_text, key_map):
+    def parse_double_click(self, default_key, block_text):
         "Parse double click mode from default key"
         is_text_format = False
         is_hold_format = False
@@ -216,7 +220,7 @@ class ParseScript():
                 send_match = re.search(
                     r'Send(?:Input)?\("(.+?)"\)', block_text)
                 if send_match:
-                    remap_key = self.parse_send_remap(send_match.group(0), key_map)
+                    remap_key = self.parse_send_remap(send_match.group(0))
                 else:
                     remap_key = ""
 
@@ -258,7 +262,7 @@ class ParseScript():
 
         return remap_key, hold_interval
 
-    def parse_send_remap(self, remap_or_action, key_map):
+    def parse_send_remap(self, remap_or_action):
         "Parse SendInput line"
         if remap_or_action.startswith("SendInput("):
             key_sequence = remap_or_action[len("SendInput("):-1]
@@ -277,11 +281,11 @@ class ParseScript():
                 key = match[0]
                 if key not in seen_keys:
                     seen_keys.add(key)
-                    keys.append(self.replace_raw_keys(key, key_map))
+                    keys.append(self.key_map.get(key, key))
             remap_key = " + ".join(keys)
         else:
             remap_key = key_sequence.strip('"{}"')
-            remap_key = self.replace_raw_keys(remap_key, key_map)
+            remap_key = self.key_map.get(remap_key, remap_key)
         return remap_key
 
     def parse_text_format(self, block_text):
@@ -291,7 +295,3 @@ class ParseScript():
         if text_match:
             remap_key = text_match.group(1)
         return remap_key
-
-    def replace_raw_keys(self, key, key_map):
-        "Translate raw key into readable key"
-        return key_map.get(key, key)

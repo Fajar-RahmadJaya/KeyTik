@@ -254,7 +254,7 @@ class ProfileUI():
     def save_changes(self, mode_combobox, entries_to_disable):
         "Write script"
         write_script = WriteScript(self.remap_row_comp)
-        script_name = self.get_script_name(entries_to_disable[0])
+        script_name = self.get_script_name(entries_to_disable[0][0])
         if not script_name:
             return
 
@@ -265,8 +265,8 @@ class ProfileUI():
             mode = mode_combobox.currentText().strip().lower()
             write_script.handle_write(
                 script_name, mode,
-                program_entry=entries_to_disable[1],
-                keyboard_entry=entries_to_disable[2])
+                program_entry=entries_to_disable[1][0],
+                keyboard_entry=entries_to_disable[2][0])
             self.main_core.update_script_signal.emit()
             self.edit_window.destroy()
 

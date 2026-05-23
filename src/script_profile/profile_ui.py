@@ -1,7 +1,6 @@
 "UI for create/edit profile"
 
 import os
-import traceback
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
     QComboBox, QGridLayout, QMessageBox, QVBoxLayout, QSpacerItem,
@@ -249,7 +248,8 @@ class ProfileUI():
 
         save_button = QPushButton("Save Changes", self.edit_window)
         save_button.clicked.connect(
-            lambda: self.save_changes(mode_combobox, top_widget))
+            lambda: self.save_changes(mode_combobox.currentText().strip().lower(),
+                                      top_widget))
         save_button.setFixedHeight(28)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
@@ -269,10 +269,11 @@ class ProfileUI():
 
         return bottom_widget
 
-    def save_changes(self, mode_combobox, top_widget: QWidget):
+    def save_changes(self, mode, top_widget: QWidget):
         "Write script"
         script_name_entry = top_widget.findChild(QLineEdit, "ScriptNameEntry")
         script_name = script_name_entry.text().strip() + ".ahk"
+
         if not script_name:
             QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
             return
@@ -281,28 +282,24 @@ class ProfileUI():
         #     return
 
         try:
-            mode = mode_combobox.currentText().strip().lower()
-            self.handle_write(script_name, mode, top_widget)
-            self.main_core.update_script_signal.emit()
-            self.edit_window.destroy()
+            output_path = os.path.join(self.main_core.script_dir, script_name)
+            with open(output_path, 'w', encoding='utf-8') as file:
+                write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
+                condition_string = write_script.write_condition(top_widget)
 
-        except ValueError as e:
-            print(f"Error writing script: {e}")
-            traceback.print_exc()
+                if mode == "text mode":
+                    write_script.handle_text_mode(file, condition_string)
+                elif mode == "default mode":
+                    write_default = WriteDefault(write_script)
+                    write_default.handle_default_mode(file, condition_string)
+                else:
+                    diff_comp.pro_write(file, mode, condition_string)
 
-    def handle_write(self, script_name, mode, top_widget):
-        "Action when saving profile"
-        output_path = os.path.join(self.main_core.script_dir, script_name)
+        except FileNotFoundError as error:
+            print(f"Error: {error}")
 
-        write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
+        # Update profile list
+        self.main_core.update_script_signal.emit()
 
-        with open(output_path, 'w', encoding='utf-8') as file:
-            condition_string = write_script.write_condition(top_widget)
-
-            if mode == "text mode":
-                write_script.handle_text_mode(file, condition_string)
-            elif mode == "default mode":
-                write_default = WriteDefault(write_script)
-                write_default.handle_default_mode(file, condition_string)
-            else:
-                diff_comp.pro_write(file, mode, condition_string)
+        # Exit edit window
+        self.edit_window.destroy()

@@ -109,7 +109,7 @@ class RemapRow:
         self.edit_frame = edit_frame
         self.edit_frame_layout = edit_frame_layout
 
-    def default_mode_widget(self, lines, parent_window):
+    def default_mode_widget(self, parent_window, lines=None):
         "Default mode frame"
         parse_script = ParseScript()  # Composition
 

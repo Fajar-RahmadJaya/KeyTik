@@ -41,7 +41,7 @@ class WriteScript():
         self.dashboard_core = DashboardCore()
         self.remap_row_core = RemapRowCore()
 
-    def check_key_integrity(self):
+    def check_shortcut_integrity(self):
         "Make sure there is no conflict on profile input"
         shortcut_types = {"normal": [], "caps": []}
         caps_on_present = False
@@ -100,6 +100,10 @@ class WriteScript():
 
     def handle_text_mode(self, file, condition_string: ConditionString):
         "Write text mode"
+        # Make sure shortcut valid
+        if not self.check_shortcut_integrity():
+            return
+
         file.write("; text\n")
         self.dashboard_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
@@ -352,7 +356,7 @@ cm1 := AHI.CreateContextManager(id1)\n
 
 class WriteDefault():
     "Default mode writing"
-    def __init__(self, write_script):
+    def __init__(self, write_script: WriteScript):
         # Parameter
         self.write_script = write_script
 
@@ -361,6 +365,10 @@ class WriteDefault():
 
     def handle_default_mode(self, file, condition_string: ConditionString):
         "Write default mode"
+        # Make sure shortcut valid
+        if not self.write_script.check_shortcut_integrity():
+            return
+
         dashboard_core = DashboardCore()  # Composition
 
         file.write("; default\n")

@@ -278,9 +278,6 @@ class ProfileUI():
             QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
             return
 
-        # if not write_script.check_key_integrity():
-        #     return
-
         try:
             output_path = os.path.join(self.main_core.script_dir, script_name)
             with open(output_path, 'w', encoding='utf-8') as file:

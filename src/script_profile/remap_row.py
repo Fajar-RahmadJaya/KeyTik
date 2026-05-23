@@ -114,7 +114,7 @@ class RemapRow():
 
         return remap_label_widget
 
-    def remap_row(self, parent_window=None, parsed_remap=None, insert_after=None):
+    def remap_row(self, parent_window=None, parsed_remap=None):
         "Remap row"
         # Remap row card
         card_frame = QFrame(self.edit_frame)
@@ -168,15 +168,9 @@ class RemapRow():
 
         # The order where the widget will be added
         mapping_row_widgets = []
-        if insert_after:
-            idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
-            self.edit_frame_layout.insertWidget(idx, card_frame)
-            self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
-            mapping_row_widgets.insert(idx // 2, (card_frame, separator_widget))
-        else:
-            self.edit_frame_layout.addWidget(card_frame)
-            self.edit_frame_layout.addWidget(separator_widget)
-            mapping_row_widgets.append((card_frame, separator_widget))
+        self.edit_frame_layout.addWidget(card_frame)
+        self.edit_frame_layout.addWidget(separator_widget)
+        mapping_row_widgets.append((card_frame, separator_widget))
         self.update_plus_visibility(mapping_row_widgets=mapping_row_widgets)
 
         self.edit_frame.setUpdatesEnabled(True)
@@ -378,8 +372,7 @@ class RemapRow():
             right_sep.setVisible(False)
             left_sep.setVisible(False)
             if row_type == "remap row":
-                self.remap_row(parent_window=parent_window,
-                               insert_after=(remap_row_widget, separator_widget))
+                self.remap_row(parent_window=parent_window)
             elif row_type == "shortcut row":
                 self.shortcut_row_comp.shortcut_row(
                     parent_window=parent_window, insert_after=(remap_row_widget, separator_widget))

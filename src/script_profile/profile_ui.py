@@ -171,6 +171,8 @@ class ProfileUI():
 
         # Add profile mode widget
         self.remap_row_comp = RemapRow(self.edit_frame, self.edit_frame_layout, entries_to_disable)
+
+        # Default mode
         if mode_line == "; default":
             self.remap_row_comp.default_mode_widget(lines, key_map, self.edit_window)
 
@@ -234,7 +236,8 @@ class ProfileUI():
             shortcut_row_comp.is_text_mode = False
             shortcut_row_comp.shortcut_title()
             shortcut_row_comp.shortcut_row(parent_window)
-            self.remap_row_comp.remap_title()
+            remap_title_widget = self.remap_row_comp.remap_title()
+            self.edit_frame_layout.addWidget(remap_title_widget)
             self.remap_row_comp.remap_row(parent_window=parent_window)
             self.edit_frame_layout.addItem(spacer)
 

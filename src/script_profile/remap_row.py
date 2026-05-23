@@ -81,18 +81,23 @@ class RemapRow():
     def default_mode_widget(self, lines, key_map, parent_window):
         "Default mode frame"
         parse_script = ParseScript()  # Composition
+
+        # Shortcut title
         self.shortcut_row_comp.shortcut_title()
 
+        # Shortcut row
         parsed_shortcuts_list = parse_script.parse_shortcuts(lines, key_map)
-
         if parsed_shortcuts_list:
             for parsed_shortcut in parsed_shortcuts_list:
                 self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcut)
         else:
             self.shortcut_row_comp.shortcut_row(parent_window)
 
-        self.remap_title()
+        # Remap title
+        remap_title_widget = self.remap_title()
+        self.edit_frame_layout.addWidget(remap_title_widget)
 
+        # Remap row
         if parse_script.parse_default_mode(lines, key_map):
             # Unpack tuple
             for (default_key, remap_key, is_text_format,
@@ -115,23 +120,22 @@ class RemapRow():
 
     def remap_title(self):
         "Key remap row tittle label"
-        remap_label_widget = QWidget(self.edit_frame)
+        remap_label_widget = QWidget()
 
         remap_label_layout = QGridLayout()
         remap_label_layout.setContentsMargins(0, 0, 0, 0)
         remap_label_widget.setLayout(remap_label_layout)
 
-        default_key_label = QLabel("Default Key", self.edit_frame)
+        default_key_label = QLabel("Default Key")
         default_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         default_key_label.setStyleSheet(style.PROFILE_ROW_LABEL)
         remap_label_layout.addWidget(default_key_label, 0, 0, 1, 2)
 
-        remap_key_label = QLabel("Remap Key", self.edit_frame)
+        remap_key_label = QLabel("Remap Key")
         remap_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         remap_key_label.setStyleSheet(style.PROFILE_ROW_LABEL)
         remap_label_layout.addWidget(remap_key_label, 0, 2, 1, 2)
 
-        self.edit_frame_layout.addWidget(remap_label_widget)
         return remap_label_widget
 
     def remap_row(self, parent_window=None, parsed_remap=None, insert_after=None):

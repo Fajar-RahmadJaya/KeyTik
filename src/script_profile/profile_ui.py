@@ -16,7 +16,7 @@ from utility import style
 from select_program.select_program_ui import SelectProgramUI
 from select_device.select_device import SelectDevice
 from script_profile.remap_row import RemapRow, ShortcutRow
-from script_profile.write_script import WriteScript
+from script_profile.write_script import WriteScript, WriteDefault
 from script_profile.parse_script import ParseScript
 
 
@@ -271,22 +271,20 @@ class ProfileUI():
 
     def save_changes(self, mode_combobox, top_widget: QWidget):
         "Write script"
-        write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
-
         script_name_entry = top_widget.findChild(QLineEdit, "ScriptNameEntry")
         script_name = script_name_entry.text().strip() + ".ahk"
         if not script_name:
             QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
             return
 
-        if not write_script.check_key_integrity():
-            return
+        # if not write_script.check_key_integrity():
+        #     return
 
         program_entry = top_widget.findChild(QLineEdit, "ProgramEntry")
         keyboard_entry = top_widget.findChild(QLineEdit, "KeyboardEntry")
         try:
             mode = mode_combobox.currentText().strip().lower()
-            write_script.handle_write(
+            self.handle_write(
                 script_name, mode,
                 program_entry=program_entry,
                 keyboard_entry=keyboard_entry)
@@ -296,3 +294,22 @@ class ProfileUI():
         except ValueError as e:
             print(f"Error writing script: {e}")
             traceback.print_exc()
+
+    def handle_write(self, script_name, mode, keyboard_entry, program_entry):
+        "Action when saving profile (Can be moved)"
+        output_path = os.path.join(self.main_core.script_dir, script_name)
+
+        write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
+
+        with open(output_path, 'w', encoding='utf-8') as file:
+            condition_string = write_script.write_condition(
+                keyboard_entry=keyboard_entry,
+                program_entry=program_entry)
+
+            if mode == "text mode":
+                write_script.handle_text_mode(file, condition_string)
+            elif mode == "default mode":
+                write_default = WriteDefault(write_script)
+                write_default.handle_default_mode(file, condition_string)
+            else:
+                diff_comp.pro_write(file, mode, condition_string)

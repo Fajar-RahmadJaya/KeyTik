@@ -163,7 +163,7 @@ class ProfileUI():
         # spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         # Add profile mode widget
-        index = diff_comp.mode_map.get(lines[0].strip())
+        index = diff_comp.mode_map.get(lines[0].strip().lower())
         self.build_profile(index, lines=lines)
 
         edit_scroll.setWidget(self.edit_frame)
@@ -182,6 +182,10 @@ class ProfileUI():
         # Spacer to coupled row tightly
         spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
+        # Build remap and shortcut row instance
+        self.shortcut_row_comp = ShortcutRow(self.edit_frame)
+        self.remap_row_comp = RemapRow(self.edit_frame)
+
         # Add profile widget
         if index == 0:
             self.default_mode_widget(self.edit_window, lines)
@@ -191,19 +195,17 @@ class ProfileUI():
             self.edit_frame_layout.addWidget(text_block)
 
         else:
-            diff_comp.pro_mode(index, shortcut_row_comp=None, parent_window=self.edit_window)
+            diff_comp.pro_mode(index, lines, self)
             self.edit_frame_layout.addItem(spacer)
 
     def default_mode_widget(self, parent_window, lines=None):
         "Default mode frame"
         parse_script = ParseScript()  # Composition
 
-        self.shortcut_row_comp = ShortcutRow(self.edit_frame)
         parsed_shortcuts_list = parse_script.parse_shortcuts(lines)
         shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
         self.edit_frame_layout.addWidget(shortcut_widget)
 
-        self.remap_row_comp = RemapRow(self.edit_frame)
         parsed_remap_list = parse_script.parse_default_mode(lines)
         remap_widget = self.remap_row_comp.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)

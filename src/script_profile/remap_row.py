@@ -192,7 +192,7 @@ class RemapRow():
 
         # The order where the widget will be added
         mapping_row_widgets = []
-        if insert_after is not None:
+        if insert_after:
             idx = self.edit_frame_layout.indexOf(insert_after[1]) + 1
             self.edit_frame_layout.insertWidget(idx, card_frame)
             self.edit_frame_layout.insertWidget(idx + 1, separator_widget)
@@ -719,8 +719,6 @@ class KeyListening(QObject):
                 self.remap_row_comp.entries_to_disable.append((paste_entry, None))
 
             # Install disable widget event filter
-            for widget in self.remap_row_comp.entries_to_disable:
-                print(widget)
             for entry_tuple in self.remap_row_comp.entries_to_disable:
                 entry = entry_tuple[0]
                 if entry is not None:

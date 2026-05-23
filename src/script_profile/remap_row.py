@@ -599,6 +599,63 @@ class KeyListening(QObject):
             if shortcut_button != button and shortcut_button is not None:
                 shortcut_button.setEnabled(state)
 
+    def setup_event_filter(self, install: bool):
+        "Install or remove event filter"
+        # Install disable widget event filter
+        for entry_tuple in self.remap_row_comp.entries_to_disable:
+            entry = entry_tuple[0]
+            if entry is not None:
+                if install:
+                    entry.installEventFilter(self)
+                else:
+                    entry.removeEventFilter(self)
+
+    def key_listening(self, target_entry, target_button):
+        "Get and Listen to key press"
+        # Initialize mouse listening thread once
+        if not self.mouse_listening_initialized:
+            mouse_listener = pynput.mouse.Listener(
+                on_click=self.mouse_listening)
+            mouse_listener.start()
+            self.mouse_listening_initialized = True
+
+        if not self.is_listening:
+            self.is_listening = True
+            self.remap_row_core.active_entry = target_entry
+            self.remap_row_core.pressed_keys = []
+            self.remap_row_core.last_combination = ""
+
+            # Append entries to disable widget
+            # Part of pro version code
+            for copas_row in self.copas_rows:
+                copy_entry, paste_entry, _, _, _, _ = copas_row
+                self.remap_row_comp.entries_to_disable.append((copy_entry, None))
+                self.remap_row_comp.entries_to_disable.append((paste_entry, None))
+
+            # Install event filter
+            self.setup_event_filter(install=True)
+
+            # Disbale other button
+            self.toggle_other_buttons(False, target_button)
+
+            self.remap_row_core.set_timer = QTimer()
+            self.remap_row_core.set_timer.setSingleShot(True)
+            self.remap_row_core.set_timer.timeout.connect(
+                lambda: self.remap_row_core.finalize_combination(target_entry))
+
+            keyboard.hook(lambda event: self.multi_key_event(event, target_entry, target_button))
+
+        else:
+            self.is_listening = False
+            self.remap_row_core.active_entry = None
+            self.remap_row_core.pressed_keys = []
+
+            # Remove disable widget event filter
+            self.setup_event_filter(install=False)
+
+            # Enable other button
+            self.toggle_other_buttons(True, target_button)
+
     def multi_key_event(self, event, entry_widget, button):
         "Action when multiple key is pressed, set timer before saving the key"
         if not self.is_listening or self.remap_row_core.active_entry != entry_widget:
@@ -650,65 +707,6 @@ class KeyListening(QObject):
                         return sc_checkboxes[0].isChecked()
                     break
         return None
-
-    def key_listening(self, entry_widget, button):
-        "Get and Listen to key press"
-        # Initialize mouse listening thread once
-        if not self.mouse_listening_initialized:
-            mouse_listener = pynput.mouse.Listener(
-                on_click=self.mouse_listening)
-            mouse_listener.start()
-            self.mouse_listening_initialized = True
-
-        if not self.is_listening:
-            self.is_listening = True
-            self.remap_row_core.active_entry = entry_widget
-            self.remap_row_core.pressed_keys = []
-            self.remap_row_core.last_combination = ""
-
-            # Append entries to disable widget
-            # Part of pro version code
-            for copas_row in self.copas_rows:
-                copy_entry, paste_entry, _, _, _, _ = copas_row
-                self.remap_row_comp.entries_to_disable.append((copy_entry, None))
-                self.remap_row_comp.entries_to_disable.append((paste_entry, None))
-
-            # Install disable widget event filter
-            for entry_tuple in self.remap_row_comp.entries_to_disable:
-                entry = entry_tuple[0]
-                if entry is not None:
-                    entry.installEventFilter(self)
-
-            self.toggle_other_buttons(False, button)
-
-            button.clicked.disconnect()
-            button.clicked.connect(lambda: self.key_listening
-                                    (entry_widget, button))
-
-            self.remap_row_core.set_timer = QTimer()
-            self.remap_row_core.set_timer.setSingleShot(True)
-            self.remap_row_core.set_timer.timeout.connect(
-                lambda: self.remap_row_core.finalize_combination(entry_widget))
-
-            keyboard.hook(lambda event: self.multi_key_event(event, entry_widget, button))
-
-        else:
-            self.is_listening = False
-            self.remap_row_core.active_entry = None
-            self.remap_row_core.pressed_keys = []
-
-            # Remove disable widget event filet
-            for entry_tuple in self.remap_row_comp.entries_to_disable:
-                entry = entry_tuple[0]
-                if entry is not None:
-                    entry.removeEventFilter(self)
-
-            self.toggle_other_buttons(True, button)
-
-            if button is not None:
-                button.clicked.disconnect()
-                button.clicked.connect(lambda: self.key_listening
-                                        (entry_widget, button))
 
     def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
         "Get and listen to mouse key press. Pynput on_click"

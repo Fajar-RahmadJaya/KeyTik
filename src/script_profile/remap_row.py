@@ -5,16 +5,15 @@ import pynput
 import keyboard
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLabel, QPushButton, QCheckBox, QLineEdit, QFrame, QHBoxLayout,
-    QVBoxLayout, QWidget, QSizePolicy, QGridLayout, QTextEdit
+    QVBoxLayout, QWidget, QSizePolicy, QGridLayout
 )
-from PySide6.QtCore import Qt, Signal, QObject, QTimer, QEvent  # pylint: disable=E0611
+from PySide6.QtCore import Qt, Signal, QTimer, QEvent, QObject  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtGui import QCursor  # pylint: disable=E0611
 
 from utility import icons
 from utility import constant
 from utility import style
-from script_profile.parse_script import ParseScript
 from script_profile.remap_row_core import RemapRowCore
 from select_key.select_key_ui import SelectKeyUI
 
@@ -96,30 +95,15 @@ class SharedRow:  # pylint: disable=R0903
 
 class RemapRow:
     "Remap row on profile creation"
-    def __init__(self, edit_frame, edit_frame_layout, entries_to_disable):
+    def __init__(self, edit_frame):
         super().__init__()
         # Composition
         self.select_key_ui = SelectKeyUI()
-        self.shortcut_row_comp = ShortcutRow(self)
-        self.key_listening_comp = self.shortcut_row_comp.key_listening_comp
+        self.key_listening_comp = KeyListening(edit_frame)
 
         # Variables
-        self.entries_to_disable = entries_to_disable
         self.key_rows = []
         self.edit_frame = edit_frame
-        self.edit_frame_layout = edit_frame_layout
-
-    def default_mode_widget(self, parent_window, lines=None):
-        "Default mode frame"
-        parse_script = ParseScript()  # Composition
-
-        parsed_shortcuts_list = parse_script.parse_shortcuts(lines)
-        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
-        self.edit_frame_layout.addWidget(shortcut_widget)
-
-        parsed_remap_list = parse_script.parse_default_mode(lines)
-        remap_widget = self.remap_row(parent_window, parsed_remap_list)
-        self.edit_frame_layout.addWidget(remap_widget)
 
     def remap_row(self, parent_window, parsed_remap_list: list=None):
         "Build remap row"
@@ -388,15 +372,13 @@ class RemapRow:
 
 class ShortcutRow():
     "Shortcut row on profile creation"
-    def __init__(self, remap_row_comp: RemapRow):
+    def __init__(self, edit_frame):
         # Variable
         self.is_text_mode = None
         self.shortcut_rows = []
 
         # Composition
-        self.remap_row_comp = remap_row_comp
-        self.key_listening_comp = KeyListening(
-            shortcut_row_comp=self, remap_row_comp=self.remap_row_comp)
+        self.key_listening_comp = KeyListening(edit_frame)
 
         # UI
         self.shortcut_entry = None
@@ -507,51 +489,19 @@ class ShortcutRow():
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: self.remap_row_comp.select_key_ui.select_key(
+            lambda: SelectKeyUI().select_key(
                 parent_window, self.shortcut_entry, context="shortcut"))
         shortcut_layout.addWidget(shortcut_choose, 1, 1)
 
         shortcut_row_layout.addWidget(shortcut_continer, 0, 0)
 
-    def text_block(self, lines=None):
-        "Text mode frame(to do: fix)"
-        text_block = QTextEdit()
-        text_block.setLineWrapMode(QTextEdit.WidgetWidth)
-        text_block.setFixedHeight(14 * text_block.fontMetrics().height())
-        text_block.setFontPointSize(10)
-        text_block.setReadOnly(False)
-        text_block.setStyleSheet(style.TEXT_BLOCK)
-        text_content = self.extract_and_filter_content(lines)
-        text_block.setPlainText(text_content.strip())
-
-        return text_block
-
-    def extract_and_filter_content(self, lines):
-        "Get text block value from the marker"
-        inside = False
-        result_lines = []
-        if lines:
-            for line in lines:
-                stripped = line.strip()
-                if stripped == "; Text mode start":
-                    inside = True
-                    continue
-                if stripped == "; Text mode end":
-                    inside = False
-                    continue
-                if inside:
-                    result_lines.append(line)
-
-        return ''.join(result_lines)
 
 class KeyListening(QObject):
     "Listen to key press"
     request_timer_start = Signal()
-    def __init__(self, remap_row_comp=None, shortcut_row_comp=None):
+    def __init__(self, edit_frame):
         super().__init__()
         # Composition
-        self.remap_row_comp = remap_row_comp
-        self.shortcut_row_comp = shortcut_row_comp
         self.remap_row_core = RemapRowCore()
 
         # Signal
@@ -561,6 +511,9 @@ class KeyListening(QObject):
         self.mouse_listening_initialized = False
         self.is_listening = False
         self.copas_rows = []
+
+        # UI
+        self.edit_frame = edit_frame
 
     def eventFilter(self, _, event):  # pylint: disable=C0103
         "Filter event by key press and window"
@@ -575,14 +528,14 @@ class KeyListening(QObject):
 
     def toggle_other_buttons(self, target_button, other_button_enabled: bool):
         "Change the state of non selected button"
-        button_list = self.remap_row_comp.edit_frame.findChildren(QPushButton)
+        button_list = self.edit_frame.findChildren(QPushButton)
         for button in button_list:
             if button != target_button:
                 button.setEnabled(other_button_enabled)
 
     def toggle_other_entry(self, target_entry, other_entry_enabled: bool):
         "Install or remove event filter to enable/disable entry"
-        entry_list = self.remap_row_comp.edit_frame.findChildren(QLineEdit)
+        entry_list = self.edit_frame.findChildren(QLineEdit)
         for entry in entry_list:
             if entry != target_entry:
                 if other_entry_enabled:
@@ -634,11 +587,12 @@ class KeyListening(QObject):
         if not self.is_listening or self.remap_row_core.active_entry != entry_widget:
             return
 
-        if self.handle_sc_listening(button):
-            key = f"SC{event.scan_code:02X}"
-        else:
-            key = event.name
+        # if sc_checkbox.isChecked():
+        #     key = f"SC{event.scan_code:02X}"
+        # else:
+        #     key = event.name
 
+        key = event.name
         key_lower = key.lower()
         if key_lower in constant.changes_key:
             key = constant.changes_key[key_lower]
@@ -664,22 +618,6 @@ class KeyListening(QObject):
                 else:
                     if hasattr(self, "release_timer"):
                         self.request_timer_start.emit()
-
-    def handle_sc_listening(self, button):
-        "Check whether to use scan code listening or not"
-        for key_widget in self.remap_row_comp.key_rows:
-            if button == key_widget.default_key.default_key_select:
-                parent_widget = button.parent()
-                if parent_widget:
-                    sc_checkboxes = [child for child
-                                        in parent_widget.
-                                        findChildren(QObject)
-                                        if child.objectName() ==
-                                        "sc_checkbox"]
-                    if sc_checkboxes:
-                        return sc_checkboxes[0].isChecked()
-                    break
-        return None
 
     def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
         "Get and listen to mouse key press. Pynput on_click"
@@ -707,8 +645,8 @@ class KeyListening(QObject):
 
     def check_mouse_event(self):
         "Check if cursor is over any widget in key_rows"
-        local_pos = self.remap_row_comp.edit_frame.mapFromGlobal(QCursor.pos())
-        widget = self.remap_row_comp.edit_frame.childAt(local_pos)
+        local_pos = self.edit_frame.mapFromGlobal(QCursor.pos())
+        widget = self.edit_frame.childAt(local_pos)
         if isinstance(widget, (QPushButton, QLineEdit, QCheckBox)):
             return True
 

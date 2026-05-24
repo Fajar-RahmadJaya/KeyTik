@@ -118,7 +118,7 @@ class ProfileUI():
 
         program_entry = QLineEdit(top_widget)
         program_entry.setObjectName("ProgramEntry")
-        program_line = parse_script.parse_program(lines) if lines else ""
+        program_line = parse_script.parse_program(lines) if lines else None
         program_entry.setText(program_line)
         top_layout.addWidget(program_entry, 1, 1, 1, 2)
 
@@ -136,7 +136,7 @@ class ProfileUI():
 
         keyboard_entry = QLineEdit(top_widget)
         keyboard_entry.setObjectName("KeyboardEntry")
-        device_line = parse_script.parse_device(lines) if lines else ""
+        device_line = parse_script.parse_device(lines) if lines else None
         keyboard_entry.setText(device_line)
         top_layout.addWidget(keyboard_entry, 2, 1, 1, 2)
 
@@ -210,11 +210,11 @@ class ProfileUI():
         "Default mode frame"
         parse_script = ParseScript()  # Composition
 
-        parsed_shortcuts_list = parse_script.parse_shortcuts(lines) if lines else []
+        parsed_shortcuts_list = parse_script.parse_shortcuts(lines) if lines else None
         shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
         self.edit_frame_layout.addWidget(shortcut_widget)
 
-        parsed_remap_list = parse_script.parse_default_mode(lines) if lines else []
+        parsed_remap_list = parse_script.parse_default_mode(lines) if lines else None
         remap_widget = self.remap_row_comp.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)
 
@@ -226,11 +226,8 @@ class ProfileUI():
         text_block.setFontPointSize(10)
         text_block.setReadOnly(False)
         text_block.setStyleSheet(style.TEXT_BLOCK)
-        if lines:
-            text_content = self.extract_and_filter_content(lines)
-        else:
-            text_content = ""
-        text_block.setPlainText(text_content.strip())
+        text_content = self.extract_and_filter_content(lines).strip() if lines else None
+        text_block.setPlainText(text_content)
 
         return text_block
 

@@ -2,9 +2,19 @@
 
 import os
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QWidget, QDialog, QLabel, QLineEdit, QPushButton, QScrollArea,
-    QComboBox, QGridLayout, QMessageBox, QVBoxLayout, QSpacerItem,
-    QSizePolicy, QTextEdit
+    QWidget,
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QScrollArea,
+    QComboBox,
+    QGridLayout,
+    QMessageBox,
+    QVBoxLayout,
+    QSpacerItem,
+    QSizePolicy,
+    QTextEdit,
 )
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
@@ -19,8 +29,9 @@ from script_profile.write_script import WriteScript, WriteDefault
 from script_profile.parse_script import ParseScript
 
 
-class ProfileUI():
+class ProfileUI:
     "Create/edit profile UI"
+
     def __init__(self, main_core):
         # Parameter
         self.main_core = main_core
@@ -48,7 +59,7 @@ class ProfileUI():
         # Handle Edit Profile
         else:
             script_path = os.path.join(self.main_core.script_dir, script_name)
-            with open(script_path, 'r', encoding='utf-8') as file:
+            with open(script_path, "r", encoding="utf-8") as file:
                 lines = file.readlines()
             if not lines:
                 return
@@ -95,7 +106,7 @@ class ProfileUI():
         script_name_entry = QLineEdit(top_widget)
         script_name_entry.setObjectName("ScriptNameEntry")
         if script_name:
-            script_name_entry.setText(script_name.replace('.ahk', ''))
+            script_name_entry.setText(script_name.replace(".ahk", ""))
             script_name_entry.setReadOnly(True)
         else:
             script_name_entry.setText("")
@@ -125,7 +136,8 @@ class ProfileUI():
         program_select_button = QPushButton("Select Program", top_widget)
         program_select_button.setToolTip("Choose program and bind profile to it")
         program_select_button.clicked.connect(
-            lambda: SelectProgramUI().program_window(program_entry, self.edit_window))
+            lambda: SelectProgramUI().program_window(program_entry, self.edit_window)
+        )
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
     def select_device_widget(self, top_widget, top_layout, lines, parse_script):
@@ -144,7 +156,9 @@ class ProfileUI():
         keyboard_select_button.setToolTip("Choose device and bind profile to it")
         keyboard_select_button.clicked.connect(
             lambda: SelectDevice().open_device_selection(
-                self.edit_window, keyboard_entry))
+                self.edit_window, keyboard_entry
+            )
+        )
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
     def edit_middle(self, lines):
@@ -211,7 +225,9 @@ class ProfileUI():
         parse_script = ParseScript()  # Composition
 
         parsed_shortcuts_list = parse_script.parse_shortcuts(lines) if lines else None
-        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
+        shortcut_widget = self.shortcut_row_comp.shortcut_row(
+            parent_window, parsed_shortcuts_list
+        )
         self.edit_frame_layout.addWidget(shortcut_widget)
 
         parsed_remap_list = parse_script.parse_default_mode(lines) if lines else None
@@ -246,7 +262,7 @@ class ProfileUI():
             if inside:
                 result_lines.append(line)
 
-        return ''.join(result_lines)
+        return "".join(result_lines)
 
     def edit_bottom(self, first_line, top_widget):
         "Bottom part of profile manager"
@@ -257,8 +273,10 @@ class ProfileUI():
 
         save_button = QPushButton("Save Changes", self.edit_window)
         save_button.clicked.connect(
-            lambda: self.save_changes(mode_combobox.currentText().strip().lower(),
-                                      top_widget))
+            lambda: self.save_changes(
+                mode_combobox.currentText().strip().lower(), top_widget
+            )
+        )
         save_button.setFixedHeight(28)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
@@ -289,7 +307,7 @@ class ProfileUI():
 
         try:
             output_path = os.path.join(self.main_core.script_dir, script_name)
-            with open(output_path, 'w', encoding='utf-8') as file:
+            with open(output_path, "w", encoding="utf-8") as file:
                 write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
                 condition_string = write_script.write_condition(top_widget)
 

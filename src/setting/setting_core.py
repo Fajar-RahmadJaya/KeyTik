@@ -6,7 +6,7 @@ import webbrowser
 import subprocess
 import ctypes
 import requests
-from PySide6.QtWidgets import (QMessageBox, QFileDialog, QApplication)  # pylint: disable=E0611
+from PySide6.QtWidgets import QMessageBox, QFileDialog, QApplication  # pylint: disable=E0611
 from PySide6.QtGui import QPalette  # pylint: disable=E0611
 from utility import constant
 from utility import utils
@@ -14,8 +14,10 @@ from utility import style
 from utility.diff import diff_comp
 from dashboard.dashboard_core import DashboardCore
 
-class SettingCore():
+
+class SettingCore:
     "Setting logic"
+
     def change_data_location(self, parent):
         "Change active and stored profile directory for 'change profile location'"
         new_path = QFileDialog.getExistingDirectory(
@@ -38,8 +40,8 @@ class SettingCore():
                 print(f"The selected path does not exist: {new_path}")
                 return
 
-            new_active_dir = os.path.join(new_path, 'Active')
-            new_store_dir = os.path.join(new_path, 'Store')
+            new_active_dir = os.path.join(new_path, "Active")
+            new_store_dir = os.path.join(new_path, "Store")
 
             if os.path.exists(utils.active_dir):
                 shutil.move(utils.active_dir, new_path)
@@ -70,8 +72,10 @@ class SettingCore():
                 dashboard_core.activate_script(script)
 
             QMessageBox.information(
-                None, "Change Profile Location",
-                "Profile location changed successfully!")
+                None,
+                "Change Profile Location",
+                "Profile location changed successfully!",
+            )
         except PermissionError as e:
             print(f"An error occurred: {e}")
             QMessageBox.critical(None, "Error", f"An error occurred: {e}")
@@ -88,27 +92,30 @@ class SettingCore():
             # Apply palette directly when theme is in the same default color
             palette = style.get_palette()
             base_light = style.is_light(palette.color(QPalette.Base))
-            default_theme_light = os.environ.get("QT_QPA_PLATFORM") == "windows:darkmode=1"
+            default_theme_light = (
+                os.environ.get("QT_QPA_PLATFORM") == "windows:darkmode=1"
+            )
 
             # Palette with different default theme need restart
-            if (base_light != default_theme_light
-                or theme.get("value") in ("light", "dark")):
+            if base_light != default_theme_light or theme.get("value") in (
+                "light",
+                "dark",
+            ):
                 QMessageBox.information(
                     parent,
                     "Success",
                     f"""Theme changed to {config.theme}.
-Please restart {diff_comp.program_name} to apply change.""")
+Please restart {diff_comp.program_name} to apply change.""",
+                )
             else:
                 # Set palette
                 QApplication.setPalette(palette)
                 QApplication.setStyleSheet(
-                    QApplication.instance(),
-                    style.button_highlight(style_sheet=True))
+                    QApplication.instance(), style.button_highlight(style_sheet=True)
+                )
 
         except FileNotFoundError as error:
-            QMessageBox.critical(parent,
-                              "Error",
-                              f"Failed to change theme\n{error}")
+            QMessageBox.critical(parent, "Error", f"Failed to change theme\n{error}")
 
     def save_accent(self, accent: list, parent):
         "Write accent preference to config file"
@@ -120,13 +127,11 @@ Please restart {diff_comp.program_name} to apply change.""")
             # Update accent palette and button highlight stylesheet
             QApplication.setPalette(style.get_palette())
             QApplication.setStyleSheet(
-                QApplication.instance(),
-                style.button_highlight(style_sheet=True))
+                QApplication.instance(), style.button_highlight(style_sheet=True)
+            )
 
         except FileNotFoundError as error:
-            QMessageBox.critical(parent,
-                                "Error",
-                                f"Failed to change Accent\n{error}")
+            QMessageBox.critical(parent, "Error", f"Failed to change Accent\n{error}")
 
     def save_style(self, updated_style):
         "Write style preference to config file"
@@ -157,7 +162,8 @@ Please restart {diff_comp.program_name} to apply change.""")
                     parent,
                     "Success",
                     f"""Mica effect enabled.
-Please restart {diff_comp.program_name} to apply change.""")
+Please restart {diff_comp.program_name} to apply change.""",
+                )
             else:
                 # Apply mica on setting window
                 style.apply_mica(parent)
@@ -165,9 +171,7 @@ Please restart {diff_comp.program_name} to apply change.""")
                 style.apply_mica(parent.window().parentWidget())
 
         except FileNotFoundError as error:
-            QMessageBox.critical(parent,
-                                "Error",
-                                f"Failed to change style\n{error}")
+            QMessageBox.critical(parent, "Error", f"Failed to change style\n{error}")
 
     def ahk_action(self, ahk_installed):
         "Uninstall AutoHotkey"
@@ -180,7 +184,8 @@ Please restart {diff_comp.program_name} to apply change.""")
                 QMessageBox.critical(
                     None,
                     "Error",
-                    "Failed to uninstall: AutoHotkey installation path not found")
+                    "Failed to uninstall: AutoHotkey installation path not found",
+                )
         else:
             webbrowser.open("https://www.autohotkey.com")
 
@@ -189,19 +194,16 @@ Please restart {diff_comp.program_name} to apply change.""")
         try:
             if driver_installed:
                 ctypes.windll.shell32.ShellExecuteW(
-                    None, "runas",
-                    constant.interception_uninstall_path, None, None, 1
+                    None, "runas", constant.interception_uninstall_path, None, None, 1
                 )
             else:
                 ctypes.windll.shell32.ShellExecuteW(
-                    None, "runas", constant.interception_install_path,
-                    None, None, 1
+                    None, "runas", constant.interception_install_path, None, None, 1
                 )
         except FileNotFoundError:
             QMessageBox.critical(
-                None,
-                "Error",
-                "Failed to uninstall: inter_uninstall.bat not found")
+                None, "Error", "Failed to uninstall: inter_uninstall.bat not found"
+            )
 
     def check_for_update(self):
         "Check for update comparing current version and latest version from GitHub API"

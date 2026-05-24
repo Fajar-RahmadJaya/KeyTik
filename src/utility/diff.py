@@ -3,12 +3,11 @@ The only import allowed should be diff_comp"""
 
 import sys
 
-class _Diff():
+
+class _Diff:
     "Code difference between normal version and pro version to make migration easier"
-    mode_item = [
-        "Default Mode",
-        "Text Mode"
-    ]
+
+    mode_item = ["Default Mode", "Text Mode"]
 
     mode_map = {
         "; default": 0,
@@ -21,12 +20,14 @@ class _Diff():
 
     announcement_link = "https://keytik.com/normal-md"
 
-    check_update_link = "https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest"
+    check_update_link = (
+        "https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releases/latest"
+    )
 
     release_link = "https://github.com/Fajar-RahmadJaya/KeyTik/releases"
 
     def parse_update_response(self, response):
-        "Parse the response from check for update "
+        "Parse the response from check for update"
         release_data = response.json()
         latest_version = release_data.get("tag_name")
         if self.current_version != latest_version:
@@ -48,10 +49,12 @@ class _Diff():
         print("There is no such mode")
         print(f"Missing parameter: {file}, {key_translations}, {mode}")
 
+
 # Decide which class to use
 if "--pro" in sys.argv:
     try:
-        from pro_version.diff import Diff as ProDiff # type: ignore  # pylint: disable=E0401
+        from pro_version.diff import Diff as ProDiff  # type: ignore  # pylint: disable=E0401
+
         diff_comp = ProDiff()
     except ImportError:
         print("Command error: Condition not satisfied")

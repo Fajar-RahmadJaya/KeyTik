@@ -1,8 +1,14 @@
 "UI for program selection"
 
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog, QLabel, QLineEdit, QPushButton, QTreeWidget,
-    QVBoxLayout, QHBoxLayout)
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QTreeWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+)
 from PySide6.QtCore import Qt, QTimer  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
@@ -11,8 +17,9 @@ from utility import style
 from select_program.select_program_core import SelectProgramCore
 
 
-class SelectProgramUI():
+class SelectProgramUI:
     "Select program UI"
+
     def __init__(self):
         # UI
         self.program_tree = None
@@ -29,8 +36,7 @@ class SelectProgramUI():
         geometry = style.get_geometry(parent, 620, 300)
         select_program_window.setGeometry(geometry)
         select_program_window.setModal(True)
-        select_program_window.setAttribute(
-            Qt.WidgetAttribute.WA_DeleteOnClose)
+        select_program_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         style.apply_mica(select_program_window)
 
         main_layout = QVBoxLayout(select_program_window)
@@ -48,12 +54,12 @@ class SelectProgramUI():
         def fit_sorted_column():
             sort_col = header.sortIndicatorSection()
             total_width = self.program_tree.viewport().width()
-            other_cols = [i for i in range(self.program_tree.columnCount())
-                          if i != sort_col]
+            other_cols = [
+                i for i in range(self.program_tree.columnCount()) if i != sort_col
+            ]
             for col in other_cols:
                 self.program_tree.setColumnWidth(col, 120)
-            expanded_width = (total_width -
-                              120 * len(other_cols))
+            expanded_width = total_width - 120 * len(other_cols)
             expanded_width = max(expanded_width, 120)
 
             self.program_tree.setColumnWidth(sort_col, expanded_width)
@@ -78,7 +84,8 @@ class SelectProgramUI():
 
         save_button = QPushButton("Select", select_program_window)
         save_button.clicked.connect(
-            lambda: self.save_selected_programs(entry_widget, select_program_window))
+            lambda: self.save_selected_programs(entry_widget, select_program_window)
+        )
         button_layout.addWidget(save_button)
 
         search_layout = QHBoxLayout()
@@ -93,13 +100,14 @@ class SelectProgramUI():
         search_entry.textChanged.connect(self.search_programs)
 
         refresh_button = QPushButton("Refresh", select_program_window)
-        refresh_button.clicked.connect(lambda: self.update_program_treeview(
-            show_all_processes=self.show_all_button.text() == "Show App Only"
-        ))
+        refresh_button.clicked.connect(
+            lambda: self.update_program_treeview(
+                show_all_processes=self.show_all_button.text() == "Show App Only"
+            )
+        )
         search_layout.addWidget(refresh_button)
 
-        self.show_all_button = QPushButton(
-            "Show All Processes", select_program_window)
+        self.show_all_button = QPushButton("Show All Processes", select_program_window)
         self.show_all_button.clicked.connect(self.toggle_show_all_processes)
         search_layout.addWidget(self.show_all_button)
 
@@ -108,16 +116,19 @@ class SelectProgramUI():
         select_program_core = SelectProgramCore()  # Composition
 
         if show_all_processes is None:
-            show_all_processes = (
-                self.show_all_button.text()) == "Show All Processes"
+            show_all_processes = (self.show_all_button.text()) == "Show All Processes"
         self.program_tree.clear()
 
-        processes = select_program_core.get_running_processes(app_only=not show_all_processes)
+        processes = select_program_core.get_running_processes(
+            app_only=not show_all_processes
+        )
         for proc in processes:
             window_title, class_name, proc_name = proc[:3]
             p_type = proc[3] if len(proc) > 3 else "Application"
             if show_all_processes or p_type == "Application":
-                item = select_program_core.multi_check([window_title, class_name, proc_name])
+                item = select_program_core.multi_check(
+                    [window_title, class_name, proc_name]
+                )
                 self.program_tree.addTopLevelItem(item)
 
         if hasattr(self, "fit_sorted_column"):

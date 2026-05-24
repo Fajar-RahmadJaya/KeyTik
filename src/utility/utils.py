@@ -1,4 +1,5 @@
 "Utility module"
+
 import os
 import json
 from dataclasses import dataclass
@@ -6,6 +7,7 @@ import winreg
 
 
 from utility import constant
+
 
 # ------------------------------ Migrate Old Config ------------------------------
 def migrate_old_config():
@@ -23,6 +25,7 @@ def migrate_old_config():
     except (json.JSONDecodeError, FileNotFoundError) as error:
         print(f"Error: {error}")
 
+
 def load_profile_path():
     "Load old config profile path"
     try:
@@ -37,11 +40,12 @@ def load_profile_path():
 
     return profile_path
 
+
 def load_theme():
     "Load old config theme"
     try:
         theme_path = os.path.join(constant.appdata_dir, "theme.json")
-        with open(theme_path, 'r', encoding="utf-8") as theme_file:
+        with open(theme_path, "r", encoding="utf-8") as theme_file:
             theme = theme_file.read().strip().lower()
         os.remove(theme_path)
     except (json.JSONDecodeError, FileNotFoundError) as error:
@@ -50,11 +54,12 @@ def load_theme():
 
     return theme
 
+
 def load_show_announcement():
     "Load old config show announcement"
     try:
         show_announcement_path = os.path.join(constant.appdata_dir, "dont_show.json")
-        with open(show_announcement_path, "r", encoding='utf-8') as dont_show_file:
+        with open(show_announcement_path, "r", encoding="utf-8") as dont_show_file:
             value = json.load(dont_show_file)
             show_announcement = value.get("welcome_condition", True)
         os.remove(show_announcement_path)
@@ -63,6 +68,7 @@ def load_show_announcement():
         show_announcement = True
 
     return show_announcement
+
 
 def load_pinned_profile():
     "Load old config pinned profile"
@@ -77,11 +83,12 @@ def load_pinned_profile():
 
     return pinned_profile
 
+
 def load_exit_key():
     "Load old config exit key"
     try:
         exit_keys_path = os.path.join(constant.appdata_dir, "exit_keys.json")
-        with open(exit_keys_path, 'r', encoding='utf-8') as exit_key_file:
+        with open(exit_keys_path, "r", encoding="utf-8") as exit_key_file:
             exit_key = json.load(exit_key_file)
         os.remove(exit_keys_path)
     except (json.JSONDecodeError, FileNotFoundError) as error:
@@ -90,10 +97,12 @@ def load_exit_key():
 
     return exit_key
 
+
 # ------------------------------ Config ------------------------------
 @dataclass
 class Config:  # pylint: disable=R0902
     "Dataclass to make config usage easier"
+
     show_announcement: bool
     style: str
     theme_type: str
@@ -103,6 +112,7 @@ class Config:  # pylint: disable=R0902
     profile_path: str
     pinned_profile: list
     exit_key: dict
+
 
 def get_config():
     "Get config from json file"
@@ -121,13 +131,14 @@ def get_config():
                 mica_effect=value.get("mica_effect") or "default",
                 profile_path=value.get("profile_path") or constant.appdata_dir,
                 pinned_profile=value.get("pinned_profile", []),
-                exit_key=value.get("exit_key", {})
+                exit_key=value.get("exit_key", {}),
             )
         return config
 
     except (json.JSONDecodeError, FileNotFoundError) as error:
         print(f"Error: {error}")
     return None
+
 
 def update_config(config):
     "Save config into json file"
@@ -137,8 +148,9 @@ def update_config(config):
     except (json.JSONDecodeError, FileNotFoundError) as error:
         print(f"Error: {error}")
 
-active_dir = os.path.join(get_config().profile_path, 'Active')
-store_dir = os.path.join(get_config().profile_path, 'Store')
+
+active_dir = os.path.join(get_config().profile_path, "Active")
+store_dir = os.path.join(get_config().profile_path, "Store")
 
 if not os.path.exists(active_dir):
     os.makedirs(active_dir)
@@ -150,18 +162,17 @@ if not os.path.exists(constant.appdata_dir):
     os.makedirs(constant.appdata_dir)
 
 device_list_path = os.path.join(
-    active_dir, "Autohotkey Interception", "shared_device_info.txt")
+    active_dir, "Autohotkey Interception", "shared_device_info.txt"
+)
 device_finder_path = os.path.join(
-    active_dir, "Autohotkey Interception", "find_device.ahk")
-coordinate_path = os.path.join(
-    active_dir, "Autohotkey Interception", "Coordinate.ahk")
+    active_dir, "Autohotkey Interception", "find_device.ahk"
+)
+coordinate_path = os.path.join(active_dir, "Autohotkey Interception", "Coordinate.ahk")
+
 
 def get_ahk_install_dir():
     "Get AutoHotkey installation directory in case not installed via other method"
-    reg_paths = [
-        r"SOFTWARE\AutoHotkey",
-        r"SOFTWARE\WOW6432Node\AutoHotkey"
-    ]
+    reg_paths = [r"SOFTWARE\AutoHotkey", r"SOFTWARE\WOW6432Node\AutoHotkey"]
     for reg_path in reg_paths:
         try:
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
@@ -171,9 +182,10 @@ def get_ahk_install_dir():
             continue
     return None
 
+
 ahk_uninstall_path = os.path.join(
-    get_ahk_install_dir()
-    or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk",
+    get_ahk_install_dir() or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk",
     "UX",
-    "ui-uninstall.ahk")
+    "ui-uninstall.ahk",
+)
 ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")

@@ -2,9 +2,18 @@
 
 import unicodedata
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog, QTreeWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QLineEdit, QPushButton, QHeaderView,
-    QListWidget, QListWidgetItem, QCheckBox, QTreeWidgetItem
+    QDialog,
+    QTreeWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QHeaderView,
+    QListWidget,
+    QListWidgetItem,
+    QCheckBox,
+    QTreeWidgetItem,
 )
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt, QPoint  # pylint: disable=E0611
@@ -15,8 +24,9 @@ from utility import style
 from select_key.select_key_core import SelectKeyCore
 
 
-class SelectKeyUI():
+class SelectKeyUI:
     "Select Key UI"
+
     def __init__(self):
         # Composition
         self.select_key_core = SelectKeyCore()
@@ -36,7 +46,7 @@ class SelectKeyUI():
             "shortcut": {"ANSI Keys"} | {b[2] for b in constant.unicode_blocks},
             "default": {"Shortcut Special", "ANSI Keys"}
             | {b[2] for b in constant.unicode_blocks},
-            "remap": {"Shortcut Special"}
+            "remap": {"Shortcut Special"},
         }
 
         hide_block = context_hide.get(context)
@@ -50,7 +60,9 @@ class SelectKeyUI():
 
         main_layout = QVBoxLayout(select_key_window)
         # Top part
-        main_layout.addLayout(self.select_key_top(select_key_window, hide_block, context))
+        main_layout.addLayout(
+            self.select_key_top(select_key_window, hide_block, context)
+        )
 
         # Tree view
         main_layout.addWidget(self.tree_view())
@@ -71,7 +83,8 @@ class SelectKeyUI():
         filter_button = QPushButton()
         filter_button.setIcon(icons.get_icon(icons.icon_filter))
         filter_button.clicked.connect(
-            lambda: self.show_filter_popup(search_entry, filter_popup))
+            lambda: self.show_filter_popup(search_entry, filter_popup)
+        )
         choose_search_layout.addWidget(filter_button)
 
         filter_popup = QDialog(select_key_window, Qt.Popup)
@@ -87,9 +100,8 @@ class SelectKeyUI():
         self.filter_dropdown = QListWidget()
         self.filter_dropdown.setSelectionMode(QListWidget.NoSelection)
         self.filter_dropdown.itemChanged.connect(
-            lambda: self.populate_tree(
-                hide_block, search_entry.text()
-            ))
+            lambda: self.populate_tree(hide_block, search_entry.text())
+        )
 
         # Populate filter dropdown based on block name
         try:
@@ -112,24 +124,26 @@ class SelectKeyUI():
         search_entry.setPlaceholderText(" Search Key")
         search_entry.setFixedWidth(170)
         search_entry.textChanged.connect(
-            lambda: self.populate_tree(hide_block, search_entry.text()))
+            lambda: self.populate_tree(hide_block, search_entry.text())
+        )
         choose_search_layout.addWidget(search_entry)
 
         self.search_unicode_checkbox = QCheckBox("Search Unicode")
         self.search_unicode_checkbox.setChecked(False)
         self.search_unicode_checkbox.toggled.connect(
-            lambda: self.populate_tree(hide_block, search_entry.text()))
+            lambda: self.populate_tree(hide_block, search_entry.text())
+        )
         if not context == "remap":
             self.search_unicode_checkbox.setEnabled(False)
             self.search_unicode_checkbox.setToolTip(
                 "Unicode only supported on remap key."
-                )
+            )
         else:
             self.search_unicode_checkbox.setToolTip(
                 "Search key by name and description.\n"
                 "Unicode search may be slow. Enable only if needed.\n"
                 "Letter search needs at least 3 letters."
-                )
+            )
 
         choose_search_layout.addWidget(self.search_unicode_checkbox)
 
@@ -140,8 +154,7 @@ class SelectKeyUI():
         if filter_popup.isVisible():
             filter_popup.hide()
         else:
-            global_pos = search_entry.mapToGlobal(
-                QPoint(0, search_entry.height()))
+            global_pos = search_entry.mapToGlobal(QPoint(0, search_entry.height()))
             filter_popup.setFixedWidth(search_entry.width())
             filter_popup.move(global_pos)
             filter_popup.show()
@@ -159,7 +172,8 @@ class SelectKeyUI():
         self.select_key_tree.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.select_key_tree.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.select_key_tree.itemClicked.connect(
-            lambda item: self.click_checkbox(item, self.select_key_entry))
+            lambda item: self.click_checkbox(item, self.select_key_entry)
+        )
         self.select_key_tree.header().setDefaultAlignment(Qt.AlignCenter)
         self.select_key_tree.header().setSectionResizeMode(0, QHeaderView.Fixed)
         self.select_key_tree.header().setSectionResizeMode(1, QHeaderView.Fixed)
@@ -184,7 +198,10 @@ class SelectKeyUI():
 
         select_key_button = QPushButton("Save Keys")
         select_key_button.clicked.connect(
-            lambda: self.on_save_keys(select_key_window, target_entry, self.select_key_entry))
+            lambda: self.on_save_keys(
+                select_key_window, target_entry, self.select_key_entry
+            )
+        )
         select_key_layout.addWidget(select_key_button)
 
         return select_key_layout
@@ -211,9 +228,12 @@ class SelectKeyUI():
                 unicode_filtered_data, codepoint = self.search_with_unicode(search_text)
 
                 # Get the block of filtered unicode
-                filtered_block = self.select_key_core.get_checked_filter(self.filter_dropdown)
-                unicode_filtered_block = self.get_unicode_block(hide_block,
-                                                                filtered_block, codepoint)
+                filtered_block = self.select_key_core.get_checked_filter(
+                    self.filter_dropdown
+                )
+                unicode_filtered_block = self.get_unicode_block(
+                    hide_block, filtered_block, codepoint
+                )
 
                 # Add unicode filtered data
                 if block_name == unicode_filtered_block:
@@ -234,7 +254,7 @@ class SelectKeyUI():
                 self.select_key_tree.addTopLevelItem(parent_item)
 
                 # Populate lazy unicode
-                if (block_name in [b[2] for b in constant.unicode_blocks]):
+                if block_name in [b[2] for b in constant.unicode_blocks]:
                     parent_item.setExpanded(False)
                     parent_item.setData(0, Qt.UserRole, "unicode_block")
                     dummy_child = QTreeWidgetItem(["", ""])
@@ -267,14 +287,12 @@ class SelectKeyUI():
 
         # Search key on child item
         for char, char_name in data.items():
-            key_match = (search_text and search_text in char.lower())
-            description_match = (search_text and
-                                 search_text in char_name.get("description", "").lower())
-            if (not search_text
-                or block_match
-                or key_match
-                or description_match):
-                filtered_data.append((char, char_name['description']))
+            key_match = search_text and search_text in char.lower()
+            description_match = (
+                search_text and search_text in char_name.get("description", "").lower()
+            )
+            if not search_text or block_match or key_match or description_match:
+                filtered_data.append((char, char_name["description"]))
 
         return filtered_data
 
@@ -328,7 +346,8 @@ class SelectKeyUI():
                     self.checked_keys_list.remove(key_tuple)
 
             select_key_entry.setText(
-                ' + '.join([child for _, child in self.checked_keys_list]))
+                " + ".join([child for _, child in self.checked_keys_list])
+            )
 
     def on_save_keys(self, select_key_window, target_entry, select_key_entry):
         "Insert the selected key on target_entry (default/remap entry)"

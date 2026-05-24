@@ -2,16 +2,17 @@
 
 import json
 import unicodedata
-from PySide6.QtWidgets import (QTreeWidgetItem) # pylint: disable=E0611
-from PySide6.QtGui import QIcon # pylint: disable=E0611
+from PySide6.QtWidgets import QTreeWidgetItem  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 
 from utility import constant
 from utility import icons
 
 
-class SelectKeyCore():
+class SelectKeyCore:
     "Key selection non UI"
+
     def get_unicode_block_range(self, block_name):
         "Get unicode blocks (category) range (eg. 0x0000, 0x007F)"
         for start, end, name in constant.unicode_blocks:
@@ -31,10 +32,7 @@ class SelectKeyCore():
                 name = unicodedata.name(char)
                 if not char.strip():
                     continue
-                block_dict[char] = {
-                    "translate": str(codepoint),
-                    "description": name
-                }
+                block_dict[char] = {"translate": str(codepoint), "description": name}
             except ValueError:
                 continue
         return block_dict
@@ -57,8 +55,7 @@ class SelectKeyCore():
                 block_data = self.get_unicode_block_data(block_name)
                 for char, info in block_data.items():
                     child_item = QTreeWidgetItem(["  " + char, ""])
-                    child_item.setFlags(
-                        child_item.flags() | Qt.ItemIsUserCheckable)
+                    child_item.setFlags(child_item.flags() | Qt.ItemIsUserCheckable)
                     key_tuple = (block_name, char)
                     self.populate_unicode(key_tuple, child_item, info)
                     item.addChild(child_item)
@@ -66,7 +63,7 @@ class SelectKeyCore():
 
     def populate_unicode(self, key_tuple, child_item, info):
         "Populate unicode description and check state"
-        if key_tuple in getattr(self, 'checked_keys_list', []):
+        if key_tuple in getattr(self, "checked_keys_list", []):
             child_item.setCheckState(0, Qt.Checked)
         else:
             child_item.setCheckState(0, Qt.Unchecked)

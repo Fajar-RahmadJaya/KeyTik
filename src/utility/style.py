@@ -13,6 +13,7 @@ import win32mica
 from utility import utils
 from utility import constant
 
+
 # ---------------------------- Palatte ------------------------------
 def color_rgba(color: QColor, alpha: float):
     "Transform QColor into RGBA"
@@ -23,12 +24,15 @@ def color_rgba(color: QColor, alpha: float):
     rgba = f"rgba({red}, {green}, {blue}, {alpha})"
     return rgba
 
+
 def invert_color(color: QColor):
     "Change color to the oposite of it"
-    inverted_color = QColor(255 - color.red(), 255 - color.green(),
-    255 - color.blue(), color.alpha())
+    inverted_color = QColor(
+        255 - color.red(), 255 - color.green(), 255 - color.blue(), color.alpha()
+    )
 
     return inverted_color
+
 
 def is_light(color: QColor) -> bool:
     "Determine whether the color is dark or light"
@@ -39,12 +43,15 @@ def is_light(color: QColor) -> bool:
 
     return luminance > 0.5
 
+
 def detect_system_theme():
     "Detecting system theme for Pyside6 default theme handling"
     if sys.platform == "win32":
         try:
             registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
-            theme_registry = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+            theme_registry = (
+                r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+            )
             key = winreg.OpenKey(registry, theme_registry)
             value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
             winreg.CloseKey(key)
@@ -53,7 +60,10 @@ def detect_system_theme():
             print("Theme registry not found.")
     return "light"
 
+
 mica_supported = bool(sys.getwindowsversion().build >= 22000)
+
+
 def apply_mica(target_window):
     "Apply mica style on target window using win32mica"
     config = utils.get_config()
@@ -67,8 +77,9 @@ def apply_mica(target_window):
         win32mica.ApplyMica(
             HWND=int(target_window.winId()),
             Theme=getattr(win32mica.MicaTheme, theme),
-            Style=getattr(win32mica.MicaStyle, mica_effect.upper())
+            Style=getattr(win32mica.MicaStyle, mica_effect.upper()),
         )
+
 
 def set_custom_palette(palette: QPalette):
     "Apply custom theme to QPalette"
@@ -76,7 +87,7 @@ def set_custom_palette(palette: QPalette):
     theme_file = os.path.join(constant.theme_dir, config.theme + ".json")
 
     try:
-        with open (theme_file, "r", encoding="utf-8") as file:
+        with open(theme_file, "r", encoding="utf-8") as file:
             theme_dict = json.load(file)
     except FileNotFoundError as error:
         print(f"Error: {error}")
@@ -89,17 +100,18 @@ def set_custom_palette(palette: QPalette):
                 palette.setColor(
                     getattr(palette.ColorGroup, color_group),
                     getattr(palette.ColorRole, role),
-                    QColor(color)
+                    QColor(color),
                 )
 
                 # Set color goup inactive the same as active
                 palette.setColor(
                     palette.ColorGroup.Inactive,
                     getattr(palette.ColorRole, role),
-                    QColor(color)
+                    QColor(color),
                 )
 
     return palette
+
 
 def set_accent(palette: QPalette):
     "Apply accent to QPalette"
@@ -107,6 +119,7 @@ def set_accent(palette: QPalette):
 
     if accent != "default":
         palette.setColor(QPalette.ColorRole.Accent, QColor(accent))
+
 
 def get_palette() -> QPalette:
     "Set global appearance based on user config using palette and style"
@@ -131,16 +144,20 @@ def get_palette() -> QPalette:
 
     return palette
 
+
 PALETTE = get_palette()
 IS_BASE_LIGHT = is_light(PALETTE.color(QPalette.Base))
+
 
 @dataclass
 class Color:
     "Dataclass to hold palette used on styling"
+
     surface: str
     mantle: str
     subtext: str
     overlay: str
+
 
 def get_color():
     "Get color palette on various theme"
@@ -162,16 +179,13 @@ def get_color():
         subtext = None
         overlay = None
 
-    color = Color(
-        surface=surface,
-        mantle=mantle,
-        subtext=subtext,
-        overlay=overlay
-    )
+    color = Color(surface=surface, mantle=mantle, subtext=subtext, overlay=overlay)
 
     return color
 
+
 COLOR = get_color()
+
 
 # ---------------------------- Styling ------------------------------
 def get_geometry(parent_window, width, height):
@@ -186,6 +200,7 @@ def get_geometry(parent_window, width, height):
     y = parent_y + (parent_height - height) // 2
     return QRect(x, y, width, height)
 
+
 # -------------------- Shared --------------------
 WIN11_BUTTON = f"""
 QPushButton{{
@@ -199,6 +214,7 @@ QPushButton:hover {{
     background-color: {COLOR.overlay};
 }}
 """
+
 
 def card(object_name=None):
     "Card like styling"
@@ -217,6 +233,7 @@ def card(object_name=None):
     """
 
     return style_sheet
+
 
 # -------------------- Dashboard --------------------
 PROFILE_ROW_LABEL = "font-size: 13px; font-weight: bold;"
@@ -244,6 +261,7 @@ QGroupBox:title {{
 # -------------------- Setting --------------------
 HEADING_STYLE = "font-size:13px; margin-bottom:2px"
 SUBHEADING_STYLE = f"font-size:11px; color: {COLOR.subtext};"
+
 
 def button_highlight(style_sheet=False):
     "Pass empty parameter to get object name only"

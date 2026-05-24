@@ -6,9 +6,9 @@ import sys
 
 # Directory
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-data_dir = os.path.join(script_dir, '_internal', 'Data')
-appdata_dir = os.path.join(os.getenv('APPDATA'), 'KeyTik')
-ahi_dir = os.path.join(data_dir, 'Active', 'AutoHotkey Interception')
+data_dir = os.path.join(script_dir, "_internal", "Data")
+appdata_dir = os.path.join(os.getenv("APPDATA"), "KeyTik")
+ahi_dir = os.path.join(data_dir, "Active", "AutoHotkey Interception")
 theme_dir = os.path.join(data_dir, "theme")
 
 # General
@@ -343,4 +343,4 @@ unicode_blocks = [
     (0xE0100, 0xE01EF, "Variation Selectors Supplement"),
     (0xF0000, 0xFFFFF, "Supplementary Private Use Area-A"),
     (0x100000, 0x10FFFF, "Supplementary Private Use Area-B"),
-    ]
+]

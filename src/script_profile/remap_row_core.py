@@ -1,10 +1,13 @@
 "Logic for create/edit profile"
+
 import json
 
 from utility import constant
 
-class RemapRowCore():
+
+class RemapRowCore:
     "Create/edit profile logic"
+
     def __init__(self):
         self.pressed_keys = []
         self.pressed_keys = []
@@ -15,7 +18,7 @@ class RemapRowCore():
 
     def update_entry(self):
         "Add + on multi key press"
-        shortcut_combination = '+'.join(self.pressed_keys)
+        shortcut_combination = "+".join(self.pressed_keys)
         if hasattr(self, "active_entry") and self.active_entry is not None:
             self.active_entry.setText(shortcut_combination)
 
@@ -26,6 +29,7 @@ class RemapRowCore():
 
     def format_key_combo(self, keys):
         "Format for multiple key press"
+
         def format_key(k):
             if len(k) == 1 and k.islower():
                 return k
@@ -35,7 +39,7 @@ class RemapRowCore():
             keys = list(keys)
         if len(keys) == 1:
             return format_key(keys[0])
-        return ' + '.join(format_key(k) for k in keys)
+        return " + ".join(format_key(k) for k in keys)
 
     def update_widget(self, entry_widget):
         "Insert saved key into entry"
@@ -65,7 +69,7 @@ class RemapRowCore():
         "Open and read key list"
         key_map = {}
         try:
-            with open(constant.keylist_path, 'r', encoding='utf-8') as file:
+            with open(constant.keylist_path, "r", encoding="utf-8") as file:
                 data = json.load(file)
                 for category_dict in data:
                     for _, keys in category_dict.items():

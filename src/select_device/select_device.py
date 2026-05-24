@@ -4,8 +4,13 @@ import os
 import ctypes
 import time
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog, QPushButton, QTreeWidgetItem,
-    QVBoxLayout, QHBoxLayout, QTreeWidget, QMessageBox
+    QDialog,
+    QPushButton,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QHBoxLayout,
+    QTreeWidget,
+    QMessageBox,
 )
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
@@ -15,8 +20,9 @@ from utility import constant
 from utility import style
 
 
-class SelectDevice():
+class SelectDevice:
     "Device selection logic for device binding"
+
     # ------------------------------ UI ------------------------------
     def open_device_selection(self, parent, keyboard_entry):
         "Device selection window"
@@ -26,8 +32,7 @@ class SelectDevice():
         device_selection_window = None
 
         # Make device selection window on top of root
-        if (device_selection_window
-                and device_selection_window.isVisible()):
+        if device_selection_window and device_selection_window.isVisible():
             device_selection_window.raise_()
             return
 
@@ -41,15 +46,13 @@ class SelectDevice():
         geometry = style.get_geometry(parent, 620, 300)
         device_selection_window.setGeometry(geometry)
         device_selection_window.setModal(True)
-        device_selection_window.setAttribute(
-            Qt.WidgetAttribute.WA_DeleteOnClose)
+        device_selection_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         style.apply_mica(device_selection_window)
 
         main_layout = QVBoxLayout(device_selection_window)
 
         device_tree = QTreeWidget(device_selection_window)
-        device_tree.setHeaderLabels(
-            ["Device Type", "VID", "PID", "Handle"])
+        device_tree.setHeaderLabels(["Device Type", "VID", "PID", "Handle"])
         main_layout.addWidget(device_tree)
 
         button_layout = QHBoxLayout()
@@ -58,20 +61,23 @@ class SelectDevice():
         select_button = QPushButton("Select", device_selection_window)
         select_button.clicked.connect(
             lambda: self.select_device(
-                device_tree,
-                keyboard_entry,
-                device_selection_window))
+                device_tree, keyboard_entry, device_selection_window
+            )
+        )
         button_layout.addWidget(select_button)
 
         monitor_button = QPushButton(
-            "Open AHI Monitor To Test Device", device_selection_window)
+            "Open AHI Monitor To Test Device", device_selection_window
+        )
         monitor_button.clicked.connect(self.run_monitor)
         button_layout.addWidget(monitor_button)
 
         refresh_button = QPushButton("Refresh", device_selection_window)
-        refresh_button.clicked.connect(lambda: self.update_treeview(
-                self.refresh_device_list(utils.device_list_path),
-                device_tree))
+        refresh_button.clicked.connect(
+            lambda: self.update_treeview(
+                self.refresh_device_list(utils.device_list_path), device_tree
+            )
+        )
         button_layout.addWidget(refresh_button)
 
         devices = self.refresh_device_list(utils.device_list_path)
@@ -85,8 +91,7 @@ class SelectDevice():
         "Pressing device row will select device"
         selected_items = tree.selectedItems()
         if selected_items:
-            device = [selected_items[0].text(i)
-                      for i in range(tree.columnCount())]
+            device = [selected_items[0].text(i) for i in range(tree.columnCount())]
             device_type = device[0]
             vid_pid = device[3]
 
@@ -99,16 +104,11 @@ class SelectDevice():
         tree.clear()
 
         for device in devices:
-            if (device.get('VID')
-                    and device.get('PID')
-                    and device.get('Handle')):
-
-                device_type = ("Mouse"
-                               if device['Is Mouse'] == "Yes"
-                               else "Keyboard")
+            if device.get("VID") and device.get("PID") and device.get("Handle"):
+                device_type = "Mouse" if device["Is Mouse"] == "Yes" else "Keyboard"
                 item = QTreeWidgetItem(
-                    [device_type, device['VID'],
-                        device['PID'], device['Handle']])
+                    [device_type, device["VID"], device["PID"], device["Handle"]]
+                )
                 tree.addTopLevelItem(item)
 
     def refresh_device_list(self, file_path):
@@ -122,7 +122,7 @@ class SelectDevice():
         "Parse device VID/PID or handle for device binding"
         devices = []
         try:
-            with open(file_path, 'r', encoding='utf-8') as file:
+            with open(file_path, "r", encoding="utf-8") as file:
                 lines = file.readlines()
 
             lines = [line.strip() for line in lines if line.strip()]
@@ -132,23 +132,27 @@ class SelectDevice():
                 line = line.strip()
                 if line.startswith("Device ID"):
                     if device_info:
-                        if (device_info.get('VID') and
-                                device_info.get('PID') and
-                                device_info.get('Handle')):
+                        if (
+                            device_info.get("VID")
+                            and device_info.get("PID")
+                            and device_info.get("Handle")
+                        ):
                             devices.append(device_info)
-                    device_info = {'Device ID': line.split(":")[1].strip()}
+                    device_info = {"Device ID": line.split(":")[1].strip()}
                 elif line.startswith("VID:"):
-                    device_info['VID'] = line.split(":")[1].strip()
+                    device_info["VID"] = line.split(":")[1].strip()
                 elif line.startswith("PID:"):
-                    device_info['PID'] = line.split(":")[1].strip()
+                    device_info["PID"] = line.split(":")[1].strip()
                 elif line.startswith("Handle:"):
-                    device_info['Handle'] = line.split(":")[1].strip()
+                    device_info["Handle"] = line.split(":")[1].strip()
                 elif line.startswith("Is Mouse:"):
-                    device_info['Is Mouse'] = line.split(":")[1].strip()
+                    device_info["Is Mouse"] = line.split(":")[1].strip()
 
-            if (device_info.get('VID') and
-                    device_info.get('PID') and
-                    device_info.get('Handle')):
+            if (
+                device_info.get("VID")
+                and device_info.get("PID")
+                and device_info.get("Handle")
+            ):
                 devices.append(device_info)
 
         except (ValueError, FileNotFoundError) as e:
@@ -168,44 +172,47 @@ class SelectDevice():
             "This driver is required to use assign on specific device feature.\n \n \n"
             "Note: Restart your device after installation.\n"
             "Would you like to install it now?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
 
         if reply == QMessageBox.StandardButton.Yes:
             try:
                 if os.path.exists(constant.interception_install_path):
-
-                    install_dir = (os.path.dirname
-                                    (constant.interception_install_path))
+                    install_dir = os.path.dirname(constant.interception_install_path)
 
                     ctypes.windll.shell32.ShellExecuteW(
                         None,
                         "runas",
                         "cmd.exe",
                         (
-                        f"/k cd /d {install_dir} && "
-                        f"{os.path.basename(constant.interception_install_path)}"
+                            f"/k cd /d {install_dir} && "
+                            f"{os.path.basename(constant.interception_install_path)}"
                         ),
                         None,
-                        1
+                        1,
                     )
                 else:
                     QMessageBox.critical(
                         None,
                         "Installation Failed",
-                        "Installation script not found. Please check your installation."
+                        "Installation script not found. Please check your installation.",
                     )
             except FileNotFoundError as e:
-                QMessageBox.critical(None,
-                                        "Error",
-                                        f"An error occurred during installation: {str(e)}")
+                QMessageBox.critical(
+                    None, "Error", f"An error occurred during installation: {str(e)}"
+                )
         return False
 
     def run_monitor(self):
         "Run AutoHotkey Interception built in device monitor"
-        script_path = os.path.join(constant.script_dir,
-                                    "_internal", "Data", "Active",
-                                    "AutoHotkey Interception", "Monitor.ahk")
+        script_path = os.path.join(
+            constant.script_dir,
+            "_internal",
+            "Data",
+            "Active",
+            "AutoHotkey Interception",
+            "Monitor.ahk",
+        )
         if os.path.exists(script_path):
             os.startfile(script_path)
         else:

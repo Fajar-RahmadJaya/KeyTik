@@ -3,10 +3,19 @@
 import os
 import webbrowser
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog, QVBoxLayout, QPushButton,
-    QHBoxLayout, QMessageBox, QScrollArea,
-    QFrame, QWidget, QLabel, QSizePolicy, QComboBox,
-    QStyleFactory)
+    QDialog,
+    QVBoxLayout,
+    QPushButton,
+    QHBoxLayout,
+    QMessageBox,
+    QScrollArea,
+    QFrame,
+    QWidget,
+    QLabel,
+    QSizePolicy,
+    QComboBox,
+    QStyleFactory,
+)
 from PySide6.QtGui import QIcon, QFont, QColor, QPixmap, QPainter  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 import qt_themes
@@ -19,14 +28,18 @@ from utility import style
 from setting.setting_core import SettingCore
 from setting.announcement import Announcement
 
+
 class SettingCombobox(QComboBox):  # pylint: disable=R0903
     "Ignore Wheel Event"
+
     def wheelEvent(self, event):  # pylint: disable=C0103
         "Override wheelEvent"
         event.ignore()
 
-class SettingUI():
+
+class SettingUI:
     "Setting UI"
+
     def __init__(self):
         # Composition
         self.setting_core = SettingCore()
@@ -142,12 +155,13 @@ class SettingUI():
         pro_upgrade_button = self.setting_button()
         pro_upgrade_button.setText("Get KeyTik Pro")
         pro_upgrade_button.clicked.connect(
-            lambda: webbrowser.open(
-                "https://fajarrahmadjaya.gumroad.com/l/keytik-pro"))
+            lambda: webbrowser.open("https://fajarrahmadjaya.gumroad.com/l/keytik-pro")
+        )
         pro_upgrade_button.setObjectName(style.button_highlight())
 
-        pro_upgrade_layout, pro_upgrade_frame = self.setting_card(heading="KeyTik Pro",
-                                                subheading="Pro version available at $20")
+        pro_upgrade_layout, pro_upgrade_frame = self.setting_card(
+            heading="KeyTik Pro", subheading="Pro version available at $20"
+        )
         pro_upgrade_layout.addWidget(pro_upgrade_button)
         pro_version_layout.addWidget(pro_upgrade_frame)
 
@@ -186,15 +200,16 @@ class SettingUI():
         style_combobox.addItem("Default")
         style_combobox.addItems(QStyleFactory.keys())
         current_style = utils.get_config().style
-        style_combobox.setCurrentText(current_style if current_style
-                                        else "Default")
+        style_combobox.setCurrentText(current_style if current_style else "Default")
         style_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_style(
-                updated_style=style_combobox.currentText()))
+                updated_style=style_combobox.currentText()
+            )
+        )
 
         style_layout, style_frame = self.setting_card(
-            heading="Style",
-            subheading="Change widget style")
+            heading="Style", subheading="Change widget style"
+        )
         style_layout.addWidget(style_combobox)
 
         return style_frame
@@ -204,48 +219,42 @@ class SettingUI():
         theme_combobox = self.setting_combobox()
 
         # Default theme
-        theme_combobox.addItem("Light", {
-            "type": "default",
-            "value": "light"
-        })
-        theme_combobox.addItem("Dark", {
-            "type": "default",
-            "value": "dark"
-        })
-        theme_combobox.addItem("System", {
-            "type": "default",
-            "value": "system"
-        })
+        theme_combobox.addItem("Light", {"type": "default", "value": "light"})
+        theme_combobox.addItem("Dark", {"type": "default", "value": "dark"})
+        theme_combobox.addItem("System", {"type": "default", "value": "system"})
 
         # Custom theme
         for custom_theme in self.setting_core.get_custom_theme():
             theme_name = custom_theme.replace(".json", "")
-            theme_combobox.addItem(theme_name.replace("_", " ").title(),
-                                   {
-                                       "type": "custom",
-                                       "value": theme_name
-                                    })
+            theme_combobox.addItem(
+                theme_name.replace("_", " ").title(),
+                {"type": "custom", "value": theme_name},
+            )
 
         # qt-themes theme
         qt_themes_dict = qt_themes.get_themes()
         for qt_theme, _ in qt_themes_dict.items():
             # Remove catppuccin
-            if not qt_theme.startswith("catppuccin") or not qt_theme.startswith("dracula"):
-                theme_combobox.addItem(qt_theme.replace('_', ' ').title(),
-                                       {
-                                           "type": "qt-themes",
-                                           "value": qt_theme
-                                        })
+            if not qt_theme.startswith("catppuccin") or not qt_theme.startswith(
+                "dracula"
+            ):
+                theme_combobox.addItem(
+                    qt_theme.replace("_", " ").title(),
+                    {"type": "qt-themes", "value": qt_theme},
+                )
 
-        theme_combobox.setCurrentText(utils.get_config().theme.replace('_', ' ').title())
+        theme_combobox.setCurrentText(
+            utils.get_config().theme.replace("_", " ").title()
+        )
         theme_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_theme(
-                theme=theme_combobox.currentData(),
-                parent=settings_window))
+                theme=theme_combobox.currentData(), parent=settings_window
+            )
+        )
 
         theme_layout, theme_frame = self.setting_card(
-            heading="Theme",
-            subheading="Change widget palette")
+            heading="Theme", subheading="Change widget palette"
+        )
         theme_layout.addWidget(theme_combobox)
 
         return theme_frame
@@ -259,15 +268,19 @@ class SettingUI():
         # Item data should be the color name and color hex
         accent_combobox.addItem("Default", ["Default", "default"])
         # Dracula accent
-        accent_combobox.addItem(self.color_circle("#BD93F9"), "Dracula",
-                                ["Dracula", "#BD93F9"])
+        accent_combobox.addItem(
+            self.color_circle("#BD93F9"), "Dracula", ["Dracula", "#BD93F9"]
+        )
         # Catppuccin Accent
         for flavor in catppuccin_palette:
             for color in flavor.colors:
                 if color.accent:
                     accent_name = f"Catppuccin {flavor.name} {color.name}".title()
-                    accent_combobox.addItem(self.color_circle(color.hex),
-                                            accent_name, [accent_name, color.hex])
+                    accent_combobox.addItem(
+                        self.color_circle(color.hex),
+                        accent_name,
+                        [accent_name, color.hex],
+                    )
 
                 if color.hex == config.accent:
                     accent_name = f"Catppuccin {flavor.name} {color.name}".title()
@@ -277,12 +290,13 @@ class SettingUI():
         accent_combobox.setToolTip(accent_combobox.currentText())
         accent_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_accent(
-                accent=accent_combobox.currentData(),
-                parent=settings_window))
+                accent=accent_combobox.currentData(), parent=settings_window
+            )
+        )
 
         accent_layout, accent_frame = self.setting_card(
-            heading="Accent Color",
-            subheading="Change highlighted widget color")
+            heading="Accent Color", subheading="Change highlighted widget color"
+        )
         accent_layout.addWidget(accent_combobox)
 
         return accent_frame
@@ -312,12 +326,13 @@ class SettingUI():
         mica_combobox.setCurrentText(utils.get_config().mica_effect.capitalize())
         mica_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_mica_effect(
-                new_mica=mica_combobox.currentText(),
-                parent=settings_window))
+                new_mica=mica_combobox.currentText(), parent=settings_window
+            )
+        )
 
         mica_layout, mica_frame = self.setting_card(
-            heading="Mica Effect",
-            subheading="Windows and surfaces appear translucent")
+            heading="Mica Effect", subheading="Windows and surfaces appear translucent"
+        )
         mica_layout.addWidget(mica_combobox)
 
         return mica_frame
@@ -347,11 +362,12 @@ class SettingUI():
         profile_location_button = self.setting_button()
         profile_location_button.setText("Change Location")
         profile_location_button.clicked.connect(
-            lambda: self.setting_core.change_data_location(settings_window))
+            lambda: self.setting_core.change_data_location(settings_window)
+        )
 
         profile_location_layout, profile_location_frame = self.setting_card(
-            heading="Profile Location",
-            subheading=utils.get_config().profile_path)
+            heading="Profile Location", subheading=utils.get_config().profile_path
+        )
         profile_location_layout.addWidget(profile_location_button)
 
         return profile_location_frame
@@ -362,10 +378,12 @@ class SettingUI():
         announcement_button = self.setting_button()
         announcement_button.setText("Announcement")
         announcement_button.clicked.connect(
-            lambda: announcement.show_announcement_window(settings_window))
+            lambda: announcement.show_announcement_window(settings_window)
+        )
 
-        announcement_layout, announcement_frame = self.setting_card(heading="Announcement",
-                                            subheading="Show announcement")
+        announcement_layout, announcement_frame = self.setting_card(
+            heading="Announcement", subheading="Show announcement"
+        )
         announcement_layout.addWidget(announcement_button)
 
         return announcement_frame
@@ -399,16 +417,18 @@ class SettingUI():
 
         ahk_button = self.setting_button()
         ahk_button.setText(
-            "Uninstall AutoHotkey"
-            if ahk_installed
-            else "Install AutoHotkey")
-        ahk_button.clicked.connect(
-            lambda: self.setting_core.ahk_action(ahk_installed))
+            "Uninstall AutoHotkey" if ahk_installed else "Install AutoHotkey"
+        )
+        ahk_button.clicked.connect(lambda: self.setting_core.ahk_action(ahk_installed))
 
         ahk_layout, ahk_frame = self.setting_card(
             heading="AutoHotkey Installation",
-            subheading=("AutoHotkey is installed" if ahk_installed
-                        else "AutoHotkey not installed"))
+            subheading=(
+                "AutoHotkey is installed"
+                if ahk_installed
+                else "AutoHotkey not installed"
+            ),
+        )
         ahk_layout.addWidget(ahk_button)
 
         return ahk_frame
@@ -419,16 +439,22 @@ class SettingUI():
 
         interception_button = self.setting_button()
         interception_button.setText(
-                                "Uninstall Interception Driver"
-                                if interception_installed
-                                else "Install Interception Driver")
+            "Uninstall Interception Driver"
+            if interception_installed
+            else "Install Interception Driver"
+        )
         interception_button.clicked.connect(
-            lambda: self.setting_core.driver_action(interception_installed))
+            lambda: self.setting_core.driver_action(interception_installed)
+        )
 
         interception_layout, interception_frame = self.setting_card(
             heading="Interception Driver Installation",
-            subheading=("Interception Driver is Installed" if interception_installed
-                        else "Interception Driver not Installed"))
+            subheading=(
+                "Interception Driver is Installed"
+                if interception_installed
+                else "Interception Driver not Installed"
+            ),
+        )
         interception_layout.addWidget(interception_button)
 
         return interception_frame
@@ -438,10 +464,12 @@ class SettingUI():
         check_update_button = self.setting_button()
         check_update_button.setText("Check For Update")
         check_update_button.clicked.connect(
-            lambda: self.update_messagebox(show_no_update_message=True))
+            lambda: self.update_messagebox(show_no_update_message=True)
+        )
 
-        check_update_layout, check_update_frame = self.setting_card(heading="Check for update",
-                                                subheading="Check for update")
+        check_update_layout, check_update_frame = self.setting_card(
+            heading="Check for update", subheading="Check for update"
+        )
         check_update_layout.addWidget(check_update_button)
 
         return check_update_frame
@@ -451,17 +479,20 @@ class SettingUI():
         latest_version = self.setting_core.check_for_update()
         if latest_version:
             reply = QMessageBox.question(
-                None, "Update Available",
+                None,
+                "Update Available",
                 (
-                f"New update available: {diff_comp.program_name} {latest_version}\n\n"
-                "Would you like to go to the update page?"
+                    f"New update available: {diff_comp.program_name} {latest_version}\n\n"
+                    "Would you like to go to the update page?"
                 ),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             )
             if reply == QMessageBox.StandardButton.Yes:
                 webbrowser.open(diff_comp.release_link)
         else:
             if show_no_update_message:
                 QMessageBox.information(
-                    None, "Check For Update",
-                    "You are using the latest version of KeyTik.")
+                    None,
+                    "Check For Update",
+                    "You are using the latest version of KeyTik.",
+                )

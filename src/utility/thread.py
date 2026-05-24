@@ -9,8 +9,10 @@ from script_profile.write_script import WriteScript
 from utility import utils
 from dashboard.dashboard_core import DashboardCore
 
+
 class Thread(QThread):  # pylint: disable=R0903
     "Startup thread worker"
+
     update_found = Signal()
     show_announcement = Signal()
     ahk_not_installed = Signal()
@@ -44,5 +46,6 @@ class Thread(QThread):  # pylint: disable=R0903
         # Initialize keyboard hook thread once
         def _dummy(_):
             pass
+
         dummy_hook = keyboard.hook(_dummy)
         keyboard.unhook(dummy_hook)

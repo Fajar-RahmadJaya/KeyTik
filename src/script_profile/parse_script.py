@@ -5,9 +5,11 @@ from dataclasses import dataclass
 
 from script_profile.remap_row_core import RemapRowCore
 
+
 @dataclass
 class ParsedRemap:
     "Data class containing parsed remap"
+
     default_key: str
     remap_key: str
     hold_interval: int
@@ -16,8 +18,10 @@ class ParsedRemap:
     is_sc: bool
     is_text_format: bool
 
-class ParseScript():
+
+class ParseScript:
     "Parse AutoHotkey script"
+
     def __init__(self):
         self.key_map = RemapRowCore().load_key_list()
 
@@ -26,8 +30,7 @@ class ParseScript():
         device_id = None
         device_type = "Keyboard"
         for line in lines:
-            if ("AHI.GetDeviceId" in line
-                    or "AHI.GetDeviceIdFromHandle" in line):
+            if "AHI.GetDeviceId" in line or "AHI.GetDeviceIdFromHandle" in line:
                 start = line.find("(") + 1
                 end = line.find(")")
                 params = line[start:end].split(",")
@@ -36,9 +39,11 @@ class ParseScript():
                 elif "true" in params[0].strip():
                     device_type = "Mouse"
                 device_id = ", ".join(
-                    param.strip().replace('"', '') for param in params)
+                    param.strip().replace('"', "") for param in params
+                )
                 device_id = device_id.replace("false", device_type).replace(
-                    "true", device_type)
+                    "true", device_type
+                )
                 break
         return device_id
 
@@ -48,19 +53,18 @@ class ParseScript():
         for line in lines:
             line = line.strip()
             if line.startswith("#HotIf"):
-                matches = re.findall(
-                    r'WinActive\("ahk_(exe|class)\s+([^"]+)"\)', line)
+                matches = re.findall(r'WinActive\("ahk_(exe|class)\s+([^"]+)"\)', line)
                 for match in matches:
                     program_type, program_name = match
                     if program_type == "exe":
                         programs.append(f"[Process, {program_name}]")
                     elif program_type == "class":
                         programs.append(f"[Class, {program_name}]")
-                tittle_matches = re.findall(
-                    r'WinActive\("([^"]+)"\)', line)
+                tittle_matches = re.findall(r'WinActive\("([^"]+)"\)', line)
                 for tittle in tittle_matches:
-                    if (not (tittle.startswith("ahk_exe ")
-                             or tittle.startswith("ahk_class "))):
+                    if not (
+                        tittle.startswith("ahk_exe ") or tittle.startswith("ahk_class ")
+                    ):
                         programs.append(f"[Tittle, {tittle}]")
         return " ".join(programs)
 
@@ -115,8 +119,7 @@ class ParseScript():
                 if line == "}":
                     in_block = False
                     block_text = " ".join(current_block)
-                    remaps.append(
-                        self.parse_double_click(default_key, block_text))
+                    remaps.append(self.parse_double_click(default_key, block_text))
                     current_block = []
                     continue
 
@@ -124,13 +127,12 @@ class ParseScript():
                 continue
 
             if line.startswith("*") and "::{" in line:
-                default_key = line[1:line.index("::{")]
+                default_key = line[1 : line.index("::{")]
                 in_block = True
                 current_block = []
                 continue
 
-            if ("::" in line and "::{" not in line and ":: ; Shortcuts"
-                    not in line):
+            if "::" in line and "::{" not in line and ":: ; Shortcuts" not in line:
                 remaps.append(self.parse_remap_key(line))
 
         return remaps
@@ -162,20 +164,21 @@ class ParseScript():
             remap_key = ""
             hold_interval = "10"
 
-            if not default_key.startswith('~') and '&' in default_key:
+            if not default_key.startswith("~") and "&" in default_key:
                 is_first_key = True
 
-            if default_key.startswith('SC') or default_key.startswith('~SC'):
+            if default_key.startswith("SC") or default_key.startswith("~SC"):
                 is_sc = True
 
-            if remap_or_action.startswith('SendText'):
+            if remap_or_action.startswith("SendText"):
                 remap_key = self.parse_text_format(remap_or_action)
                 is_text_format = True
-            elif 'SetTimer' in remap_or_action:
+            elif "SetTimer" in remap_or_action:
                 remap_key, hold_interval = self.parse_hold_format(remap_or_action)
                 is_hold_format = True
-            elif (remap_or_action.startswith('Send') or
-                  remap_or_action.startswith('SendInput')):
+            elif remap_or_action.startswith("Send") or remap_or_action.startswith(
+                "SendInput"
+            ):
                 remap_key = self.parse_send_remap(remap_or_action)
             else:
                 remap_key = remap_or_action
@@ -189,7 +192,8 @@ class ParseScript():
                 is_hold_format=is_hold_format,
                 is_first_key=is_first_key,
                 is_sc=is_sc,
-                is_text_format=is_text_format)
+                is_text_format=is_text_format,
+            )
         return None
 
     def parse_double_click(self, default_key, block_text):
@@ -201,24 +205,24 @@ class ParseScript():
         is_first_key = False
         is_sc = False
 
-        if not default_key.startswith('~') and '&' in default_key:
+        if not default_key.startswith("~") and "&" in default_key:
             is_first_key = True
 
-        if default_key.startswith('SC') or default_key.startswith('~SC'):
+        if default_key.startswith("SC") or default_key.startswith("~SC"):
             is_sc = True
 
-        if ('A_PriorHotkey' in block_text and
-                'A_TimeSincePriorHotkey < 400' in block_text):
-
-            if 'SendText' in block_text:
+        if (
+            "A_PriorHotkey" in block_text
+            and "A_TimeSincePriorHotkey < 400" in block_text
+        ):
+            if "SendText" in block_text:
                 remap_key = self.parse_text_format(block_text)
                 is_text_format = True
-            elif 'SetTimer' in block_text:
+            elif "SetTimer" in block_text:
                 remap_key, hold_interval = self.parse_hold_format(block_text)
                 is_hold_format = True
             else:
-                send_match = re.search(
-                    r'Send(?:Input)?\("(.+?)"\)', block_text)
+                send_match = re.search(r'Send(?:Input)?\("(.+?)"\)', block_text)
                 if send_match:
                     remap_key = self.parse_send_remap(send_match.group(0))
                 else:
@@ -235,13 +239,15 @@ class ParseScript():
         )
 
     def get_unicode(self, text):
-        'Parse Unicode fron SendInput'
+        "Parse Unicode fron SendInput"
+
         def chr_replacer(match):
             code = int(match.group(1))
             return chr(code)
-        text = re.sub(r'"', '', text)
-        text = re.sub(r'\s*\+\s*', '', text)
-        text = re.sub(r'Chr\((\d+)\)', chr_replacer, text)
+
+        text = re.sub(r'"', "", text)
+        text = re.sub(r"\s*\+\s*", "", text)
+        text = re.sub(r"Chr\((\d+)\)", chr_replacer, text)
         return text
 
     def parse_hold_format(self, remap_or_action):
@@ -249,14 +255,14 @@ class ParseScript():
         remap_key = ""
         hold_interval = "10"
 
-        send_match = re.search(r'Send(?:Input)?\((.+)\)', remap_or_action)
+        send_match = re.search(r"Send(?:Input)?\((.+)\)", remap_or_action)
         if send_match:
             down_sequence = send_match.group(1)
             down_sequence = self.get_unicode(down_sequence)
-            down_keys = re.findall(r'{(.*?) Down}', down_sequence)
+            down_keys = re.findall(r"{(.*?) Down}", down_sequence)
             if down_keys:
                 remap_key = " + ".join(down_keys)
-                interval_match = re.search(r'-\s*(\d+)', remap_or_action)
+                interval_match = re.search(r"-\s*(\d+)", remap_or_action)
                 if interval_match:
                     hold_interval = str(int(interval_match.group(1)) / 1000)
 
@@ -265,16 +271,16 @@ class ParseScript():
     def parse_send_remap(self, remap_or_action):
         "Parse SendInput line"
         if remap_or_action.startswith("SendInput("):
-            key_sequence = remap_or_action[len("SendInput("):-1]
+            key_sequence = remap_or_action[len("SendInput(") : -1]
         elif remap_or_action.startswith("Send("):
-            key_sequence = remap_or_action[len("Send("):-1]
+            key_sequence = remap_or_action[len("Send(") : -1]
         else:
             key_sequence = remap_or_action.split(" ", 1)[1]
         key_sequence = self.get_unicode(key_sequence)
         keys = []
         remap_key = ""
 
-        matches = re.findall(r'{(.*?)( down| up)}', key_sequence)
+        matches = re.findall(r"{(.*?)( down| up)}", key_sequence)
         if matches:
             seen_keys = set()
             for match in matches:

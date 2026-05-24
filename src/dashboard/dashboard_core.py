@@ -9,19 +9,23 @@ import winshell
 import win32gui
 from win32com.client import Dispatch
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QFileDialog, QMessageBox,
-    QInputDialog
+    QFileDialog,
+    QMessageBox,
+    QInputDialog,
 )
-from PySide6.QtCore import Signal, QObject # pylint: disable=E0611
+from PySide6.QtCore import Signal, QObject  # pylint: disable=E0611
 from pynput.keyboard import Controller, Key
 
 from utility import constant
 from utility import utils
 from utility import icons
 
+
 class DashboardCore(QObject):
     "Main Logic"
+
     update_script_signal = Signal()
+
     def __init__(self):
         super().__init__()
         # UI initialization
@@ -42,9 +46,8 @@ class DashboardCore(QObject):
             if selected_files:
                 selected_file = selected_files[0]
 
-                if not selected_file.endswith('.ahk'):
-                    QMessageBox.warning(None, "Error",
-                                        "Only .ahk files are allowed.")
+                if not selected_file.endswith(".ahk"):
+                    QMessageBox.warning(None, "Error", "Only .ahk files are allowed.")
                     return
 
                 file_name = os.path.basename(selected_file)
@@ -53,8 +56,7 @@ class DashboardCore(QObject):
                 try:
                     shutil.move(selected_file, destination_path)
                 except NotADirectoryError as e:
-                    QMessageBox.warning(None, "Error",
-                                        f"Failed to move file: {e}")
+                    QMessageBox.warning(None, "Error", f"Failed to move file: {e}")
                     return
 
                 self.validate_imported_files(destination_path, file_name)
@@ -65,44 +67,44 @@ class DashboardCore(QObject):
         try:
             exit_key = self.generate_exit_key(file_name)
 
-            with open(destination_path, 'r', encoding='utf-8') as file:
+            with open(destination_path, "r", encoding="utf-8") as file:
                 lines = file.readlines()
 
             lines = [line for line in lines if "::ExitApp" not in line]
 
             first_line = lines[0].strip() if lines else ""
-            has_text_or_default = (first_line.startswith("; text") or
-                                    first_line.startswith("; default"))
+            has_text_or_default = first_line.startswith(
+                "; text"
+            ) or first_line.startswith("; default")
             new_lines = []
             if not has_text_or_default:
-
-                if first_line and '::' in first_line:
-                    new_lines = [
-                        "; default\n",
-                        f"{exit_key}::ExitApp\n",
-                        "\n"
-                    ] + [first_line + '\n'] + lines[1:]
+                if first_line and "::" in first_line:
+                    new_lines = (
+                        ["; default\n", f"{exit_key}::ExitApp\n", "\n"]
+                        + [first_line + "\n"]
+                        + lines[1:]
+                    )
                 else:
-                    new_lines = [
-                        "; text\n",
-                        f"{exit_key}::ExitApp\n",
-                        "\n"
-                    ] + lines
+                    new_lines = ["; text\n", f"{exit_key}::ExitApp\n", "\n"] + lines
             else:
+                new_lines = [lines[0] + f"{exit_key}::ExitApp\n", "\n"] + lines[1:]
 
-                new_lines = [lines[0] + f"{exit_key}::ExitApp\n",
-                                "\n"] + lines[1:]
+            content_lines = "".join(new_lines).splitlines()
+            content_lines = [
+                line
+                for line in content_lines
+                if line.strip() not in ["; Text mode start", "; Text mode end"]
+            ]
 
-            content_lines = ''.join(new_lines).splitlines()
-            content_lines = [line for line in content_lines if
-                                line.strip() not in ["; Text mode start",
-                                                        "; Text mode end"]]
+            result_lines = (
+                content_lines[:3]
+                + ["; Text mode start"]
+                + content_lines[3:]
+                + ["; Text mode end"]
+            )
 
-            result_lines = (content_lines[:3] + ["; Text mode start"]
-                            + content_lines[3:] + ["; Text mode end"])
-
-            with open(destination_path, 'w', encoding='utf-8') as file:
-                file.write('\n'.join(result_lines) + '\n')
+            with open(destination_path, "w", encoding="utf-8") as file:
+                file.write("\n".join(result_lines) + "\n")
         except FileNotFoundError as e:
             print(f"Error modifying script: {e}")
             exit_keys = utils.get_config().exit_key
@@ -116,8 +118,34 @@ class DashboardCore(QObject):
 
     def generate_exit_key(self, script_name, file=None):
         "Generate key for profile exit"
-        possible_keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        possible_keys = [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m",
+            "n",
+            "o",
+            "p",
+            "q",
+            "r",
+            "s",
+            "t",
+            "u",
+            "v",
+            "w",
+            "x",
+            "y",
+            "z",
+        ]
 
         exit_keys = utils.get_config().exit_key
 
@@ -157,8 +185,8 @@ class DashboardCore(QObject):
         new_name = dialog.textValue()
         if not ok or not new_name:
             return
-        if not new_name.lower().endswith('.ahk'):
-            new_name += '.ahk'
+        if not new_name.lower().endswith(".ahk"):
+            new_name += ".ahk"
         source_path = os.path.join(self.script_dir, script)
         destination_path = os.path.join(self.script_dir, new_name)
         try:
@@ -175,7 +203,7 @@ class DashboardCore(QObject):
                 None,
                 "Delete Script",
                 f"Are you sure you want to delete '{script_name}'?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             )
             if reply != QMessageBox.StandardButton.Yes:
                 return
@@ -183,11 +211,9 @@ class DashboardCore(QObject):
                 os.remove(script_path)
                 self.update_script_signal.emit()
             except FileNotFoundError as e:
-                QMessageBox.warning(None, "Error",
-                                    f"Failed to delete the script: {e}")
+                QMessageBox.warning(None, "Error", f"Failed to delete the script: {e}")
         else:
-            QMessageBox.warning(None, "Error",
-                                f"{script_name} does not exist.")
+            QMessageBox.warning(None, "Error", f"{script_name} does not exist.")
 
     def activate_script(self, script_name):
         "Run profile"
@@ -197,7 +223,6 @@ class DashboardCore(QObject):
             script_path = os.path.join(utils.store_dir, script_name)
 
         if os.path.isfile(script_path):
-
             os.startfile(script_path)
         else:
             QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
@@ -213,24 +238,24 @@ class DashboardCore(QObject):
             exit_keys = utils.get_config().exit_key
             exit_combo = exit_keys.get(script_name)
             if not exit_combo:
-                QMessageBox.critical(None,
-                                        "Error",
-                                        f"No exit key found for {script_name}")
+                QMessageBox.critical(
+                    None, "Error", f"No exit key found for {script_name}"
+                )
                 return
 
             keyboard = Controller()
-            if '^' in exit_combo:
+            if "^" in exit_combo:
                 keyboard.press(Key.ctrl)
-            if '!' in exit_combo:
+            if "!" in exit_combo:
                 keyboard.press(Key.alt)
 
             final_key = exit_combo[-1]
             keyboard.press(final_key)
             keyboard.release(final_key)
 
-            if '!' in exit_combo:
+            if "!" in exit_combo:
                 keyboard.release(Key.alt)
-            if '^' in exit_combo:
+            if "^" in exit_combo:
                 keyboard.release(Key.ctrl)
         else:
             QMessageBox.critical(None, "Error", f"{script_path} does not exist.")
@@ -248,7 +273,6 @@ class DashboardCore(QObject):
 
         if os.path.isfile(script_path):
             try:
-
                 shutil.move(script_path, target_path)
                 self.update_script_signal.emit()
             except NotADirectoryError as e:
@@ -279,7 +303,7 @@ class DashboardCore(QObject):
             "AutoHotkey v2 is not installed on your system. "
             "AutoHotkey is required for KeyTik to work.\n\n"
             "Would you like to download it now?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
         if reply == QMessageBox.StandardButton.Yes:
             webbrowser.open("https://www.autohotkey.com/")
@@ -301,13 +325,16 @@ class DashboardCore(QObject):
 
     def list_scripts(self):
         "List profile, with listing all AHK script on active directory order by pinned first"
-        all_scripts = [f for f in os.listdir(self.script_dir)
-                       if f.endswith('.ahk') or f.endswith('.py')]
+        all_scripts = [
+            f
+            for f in os.listdir(self.script_dir)
+            if f.endswith(".ahk") or f.endswith(".py")
+        ]
 
-        pinned = [script for script in all_scripts
-                  if script in self.pinned_profiles]
-        unpinned = [script for script in all_scripts
-                    if script not in self.pinned_profiles]
+        pinned = [script for script in all_scripts if script in self.pinned_profiles]
+        unpinned = [
+            script for script in all_scripts if script not in self.pinned_profiles
+        ]
 
         scripts = pinned + unpinned
         return scripts
@@ -365,27 +392,23 @@ class DashboardCore(QObject):
 
     def check_ahi_dir(self):
         "Make sure AutoHotkey Interception folder is in active profile folder"
-        target_folder = os.path.join(utils.active_dir,
-                                        'AutoHotkey Interception')
+        target_folder = os.path.join(utils.active_dir, "AutoHotkey Interception")
 
         def get_all_relative_paths(base_dir):
             rel_paths = set()
             for root, dirs, files in os.walk(base_dir):
                 for name in files:
-                    rel_path = os.path.relpath(os.path.join(root, name),
-                                                base_dir)
+                    rel_path = os.path.relpath(os.path.join(root, name), base_dir)
                     rel_paths.add(rel_path)
                 for name in dirs:
-                    rel_path = os.path.relpath(os.path.join(root, name),
-                                                base_dir)
+                    rel_path = os.path.relpath(os.path.join(root, name), base_dir)
                     rel_paths.add(rel_path)
             return rel_paths
 
         ahi_paths = get_all_relative_paths(constant.ahi_dir)
         target_paths = get_all_relative_paths(target_folder)
 
-        if (not ahi_paths.issubset(target_paths) or
-                not os.path.isdir(target_folder)):
+        if not ahi_paths.issubset(target_paths) or not os.path.isdir(target_folder):
             if os.path.exists(target_folder):
                 shutil.rmtree(target_folder)
             shutil.copytree(constant.ahi_dir, target_folder)
@@ -393,6 +416,7 @@ class DashboardCore(QObject):
     def get_running_ahk(self):
         "Get running ahk script"
         running_script = set()
+
         def callback(hwnd, running_script):
             if win32gui.IsWindowVisible(hwnd) or win32gui.IsWindowEnabled(hwnd):  # pylint: disable=I1101
                 class_name = win32gui.GetClassName(hwnd)  # pylint: disable=I1101
@@ -401,5 +425,6 @@ class DashboardCore(QObject):
                     title = re.sub(r" - AutoHotkey v[\d\.]+$", "", title)
                     if title:
                         running_script.add(os.path.basename(title))
+
         win32gui.EnumWindows(callback, running_script)  # pylint: disable=I1101
         return running_script

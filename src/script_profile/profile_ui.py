@@ -103,14 +103,23 @@ class ProfileUI():
         top_layout.addWidget(script_name_entry, 0, 1, 1, 3)
 
         # Select program to bind
+        self.select_program_widget(top_widget, top_layout, lines, parse_script)
+
+        # Select keyboard/mouse to bind
+        self.select_device_widget(top_widget, top_layout, lines, parse_script)
+
+        return top_widget
+
+    def select_program_widget(self, top_widget, top_layout, lines, parse_script):
+        "Program binding widget"
         program_label = QLabel("Program", top_widget)
         program_label.setFixedWidth(90)
         top_layout.addWidget(program_label, 1, 0, 1, 1)
 
         program_entry = QLineEdit(top_widget)
         program_entry.setObjectName("ProgramEntry")
-        if parse_script.parse_program(lines):
-            program_entry.setText(parse_script.parse_program(lines))
+        program_line = parse_script.parse_program(lines) if lines else ""
+        program_entry.setText(program_line)
         top_layout.addWidget(program_entry, 1, 1, 1, 2)
 
         program_select_button = QPushButton("Select Program", top_widget)
@@ -119,15 +128,16 @@ class ProfileUI():
             lambda: SelectProgramUI().program_window(program_entry, self.edit_window))
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
-        # Select keyboard/mouse to bind
+    def select_device_widget(self, top_widget, top_layout, lines, parse_script):
+        "Device binding widget"
         keyboard_label = QLabel("Device ID", top_widget)
         keyboard_label.setFixedWidth(90)
         top_layout.addWidget(keyboard_label, 2, 0, 1, 1)
 
         keyboard_entry = QLineEdit(top_widget)
         keyboard_entry.setObjectName("KeyboardEntry")
-        if parse_script.parse_device(lines):
-            keyboard_entry.setText(parse_script.parse_device(lines))
+        device_line = parse_script.parse_device(lines) if lines else ""
+        keyboard_entry.setText(device_line)
         top_layout.addWidget(keyboard_entry, 2, 1, 1, 2)
 
         keyboard_select_button = QPushButton("Select Device", top_widget)
@@ -136,8 +146,6 @@ class ProfileUI():
             lambda: SelectDevice().open_device_selection(
                 self.edit_window, keyboard_entry))
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
-
-        return top_widget
 
     def edit_middle(self, lines):
         "Middle part of profile manager"
@@ -202,11 +210,11 @@ class ProfileUI():
         "Default mode frame"
         parse_script = ParseScript()  # Composition
 
-        parsed_shortcuts_list = parse_script.parse_shortcuts(lines)
+        parsed_shortcuts_list = parse_script.parse_shortcuts(lines) if lines else []
         shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
         self.edit_frame_layout.addWidget(shortcut_widget)
 
-        parsed_remap_list = parse_script.parse_default_mode(lines)
+        parsed_remap_list = parse_script.parse_default_mode(lines) if lines else []
         remap_widget = self.remap_row_comp.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)
 
@@ -218,7 +226,10 @@ class ProfileUI():
         text_block.setFontPointSize(10)
         text_block.setReadOnly(False)
         text_block.setStyleSheet(style.TEXT_BLOCK)
-        text_content = self.extract_and_filter_content(lines)
+        if lines:
+            text_content = self.extract_and_filter_content(lines)
+        else:
+            text_content = ""
         text_block.setPlainText(text_content.strip())
 
         return text_block
@@ -227,17 +238,16 @@ class ProfileUI():
         "Get text block value from the marker"
         inside = False
         result_lines = []
-        if lines:
-            for line in lines:
-                stripped = line.strip()
-                if stripped == "; Text mode start":
-                    inside = True
-                    continue
-                if stripped == "; Text mode end":
-                    inside = False
-                    continue
-                if inside:
-                    result_lines.append(line)
+        for line in lines:
+            stripped = line.strip()
+            if stripped == "; Text mode start":
+                inside = True
+                continue
+            if stripped == "; Text mode end":
+                inside = False
+                continue
+            if inside:
+                result_lines.append(line)
 
         return ''.join(result_lines)
 

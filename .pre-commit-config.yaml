@@ -1,7 +1,13 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
-default_install_hook_types: [pre-commit, pre-push]
+default_install_hook_types:
+  - pre-commit
+  - pre-push
+  - post-checkout
+  - post-merge
+  - post-rewrite
+
 repos:
 # Standard pre-commit hooks
 - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -16,22 +22,22 @@ repos:
         --autofix,
         --no-sort-keys]
 
-# Ruff for formater and auto fix lint
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.14  # Ruff version.
-  hooks:
-    - id: ruff-check  # Run the linter.
-      args: [ --fix ]
-    - id: ruff-format  # Run the formatter.
-
-# make sure your uv.lock file is up to date
-# even if pyproject.toml file was changed
+# Synchronize dependencies upon branch checkout, pull or rebase
 - repo: https://github.com/astral-sh/uv-pre-commit
-  rev: 0.11.15  # uv version.
+  rev: 0.11.15
   hooks:
-  - id: uv-lock
+  - id: uv-sync
+    args: [ --all-groups ]
 
-# Pylint pre-push
+# Ruff formatter and auto fix lint error
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.15.14
+  hooks:
+  - id: ruff-format
+  - id: ruff-check
+    args: [ --fix ]
+
+# Pylint check on push
 - repo: local
   hooks:
   - id: pylint

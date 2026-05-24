@@ -1,41 +1,39 @@
 {
-    "attribution": {
-        "repository": "https://github.com/catppuccin/qbittorrent",
-        "license": "MIT",
-        "license-link": "https://github.com/catppuccin/qbittorrent?tab=MIT-1-ov-file",
-        "file": "https://github.com/catppuccin/qbittorrent/blob/main/src/catppuccin-latte/config.json"
-    },
-
-    "Active": {
-        "Window": "#eff1f5",
-        "WindowText": "#4c4f69",
-        "Base": "#dce0e8",
-        "AlternateBase": "#e6e9ef",
-        "Text": "#4c4f69",
-        "ToolTipBase": "#ccd0da",
-        "ToolTipText": "#4c4f69",
-        "BrightText": "#8839ef",
-        "Highlight": "#1e66f5",
-        "HighlightedText": "#dce0e8",
-        "Button": "#ccd0da",
-        "ButtonText": "#4c4f69",
-        "Link": "#1e66f5",
-        "LinkVisited": "#7287fd",
-        "Light": "#acb0be",
-        "Midlight": "#bcc0cc",
-        "Mid": "#eff1f5",
-        "Dark": "#e6e9ef",
-        "Shadow": "#dce0e8",
-        "PlaceholderText": "#7c7f93",
-        "Accent": "#8839ef"
-    },
-
-    "Disabled": {
-        "WindowText": "#8c8fa1",
-        "Text": "#8c8fa1",
-        "ToolTipText": "#8c8fa1",
-        "BrightText": "#8c8fa1",
-        "HighlightedText": "#8c8fa1",
-        "ButtonText": "#8c8fa1"
-    }
+  "attribution": {
+    "repository": "https://github.com/catppuccin/qbittorrent",
+    "license": "MIT",
+    "license-link": "https://github.com/catppuccin/qbittorrent?tab=MIT-1-ov-file",
+    "file": "https://github.com/catppuccin/qbittorrent/blob/main/src/catppuccin-latte/config.json"
+  },
+  "Active": {
+    "Window": "#eff1f5",
+    "WindowText": "#4c4f69",
+    "Base": "#dce0e8",
+    "AlternateBase": "#e6e9ef",
+    "Text": "#4c4f69",
+    "ToolTipBase": "#ccd0da",
+    "ToolTipText": "#4c4f69",
+    "BrightText": "#8839ef",
+    "Highlight": "#1e66f5",
+    "HighlightedText": "#dce0e8",
+    "Button": "#ccd0da",
+    "ButtonText": "#4c4f69",
+    "Link": "#1e66f5",
+    "LinkVisited": "#7287fd",
+    "Light": "#acb0be",
+    "Midlight": "#bcc0cc",
+    "Mid": "#eff1f5",
+    "Dark": "#e6e9ef",
+    "Shadow": "#dce0e8",
+    "PlaceholderText": "#7c7f93",
+    "Accent": "#8839ef"
+  },
+  "Disabled": {
+    "WindowText": "#8c8fa1",
+    "Text": "#8c8fa1",
+    "ToolTipText": "#8c8fa1",
+    "BrightText": "#8c8fa1",
+    "HighlightedText": "#8c8fa1",
+    "ButtonText": "#8c8fa1"
   }
+}

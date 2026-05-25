@@ -105,7 +105,7 @@ class SelectProgramCore:
                             windows.append(
                                 (
                                     win32gui.GetClassName(hwnd),  # pylint: disable=I1101
-                                    win32gui.GetWindowText(hwnd),
+                                    win32gui.GetWindowText(hwnd),  # pylint: disable=I1101
                                 )
                             )  # pylint: disable=I1101
 

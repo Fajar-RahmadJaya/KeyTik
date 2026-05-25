@@ -87,18 +87,22 @@ class ParseScript:
                 continue
 
             if ":: ; Shortcuts" in line:
-                parts = line.split("::")
-                shortcuts_line = parts[0].strip().replace("~", "").replace("*", "")
-                if " & " in shortcuts_line:
-                    keys = [k.strip() for k in shortcuts_line.split(" & ")]
-                    translated = [self.key_map.get(key, key) for key in keys]
-                    shortcuts_key = " + ".join(translated)
-                else:
-                    shortcuts_key = self.key_map.get(shortcuts_line, shortcuts_line)
-
-                shortcuts.append(shortcuts_key)
+                shortcuts.append(self.normal_shortcut(line))
 
         return shortcuts
+
+    def normal_shortcut(self, line):
+        "Parse normal sortcut using ::"
+        parts = line.split("::")
+        shortcuts_line = parts[0].strip().replace("~", "").replace("*", "")
+        if " & " in shortcuts_line:
+            keys = [k.strip() for k in shortcuts_line.split(" & ")]
+            translated = [self.key_map.get(key, key) for key in keys]
+            shortcuts_key = " + ".join(translated)
+        else:
+            shortcuts_key = self.key_map.get(shortcuts_line, shortcuts_line)
+
+        return shortcuts_key
 
     def parse_default_mode(self, lines):
         "Parse default mode"

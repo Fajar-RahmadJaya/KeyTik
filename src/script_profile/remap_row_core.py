@@ -62,7 +62,7 @@ class RemapRowCore:
                     key_map[raw] = readable
                 else:
                     key_map[raw] = readable.title()
-                return key_map
+
         return key_map
 
     def read_keylist(self):

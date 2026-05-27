@@ -213,15 +213,15 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+hook = [
+    { name = "pre-commit" },
+]
+installer = [
+    { name = "pyinstaller" },
+]
 lint = [
     { name = "pylint" },
     { name = "ruff" },
-]
-pre-commit = [
-    { name = "pre-commit" },
-]
-pyinstaller = [
-    { name = "pyinstaller" },
 ]
 
 [package.metadata]
@@ -241,12 +241,12 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+hook = [{ name = "pre-commit", specifier = ">=4.6.0" }]
+installer = [{ name = "pyinstaller", specifier = ">=6.20.0" }]
 lint = [
     { name = "pylint", specifier = ">=4.0.5" },
     { name = "ruff", specifier = ">=0.15.14" },
 ]
-pre-commit = [{ name = "pre-commit", specifier = ">=4.6.0" }]
-pyinstaller = [{ name = "pyinstaller", specifier = ">=6.20.0" }]
 
 [[package]]
 name = "macholib"

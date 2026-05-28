@@ -21,11 +21,11 @@ CHECK_UPDATE_LINK = (
 RELEASE_LINK = "https://github.com/Fajar-RahmadJaya/KeyTik/releases"
 
 
-def parse_update_response(self, response):
+def parse_update_response(response):
     "Parse the response from check for update"
     release_data = response.json()
     latest_version = release_data.get("tag_name")
-    if self.current_version != latest_version:
+    if CURRENT_VERSION != latest_version:
         return latest_version
     return None
 
@@ -35,6 +35,6 @@ def pro_mode(index, lines, profile_ui):
     print(f"Invalid {index}, {lines}, {profile_ui}")
 
 
-def pro_write(lines, profile_ui):
+def pro_write(file, mode, condition_string):
     "Dummy write on normal version"
-    print(f"Invalid {lines}, {profile_ui}")
+    print(f"Invalid {file}, {mode}", {condition_string})

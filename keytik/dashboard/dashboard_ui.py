@@ -17,14 +17,14 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 
-from utility import constant
-from utility import utils
-from utility import icons
-from utility.diff import diff_comp
-from utility import style
-from dashboard.dashboard_core import DashboardCore
-from script_profile.profile_ui import ProfileUI
-from setting.setting_ui import SettingUI
+from keytik.utility import constant
+from keytik.utility import utils
+from keytik.utility import icons
+from keytik.utility import diff
+from keytik.utility import style
+from keytik.dashboard.dashboard_core import DashboardCore
+from keytik.script_profile.profile_ui import ProfileUI
+from keytik.setting.setting_ui import SettingUI
 
 
 class DashboardUI(QMainWindow):
@@ -40,7 +40,7 @@ class DashboardUI(QMainWindow):
         self.dashboard_core.update_script_signal.connect(self.update_script_list)
 
         # UI initialization
-        self.setWindowTitle(diff_comp.program_name)
+        self.setWindowTitle(diff.PROGRAM_NAME)
         self.setFixedSize(660, 500)
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()

@@ -2,7 +2,7 @@
 
 import json
 
-from utility import constant
+from keytik.utility import constant
 
 
 class RemapRowCore:

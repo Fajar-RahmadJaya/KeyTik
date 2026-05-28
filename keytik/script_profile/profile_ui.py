@@ -19,14 +19,14 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
-from utility import constant
-from utility.diff import diff_comp
-from utility import style
-from select_program.select_program_ui import SelectProgramUI
-from select_device.select_device import SelectDevice
-from script_profile.remap_row import RemapRow, ShortcutRow
-from script_profile.write_script import WriteScript, WriteDefault
-from script_profile.parse_script import ParseScript
+from keytik.utility import constant
+from keytik.utility import diff
+from keytik.utility import style
+from keytik.select_program.select_program_ui import SelectProgramUI
+from keytik.select_device.select_device import SelectDevice
+from keytik.script_profile.remap_row import RemapRow, ShortcutRow
+from keytik.script_profile.write_script import WriteScript, WriteDefault
+from keytik.script_profile.parse_script import ParseScript
 
 
 class ProfileUI:
@@ -185,7 +185,7 @@ class ProfileUI:
         # spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         # Add profile mode widget
-        index = diff_comp.mode_map.get(lines[0].strip().lower())
+        index = diff.mode_map.get(lines[0].strip().lower())
         self.build_profile(index, lines=lines)
 
         edit_scroll.setWidget(self.edit_frame)
@@ -217,7 +217,7 @@ class ProfileUI:
             self.edit_frame_layout.addWidget(text_block)
 
         else:
-            diff_comp.pro_mode(index, lines, self)
+            diff.pro_mode(index, lines, self)
             self.edit_frame_layout.addItem(spacer)
 
     def default_mode_widget(self, parent_window, lines=None):
@@ -281,12 +281,12 @@ class ProfileUI:
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
-        mode_combobox.addItems(diff_comp.mode_item)
+        mode_combobox.addItems(diff.mode_item)
         mode_combobox.setEditable(True)
         mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
         mode_combobox.lineEdit().setReadOnly(True)
         mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        default_index = diff_comp.mode_map.get(first_line.lower(), 0)
+        default_index = diff.mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
 
         mode_combobox.currentIndexChanged.connect(self.build_profile)
@@ -317,7 +317,7 @@ class ProfileUI:
                     write_default = WriteDefault(write_script)
                     write_default.handle_default_mode(file, condition_string)
                 else:
-                    diff_comp.pro_write(file, mode, condition_string)
+                    diff.pro_write(file, mode, condition_string)
 
         except FileNotFoundError as error:
             print(f"Error: {error}")

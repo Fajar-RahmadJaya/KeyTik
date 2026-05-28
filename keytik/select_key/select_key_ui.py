@@ -18,10 +18,10 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt, QPoint  # pylint: disable=E0611
 
-from utility import constant
-from utility import icons
-from utility import style
-from select_key.select_key_core import SelectKeyCore
+from keytik.utility import constant
+from keytik.utility import icons
+from keytik.utility import style
+from keytik.select_key.select_key_core import SelectKeyCore
 
 
 class SelectKeyUI:

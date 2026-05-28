@@ -7,11 +7,11 @@ import re
 from PySide6.QtWidgets import QLineEdit, QCheckBox, QMessageBox  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
-from utility import constant
-from utility import utils
-from select_key.select_key_core import SelectKeyCore
-from dashboard.dashboard_core import DashboardCore
-from script_profile.remap_row_core import RemapRowCore
+from keytik.utility import constant
+from keytik.utility import utils
+from keytik.select_key.select_key_core import SelectKeyCore
+from keytik.dashboard.dashboard_core import DashboardCore
+from keytik.script_profile.remap_row_core import RemapRowCore
 
 
 @dataclass

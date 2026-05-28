@@ -16,9 +16,9 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from PySide6.QtCore import Signal, QObject  # pylint: disable=E0611
 from pynput.keyboard import Controller, Key
 
-from utility import constant
-from utility import utils
-from utility import icons
+from keytik.utility import constant
+from keytik.utility import utils
+from keytik.utility import icons
 
 
 class DashboardCore(QObject):

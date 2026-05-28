@@ -5,8 +5,14 @@ import sys
 
 
 # Directory
-script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-data_dir = os.path.join(script_dir, "_internal", "Data")
+script_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+cwd_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+script_path_data = os.path.join(script_path, "_internal", "Data")
+cwd_path_data = os.path.join(cwd_path, "_internal", "Data")
+if os.path.exists(script_path_data):
+    data_dir = script_path_data
+else:
+    data_dir = cwd_path_data
 appdata_dir = os.path.join(os.getenv("APPDATA"), "KeyTik")
 ahi_dir = os.path.join(data_dir, "Active", "AutoHotkey Interception")
 theme_dir = os.path.join(data_dir, "theme")

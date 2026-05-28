@@ -3,7 +3,7 @@
 import re
 from dataclasses import dataclass
 
-from script_profile.remap_row_core import RemapRowCore
+from keytik.script_profile.remap_row_core import RemapRowCore
 
 
 @dataclass

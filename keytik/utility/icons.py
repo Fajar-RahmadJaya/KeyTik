@@ -6,8 +6,8 @@ from PySide6.QtGui import QPixmap, QPainter, QColor, QIcon, QPalette  # pylint: 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 
-from utility import constant
-from utility import style
+from keytik.utility import constant
+from keytik.utility import style
 
 
 icon_cache = {}
@@ -41,7 +41,7 @@ def get_icon(path, highlighted=False):
     return icon_cache[cache_key]
 
 
-icon_dir = os.path.join(constant.script_dir, "_internal", "Data", "icon")
+icon_dir = os.path.join(constant.data_dir, "icon")
 
 # Profile Icon
 run = os.path.join(icon_dir, "run.svg")

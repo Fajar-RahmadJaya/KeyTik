@@ -15,10 +15,10 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt, QThread, Signal  # pylint: disable=E0611
 
-from utility import constant
-from utility.diff import diff_comp
-from utility import utils
-from utility import style
+from keytik.utility import constant
+from keytik.utility import diff
+from keytik.utility import utils
+from keytik.utility import style
 
 
 class AnnouncmentThread(QThread):  # pylint: disable=R0903
@@ -36,7 +36,7 @@ class AnnouncmentThread(QThread):  # pylint: disable=R0903
         self.announcement_files = []
         i = 1
         while True:
-            url = f"{diff_comp.announcement_link}/{i}.txt"
+            url = f"{diff.ANNOUNCEMENT_LINK}/{i}.txt"
             try:
                 response = requests.get(url, timeout=5)
                 if response.status_code == 404:

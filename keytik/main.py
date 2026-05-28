@@ -4,13 +4,13 @@ import os
 import sys
 from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 
-from utility import utils
-from utility import thread
-from utility import style
-from dashboard.dashboard_ui import DashboardUI
-from dashboard.dashboard_core import DashboardCore
-from setting.announcement import Announcement
-from setting.setting_ui import SettingUI
+from keytik.utility import utils
+from keytik.utility import thread
+from keytik.utility import style
+from keytik.dashboard.dashboard_ui import DashboardUI
+from keytik.dashboard.dashboard_core import DashboardCore
+from keytik.setting.announcement import Announcement
+from keytik.setting.setting_ui import SettingUI
 
 
 def main():

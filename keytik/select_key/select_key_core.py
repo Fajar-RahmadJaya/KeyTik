@@ -6,8 +6,8 @@ from PySide6.QtWidgets import QTreeWidgetItem  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 
-from utility import constant
-from utility import icons
+from keytik.utility import constant
+from keytik.utility import icons
 
 
 class SelectKeyCore:

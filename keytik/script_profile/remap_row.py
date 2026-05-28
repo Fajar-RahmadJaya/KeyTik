@@ -19,11 +19,11 @@ from PySide6.QtCore import Qt, Signal, QTimer, QEvent, QObject  # pylint: disabl
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtGui import QCursor  # pylint: disable=E0611
 
-from utility import icons
-from utility import constant
-from utility import style
-from script_profile.remap_row_core import RemapRowCore
-from select_key.select_key_ui import SelectKeyUI
+from keytik.utility import icons
+from keytik.utility import constant
+from keytik.utility import style
+from keytik.script_profile.remap_row_core import RemapRowCore
+from keytik.select_key.select_key_ui import SelectKeyUI
 
 
 @dataclass

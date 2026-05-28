@@ -4,10 +4,10 @@ import os
 import keyboard
 from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
-from setting.setting_core import SettingCore
-from script_profile.write_script import WriteScript
-from utility import utils
-from dashboard.dashboard_core import DashboardCore
+from keytik.setting.setting_core import SettingCore
+from keytik.script_profile.write_script import WriteScript
+from keytik.utility import utils
+from keytik.dashboard.dashboard_core import DashboardCore
 
 
 class Thread(QThread):  # pylint: disable=R0903

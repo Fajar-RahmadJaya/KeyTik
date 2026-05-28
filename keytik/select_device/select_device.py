@@ -15,9 +15,9 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
-from utility import utils
-from utility import constant
-from utility import style
+from keytik.utility import utils
+from keytik.utility import constant
+from keytik.utility import style
 
 
 class SelectDevice:
@@ -206,9 +206,7 @@ class SelectDevice:
     def run_monitor(self):
         "Run AutoHotkey Interception built in device monitor"
         script_path = os.path.join(
-            constant.script_dir,
-            "_internal",
-            "Data",
+            constant.data_dir,
             "Active",
             "AutoHotkey Interception",
             "Monitor.ahk",

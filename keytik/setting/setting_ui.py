@@ -21,12 +21,12 @@ from PySide6.QtCore import Qt  # pylint: disable=E0611
 import qt_themes
 from catppuccin import PALETTE as catppuccin_palette
 
-from utility import constant
-from utility import utils
-from utility.diff import diff_comp
-from utility import style
-from setting.setting_core import SettingCore
-from setting.announcement import Announcement
+from keytik.utility import constant
+from keytik.utility import utils
+from keytik.utility import diff
+from keytik.utility import style
+from keytik.setting.setting_core import SettingCore
+from keytik.setting.announcement import Announcement
 
 
 class SettingCombobox(QComboBox):  # pylint: disable=R0903
@@ -124,7 +124,7 @@ class SettingUI:
         content_layout.setContentsMargins(8, 8, 8, 8)
 
         # Pro Version
-        if diff_comp.program_name != "KeyTik Pro":
+        if diff.PROGRAM_NAME != "KeyTik Pro":
             content_layout.addWidget(self.pro_version())
 
         # Appearance
@@ -482,13 +482,13 @@ class SettingUI:
                 None,
                 "Update Available",
                 (
-                    f"New update available: {diff_comp.program_name} {latest_version}\n\n"
+                    f"New update available: {diff.PROGRAM_NAME} {latest_version}\n\n"
                     "Would you like to go to the update page?"
                 ),
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             )
             if reply == QMessageBox.StandardButton.Yes:
-                webbrowser.open(diff_comp.release_link)
+                webbrowser.open(diff.RELEASE_LINK)
         else:
             if show_no_update_message:
                 QMessageBox.information(

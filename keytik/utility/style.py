@@ -10,8 +10,8 @@ from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
 import qt_themes
 import win32mica
 
-from utility import utils
-from utility import constant
+from keytik.utility import utils
+from keytik.utility import constant
 
 
 # ---------------------------- Palatte ------------------------------

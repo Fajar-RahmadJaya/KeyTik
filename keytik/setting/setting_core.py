@@ -8,11 +8,12 @@ import ctypes
 import requests
 from PySide6.QtWidgets import QMessageBox, QFileDialog, QApplication  # pylint: disable=E0611
 from PySide6.QtGui import QPalette  # pylint: disable=E0611
-from utility import constant
-from utility import utils
-from utility import style
-from utility.diff import diff_comp
-from dashboard.dashboard_core import DashboardCore
+
+from keytik.utility import constant
+from keytik.utility import utils
+from keytik.utility import style
+from keytik.utility import diff
+from keytik.dashboard.dashboard_core import DashboardCore
 
 
 class SettingCore:
@@ -105,7 +106,7 @@ class SettingCore:
                     parent,
                     "Success",
                     f"""Theme changed to {config.theme}.
-Please restart {diff_comp.program_name} to apply change.""",
+Please restart {diff.PROGRAM_NAME} to apply change.""",
                 )
             else:
                 # Set palette
@@ -162,7 +163,7 @@ Please restart {diff_comp.program_name} to apply change.""",
                     parent,
                     "Success",
                     f"""Mica effect enabled.
-Please restart {diff_comp.program_name} to apply change.""",
+Please restart {diff.PROGRAM_NAME} to apply change.""",
                 )
             else:
                 # Apply mica on setting window
@@ -208,9 +209,9 @@ Please restart {diff_comp.program_name} to apply change.""",
     def check_for_update(self):
         "Check for update comparing current version and latest version from GitHub API"
         try:
-            response = requests.get(diff_comp.check_update_link, timeout=5)
+            response = requests.get(diff.CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == 200:
-                return diff_comp.parse_update_response(response)
+                return diff.parse_update_response(response)
         except requests.exceptions.ConnectionError:
             pass
         return None

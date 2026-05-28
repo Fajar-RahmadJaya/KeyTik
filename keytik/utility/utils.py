@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import winreg
 
 
-from utility import constant
+from keytik.utility import constant
 
 
 # ------------------------------ Migrate Old Config ------------------------------

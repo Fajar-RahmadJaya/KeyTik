@@ -12,9 +12,9 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from PySide6.QtCore import Qt, QTimer  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
-from utility import constant
-from utility import style
-from select_program.select_program_core import SelectProgramCore
+from keytik.utility import constant
+from keytik.utility import style
+from keytik.select_program.select_program_core import SelectProgramCore
 
 
 class SelectProgramUI:

@@ -22,5 +22,5 @@ jobs:
         run: uv sync --locked --all-groups
 
       - name: Run Pylint
-        run: uv run pylint ./src
+        run: uv run pylint ./keytik
         continue-on-error: false

@@ -1,0 +1,38 @@
+{
+  "attribution": {
+    "repository": "https://github.com/MahdiMirzadeh/qbittorrent",
+    "license": "MIT",
+    "license-link": "https://github.com/MahdiMirzadeh/qbittorrent?tab=MIT-1-ov-file",
+    "file": "https://github.com/MahdiMirzadeh/qbittorrent/blob/master/themes/gruvbox-light.json"
+  },
+  "Active": {
+    "Window": "#FBF1C7",
+    "WindowText": "#3C3836",
+    "Base": "#D5C4A1",
+    "AlternateBase": "#F5E9C6",
+    "Text": "#3C3836",
+    "ToolTipBase": "#D5C4A1",
+    "ToolTipText": "#3C3836",
+    "BrightText": "#282828",
+    "Highlight": "#EBDBB2",
+    "HighlightedText": "#3C3836",
+    "Button": "#F2E5BC",
+    "ButtonText": "#3C3836",
+    "Link": "#D79921",
+    "LinkVisited": "#B57614",
+    "Light": "#F2E5BC",
+    "Midlight": "#E2D3A2",
+    "Mid": "#D5C4A1",
+    "Dark": "#D5C4A1",
+    "Shadow": "#D5C4A1",
+    "Accent": "#D79921"
+  },
+  "Disabled": {
+    "WindowText": "#928374",
+    "Text": "#928374",
+    "ToolTipText": "#928374",
+    "BrightText": "#928374",
+    "HighlightedText": "#928374",
+    "ButtonText": "#928374"
+  }
+}

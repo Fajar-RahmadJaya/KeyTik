@@ -1,0 +1,38 @@
+{
+  "attribution": {
+    "repository": "https://github.com/MahdiMirzadeh/qbittorrent",
+    "license": "MIT",
+    "license-link": "https://github.com/MahdiMirzadeh/qbittorrent?tab=MIT-1-ov-file",
+    "file": "https://github.com/MahdiMirzadeh/qbittorrent/blob/master/themes/solarized-light.json"
+  },
+  "Active": {
+    "Window": "#FDF6E3",
+    "WindowText": "#657B83",
+    "Base": "#D5C4A1",
+    "AlternateBase": "#F3EAC1",
+    "Text": "#657B83",
+    "ToolTipBase": "#D5C4A1",
+    "ToolTipText": "#657B83",
+    "BrightText": "#002B36",
+    "Highlight": "#EEE8D5",
+    "HighlightedText": "#657B83",
+    "Button": "#EEE8D5",
+    "ButtonText": "#657B83",
+    "Link": "#268BD2",
+    "LinkVisited": "#1B6EA3",
+    "Light": "#EEE8D5",
+    "Midlight": "#E6D6A6",
+    "Mid": "#D5C4A1",
+    "Dark": "#D3CDB7",
+    "Shadow": "#D5C4A1",
+    "Accent": "#268BD2"
+  },
+  "Disabled": {
+    "WindowText": "#93A1A1",
+    "Text": "#93A1A1",
+    "ToolTipText": "#93A1A1",
+    "BrightText": "#93A1A1",
+    "HighlightedText": "#93A1A1",
+    "ButtonText": "#93A1A1"
+  }
+}

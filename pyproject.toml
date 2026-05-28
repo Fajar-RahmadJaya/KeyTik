@@ -28,9 +28,6 @@ lint = [
     "pylint>=4.0.5",
     "ruff>=0.15.14",
 ]
-pre-commit = [
+hook = [
     "pre-commit>=4.6.0",
-]
-pyinstaller = [
-    "pyinstaller>=6.20.0",
 ]

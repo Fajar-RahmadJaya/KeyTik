@@ -1,0 +1,38 @@
+{
+  "attribution": {
+    "repository": "https://github.com/MahdiMirzadeh/qbittorrent",
+    "license": "MIT",
+    "license-link": "https://github.com/MahdiMirzadeh/qbittorrent?tab=MIT-1-ov-file",
+    "file": "https://github.com/MahdiMirzadeh/qbittorrent/blob/master/themes/dracula.json"
+  },
+  "Active": {
+    "Window": "#282A36",
+    "WindowText": "#F8F8F2",
+    "Base": "#191A21",
+    "AlternateBase": "#1E1F29",
+    "Text": "#F8F8F2",
+    "ToolTipBase": "#191A21",
+    "ToolTipText": "#F8F8F2",
+    "BrightText": "#FFFFFF",
+    "Highlight": "#44475A",
+    "HighlightedText": "#F8F8F2",
+    "Button": "#44475A",
+    "ButtonText": "#F8F8F2",
+    "Link": "#BD93F9",
+    "LinkVisited": "#8B6BB7",
+    "Light": "#44475A",
+    "Midlight": "#383A59",
+    "Mid": "#191A21",
+    "Dark": "#44475A",
+    "Shadow": "#191A21",
+    "Accent": "#BD93F9"
+  },
+  "Disabled": {
+    "WindowText": "#6272A4",
+    "Text": "#6272A4",
+    "ToolTipText": "#6272A4",
+    "BrightText": "#6272A4",
+    "HighlightedText": "#6272A4",
+    "ButtonText": "#6272A4"
+  }
+}

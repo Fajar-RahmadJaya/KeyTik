@@ -25,7 +25,7 @@ dependencies = [
 
 [dependency-groups]
 lint = [
-    "pylint>=4.0.5",
+    "pylint>=4.0.6",
     "ruff>=0.15.18",
 ]
 hook = [

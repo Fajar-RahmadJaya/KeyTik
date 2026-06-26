@@ -180,12 +180,6 @@ KeyTik is available at the following platforms:
 <details>
   <summary><b>See More Preview</b></div></summary>
   <div align="center">
-  <img src=".github/Preview/Menu/main dark.png" alt="Dark Mode" width="500" />
-  </div>
-  <div align="center">
-  <img src=".github/Preview/Menu/main light.png" alt="Light Mode" width="500" />
-  </div>
-  <div align="center">
   <img src=".github/Preview/Menu/default mode.png" alt="Default Mode" width="500" />
   </div>
   <div align="center">

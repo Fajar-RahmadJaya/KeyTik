@@ -39,19 +39,12 @@ KeyTik is also packed with [features](#features) like Bind to Programs and Devic
 
 </div>
 
-KeyTik Pro version is available at Gumroad at $20 for lifetime purchase. Check out KeyTik Pro at [https://fajarrahmadjaya.gumroad.com/l/keytik-pro](https://fajarrahmadjaya.gumroad.com/l/keytik-pro).
+KeyTik Pro version is available at Gumroad at **$20** for **lifetime purchase**. Pro version has additional features compared to the normal version while not overwhelming it.
 
-Pro version has additional features compared to the normal version while not overwhelming it. Think of Pro version as a way to support the developer or as a more user-friendly version of the normal version. Pro version consists of additional UI for the auto clicker, file opener, screen clicker, and additional automation tools such as window manager, easy always-on-top, and multi copy-paste.
-
-<br>
-
-<div align="center">
-<img src=".github/Preview/Pro/slideshow.gif" alt="Pro Version Preview gif" width="500" />
 </div>
 
-<br>
 <details>
-  <summary><b>Click to see more</b></div></summary>
+  <summary><b>Learn More</b></div></summary>
 
   ## What You Get With the Pro Version
   On KeyTik Pro, you will get every feature on the normal version (see [Normal Version Features](/docs/introduction/features) for more) plus additional features. Below are the additional features on KeyTik Pro:
@@ -132,6 +125,9 @@ Pro version has additional features compared to the normal version while not ove
   - Completed: Implemented.
   - No Description: Not implemented and yet worked on.
 </details>
+
+<br>
+<div align="center"><a href="https://fajarrahmadjaya.gumroad.com/l/keytik-pro"><img src=".github\Preview\GumroadButton.png" alt="Gumroad Button" width="240" /></a></div>
 <br>
 
 <div align="center">
@@ -178,32 +174,39 @@ KeyTik is available at the following platforms:
 </div>
 
 <div align="center">
-<img src=".github/Preview/main dark.png" alt="Dark Mode" width="500" />
+<img src=".github\Preview\Theme.webp" alt="Main Window Theme GIF" width="500" />
 </div>
-<div align="center">
-<img src=".github/Preview/main light.png" alt="Light Mode" width="500" />
-</div>
-<div align="center">
-<img src=".github/Preview/default mode.png" alt="Default Mode" width="500" />
-</div>
-<div align="center">
-<img src=".github/Preview/choosing key1.png" alt="Choosing Key 1" width="500" />
-</div>
-<div align="center">
-<img src=".github/Preview/choosing key2.png" alt="Choosing Key 2" width="500" />
-</div>
-<div align="center">
-<img src=".github/Preview/key format.gif" alt="Key Format Example" width="500" />
-</div>
-<div align="center">
-<img src=".github/Preview/text mode.png" alt="Text Mode" width="500" />
-</div>
-<div align="center">
-<img src=".github/Preview/select device.png" alt="Example 3" width="500" />
-</div>
-<div align="center">
-<img src=".github/Preview/select program.png" alt="Select Programs.png" width="500" />
-</div>
+
+<details>
+  <summary><b>See More Preview</b></div></summary>
+  <div align="center">
+  <img src=".github/Preview/Menu/main dark.png" alt="Dark Mode" width="500" />
+  </div>
+  <div align="center">
+  <img src=".github/Preview/Menu/main light.png" alt="Light Mode" width="500" />
+  </div>
+  <div align="center">
+  <img src=".github/Preview/Menu/default mode.png" alt="Default Mode" width="500" />
+  </div>
+  <div align="center">
+  <img src=".github/Preview/Menu/choosing key1.png" alt="Choosing Key 1" width="500" />
+  </div>
+  <div align="center">
+  <img src=".github/Preview/Menu/choosing key2.png" alt="Choosing Key 2" width="500" />
+  </div>
+  <div align="center">
+  <img src=".github/Preview/Menu/key format.gif" alt="Key Format Example" width="500" />
+  </div>
+  <div align="center">
+  <img src=".github/Preview/Menu/text mode.png" alt="Text Mode" width="500" />
+  </div>
+  <div align="center">
+  <img src=".github/Preview/Menu/select device.png" alt="Example 3" width="500" />
+  </div>
+  <div align="center">
+  <img src=".github/Preview/Menu/select program.png" alt="Select Programs.png" width="500" />
+  </div>
+</details>
 
 <br>
 

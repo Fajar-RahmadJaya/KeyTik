@@ -180,25 +180,22 @@ KeyTik is available at the following platforms:
 <details>
   <summary><b>See More Preview</b></div></summary>
   <div align="center">
-  <img src=".github/Preview/Menu/default mode.png" alt="Default Mode" width="500" />
+  <img src=".github\Preview\Menu\1_DefaultMode.png" alt="Default Mode" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Menu/choosing key1.png" alt="Choosing Key 1" width="500" />
+  <img src=".github\Preview\Menu\2_ChooseKey.png" alt="Choose Key" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Menu/choosing key2.png" alt="Choosing Key 2" width="500" />
+  <img src=".github\Preview\Menu\3_ChooseKeyUnicode.png" alt="Choose Unicode Key" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Menu/key format.gif" alt="Key Format Example" width="500" />
+  <img src=".github\Preview\Menu\4_SelectDevice.png" alt="Select Device" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Menu/text mode.png" alt="Text Mode" width="500" />
+  <img src=".github\Preview\Menu\5_SelectProgram.png" alt="Select Program" width="500" />
   </div>
   <div align="center">
-  <img src=".github/Preview/Menu/select device.png" alt="Example 3" width="500" />
-  </div>
-  <div align="center">
-  <img src=".github/Preview/Menu/select program.png" alt="Select Programs.png" width="500" />
+  <img src=".github\Preview\Menu\6_TextMode.png" alt="Text Mode" width="500" />
   </div>
 </details>
 

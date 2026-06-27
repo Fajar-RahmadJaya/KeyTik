@@ -177,9 +177,6 @@ KeyTik is available at the following platforms:
 <img src=".github\Preview\Theme.webp" alt="Main Window Theme GIF" width="500" />
 </div>
 
-> [!NOTE]
-> This is a preview of the beta version.
-
 <details>
   <summary><b>See More Preview</b></div></summary>
   <div align="center">
@@ -201,6 +198,9 @@ KeyTik is available at the following platforms:
   <img src=".github\Preview\Menu\6_TextMode.png" alt="Text Mode" width="500" />
   </div>
 </details>
+
+> [!NOTE]
+> This is a preview of the beta version.
 
 <br>
 

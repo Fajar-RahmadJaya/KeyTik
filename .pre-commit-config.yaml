@@ -11,10 +11,15 @@ repos:
   rev: v3.2.0
   hooks:
   - id: trailing-whitespace
+    stages: [pre-commit]
   - id: end-of-file-fixer
+    stages: [pre-commit]
   - id: check-yaml
+    stages: [pre-commit]
   - id: check-added-large-files
+    stages: [pre-commit]
   - id: pretty-format-json
+    stages: [pre-commit]
     args:
       [
         --autofix,
@@ -25,11 +30,11 @@ repos:
   rev: 0.11.15
   hooks:
   - id: uv-sync
+    name: uv sync
+    stages: [post-checkout, post-merge, post-rewrite]
     args: [
-      --group,
-      lint,
-      --group,
-      hook
+      --group, lint,
+      --group, hook
       ]
 
 # Ruff formatter and auto fix lint error
@@ -37,7 +42,13 @@ repos:
   rev: v0.15.14
   hooks:
   - id: ruff-format
+    name: ruff format
+    types: [python]
+    stages: [pre-commit]
   - id: ruff-check
+    name: ruff check
+    types: [python]
+    stages: [pre-commit]
     args: [ --fix ]
 
 # Pylint check on push

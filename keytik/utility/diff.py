@@ -24,7 +24,7 @@ mode_map = {
 
 PROGRAM_NAME = "KeyTik"
 
-CURRENT_VERSION = "v2.3.5"
+CURRENT_VERSION = "v2.3.6"
 
 ANNOUNCEMENT_LINK = "https://keytik.com/normal-md"
 

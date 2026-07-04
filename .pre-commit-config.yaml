@@ -12,18 +12,19 @@ repos:
   hooks:
   - id: trailing-whitespace
     stages: [pre-commit]
+
   - id: end-of-file-fixer
     stages: [pre-commit]
+
   - id: check-yaml
     stages: [pre-commit]
+
   - id: check-added-large-files
     stages: [pre-commit]
+
   - id: pretty-format-json
     stages: [pre-commit]
-    args:
-      [
-        --autofix,
-        --no-sort-keys]
+    args: [--autofix, --no-sort-keys]
 
 # Synchronize dependencies upon branch checkout, pull or rebase
 - repo: https://github.com/astral-sh/uv-pre-commit
@@ -32,10 +33,7 @@ repos:
   - id: uv-sync
     name: uv sync
     stages: [post-checkout, post-merge, post-rewrite]
-    args: [
-      --group, lint,
-      --group, hook
-      ]
+    args: [--group, lint, --group, hook]
 
 # Ruff formatter and auto fix lint error
 - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -45,6 +43,7 @@ repos:
     name: ruff format
     types: [python]
     stages: [pre-commit]
+
   - id: ruff-check
     name: ruff check
     types: [python]
@@ -61,8 +60,4 @@ repos:
     types: [python]
     stages: [pre-push]
     require_serial: true
-    args:
-      [
-        "-rn", # Only display messages
-        "-sn", # Don't display the score
-      ]
+    args: ["-rn", "-sn",] # Only display messages

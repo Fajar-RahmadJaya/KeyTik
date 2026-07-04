@@ -26,8 +26,10 @@ repos:
   hooks:
   - id: uv-sync
     args: [
-      --group lint,
-      --group hook
+      --group,
+      lint,
+      --group,
+      hook
       ]
 
 # Ruff formatter and auto fix lint error

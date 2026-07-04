@@ -39,7 +39,7 @@ KeyTik is also packed with [features](#features) like Bind to Programs and Devic
 
 </div>
 
-KeyTik Pro version is available at Gumroad at **$20** for **lifetime purchase**. Pro version has additional features compared to the normal version while not overwhelming it.
+KeyTik Pro version is available at Gumroad at ~~$20~~ **$15 (Big Update Discount)** for **lifetime purchase**. Pro version has additional features compared to the normal version while not overwhelming it.
 
 </div>
 
@@ -127,7 +127,7 @@ KeyTik Pro version is available at Gumroad at **$20** for **lifetime purchase**.
 </details>
 
 <br>
-<div align="center"><a href="https://fajarrahmadjaya.gumroad.com/l/keytik-pro"><img src=".github\Preview\GumroadButton.png" alt="Gumroad Button" width="240" /></a></div>
+<div align="center"><a href="https://fajarrahmadjaya.gumroad.com/l/keytik-pro/big-update"><img src=".github\Preview\GumroadButton.png" alt="Gumroad Button" width="240" /></a></div>
 <br>
 
 <div align="center">

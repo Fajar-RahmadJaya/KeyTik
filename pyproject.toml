@@ -1,6 +1,6 @@
 [project]
 name = "keytik"
-version = "2.3.5"
+version = "2.3.6"
 description = "A Powerful Multi-Profile Key Mapper, Clicker, Macro, and More."
 authors = [
     {name = "Fajar Rahmad Jaya",email = "Fajar.Rahmad.Jaya.Profile@gmail.com"}
@@ -31,7 +31,14 @@ lint = [
 hook = [
     "pre-commit>=4.6.0",
 ]
+pyinstaller = [
+    "pyinstaller>=6.21.0",
+]
+changelog-generator = [
+    "git-cliff>=2.13.1",
+]
 
+# Build system
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -39,7 +46,96 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["keytik"]
 
+# Include data folder
 [tool.hatch.build]
 include = [
     "keytik/_internal/**",
 ]
+
+# Changelog generator
+[tool.git-cliff.changelog]
+body = """
+{% if version %}\
+    ## KeyTik v{{ version | trim_start_matches(pat="v") }}
+{% else %}\
+    ## [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
+            {% if commit.breaking %}[**breaking**] {% endif %}\
+            {{ commit.message | upper_first }}\
+    {% endfor %}
+{% endfor %}
+"""
+# Remove leading and trailing whitespaces from the changelog's body.
+trim = true
+# Render body even when there are no releases to process.
+render_always = true
+# An array of regex based postprocessors to modify the changelog.
+postprocessors = [
+    # Replace the placeholder <REPO> with a URL.
+    #{ pattern = '<REPO>', replace = "https://github.com/orhun/git-cliff" },
+]
+# output file path
+output = "CHANGELOG.md"
+
+[tool.git-cliff.git]
+# Parse commits according to the conventional commits specification.
+# See https://www.conventionalcommits.org
+conventional_commits = true
+# Exclude commits that do not match the conventional commits specification.
+filter_unconventional = true
+# Require all commits to be conventional.
+# Takes precedence over filter_unconventional.
+require_conventional = false
+# Split commits on newlines, treating each line as an individual commit.
+split_commits = false
+# An array of regex based parsers to modify commit messages prior to further processing.
+commit_preprocessors = [
+    # Replace issue numbers with link templates to be updated in `changelog.postprocessors`.
+    #{ pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](<REPO>/issues/${2}))"},
+    # Check spelling of the commit message using https://github.com/crate-ci/typos.
+    # If the spelling is incorrect, it will be fixed automatically.
+    #{ pattern = '.*', replace_command = 'typos --write-changes -' },
+]
+# Prevent commits that are breaking from being excluded by commit parsers.
+protect_breaking_commits = false
+# An array of regex based parsers for extracting data from the commit message.
+# Assigns commits to groups.
+# Optionally sets the commit's scope and can decide to exclude commits from further processing.
+commit_parsers = [
+    { message = "^feat", group = "<!-- 0 -->🚀 Features" },
+    { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
+    { message = "^doc", group = "<!-- 3 -->📚 Documentation", skip = true },
+    { message = "^perf", group = "<!-- 4 -->⚡ Performance", skip = true },
+    { message = "^refactor", group = "<!-- 2 -->🚜 Refactor", skip = true },
+    { message = "^style", group = "<!-- 5 -->🎨 Styling", skip = true },
+    { message = "^test", group = "<!-- 6 -->🧪 Testing", skip = true },
+    { message = "^chore\\(release\\): prepare for", skip = true },
+    { message = "^chore\\(deps.*\\)", skip = true },
+    { message = "^chore\\(pr\\)", skip = true },
+    { message = "^chore\\(pull\\)", skip = true },
+    { message = "^chore|^ci", group = "<!-- 7 -->⚙️ Miscellaneous Tasks", skip = true },
+    { body = ".*security", group = "<!-- 8 -->🛡️ Security", skip = true },
+    { message = "^revert", group = "<!-- 9 -->◀️ Revert", skip = true },
+    { message = ".*", group = "<!-- 10 -->💼 Other", skip = true },
+]
+# Exclude commits that are not matched by any commit parser.
+filter_commits = false
+# Fail on a commit that is not matched by any commit parser.
+fail_on_unmatched_commit = false
+# An array of link parsers for extracting external references, and turning them into URLs, using regex.
+link_parsers = []
+# Include only the tags that belong to the current branch.
+use_branch_tags = false
+# Order releases topologically instead of chronologically.
+topo_order = false
+# Order commits topologically instead of chronologically.
+topo_order_commits = true
+# Order of commits in each group/release within the changelog.
+# Allowed values: newest, oldest
+sort_commits = "oldest"
+# Process submodules commits
+recurse_submodules = false

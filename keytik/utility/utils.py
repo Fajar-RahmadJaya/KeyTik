@@ -198,7 +198,7 @@ def get_ahk_install_dir():
 
 
 ahk_uninstall_path = os.path.join(
-    get_ahk_install_dir() or r"C:\Program Files\AutoHotkey\UX\ui-uninstall.ahk",
+    get_ahk_install_dir() or r"C:\Program Files\AutoHotkey",
     "UX",
     "ui-uninstall.ahk",
 )

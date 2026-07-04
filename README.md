@@ -199,9 +199,6 @@ KeyTik is available at the following platforms:
   </div>
 </details>
 
-> [!NOTE]
-> This is a preview of the beta version.
-
 <br>
 
 <div align="center">

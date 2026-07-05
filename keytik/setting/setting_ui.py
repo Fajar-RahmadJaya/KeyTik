@@ -12,47 +12,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Setting UI code"
+"""Setting UI code."""
 
 import os
 import webbrowser
-from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog,
-    QVBoxLayout,
-    QPushButton,
-    QHBoxLayout,
-    QMessageBox,
-    QScrollArea,
-    QFrame,
-    QWidget,
-    QLabel,
-    QSizePolicy,
-    QComboBox,
-    QStyleFactory,
-)
-from PySide6.QtGui import QIcon, QFont, QColor, QPixmap, QPainter  # pylint: disable=E0611
-from PySide6.QtCore import Qt  # pylint: disable=E0611
+
 import qt_themes
 from catppuccin import PALETTE as catppuccin_palette
+from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtGui import (  # pylint: disable=E0611
+    QColor,
+    QFont,
+    QIcon,
+    QPainter,
+    QPixmap,
+)
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QComboBox,
+    QDialog,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QScrollArea,
+    QSizePolicy,
+    QStyleFactory,
+    QVBoxLayout,
+    QWidget,
+)
 
-from keytik.utility import constant
-from keytik.utility import utils
-from keytik.utility import diff
-from keytik.utility import style
-from keytik.setting.setting_core import SettingCore
 from keytik.setting.announcement import Announcement
+from keytik.setting.setting_core import SettingCore
+from keytik.utility import constant, diff, style, utils
 
 
 class SettingCombobox(QComboBox):  # pylint: disable=R0903
-    "Ignore Wheel Event"
+    """Ignore Wheel Event."""
 
     def wheelEvent(self, event):  # pylint: disable=C0103
-        "Override wheelEvent"
+        """Override wheelEvent."""
         event.ignore()
 
 
 class SettingUI:
-    "Setting UI"
+    """Setting UI."""
 
     def __init__(self):
         # Composition
@@ -63,7 +67,7 @@ class SettingUI:
 
     # ------------------------------ Template ------------------------------
     def setting_card(self, heading="", subheading=""):
-        "Setting card template"
+        """Setting card template."""
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
         card_frame.setObjectName("setting")
@@ -82,7 +86,7 @@ class SettingUI:
         return card_layout, card_frame
 
     def setting_combobox(self):
-        "Setting combobox template"
+        """Setting combobox template."""
         setting_combobox = SettingCombobox()
         setting_combobox.setFixedWidth(164)
         setting_combobox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
@@ -90,7 +94,7 @@ class SettingUI:
         return setting_combobox
 
     def setting_button(self):
-        "Setting button template"
+        """Setting button template."""
         setting_button = QPushButton()
         setting_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         setting_button.setFixedWidth(164)
@@ -98,7 +102,7 @@ class SettingUI:
         return setting_button
 
     def setting_header_label(self):
-        "Setting header label template"
+        """Setting header label template."""
         setting_header_font = QFont()
         setting_header_font.setBold(True)
         setting_header_font.setPixelSize(13)
@@ -111,7 +115,7 @@ class SettingUI:
 
     # ------------------------------ Window ------------------------------
     def setting_window(self, parent):
-        "Setting window"
+        """Setting window."""
         settings_window = QDialog(parent)
         settings_window.setWindowTitle("Settings")
         geometry = style.get_geometry(parent, 600, 400)
@@ -155,7 +159,7 @@ class SettingUI:
 
     # ------------------------------ Pro Version ------------------------------
     def pro_version(self):
-        "Pro version setting"
+        """Pro version setting."""
         pro_version_widget = QWidget()
         pro_version_layout = QVBoxLayout(pro_version_widget)
         pro_version_layout.setContentsMargins(0, 0, 0, 0)
@@ -183,7 +187,7 @@ class SettingUI:
 
     # ------------------------------ Appearance ------------------------------
     def appearance(self, settings_window):
-        "Appearance setting"
+        """Appearance setting."""
         appearance_widget = QWidget()
         appearance_layout = QVBoxLayout(appearance_widget)
         appearance_layout.setContentsMargins(0, 0, 0, 0)
@@ -209,16 +213,14 @@ class SettingUI:
         return appearance_widget
 
     def style(self):
-        "Style Widget"
+        """Style Widget."""
         style_combobox = self.setting_combobox()
         style_combobox.addItem("Default")
         style_combobox.addItems(QStyleFactory.keys())
         current_style = utils.get_config().style
         style_combobox.setCurrentText(current_style if current_style else "Default")
         style_combobox.currentTextChanged.connect(
-            lambda: self.setting_core.save_style(
-                updated_style=style_combobox.currentText()
-            )
+            lambda: self.setting_core.save_style(updated_style=style_combobox.currentText())
         )
 
         style_layout, style_frame = self.setting_card(
@@ -229,7 +231,7 @@ class SettingUI:
         return style_frame
 
     def theme(self, settings_window):
-        "Theme Widget"
+        """Theme Widget."""
         theme_combobox = self.setting_combobox()
 
         # Default theme
@@ -249,17 +251,13 @@ class SettingUI:
         qt_themes_dict = qt_themes.get_themes()
         for qt_theme, _ in qt_themes_dict.items():
             # Remove catppuccin
-            if not qt_theme.startswith("catppuccin") or not qt_theme.startswith(
-                "dracula"
-            ):
+            if not qt_theme.startswith("catppuccin") or not qt_theme.startswith("dracula"):
                 theme_combobox.addItem(
                     qt_theme.replace("_", " ").title(),
                     {"type": "qt-themes", "value": qt_theme},
                 )
 
-        theme_combobox.setCurrentText(
-            utils.get_config().theme.replace("_", " ").title()
-        )
+        theme_combobox.setCurrentText(utils.get_config().theme.replace("_", " ").title())
         theme_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_theme(
                 theme=theme_combobox.currentData(), parent=settings_window
@@ -274,7 +272,7 @@ class SettingUI:
         return theme_frame
 
     def accent(self, settings_window):
-        "Theme Widget"
+        """Theme Widget."""
         config = utils.get_config()
         accent_combobox = self.setting_combobox()
         accent_combobox.view().setFixedWidth(200)
@@ -282,9 +280,7 @@ class SettingUI:
         # Item data should be the color name and color hex
         accent_combobox.addItem("Default", ["Default", "default"])
         # Dracula accent
-        accent_combobox.addItem(
-            self.color_circle("#BD93F9"), "Dracula", ["Dracula", "#BD93F9"]
-        )
+        accent_combobox.addItem(self.color_circle("#BD93F9"), "Dracula", ["Dracula", "#BD93F9"])
         # Catppuccin Accent
         for flavor in catppuccin_palette:
             for color in flavor.colors:
@@ -316,7 +312,7 @@ class SettingUI:
         return accent_frame
 
     def color_circle(self, color_hex):
-        "Circle showing accent color"
+        """Circle showing accent color."""
         if color_hex in self.circle_cache:
             return self.circle_cache[color_hex]
 
@@ -334,7 +330,7 @@ class SettingUI:
         return icon
 
     def mica_effect(self, settings_window):
-        "Mica Effect Widget"
+        """Mica Effect Widget."""
         mica_combobox = self.setting_combobox()
         mica_combobox.addItems(["Default", "Alt", "Disable"])
         mica_combobox.setCurrentText(utils.get_config().mica_effect.capitalize())
@@ -353,7 +349,7 @@ class SettingUI:
 
     # ------------------------------ General ------------------------------
     def general(self, settings_window):
-        "General setting"
+        """General setting."""
         general_widget = QWidget()
         general_layout = QVBoxLayout(general_widget)
         general_layout.setContentsMargins(0, 0, 0, 0)
@@ -372,7 +368,7 @@ class SettingUI:
         return general_widget
 
     def profile_location(self, settings_window):
-        "Profile Location Widget"
+        """Profile Location Widget."""
         profile_location_button = self.setting_button()
         profile_location_button.setText("Change Location")
         profile_location_button.clicked.connect(
@@ -387,7 +383,7 @@ class SettingUI:
         return profile_location_frame
 
     def announcement(self, settings_window):
-        "Announcement Widget"
+        """Announcement Widget."""
         announcement = Announcement()  # Composition
         announcement_button = self.setting_button()
         announcement_button.setText("Announcement")
@@ -404,7 +400,7 @@ class SettingUI:
 
     # ------------------------------ Installation ------------------------------
     def installation(self):
-        "Advanced setting"
+        """Advanced setting."""
         installation_widget = QWidget()
         installation_layout = QVBoxLayout(installation_widget)
         installation_layout.setContentsMargins(0, 0, 0, 0)
@@ -426,29 +422,23 @@ class SettingUI:
         return installation_widget
 
     def ahk_installation(self):
-        "AutoHotkey Installation Widget"
+        """AutoHotkey Installation Widget."""
         ahk_installed = os.path.exists(utils.ahkv2_dir)
 
         ahk_button = self.setting_button()
-        ahk_button.setText(
-            "Uninstall AutoHotkey" if ahk_installed else "Install AutoHotkey"
-        )
+        ahk_button.setText("Uninstall AutoHotkey" if ahk_installed else "Install AutoHotkey")
         ahk_button.clicked.connect(lambda: self.setting_core.ahk_action(ahk_installed))
 
         ahk_layout, ahk_frame = self.setting_card(
             heading="AutoHotkey Installation",
-            subheading=(
-                "AutoHotkey is installed"
-                if ahk_installed
-                else "AutoHotkey not installed"
-            ),
+            subheading=("AutoHotkey is installed" if ahk_installed else "AutoHotkey not installed"),
         )
         ahk_layout.addWidget(ahk_button)
 
         return ahk_frame
 
     def interception_installation(self):
-        "Interception Driver Installation"
+        """Interception Driver Installation."""
         interception_installed = os.path.exists(constant.DRIVER_PATH)
 
         interception_button = self.setting_button()
@@ -474,7 +464,7 @@ class SettingUI:
         return interception_frame
 
     def check_update(self):
-        "Check for Update Widget"
+        """Check for Update Widget."""
         check_update_button = self.setting_button()
         check_update_button.setText("Check For Update")
         check_update_button.clicked.connect(
@@ -489,7 +479,7 @@ class SettingUI:
         return check_update_frame
 
     def update_messagebox(self, show_no_update_message=False):
-        "Message when there is update avalible"
+        """Message when there is update avalible."""
         latest_version = self.setting_core.check_for_update()
         if latest_version:
             reply = QMessageBox.question(
@@ -503,10 +493,9 @@ class SettingUI:
             )
             if reply == QMessageBox.StandardButton.Yes:
                 webbrowser.open(diff.RELEASE_LINK)
-        else:
-            if show_no_update_message:
-                QMessageBox.information(
-                    None,
-                    "Check For Update",
-                    "You are using the latest version of KeyTik.",
-                )
+        elif show_no_update_message:
+            QMessageBox.information(
+                None,
+                "Check For Update",
+                "You are using the latest version of KeyTik.",
+            )

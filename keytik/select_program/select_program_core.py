@@ -12,23 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Logic for program selection"
+"""Logic for program selection."""
 
-import os
 import ctypes
+import os
 from ctypes import wintypes
+
+import psutil
 import win32gui
 import win32process
-import psutil
-from PySide6.QtWidgets import QTreeWidgetItem  # pylint: disable=E0611
 from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtWidgets import QTreeWidgetItem  # pylint: disable=E0611
 
 
 class SelectProgramCore:
-    "Select program Non UI"
+    """Select program Non UI."""
 
     def multi_check(self, texts):
-        "Get multiple item from selected/checked checkbox"
+        """Get multiple item from selected/checked checkbox."""
         item = QTreeWidgetItem(texts)
 
         for col in range(3):
@@ -37,7 +38,7 @@ class SelectProgramCore:
         return item
 
     def get_application_type(self):
-        "Check whether the process is a application or not"
+        """Check whether the process is a application or not."""
         dwmwa_cloaked = 14
         ws_ex_toolwindow = 0x00000080
         ws_ex_appwindow = 0x00040000
@@ -90,7 +91,7 @@ class SelectProgramCore:
         return windows
 
     def get_running_processes(self, app_only=True):
-        "Get running process"
+        """Get running process."""
         if app_only:
             return self.get_application_type()
 
@@ -106,11 +107,9 @@ class SelectProgramCore:
                 ]:
                     continue
                 pid = proc.info["pid"]
-                exe_name = proc.info["exe"] if "exe" in proc.info else None
+                exe_name = proc.info.get("exe", None)
                 exe_name = os.path.basename(exe_name) if exe_name else proc.info["name"]
-                process_type = (
-                    "Application" if self.is_visible_application(pid) else "System"
-                )
+                process_type = "Application" if self.is_visible_application(pid) else "System"
                 try:
 
                     def window_callback(hwnd, windows, pid=pid):
@@ -137,7 +136,7 @@ class SelectProgramCore:
         return processes
 
     def is_visible_application(self, pid):
-        "Check whether the process is an application by checking whether it has window or not"
+        """Check whether the process is an application by checking whether it has window or not."""
         try:
 
             def callback(hwnd, pid_list):

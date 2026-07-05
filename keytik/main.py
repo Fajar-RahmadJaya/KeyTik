@@ -12,23 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Main initialization"
+"""Main initialization."""
 
 import os
 import sys
+
 from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 
-from keytik.utility import utils
-from keytik.utility import thread
-from keytik.utility import style
-from keytik.dashboard.dashboard_ui import DashboardUI
 from keytik.dashboard.dashboard_core import DashboardCore
+from keytik.dashboard.dashboard_ui import DashboardUI
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_ui import SettingUI
+from keytik.utility import style, thread, utils
 
 
 def main():
-    "Main function"
+    """Main function."""
     # Set Appearance
     config = utils.get_config()
     style_config = config.style

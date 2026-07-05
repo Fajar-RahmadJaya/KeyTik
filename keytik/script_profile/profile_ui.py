@@ -12,39 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"UI for create/edit profile"
+"""UI for create/edit profile."""
 
 import os
-from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QWidget,
-    QDialog,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QScrollArea,
-    QComboBox,
-    QGridLayout,
-    QMessageBox,
-    QVBoxLayout,
-    QSpacerItem,
-    QSizePolicy,
-    QTextEdit,
-)
+
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QComboBox,
+    QDialog,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QScrollArea,
+    QSizePolicy,
+    QSpacerItem,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
 
-from keytik.utility import constant
-from keytik.utility import diff
-from keytik.utility import style
-from keytik.select_program.select_program_ui import SelectProgramUI
-from keytik.select_device.select_device import SelectDevice
-from keytik.script_profile.remap_row import RemapRow, ShortcutRow
-from keytik.script_profile.write_script import WriteScript, WriteDefault
 from keytik.script_profile.parse_script import ParseScript
+from keytik.script_profile.remap_row import RemapRow, ShortcutRow
+from keytik.script_profile.write_script import WriteDefault, WriteScript
+from keytik.select_device.select_device import SelectDevice
+from keytik.select_program.select_program_ui import SelectProgramUI
+from keytik.utility import constant, diff, style
 
 
 class ProfileUI:
-    "Create/edit profile UI"
+    """Create/edit profile UI."""
 
     def __init__(self, main_core):
         # Parameter
@@ -62,7 +61,7 @@ class ProfileUI:
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
 
     def edit_script(self, script_name, parent):
-        "Create/edit profile window"
+        """Create/edit profile window."""
         self.edit_window = QDialog(parent)
         # Handle Create New Profile
         if not script_name:
@@ -73,7 +72,7 @@ class ProfileUI:
         # Handle Edit Profile
         else:
             script_path = os.path.join(self.main_core.script_dir, script_name)
-            with open(script_path, "r", encoding="utf-8") as file:
+            with open(script_path, encoding="utf-8") as file:
                 lines = file.readlines()
             if not lines:
                 return
@@ -106,7 +105,7 @@ class ProfileUI:
         self.edit_window.exec()
 
     def edit_top(self, script_name, lines):
-        "Top part of profile manager"
+        """Top part of profile manager."""
         parse_script = ParseScript()  # Composition
 
         top_widget = QWidget(self.edit_window)
@@ -136,7 +135,7 @@ class ProfileUI:
         return top_widget
 
     def select_program_widget(self, top_widget, top_layout, lines, parse_script):
-        "Program binding widget"
+        """Program binding widget."""
         program_label = QLabel("Program", top_widget)
         program_label.setFixedWidth(90)
         top_layout.addWidget(program_label, 1, 0, 1, 1)
@@ -155,7 +154,7 @@ class ProfileUI:
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
     def select_device_widget(self, top_widget, top_layout, lines, parse_script):
-        "Device binding widget"
+        """Device binding widget."""
         keyboard_label = QLabel("Device ID", top_widget)
         keyboard_label.setFixedWidth(90)
         top_layout.addWidget(keyboard_label, 2, 0, 1, 1)
@@ -169,15 +168,12 @@ class ProfileUI:
         keyboard_select_button = QPushButton("Select Device", top_widget)
         keyboard_select_button.setToolTip("Choose device and bind profile to it")
         keyboard_select_button.clicked.connect(
-            lambda: SelectDevice().open_device_selection(
-                self.edit_window, keyboard_entry
-            )
+            lambda: SelectDevice().open_device_selection(self.edit_window, keyboard_entry)
         )
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
     def edit_middle(self, lines):
-        "Middle part of profile manager"
-
+        """Middle part of profile manager."""
         edit_scroll = QScrollArea(self.edit_window)
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -207,7 +203,7 @@ class ProfileUI:
         return edit_scroll
 
     def build_profile(self, index, lines=None):
-        "Add profile into layout"
+        """Add profile into layout."""
         # Clear Layout
         while self.edit_frame_layout.count():
             item = self.edit_frame_layout.takeAt(0)
@@ -235,13 +231,11 @@ class ProfileUI:
             self.edit_frame_layout.addItem(spacer)
 
     def default_mode_widget(self, parent_window, lines=None):
-        "Default mode frame"
+        """Default mode frame."""
         parse_script = ParseScript()  # Composition
 
         parsed_shortcuts_list = parse_script.parse_shortcuts(lines) if lines else None
-        shortcut_widget = self.shortcut_row_comp.shortcut_row(
-            parent_window, parsed_shortcuts_list
-        )
+        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
         self.edit_frame_layout.addWidget(shortcut_widget)
 
         parsed_remap_list = parse_script.parse_default_mode(lines) if lines else None
@@ -249,7 +243,7 @@ class ProfileUI:
         self.edit_frame_layout.addWidget(remap_widget)
 
     def text_block(self, lines=None):
-        "Text mode frame(to do: fix)"
+        """Text mode frame(to do: fix)."""
         text_block = QTextEdit()
         text_block.setLineWrapMode(QTextEdit.WidgetWidth)
         text_block.setFixedHeight(14 * text_block.fontMetrics().height())
@@ -262,7 +256,7 @@ class ProfileUI:
         return text_block
 
     def extract_and_filter_content(self, lines):
-        "Get text block value from the marker"
+        """Get text block value from the marker."""
         inside = False
         result_lines = []
         for line in lines:
@@ -279,7 +273,7 @@ class ProfileUI:
         return "".join(result_lines)
 
     def edit_bottom(self, first_line, top_widget):
-        "Bottom part of profile manager"
+        """Bottom part of profile manager."""
         bottom_widget = QWidget(self.edit_window)
         bottom_layout = QGridLayout(bottom_widget)
         bottom_layout.setContentsMargins(0, 5, 0, 0)
@@ -287,9 +281,7 @@ class ProfileUI:
 
         save_button = QPushButton("Save Changes", self.edit_window)
         save_button.clicked.connect(
-            lambda: self.save_changes(
-                mode_combobox.currentText().strip().lower(), top_widget
-            )
+            lambda: self.save_changes(mode_combobox.currentText().strip().lower(), top_widget)
         )
         save_button.setFixedHeight(28)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
@@ -311,7 +303,7 @@ class ProfileUI:
         return bottom_widget
 
     def save_changes(self, mode, top_widget: QWidget):
-        "Write script"
+        """Write script."""
         script_name_entry = top_widget.findChild(QLineEdit, "ScriptNameEntry")
         script_name = script_name_entry.text().strip() + ".ahk"
 

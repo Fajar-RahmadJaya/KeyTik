@@ -12,27 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Thread handler"
+"""Thread handler."""
 
 import os
+
 import keyboard
 from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
-from keytik.setting.setting_core import SettingCore
-from keytik.script_profile.write_script import WriteScript
-from keytik.utility import utils
 from keytik.dashboard.dashboard_core import DashboardCore
+from keytik.script_profile.write_script import WriteScript
+from keytik.setting.setting_core import SettingCore
+from keytik.utility import utils
 
 
 class Thread(QThread):  # pylint: disable=R0903
-    "Startup thread worker"
+    """Startup thread worker."""
 
     update_found = Signal()
     show_announcement = Signal()
     ahk_not_installed = Signal()
 
     def run(self):
-        "Run check update on thread to increase dashborad initialization time"
+        """Run check update on thread to increase dashborad initialization time."""
         # Composition
         write_script = WriteScript()
         setting_core = SettingCore()

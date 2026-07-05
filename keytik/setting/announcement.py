@@ -12,31 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Load online announcement from KeyTik Website"
+"""Load online announcement from KeyTik Website."""
 
 import requests
 from markdown import markdown
+from PySide6.QtCore import Qt, QThread, Signal  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog,
-    QVBoxLayout,
-    QHBoxLayout,
     QCheckBox,
+    QDialog,
+    QFrame,
+    QHBoxLayout,
     QPushButton,
     QTextBrowser,
+    QVBoxLayout,
     QWidget,
-    QFrame,
 )
-from PySide6.QtGui import QIcon  # pylint: disable=E0611
-from PySide6.QtCore import Qt, QThread, Signal  # pylint: disable=E0611
 
-from keytik.utility import constant
-from keytik.utility import diff
-from keytik.utility import utils
-from keytik.utility import style
+from keytik.utility import constant, diff, style, utils
 
 
 class AnnouncmentThread(QThread):  # pylint: disable=R0903
-    "Worker to run get announcement url"
+    """Worker to run get announcement url."""
 
     url_found = Signal()
 
@@ -45,15 +42,16 @@ class AnnouncmentThread(QThread):  # pylint: disable=R0903
         self.announcement_files = []
 
     def run(self):
-        "Overwrite run method"
+        """Overwrite run method."""
         # Loop through announcement file url in order and stop when url invalid
         self.announcement_files = []
         i = 1
+        error_code = 404
         while True:
             url = f"{diff.ANNOUNCEMENT_LINK}/{i}.txt"
             try:
                 response = requests.get(url, timeout=5)
-                if response.status_code == 404:
+                if response.status_code == error_code:
                     break
                 response.raise_for_status()
                 self.announcement_files.append(url)
@@ -74,14 +72,14 @@ class AnnouncmentThread(QThread):  # pylint: disable=R0903
 
 
 class Announcement:
-    "Announcement"
+    """Announcement."""
 
     def __init__(self):
         self.current_announcement_index = 0
         self.announcement_thread = AnnouncmentThread()
 
     def show_announcement_window(self, parent):
-        "Announcement window"
+        """Announcement window."""
         try:
             self.current_announcement_index = 0
 
@@ -145,7 +143,7 @@ class Announcement:
             print(f"Error displaying announcement window: {e}")
 
     def load_content(self, index, html_label, prev_button, next_button):
-        "Get announcement content from official website"
+        """Get announcement content from official website."""
         url = self.announcement_thread.announcement_files[index]
         md_content = constant.announcement_cache[url]
         html_content = markdown(md_content)
@@ -159,31 +157,23 @@ class Announcement:
 
         prev_button.setEnabled(self.current_announcement_index > 0)
         next_button.setEnabled(
-            self.current_announcement_index
-            < len(self.announcement_thread.announcement_files) - 1
+            self.current_announcement_index < len(self.announcement_thread.announcement_files) - 1
         )
 
     def next_doc(self, html_label, prev_button, next_button):
-        "Next announcement"
-        if (
-            self.current_announcement_index
-            < len(self.announcement_thread.announcement_files) - 1
-        ):
+        """Next announcement."""
+        if self.current_announcement_index < len(self.announcement_thread.announcement_files) - 1:
             self.current_announcement_index += 1
-            self.load_content(
-                self.current_announcement_index, html_label, prev_button, next_button
-            )
+            self.load_content(self.current_announcement_index, html_label, prev_button, next_button)
 
     def prev_doc(self, html_label, prev_button, next_button):
-        "previous announcement"
+        """Previous announcement."""
         if self.current_announcement_index > 0:
             self.current_announcement_index -= 1
-            self.load_content(
-                self.current_announcement_index, html_label, prev_button, next_button
-            )
+            self.load_content(self.current_announcement_index, html_label, prev_button, next_button)
 
     def announcement_button_frame(self, html_label):
-        "Button and checkbox"
+        """Button and checkbox."""
         button_frame = QWidget()
         button_layout = QHBoxLayout(button_frame)
         button_layout.setContentsMargins(0, 0, 0, 0)
@@ -191,17 +181,13 @@ class Announcement:
         prev_button = QPushButton("Previous")
         prev_button.setFixedWidth(100)
         prev_button.setEnabled(False)
-        prev_button.clicked.connect(
-            lambda: self.prev_doc(html_label, prev_button, next_button)
-        )
+        prev_button.clicked.connect(lambda: self.prev_doc(html_label, prev_button, next_button))
         button_layout.addWidget(prev_button)
 
         next_button = QPushButton("Next")
         next_button.setFixedWidth(100)
         next_button.setEnabled(False)
-        next_button.clicked.connect(
-            lambda: self.next_doc(html_label, prev_button, next_button)
-        )
+        next_button.clicked.connect(lambda: self.next_doc(html_label, prev_button, next_button))
         button_layout.addWidget(next_button)
 
         dont_show_checkbox = QCheckBox("Don't show again")
@@ -224,7 +210,7 @@ class Announcement:
         return button_frame
 
     def save_announcement_condition(self, dont_show_checkbox):
-        "Save user preference on file when don't show announcement checkbox is checked"
+        """Save user preference on file when don't show announcement checkbox is checked."""
         announcement_condition = not dont_show_checkbox.isChecked()
 
         config = utils.get_config()

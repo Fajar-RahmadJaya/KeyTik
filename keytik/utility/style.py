@@ -12,25 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Contain styling code"
+"""Contain styling code."""
 
-from dataclasses import dataclass
+import json
+import os
 import sys
 import winreg
-import os
-import json
-from PySide6.QtGui import QPalette, QColor  # pylint: disable=E0611
-from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
+from dataclasses import dataclass
+
 import qt_themes
 import win32mica
+from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
+from PySide6.QtGui import QColor, QPalette  # pylint: disable=E0611
 
-from keytik.utility import utils
-from keytik.utility import constant
+from keytik.utility import constant, utils
 
 
 # ---------------------------- Palatte ------------------------------
 def color_rgba(color: QColor, alpha: float):
-    "Transform QColor into RGBA"
+    """Transform QColor into RGBA."""
     red = color.red()
     green = color.green()
     blue = color.blue()
@@ -40,7 +40,7 @@ def color_rgba(color: QColor, alpha: float):
 
 
 def invert_color(color: QColor):
-    "Change color to the oposite of it"
+    """Change color to the oposite of it."""
     inverted_color = QColor(
         255 - color.red(), 255 - color.green(), 255 - color.blue(), color.alpha()
     )
@@ -49,23 +49,22 @@ def invert_color(color: QColor):
 
 
 def is_light(color: QColor) -> bool:
-    "Determine whether the color is dark or light"
+    """Determine whether the color is dark or light."""
+    threshold = 0.5
     r = color.red() / 255.0
     g = color.green() / 255.0
     b = color.blue() / 255.0
     luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
 
-    return luminance > 0.5
+    return luminance > threshold
 
 
 def detect_system_theme():
-    "Detecting system theme for Pyside6 default theme handling"
+    """Detecting system theme for Pyside6 default theme handling."""
     if sys.platform == "win32":
         try:
             registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
-            theme_registry = (
-                r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-            )
+            theme_registry = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
             key = winreg.OpenKey(registry, theme_registry)
             value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
             winreg.CloseKey(key)
@@ -75,11 +74,12 @@ def detect_system_theme():
     return "light"
 
 
-mica_supported = bool(sys.getwindowsversion().build >= 22000)
+WINDOWS_BUILD_NUMBER = 22000
+mica_supported = bool(sys.getwindowsversion().build >= WINDOWS_BUILD_NUMBER)
 
 
 def apply_mica(target_window):
-    "Apply mica style on target window using win32mica"
+    """Apply mica style on target window using win32mica."""
     config = utils.get_config()
     mica_effect = config.mica_effect
     palette = get_palette()
@@ -96,12 +96,12 @@ def apply_mica(target_window):
 
 
 def set_custom_palette(palette: QPalette):
-    "Apply custom theme to QPalette"
+    """Apply custom theme to QPalette."""
     config = utils.get_config()
     theme_file = os.path.join(constant.theme_dir, config.theme + ".json")
 
     try:
-        with open(theme_file, "r", encoding="utf-8") as file:
+        with open(theme_file, encoding="utf-8") as file:
             theme_dict = json.load(file)
     except FileNotFoundError as error:
         print(f"Error: {error}")
@@ -128,7 +128,7 @@ def set_custom_palette(palette: QPalette):
 
 
 def set_accent(palette: QPalette):
-    "Apply accent to QPalette"
+    """Apply accent to QPalette."""
     accent = utils.get_config().accent
 
     if accent != "default":
@@ -136,7 +136,7 @@ def set_accent(palette: QPalette):
 
 
 def get_palette() -> QPalette:
-    "Set global appearance based on user config using palette and style"
+    """Set global appearance based on user config using palette and style."""
     # Variables
     config = utils.get_config()
     theme_type = config.theme_type
@@ -165,7 +165,7 @@ IS_BASE_LIGHT = is_light(PALETTE.color(QPalette.Base))
 
 @dataclass
 class Color:
-    "Dataclass to hold palette used on styling"
+    """Dataclass to hold palette used on styling."""
 
     surface: str
     mantle: str
@@ -174,7 +174,7 @@ class Color:
 
 
 def get_color():
-    "Get color palette on various theme"
+    """Get color palette on various theme."""
     config = utils.get_config()
     theme = config.theme
     if theme == "light" or IS_BASE_LIGHT:
@@ -203,7 +203,7 @@ COLOR = get_color()
 
 # ---------------------------- Styling ------------------------------
 def get_geometry(parent_window, width, height):
-    "Get x and y centered relative to parent window"
+    """Get x and y centered relative to parent window."""
     parent_geometry = parent_window.geometry()
     parent_x = parent_geometry.x()
     parent_y = parent_geometry.y()
@@ -231,7 +231,7 @@ QPushButton:hover {{
 
 
 def card(object_name=None):
-    "Card like styling"
+    """Card like styling."""
     if object_name == "setting":
         border_radius = 4
         widget = f"QFrame#{object_name}"
@@ -278,7 +278,7 @@ SUBHEADING_STYLE = f"font-size:11px; color: {COLOR.subtext};"
 
 
 def button_highlight(style_sheet=False):
-    "Pass empty parameter to get object name only"
+    """Pass empty parameter to get object name only."""
     if not style_sheet:
         return "ButtonHighlight"
 

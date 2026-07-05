@@ -12,37 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Remap and shortctu row"
+"""Remap and shortctu row."""
 
 from dataclasses import dataclass
-import pynput
+
 import keyboard
+import pynput
+from PySide6.QtCore import QEvent, QObject, Qt, QTimer, Signal  # pylint: disable=E0611
+from PySide6.QtGui import QCursor  # pylint: disable=E0611
+from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QLabel,
-    QPushButton,
     QCheckBox,
-    QLineEdit,
     QFrame,
+    QGridLayout,
     QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
-    QSizePolicy,
-    QGridLayout,
 )
-from PySide6.QtCore import Qt, Signal, QTimer, QEvent, QObject  # pylint: disable=E0611
-from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
-from PySide6.QtGui import QCursor  # pylint: disable=E0611
 
-from keytik.utility import icons
-from keytik.utility import constant
-from keytik.utility import style
 from keytik.script_profile.remap_row_core import RemapRowCore
 from keytik.select_key.select_key_ui import SelectKeyUI
+from keytik.utility import constant, icons, style
 
 
 @dataclass
 class OptionWidget:
-    "Data class containing option widget"
+    """Data class containing option widget."""
 
     text_format_checkbox: QCheckBox = None
     hold_format_checkbox: QCheckBox = None
@@ -53,7 +52,7 @@ class OptionWidget:
 
 @dataclass
 class DefaultKeyWidget:
-    "Data class containing default key widget"
+    """Data class containing default key widget."""
 
     default_key_entry: QLineEdit = None
     default_key_select: QPushButton = None
@@ -61,7 +60,7 @@ class DefaultKeyWidget:
 
 @dataclass
 class RemapKeyWidget:
-    "Data class containing remap key widget"
+    """Data class containing remap key widget."""
 
     remap_key_entry: QLineEdit = None
     remap_key_select: QPushButton = None
@@ -69,7 +68,7 @@ class RemapKeyWidget:
 
 @dataclass
 class KeyWidget:
-    "Data class containing key widget"
+    """Data class containing key widget."""
 
     default_key: DefaultKeyWidget = None
     remap_key: RemapKeyWidget = None
@@ -77,16 +76,14 @@ class KeyWidget:
 
 
 class SharedRow:  # pylint: disable=R0903
-    "Shared row for remap and shortcut row"
+    """Shared row for remap and shortcut row."""
 
     def separator_widget(self, plus_event, parent_widget: QWidget):
-        "Remap row separator widget"
+        """Remap row separator widget."""
         separator_widget = QWidget()
         separator_layout = QHBoxLayout(separator_widget)
         separator_widget.setLayout(separator_layout)
-        separator_widget.setSizePolicy(
-            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
-        )
+        separator_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         separator_widget.setObjectName("SeparatorWidget")
         separator_layout.setContentsMargins(0, 0, 0, 0)
         separator_layout.setSpacing(0)
@@ -123,7 +120,7 @@ class SharedRow:  # pylint: disable=R0903
 
 
 class RemapRow:
-    "Remap row on profile creation"
+    """Remap row on profile creation."""
 
     def __init__(self, edit_frame):
         super().__init__()
@@ -135,8 +132,8 @@ class RemapRow:
         self.key_rows = []
         self.edit_frame = edit_frame
 
-    def remap_row(self, parent_window, parsed_remap_list: list = None):
-        "Build remap row"
+    def remap_row(self, parent_window, parsed_remap_list: list | None = None):
+        """Build remap row."""
         # Remap
         remap_widget = QWidget()
         remap_widget.setContentsMargins(0, 0, 0, 0)
@@ -151,7 +148,7 @@ class RemapRow:
 
         # Remap row
         def add_empty_row(_):
-            "Add empty remap row and separator"
+            """Add empty remap row and separator."""
             # Add empty row
             remap_row_widget = self.remap_card(parent_window)
             remap_layout.addWidget(remap_row_widget)
@@ -164,15 +161,11 @@ class RemapRow:
             for parsed_remap in parsed_remap_list:
                 # Remap row
                 # If list empty, add empty row
-                remap_row_widget = self.remap_card(
-                    parent_window, parsed_remap=parsed_remap
-                )
+                remap_row_widget = self.remap_card(parent_window, parsed_remap=parsed_remap)
                 remap_layout.addWidget(remap_row_widget)
 
                 # Separator
-                separator_widget = shared_row.separator_widget(
-                    add_empty_row, remap_widget
-                )
+                separator_widget = shared_row.separator_widget(add_empty_row, remap_widget)
                 remap_layout.addWidget(separator_widget)
         else:
             add_empty_row(None)
@@ -180,7 +173,7 @@ class RemapRow:
         return remap_widget
 
     def remap_title(self):
-        "Key remap row tittle label"
+        """Key remap row tittle label."""
         remap_label_widget = QWidget()
 
         remap_label_layout = QGridLayout()
@@ -200,7 +193,7 @@ class RemapRow:
         return remap_label_widget
 
     def remap_card(self, parent_window=None, parsed_remap=None):
-        "Remap row"
+        """Remap row."""
         # Remap row card
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -211,9 +204,7 @@ class RemapRow:
 
         # Remap row layout
         remap_row_widget = QWidget(card_frame)
-        remap_row_widget.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
-        )
+        remap_row_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         card_layout.addWidget(remap_row_widget)
 
         remap_row_layout = QGridLayout(remap_row_widget)
@@ -222,9 +213,7 @@ class RemapRow:
         remap_row_layout.setVerticalSpacing(0)
 
         # Default Key Widget
-        default_key, default_key_widget = self.default_key_widget(
-            parsed_remap, parent_window
-        )
+        default_key, default_key_widget = self.default_key_widget(parsed_remap, parent_window)
         remap_row_layout.addWidget(default_key_widget, 0, 0)
 
         # Arrow Widget
@@ -241,35 +230,28 @@ class RemapRow:
         remap_row_layout.addWidget(option_widget, 1, 0, 1, 3)
 
         # Set key_rows
-        self.key_rows.append(
-            KeyWidget(default_key=default_key, remap_key=remap_key, option=option)
-        )
+        self.key_rows.append(KeyWidget(default_key=default_key, remap_key=remap_key, option=option))
 
         return card_frame
 
     def default_key_widget(self, parsed_remap, parent_window):
-        "Default key widget on remap row"
+        """Default key widget on remap row."""
         default_key_container = QWidget()
         default_key_container.setContentsMargins(8, 0, 8, 0)
 
         default_key_layout = QGridLayout(default_key_container)
 
         default_key_select = QPushButton("Select")
-        default_key_select.setToolTip(
-            "Press any key or shortcut to capture it automatically"
-        )
+        default_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         default_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(
-                default_key_entry, default_key_select
-            )
+            lambda: self.key_listening_comp.key_listening(default_key_entry, default_key_select)
         )
         default_key_layout.addWidget(default_key_select, 0, 0, 1, 2)
 
         default_key_entry = QLineEdit(default_key_container)
         default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         default_key_entry.setToolTip(
-            "Default key can be a single key, "
-            "multiple keys, or a double key (eg. double-click)"
+            "Default key can be a single key, multiple keys, or a double key (eg. double-click)"
         )
         if parsed_remap:
             default_key_entry.setText(parsed_remap.default_key)
@@ -292,27 +274,21 @@ class RemapRow:
         return default_key, default_key_container
 
     def remap_key_widget(self, parsed_remap, parent_window):
-        "Remap key widget on remap row"
+        """Remap key widget on remap row."""
         remap_key_container = QWidget()
         remap_key_container.setContentsMargins(8, 0, 8, 0)
 
         remap_key_layout = QGridLayout(remap_key_container)
 
         remap_key_select = QPushButton("Select")
-        remap_key_select.setToolTip(
-            "Press any key or shortcut to capture it automatically"
-        )
+        remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(
-                remap_key_entry, remap_key_select
-            )
+            lambda: self.key_listening_comp.key_listening(remap_key_entry, remap_key_select)
         )
         remap_key_layout.addWidget(remap_key_select, 0, 0, 1, 2)
 
         remap_key_entry = QLineEdit(remap_key_container)
-        remap_key_entry.setToolTip(
-            "Remap key can be a single key, multiple keys, text, or hold"
-        )
+        remap_key_entry.setToolTip("Remap key can be a single key, multiple keys, text, or hold")
         remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if parsed_remap:
             remap_key_entry.setText(parsed_remap.remap_key)
@@ -323,9 +299,7 @@ class RemapRow:
         remap_key_choose.setIcon(icons.get_icon(icons.search))
         remap_key_choose.setToolTip("Choose Remap key")
         remap_key_choose.clicked.connect(
-            lambda: self.select_key_ui.select_key(
-                parent_window, remap_key_entry, context="remap"
-            )
+            lambda: self.select_key_ui.select_key(parent_window, remap_key_entry, context="remap")
         )
         remap_key_layout.addWidget(remap_key_choose, 1, 1, 1, 1)
 
@@ -336,15 +310,14 @@ class RemapRow:
         return remap_key, remap_key_container
 
     def option_widget(self, parsed_remap):
-        "Remap option widget on remap row"
+        """Remap option widget on remap row."""
         option_widget = QWidget()
         options_layout = QHBoxLayout(option_widget)
         options_layout.setContentsMargins(0, 5, 0, 0)
 
         first_key_checkbox = QCheckBox("Disable First Key", option_widget)
         first_key_checkbox.setToolTip(
-            "Default Key Only: "
-            "Check this to disable the first key when using multiple keys.\n"
+            "Default Key Only: Check this to disable the first key when using multiple keys.\n"
         )
         if parsed_remap:
             first_key_checkbox.setChecked(parsed_remap.is_first_key)
@@ -407,7 +380,7 @@ class RemapRow:
 
 
 class ShortcutRow:
-    "Shortcut row on profile creation"
+    """Shortcut row on profile creation."""
 
     def __init__(self, edit_frame):
         # Variable
@@ -420,8 +393,8 @@ class ShortcutRow:
         # UI
         self.shortcut_entry = None
 
-    def shortcut_row(self, parent_window, parsed_shortcuts_list: list = None):
-        "Build shortcut row"
+    def shortcut_row(self, parent_window, parsed_shortcuts_list: list | None = None):
+        """Build shortcut row."""
         # Widget and layout
         shortcut_widget = QWidget()
         shortcut_widget.setContentsMargins(0, 0, 0, 0)
@@ -436,15 +409,13 @@ class ShortcutRow:
         shared_row = SharedRow()
 
         def add_empty_row(_):
-            "Add empty shortcut row"
+            """Add empty shortcut row."""
             # Shortcut row without passing parsed shortcut list
             shortcut_row_widget = self.shortcut_card(parent_window)
             shortcut_layout.addWidget(shortcut_row_widget)
 
             # Separator widget
-            separator_widget = shared_row.separator_widget(
-                add_empty_row, shortcut_widget
-            )
+            separator_widget = shared_row.separator_widget(add_empty_row, shortcut_widget)
             shortcut_layout.addWidget(separator_widget)
 
         if parsed_shortcuts_list:
@@ -454,9 +425,7 @@ class ShortcutRow:
                 shortcut_layout.addWidget(shortcut_row_widget)
 
                 # Separator widget
-                separator_widget = shared_row.separator_widget(
-                    add_empty_row, shortcut_widget
-                )
+                separator_widget = shared_row.separator_widget(add_empty_row, shortcut_widget)
                 shortcut_layout.addWidget(separator_widget)
         else:
             add_empty_row(None)
@@ -464,14 +433,14 @@ class ShortcutRow:
         return shortcut_widget
 
     def shortcut_title(self):
-        "Shortcuts row tittle label"
+        """Shortcuts row tittle label."""
         shortcut_label = QLabel("Shortcut")
         shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         shortcut_label.setStyleSheet(style.PROFILE_ROW_LABEL)
         return shortcut_label
 
     def shortcut_card(self, parent_window, parsed_shortcut=None):
-        "Shortcut row"
+        """Shortcut row."""
         # Card frame
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -482,9 +451,7 @@ class ShortcutRow:
         card_layout.setSpacing(0)
 
         shortcut_row_widget = QWidget(card_frame)
-        shortcut_row_widget.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
-        )
+        shortcut_row_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         card_layout.addWidget(shortcut_row_widget)
 
         shortcut_row_layout = QGridLayout(shortcut_row_widget)
@@ -502,28 +469,22 @@ class ShortcutRow:
     def shortcut_widget(
         self, shortcut_row_widget, shortcut_row_layout, parsed_shortcut, parent_window
     ):
-        "Shortcut widget"
+        """Shortcut widget."""
         shortcut_continer = QWidget(shortcut_row_widget)
         shortcut_layout = QGridLayout(shortcut_continer)
         # shortcut_layout.setContentsMargins(0, 0, 0, 0)
         # shortcut_layout.setSpacing(2)
 
         shortcut_key_select = QPushButton("Select", shortcut_row_widget)
-        shortcut_key_select.setToolTip(
-            "Press any key or shortcut to capture it automatically"
-        )
+        shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         shortcut_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(
-                self.shortcut_entry, shortcut_key_select
-            )
+            lambda: self.key_listening_comp.key_listening(self.shortcut_entry, shortcut_key_select)
         )
         shortcut_layout.addWidget(shortcut_key_select, 0, 0, 1, 2)
 
         self.shortcut_entry = QLineEdit(shortcut_continer)
         self.shortcut_entry.setToolTip(
-            "Shortcut can be "
-            "a single key, multiple keys, or shortcut specials "
-            "(See select key)"
+            "Shortcut can be a single key, multiple keys, or shortcut specials (See select key)"
         )
         self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if parsed_shortcut:
@@ -536,9 +497,7 @@ class ShortcutRow:
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: SelectKeyUI().select_key(
-                parent_window, self.shortcut_entry, context="shortcut"
-            )
+            lambda: SelectKeyUI().select_key(parent_window, self.shortcut_entry, context="shortcut")
         )
         shortcut_layout.addWidget(shortcut_choose, 1, 1)
 
@@ -546,7 +505,7 @@ class ShortcutRow:
 
 
 class KeyListening(QObject):
-    "Listen to key press"
+    """Listen to key press."""
 
     request_timer_start = Signal()
 
@@ -567,7 +526,7 @@ class KeyListening(QObject):
         self.edit_frame = edit_frame
 
     def eventFilter(self, _, event):  # pylint: disable=C0103
-        "Filter event by key press and window"
+        """Filter event by key press and window."""
         if event.type() in (
             QEvent.MouseButtonPress,
             QEvent.MouseButtonRelease,
@@ -577,24 +536,22 @@ class KeyListening(QObject):
             QEvent.FocusOut,
         ):
             return True
-        if event.type() in (
+        return event.type() in (
             QEvent.Close,
             QEvent.WindowDeactivate,
             QEvent.Hide,
             QEvent.Leave,
-        ):
-            return True
-        return False
+        )
 
     def toggle_other_buttons(self, target_button, other_button_enabled: bool):
-        "Change the state of non selected button"
+        """Change the state of non selected button."""
         button_list = self.edit_frame.findChildren(QPushButton)
         for button in button_list:
             if button != target_button:
                 button.setEnabled(other_button_enabled)
 
     def toggle_other_entry(self, target_entry, other_entry_enabled: bool):
-        "Install or remove event filter to enable/disable entry"
+        """Install or remove event filter to enable/disable entry."""
         entry_list = self.edit_frame.findChildren(QLineEdit)
         for entry in entry_list:
             if entry != target_entry:
@@ -604,7 +561,7 @@ class KeyListening(QObject):
                     entry.installEventFilter(self)
 
     def key_listening(self, target_entry, target_button):
-        "Get and Listen to key press"
+        """Get and Listen to key press."""
         # Initialize mouse listening thread once
         if not self.mouse_listening_initialized:
             mouse_listener = pynput.mouse.Listener(on_click=self.mouse_listening)
@@ -629,9 +586,7 @@ class KeyListening(QObject):
                 lambda: self.remap_row_core.finalize_combination(target_entry)
             )
 
-            keyboard.hook(
-                lambda event: self.multi_key_event(event, target_entry, target_button)
-            )
+            keyboard.hook(lambda event: self.multi_key_event(event, target_entry, target_button))
 
         else:
             self.is_listening = False
@@ -645,7 +600,7 @@ class KeyListening(QObject):
             self.toggle_other_buttons(target_button, other_button_enabled=True)
 
     def multi_key_event(self, event, entry_widget, button):
-        "Action when multiple key is pressed, set timer before saving the key"
+        """Action when multiple key is pressed, set timer before saving the key."""
         if not self.is_listening or self.remap_row_core.active_entry != entry_widget:
             return
 
@@ -666,10 +621,7 @@ class KeyListening(QObject):
             if key not in self.remap_row_core.pressed_keys:
                 self.remap_row_core.pressed_keys.append(key)
                 self.remap_row_core.update_widget(entry_widget)
-            if (
-                hasattr(self, "release_timer")
-                and self.remap_row_core.set_timer.isActive()
-            ):
+            if hasattr(self, "release_timer") and self.remap_row_core.set_timer.isActive():
                 self.remap_row_core.set_timer.stop()
 
         elif event.event_type == "up":
@@ -679,12 +631,11 @@ class KeyListening(QObject):
                     self.key_listening(entry_widget, button)
                     self.request_timer_start.emit()
 
-                else:
-                    if hasattr(self, "release_timer"):
-                        self.request_timer_start.emit()
+                elif hasattr(self, "release_timer"):
+                    self.request_timer_start.emit()
 
     def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
-        "Get and listen to mouse key press. Pynput on_click"
+        """Get and listen to mouse key press. Pynput on_click."""
         if not (self.is_listening and self.remap_row_core.active_entry):
             return
 
@@ -699,18 +650,14 @@ class KeyListening(QObject):
             if mouse_button not in self.remap_row_core.pressed_keys:
                 self.remap_row_core.pressed_keys.append(mouse_button)
                 self.remap_row_core.update_widget(self.remap_row_core.active_entry)
-        else:
-            if mouse_button in self.remap_row_core.pressed_keys:
-                self.remap_row_core.pressed_keys.remove(mouse_button)
-                if not self.remap_row_core.pressed_keys:
-                    self.key_listening(self.remap_row_core.active_entry, None)
-                    self.request_timer_start.emit()
+        elif mouse_button in self.remap_row_core.pressed_keys:
+            self.remap_row_core.pressed_keys.remove(mouse_button)
+            if not self.remap_row_core.pressed_keys:
+                self.key_listening(self.remap_row_core.active_entry, None)
+                self.request_timer_start.emit()
 
     def check_mouse_event(self):
-        "Check if cursor is over any widget in key_rows"
+        """Check if cursor is over any widget in key_rows."""
         local_pos = self.edit_frame.mapFromGlobal(QCursor.pos())
         widget = self.edit_frame.childAt(local_pos)
-        if isinstance(widget, (QPushButton, QLineEdit, QCheckBox)):
-            return True
-
-        return False
+        return isinstance(widget, (QPushButton, QLineEdit, QCheckBox))

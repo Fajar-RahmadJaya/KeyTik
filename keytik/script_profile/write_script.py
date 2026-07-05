@@ -12,25 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Write AutoHotkey script"
+"""Write AutoHotkey script."""
 
-from dataclasses import dataclass
 import os
 import random
 import re
-from PySide6.QtWidgets import QLineEdit, QCheckBox, QMessageBox  # pylint: disable=E0611
-from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from dataclasses import dataclass
 
-from keytik.utility import constant
-from keytik.utility import utils
-from keytik.select_key.select_key_core import SelectKeyCore
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtWidgets import QCheckBox, QLineEdit, QMessageBox  # pylint: disable=E0611
+
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.script_profile.remap_row_core import RemapRowCore
+from keytik.select_key.select_key_core import SelectKeyCore
+from keytik.utility import constant, utils
 
 
 @dataclass
 class RemapWidget:
-    "Dataclass containing key rows tuple"
+    """Dataclass containing key rows tuple."""
 
     default_key_entry: QLineEdit = None
     remap_key_entry: QLineEdit = None
@@ -42,7 +42,7 @@ class RemapWidget:
 
 @dataclass
 class ConditionString:
-    "Dataclass containing processed condition string"
+    """Dataclass containing processed condition string."""
 
     shortcut_string: str = None
     device_string: str = None
@@ -50,7 +50,7 @@ class ConditionString:
 
 
 class WriteScript:
-    "Write script based on profile input"
+    """Write script based on profile input."""
 
     def __init__(self, remap_row_comp=None, shortcut_row_comp=None):
         self.remap_row_comp = remap_row_comp
@@ -61,7 +61,7 @@ class WriteScript:
         self.remap_row_core = RemapRowCore()
 
     def check_shortcut_integrity(self):
-        "Make sure there is no conflict on profile input"
+        """Make sure there is no conflict on profile input."""
         shortcut_types = {"normal": [], "caps": []}
         caps_on_present = False
         caps_off_present = False
@@ -124,7 +124,7 @@ class WriteScript:
         return True
 
     def handle_text_mode(self, file, condition_string: ConditionString):
-        "Write text mode"
+        """Write text mode."""
         # Make sure shortcut valid
         if not self.check_shortcut_integrity():
             return
@@ -149,7 +149,7 @@ class WriteScript:
             file.write("#HotIf\n")
 
     def write_condition(self, top_widget):
-        "Write Hotif condition for shortcuts, device, program in one hotif line"
+        """Write Hotif condition for shortcuts, device, program in one hotif line."""
         hotif_conditions = []
 
         # Shortcuts condition
@@ -175,7 +175,7 @@ class WriteScript:
         return None
 
     def shortcuts_condition(self, hotif_conditions):
-        "Shortcuts condition"
+        """Shortcuts condition."""
         shortcuts = [
             shortcut_row[0].text().strip()
             for shortcut_row in self.shortcut_row_comp.shortcut_rows
@@ -212,15 +212,15 @@ class WriteScript:
         return ""
 
     def get_program_condition(self, hotif_conditions, program_entry):
-        "Get program binding value from entry"
+        """Get program binding value from entry."""
         program_entry = program_entry.text().strip()
 
         if program_entry:
             pattern = r"\[(Tittle|Class|Process),\s*([^\]]+)\]"
             matches = re.findall(pattern, program_entry)
             conditions = []
-            for typ, value in matches:
-                value = value.strip()
+            for typ, val in matches:
+                value = val.strip()
                 if typ.lower() == "process":
                     conditions.append(f'WinActive("ahk_exe {value}")')
                 elif typ.lower() == "class":
@@ -230,7 +230,7 @@ class WriteScript:
             hotif_conditions.append(" || ".join(conditions))
 
     def device_condition(self, hotif_conditions, keyboard_entry):
-        "Device condition"
+        """Device condition."""
         device = keyboard_entry.text().strip()
         if device:
             parts = device.split(",", 1)
@@ -254,7 +254,7 @@ cm1 := AHI.CreateContextManager(id1)\n
         return ""
 
     def initialize_exit_keys(self):
-        "Make sure there is no duplicate exit key usage on each script"
+        """Make sure there is no duplicate exit key usage on each script."""
         try:
             # Resolve and get exit keys from file
             exit_keys = self.resolve_exit_files_conflict()
@@ -271,7 +271,7 @@ cm1 := AHI.CreateContextManager(id1)\n
             print(f"Error in initialize_exit_keys: {e}")
 
     def validate_exit_keys(self, exit_keys):
-        "Make sure each script have different exit keys"
+        """Make sure each script have different exit keys."""
         # Collect all ahk script from active and store dit
         ahk_files = set()
         for ahk_path in [utils.active_dir, utils.store_dir]:
@@ -294,26 +294,31 @@ cm1 := AHI.CreateContextManager(id1)\n
                 if not available_keys:
                     available_keys = possible_keys
                 exit_keys[script_name] = f"^!{random.choice(available_keys)}"
-            exit_combo = exit_keys[script_name]
 
-            # Make sure ahk script using the correct exit keys
-            for dir_path in [utils.active_dir, utils.store_dir]:
-                script_path = os.path.join(dir_path, script_name)
-                if os.path.exists(script_path):
-                    try:
-                        with open(script_path, "r", encoding="utf-8") as f:
-                            lines = f.readlines()
-                        if len(lines) < 2:
-                            lines += ["\n"] * (2 - len(lines))
-                        lines[1] = f"{exit_combo}::ExitApp\n"
-                        with open(script_path, "w", encoding="utf-8") as f:
-                            f.writelines(lines)
-                    except FileNotFoundError as e:
-                        print(f"Error processing {script_name} in {dir_path}: {e}")
-                        continue
+                # Make sure ahk script using the correct exit keys
+                self.is_valid_exit_key(script_name, exit_keys)
+
+    def is_valid_exit_key(self, script_name, exit_keys):
+        """Check whether exit key is valid."""
+        exit_combo = exit_keys[script_name]
+        for dir_path in [utils.active_dir, utils.store_dir]:
+            script_path = os.path.join(dir_path, script_name)
+            if os.path.exists(script_path):
+                try:
+                    with open(script_path, encoding="utf-8") as f:
+                        lines = f.readlines()
+                    max_length = 2
+                    if len(lines) < max_length:
+                        lines += ["\n"] * (2 - len(lines))
+                    lines[1] = f"{exit_combo}::ExitApp\n"
+                    with open(script_path, "w", encoding="utf-8") as f:
+                        f.writelines(lines)
+                except FileNotFoundError as e:
+                    print(f"Error processing {script_name} in {dir_path}: {e}")
+                    continue
 
     def resolve_exit_files_conflict(self):
-        "Resolve and get exit keys from file"
+        """Resolve and get exit keys from file."""
         # Load the exit keys from save file
         exit_keys = {}
         exit_keys = utils.get_config().exit_key
@@ -346,7 +351,7 @@ cm1 := AHI.CreateContextManager(id1)\n
         return exit_keys
 
     def is_widget_valid(self, widget_tuple):
-        "Check whether the row is valid"
+        """Check whether the row is valid."""
         try:
             entry_widget, button_widget = widget_tuple
             return entry_widget is not None and button_widget is not None
@@ -354,7 +359,7 @@ cm1 := AHI.CreateContextManager(id1)\n
             return False
 
     def translate_key(self, key):
-        "Translate raw key into readable key"
+        """Translate raw key into readable key."""
         keys = key.split("+")
         translated_keys = []
 
@@ -367,17 +372,14 @@ cm1 := AHI.CreateContextManager(id1)\n
         return " & ".join(translated_keys)
 
     def is_unicode_key(self, key):
-        "Determine whether it's unicode or hard coded key"
+        """Determine whether it's unicode or hard coded key."""
         select_key_core = SelectKeyCore()  # Composition
         key_data = select_key_core.load_keylist()
-        for child_item in key_data.values():
-            if key in child_item:
-                return False
-        return True
+        return all(key not in child_item for child_item in key_data.values())
 
 
 class WriteDefault:
-    "Default mode writing"
+    """Default mode writing."""
 
     def __init__(self, write_script: WriteScript):
         # Parameter
@@ -387,7 +389,7 @@ class WriteDefault:
         self.remap_widget = RemapWidget()
 
     def handle_default_mode(self, file, condition_string: ConditionString):
-        "Write default mode"
+        """Write default mode."""
         # Make sure shortcut valid
         if not self.write_script.check_shortcut_integrity():
             return
@@ -410,7 +412,7 @@ class WriteDefault:
             file.write("#HotIf\n")
 
     def process_key_remaps(self, file):
-        "Handle key remap write"
+        """Handle key remap write."""
         for key_widget in self.write_script.remap_row_comp.key_rows:
             self.remap_widget = RemapWidget(
                 default_key_entry=key_widget.default_key.default_key_entry,
@@ -432,7 +434,8 @@ class WriteDefault:
 
                 if has_multiple_keys:
                     keys = [k.strip() for k in default_key.split("+")]
-                    if len(keys) == 2 and keys[0] == keys[1]:
+                    double_click_length = 2
+                    if len(keys) == double_click_length and keys[0] == keys[1]:
                         self.write_double_click(file, keys[0], remap_key)
                         continue
                     default_translated = self.write_multiple_key_default(default_key)
@@ -446,7 +449,7 @@ class WriteDefault:
                 continue
 
     def handle_remap_type(self, file, default_translated, remap_key):
-        "Handle text, hold, single, multiple key mode"
+        """Handle text, hold, single, multiple key mode."""
         if self.remap_widget.text_format_checkbox.isChecked():
             self.write_text_format(file, default_translated, remap_key)
         elif self.remap_widget.hold_format_checkbox.isChecked():
@@ -457,11 +460,11 @@ class WriteDefault:
             self.write_single_key_remap(file, default_translated, remap_key)
 
     def write_text_format(self, file, default_translated, remap_key):
-        "write text format (Send literal string)"
+        """Write text format (Send literal string)."""
         file.write(f'{default_translated}::SendText("{remap_key}")\n')
 
     def write_hold_format(self, file, default_translated, remap_key):
-        "Write hold format"
+        """Write hold format."""
         hold_interval_ms = "10000"
         if (
             self.remap_widget.hold_format_checkbox.isChecked()
@@ -470,8 +473,7 @@ class WriteDefault:
             hold_interval = "10"
             if (
                 self.remap_widget.hold_interval_entry.text().strip()
-                and self.remap_widget.hold_interval_entry.text().strip()
-                != "Hold Interval"
+                and self.remap_widget.hold_interval_entry.text().strip() != "Hold Interval"
             ):
                 hold_interval = self.remap_widget.hold_interval_entry.text().strip()
             hold_interval_ms = str(int(float(hold_interval) * 1000))
@@ -481,9 +483,7 @@ class WriteDefault:
         up_parts = []
 
         for key in keys:
-            if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(
-                key
-            ):
+            if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(key):
                 down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
                 up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
             else:
@@ -496,29 +496,23 @@ class WriteDefault:
 
         if "&" in default_translated:
             file.write(
-                (
-                    f'{default_translated}::(SendInput("{down_sequence}"), '
-                    f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
-                )
+                f'{default_translated}::(SendInput("{down_sequence}"), '
+                f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
             )
         else:
             file.write(
-                (
-                    f'*{default_translated}::(SendInput("{down_sequence}"), '
-                    f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
-                )
+                f'*{default_translated}::(SendInput("{down_sequence}"), '
+                f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
             )
 
     def write_multiple_key_remap(self, file, default_translated, remap_key):
-        "Write multiple key case on remap key"
+        """Write multiple key case on remap key."""
         keys = [key.strip() for key in remap_key.split("+")]
         send_parts_down = []
         send_parts_up = []
 
         for key in keys:
-            if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(
-                key
-            ):
+            if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(key):
                 send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
                 send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
             else:
@@ -530,7 +524,7 @@ class WriteDefault:
         file.write(f'{default_translated}::SendInput("{send_sequence}")\n')
 
     def write_single_key_remap(self, file, default_translated, remap_key):
-        "Write single key case on remap key"
+        """Write single key case on remap key."""
         if self.write_script.is_unicode_key(remap_key):
             file.write(f"{default_translated}::SendInput Chr({ord(remap_key)})\n")
         else:
@@ -538,53 +532,44 @@ class WriteDefault:
             file.write(f"{default_translated}::{remap_key_tr}\n")
 
     def write_double_click(self, file, single_key, remap_key):
-        "Write double click (same key twice) on default key"
+        """Write double click (same key twice) on default key."""
         translated_key = self.write_script.translate_key(single_key)
 
         file.write(f"*{translated_key}::{{\n")
         file.write(
-            (
-                f'    if (A_PriorHotkey = "*{translated_key}") '
-                "and (A_TimeSincePriorHotkey < 400)\n"
-            )
+            f'    if (A_PriorHotkey = "*{translated_key}") and (A_TimeSincePriorHotkey < 400)\n'
         )
 
         if self.remap_widget.text_format_checkbox.isChecked():
             file.write(f'        SendText("{remap_key}")\n')
         elif self.remap_widget.hold_format_checkbox.isChecked():
             self.hold_format_double_click(remap_key, file)
-        else:
-            if "+" in remap_key:
-                keys = [key.strip() for key in remap_key.split("+")]
-                send_parts_down = []
-                send_parts_up = []
+        elif "+" in remap_key:
+            keys = [key.strip() for key in remap_key.split("+")]
+            send_parts_down = []
+            send_parts_up = []
 
-                for key in keys:
-                    if hasattr(
-                        self, "is_unicode_key"
-                    ) and self.write_script.is_unicode_key(key):
-                        send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
-                        send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
-                    else:
-                        tr_key = self.write_script.translate_key(key)
-                        send_parts_down.append(f"{{{tr_key} down}}")
-                        send_parts_up.insert(0, f"{{{tr_key} up}}")
-
-                send_sequence = "".join(send_parts_down + send_parts_up)
-                file.write(f'        SendInput("{send_sequence}")\n')
-            else:
-                if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(
-                    remap_key
-                ):
-                    file.write(f"        Send Chr({ord(remap_key)})\n")
+            for key in keys:
+                if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(key):
+                    send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
+                    send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
                 else:
-                    remap_key_tr = self.write_script.translate_key(remap_key)
-                    file.write(f'        SendInput("{remap_key_tr}")\n')
+                    tr_key = self.write_script.translate_key(key)
+                    send_parts_down.append(f"{{{tr_key} down}}")
+                    send_parts_up.insert(0, f"{{{tr_key} up}}")
+
+            send_sequence = "".join(send_parts_down + send_parts_up)
+            file.write(f'        SendInput("{send_sequence}")\n')
+        elif hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(remap_key):
+            file.write(f"        Send Chr({ord(remap_key)})\n")
+        else:
+            remap_key_tr = self.write_script.translate_key(remap_key)
+            file.write(f'        SendInput("{remap_key_tr}")\n')
 
         file.write("    }\n")
 
     def hold_format_double_click(self, remap_key, file):
-        "Write double click on hold format"
+        """Write double click on hold format."""
         hold_interval_ms = "10000"
         if (
             self.remap_widget.hold_format_checkbox.isChecked()
@@ -593,8 +578,7 @@ class WriteDefault:
             hold_interval = "10"
             if (
                 self.remap_widget.hold_interval_entry.text().strip()
-                and self.remap_widget.hold_interval_entry.text().strip()
-                != "Hold Interval"
+                and self.remap_widget.hold_interval_entry.text().strip() != "Hold Interval"
             ):
                 hold_interval = self.remap_widget.hold_interval_entry.text().strip()
             hold_interval_ms = str(int(float(hold_interval) * 1000))
@@ -604,9 +588,7 @@ class WriteDefault:
         up_parts = []
 
         for key in keys:
-            if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(
-                key
-            ):
+            if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(key):
                 down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
                 up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
             else:
@@ -618,14 +600,12 @@ class WriteDefault:
         up_sequence = "".join(up_parts)
 
         file.write(
-            (
-                f'        (SendInput("{down_sequence}"), '
-                f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
-            )
+            f'        (SendInput("{down_sequence}"), '
+            f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
         )
 
     def write_multiple_key_default(self, default_key):
-        "Write multiple key case on default key"
+        """Write multiple key case on default key."""
         if (
             self.remap_widget.first_key_checkbox is not None
             and self.remap_widget.first_key_checkbox.isChecked()
@@ -636,6 +616,6 @@ class WriteDefault:
         return translated_key
 
     def write_single_key_default(self, default_key):
-        "Write single key case on default key"
+        """Write single key case on default key."""
         translated_key = self.write_script.translate_key(default_key)
         return translated_key

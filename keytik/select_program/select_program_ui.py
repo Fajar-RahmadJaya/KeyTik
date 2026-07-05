@@ -12,27 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"UI for program selection"
+"""UI for program selection."""
 
+from PySide6.QtCore import Qt, QTimer  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog,
+    QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
     QTreeWidget,
     QVBoxLayout,
-    QHBoxLayout,
 )
-from PySide6.QtCore import Qt, QTimer  # pylint: disable=E0611
-from PySide6.QtGui import QIcon  # pylint: disable=E0611
 
-from keytik.utility import constant
-from keytik.utility import style
 from keytik.select_program.select_program_core import SelectProgramCore
+from keytik.utility import constant, style
 
 
 class SelectProgramUI:
-    "Select program UI"
+    """Select program UI."""
 
     def __init__(self):
         # UI
@@ -41,7 +40,7 @@ class SelectProgramUI:
         self.fit_sorted_column = None
 
     def program_window(self, entry_widget, parent):
-        "Select program window"
+        """Select program window."""
         select_program_window = None
 
         select_program_window = QDialog(parent)
@@ -68,9 +67,7 @@ class SelectProgramUI:
         def fit_sorted_column():
             sort_col = header.sortIndicatorSection()
             total_width = self.program_tree.viewport().width()
-            other_cols = [
-                i for i in range(self.program_tree.columnCount()) if i != sort_col
-            ]
+            other_cols = [i for i in range(self.program_tree.columnCount()) if i != sort_col]
             for col in other_cols:
                 self.program_tree.setColumnWidth(col, 120)
             expanded_width = total_width - 120 * len(other_cols)
@@ -92,7 +89,7 @@ class SelectProgramUI:
         select_program_window.exec()
 
     def program_window_button(self, main_layout, entry_widget, select_program_window):
-        "Button on program window"
+        """Button on program window."""
         button_layout = QHBoxLayout()
         main_layout.addLayout(button_layout)
 
@@ -126,30 +123,27 @@ class SelectProgramUI:
         search_layout.addWidget(self.show_all_button)
 
     def update_program_treeview(self, show_all_processes=None):
-        "Populate process into treeview"
+        """Populate process into treeview."""
         select_program_core = SelectProgramCore()  # Composition
 
         if show_all_processes is None:
             show_all_processes = (self.show_all_button.text()) == "Show All Processes"
         self.program_tree.clear()
 
-        processes = select_program_core.get_running_processes(
-            app_only=not show_all_processes
-        )
+        processes = select_program_core.get_running_processes(app_only=not show_all_processes)
         for proc in processes:
             window_title, class_name, proc_name = proc[:3]
-            p_type = proc[3] if len(proc) > 3 else "Application"
+            system_process_length = 3
+            p_type = proc[3] if len(proc) > system_process_length else "Application"
             if show_all_processes or p_type == "Application":
-                item = select_program_core.multi_check(
-                    [window_title, class_name, proc_name]
-                )
+                item = select_program_core.multi_check([window_title, class_name, proc_name])
                 self.program_tree.addTopLevelItem(item)
 
         if hasattr(self, "fit_sorted_column"):
             self.fit_sorted_column()
 
     def toggle_show_all_processes(self):
-        "Update button and pupulate tree view on 'show all process' button click"
+        """Update button and pupulate tree view on 'show all process' button click."""
         current_text = self.show_all_button.text()
         if current_text == "Show All Processes":
             self.show_all_button.setText("Show App Only")
@@ -159,13 +153,13 @@ class SelectProgramUI:
             self.update_program_treeview(show_all_processes=False)
 
     def search_programs(self, query):
-        "Search process on searchbox"
+        """Search process on searchbox."""
         for index in range(self.program_tree.topLevelItemCount()):
             item = self.program_tree.topLevelItem(index)
             item.setHidden(query.lower() not in item.text(0).lower())
 
     def save_selected_programs(self, entry_widget, select_program_window):
-        "Append selected process onto"
+        """Append selected process onto."""
         name_checked = []
         class_checked = []
         process_checked = []

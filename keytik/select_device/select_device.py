@@ -12,34 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Logic for device selection"
+"""Logic for device selection."""
 
-import os
 import ctypes
+import os
 import time
-from PySide6.QtWidgets import (  # pylint: disable=E0611
-    QDialog,
-    QPushButton,
-    QTreeWidgetItem,
-    QVBoxLayout,
-    QHBoxLayout,
-    QTreeWidget,
-    QMessageBox,
-)
+
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QDialog,
+    QHBoxLayout,
+    QMessageBox,
+    QPushButton,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+)
 
-from keytik.utility import utils
-from keytik.utility import constant
-from keytik.utility import style
+from keytik.utility import constant, style, utils
 
 
 class SelectDevice:
-    "Device selection logic for device binding"
+    """Device selection logic for device binding."""
 
     # ------------------------------ UI ------------------------------
     def open_device_selection(self, parent, keyboard_entry):
-        "Device selection window"
+        """Device selection window."""
         # Make sure interception driver installed
         if not self.check_interception_driver():
             return
@@ -74,15 +73,11 @@ class SelectDevice:
 
         select_button = QPushButton("Select", device_selection_window)
         select_button.clicked.connect(
-            lambda: self.select_device(
-                device_tree, keyboard_entry, device_selection_window
-            )
+            lambda: self.select_device(device_tree, keyboard_entry, device_selection_window)
         )
         button_layout.addWidget(select_button)
 
-        monitor_button = QPushButton(
-            "Open AHI Monitor To Test Device", device_selection_window
-        )
+        monitor_button = QPushButton("Open AHI Monitor To Test Device", device_selection_window)
         monitor_button.clicked.connect(self.run_monitor)
         button_layout.addWidget(monitor_button)
 
@@ -102,7 +97,7 @@ class SelectDevice:
     # ------------------------------ Core ------------------------------
 
     def select_device(self, tree, entry, window):
-        "Pressing device row will select device"
+        """Pressing device row will select device."""
         selected_items = tree.selectedItems()
         if selected_items:
             device = [selected_items[0].text(i) for i in range(tree.columnCount())]
@@ -114,7 +109,7 @@ class SelectDevice:
             window.accept()
 
     def update_treeview(self, devices, tree):
-        "Populate tree view with detected device"
+        """Populate tree view with detected device."""
         tree.clear()
 
         for device in devices:
@@ -126,32 +121,32 @@ class SelectDevice:
                 tree.addTopLevelItem(item)
 
     def refresh_device_list(self, file_path):
-        "Rerun find_device.ahk to refresh device"
+        """Rerun find_device.ahk to refresh device."""
         os.startfile(utils.device_finder_path)
         time.sleep(1)
         devices = self.parse_device_info(file_path)
         return devices
 
     def parse_device_info(self, file_path):
-        "Parse device VID/PID or handle for device binding"
+        """Parse device VID/PID or handle for device binding."""
         devices = []
         try:
-            with open(file_path, "r", encoding="utf-8") as file:
+            with open(file_path, encoding="utf-8") as file:
                 lines = file.readlines()
 
             lines = [line.strip() for line in lines if line.strip()]
 
             device_info = {}
-            for line in lines:
-                line = line.strip()
+            for string in lines:
+                line = string.strip()
                 if line.startswith("Device ID"):
-                    if device_info:
-                        if (
-                            device_info.get("VID")
-                            and device_info.get("PID")
-                            and device_info.get("Handle")
-                        ):
-                            devices.append(device_info)
+                    if (
+                        device_info
+                        and device_info.get("VID")
+                        and device_info.get("PID")
+                        and device_info.get("Handle")
+                    ):
+                        devices.append(device_info)
                     device_info = {"Device ID": line.split(":")[1].strip()}
                 elif line.startswith("VID:"):
                     device_info["VID"] = line.split(":")[1].strip()
@@ -162,11 +157,7 @@ class SelectDevice:
                 elif line.startswith("Is Mouse:"):
                     device_info["Is Mouse"] = line.split(":")[1].strip()
 
-            if (
-                device_info.get("VID")
-                and device_info.get("PID")
-                and device_info.get("Handle")
-            ):
+            if device_info.get("VID") and device_info.get("PID") and device_info.get("Handle"):
                 devices.append(device_info)
 
         except (ValueError, FileNotFoundError) as e:
@@ -175,7 +166,7 @@ class SelectDevice:
         return devices
 
     def check_interception_driver(self):
-        "Check whether interception driver is installed"
+        """Check whether interception driver is installed."""
         if os.path.exists(constant.DRIVER_PATH):
             return True
 
@@ -212,13 +203,11 @@ class SelectDevice:
                         "Installation script not found. Please check your installation.",
                     )
             except FileNotFoundError as e:
-                QMessageBox.critical(
-                    None, "Error", f"An error occurred during installation: {str(e)}"
-                )
+                QMessageBox.critical(None, "Error", f"An error occurred during installation: {e!s}")
         return False
 
     def run_monitor(self):
-        "Run AutoHotkey Interception built in device monitor"
+        """Run AutoHotkey Interception built in device monitor."""
         script_path = os.path.join(
             constant.data_dir,
             "Active",

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Logic for create/edit profile"
+"""Logic for create/edit profile."""
 
 import json
 
@@ -20,7 +20,7 @@ from keytik.utility import constant
 
 
 class RemapRowCore:
-    "Create/edit profile logic"
+    """Create/edit profile logic."""
 
     def __init__(self):
         self.pressed_keys = []
@@ -31,18 +31,18 @@ class RemapRowCore:
         self.set_timer = None
 
     def update_entry(self):
-        "Add + on multi key press"
+        """Add + on multi key press."""
         shortcut_combination = "+".join(self.pressed_keys)
         if hasattr(self, "active_entry") and self.active_entry is not None:
             self.active_entry.setText(shortcut_combination)
 
     def release_timer(self):
-        "Start the timer"
+        """Start the timer."""
         if hasattr(self, "release_timer"):
             self.set_timer.start(400)
 
     def format_key_combo(self, keys):
-        "Format for multiple key press"
+        """Format for multiple key press."""
 
         def format_key(k):
             if len(k) == 1 and k.islower():
@@ -56,18 +56,18 @@ class RemapRowCore:
         return " + ".join(format_key(k) for k in keys)
 
     def update_widget(self, entry_widget):
-        "Insert saved key into entry"
+        """Insert saved key into entry."""
         combo = self.format_key_combo(self.pressed_keys)
         entry_widget.setText(combo)
         self.last_combination = combo
 
     def finalize_combination(self, entry_widget):
-        "Save the combination"
+        """Save the combination."""
         entry_widget.setText(self.last_combination)
         self.pressed_keys = []
 
     def load_key_list(self):
-        "Load translation from raw key to readable key"
+        """Load translation from raw key to readable key."""
         key_map = {}
         readable_to_raw = self.read_keylist()
         for readable, raw in readable_to_raw.items():
@@ -80,10 +80,10 @@ class RemapRowCore:
         return key_map
 
     def read_keylist(self):
-        "Open and read key list"
+        """Open and read key list."""
         key_map = {}
         try:
-            with open(constant.keylist_path, "r", encoding="utf-8") as file:
+            with open(constant.keylist_path, encoding="utf-8") as file:
                 data = json.load(file)
                 for category_dict in data:
                     for _, keys in category_dict.items():

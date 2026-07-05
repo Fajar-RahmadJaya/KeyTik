@@ -12,29 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"Setting non UI code"
+"""Setting non UI code."""
 
+import ctypes
 import os
 import shutil
-import webbrowser
 import subprocess
-import ctypes
-import requests
-from PySide6.QtWidgets import QMessageBox, QFileDialog, QApplication  # pylint: disable=E0611
-from PySide6.QtGui import QPalette  # pylint: disable=E0611
+import webbrowser
 
-from keytik.utility import constant
-from keytik.utility import utils
-from keytik.utility import style
-from keytik.utility import diff
+import requests
+from PySide6.QtGui import QPalette  # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QApplication,
+    QFileDialog,
+    QMessageBox,
+)
+
 from keytik.dashboard.dashboard_core import DashboardCore
+from keytik.utility import constant, diff, style, utils
 
 
 class SettingCore:
-    "Setting logic"
+    """Setting logic."""
 
     def change_data_location(self, parent):
-        "Change active and stored profile directory for 'change profile location'"
+        """Change active and stored profile directory for 'change profile location'."""
         new_path = QFileDialog.getExistingDirectory(
             parent, "Select a New Path for Active and Store Folders"
         )
@@ -96,7 +98,7 @@ class SettingCore:
             QMessageBox.critical(None, "Error", f"An error occurred: {e}")
 
     def save_theme(self, theme: dict, parent):
-        "Write theme preference to config file"
+        """Write theme preference to config file."""
         try:
             config = utils.get_config()
 
@@ -107,9 +109,7 @@ class SettingCore:
             # Apply palette directly when theme is in the same default color
             palette = style.get_palette()
             base_light = style.is_light(palette.color(QPalette.Base))
-            default_theme_light = (
-                os.environ.get("QT_QPA_PLATFORM") == "windows:darkmode=1"
-            )
+            default_theme_light = os.environ.get("QT_QPA_PLATFORM") == "windows:darkmode=1"
 
             # Palette with different default theme need restart
             if base_light != default_theme_light or theme.get("value") in (
@@ -133,7 +133,7 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
             QMessageBox.critical(parent, "Error", f"Failed to change theme\n{error}")
 
     def save_accent(self, accent: list, parent):
-        "Write accent preference to config file"
+        """Write accent preference to config file."""
         try:
             config = utils.get_config()
             config.accent = accent[1]
@@ -149,7 +149,7 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
             QMessageBox.critical(parent, "Error", f"Failed to change Accent\n{error}")
 
     def save_style(self, updated_style):
-        "Write style preference to config file"
+        """Write style preference to config file."""
         try:
             config = utils.get_config()
             config.style = "" if updated_style == "Default" else updated_style
@@ -162,7 +162,7 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
             print(f"Error: {error}")
 
     def save_mica_effect(self, new_mica, parent):
-        "Write style preference to config file"
+        """Write style preference to config file."""
         try:
             config = utils.get_config()
             prev_mica = config.mica_effect
@@ -189,7 +189,7 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
             QMessageBox.critical(parent, "Error", f"Failed to change style\n{error}")
 
     def ahk_action(self, ahk_installed):
-        "Uninstall AutoHotkey"
+        """Uninstall AutoHotkey."""
         if ahk_installed:
             try:
                 with subprocess.Popen(utils.ahk_uninstall_path, shell=True) as proc:
@@ -205,7 +205,7 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
             webbrowser.open("https://www.autohotkey.com")
 
     def driver_action(self, driver_installed):
-        "Uninstall interception driver"
+        """Uninstall interception driver."""
         try:
             if driver_installed:
                 ctypes.windll.shell32.ShellExecuteW(
@@ -221,17 +221,18 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
             )
 
     def check_for_update(self):
-        "Check for update comparing current version and latest version from GitHub API"
+        """Check for update comparing current version and latest version."""
         try:
+            success_code = 200
             response = requests.get(diff.CHECK_UPDATE_LINK, timeout=5)
-            if response.status_code == 200:
+            if response.status_code == success_code:
                 return diff.parse_update_response(response)
         except requests.exceptions.ConnectionError:
             pass
         return None
 
     def get_custom_theme(self) -> list[str]:
-        "Return list containing custom theme"
+        """Return list containing custom theme."""
         theme_file = []
 
         for file in os.listdir(constant.theme_dir):

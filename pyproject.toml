@@ -53,7 +53,7 @@ include = [
 ]
 
 # ----------------------------- Tools -----------------------------
-# Ruff
+# --- Ruff ---
 [tool.ruff.lint]
 select = [
     "PL", # pylint
@@ -67,7 +67,24 @@ select = [
     "I", # isort
 ]
 
-# Changelog generator
+ignore = [
+    "D401", # non-imperative-mood
+    "D107", # undocumented-public-init
+    "D203", # incorrect-blank-line-before-class (Compatibility with D211)
+    "D213", # multi-line-summary-second-line (Compatibility with D212)
+]
+
+extend-safe-fixes = [
+    "D400", # missing-trailing-period
+]
+
+[tool.ruff]
+line-length = 100 # Match pylint default
+
+[tool.pylint.format]
+max-line-length = 100 # Match pylint default
+
+# --- Changelog generator ---
 [tool.git-cliff.changelog]
 body = """
 {% if version %}\

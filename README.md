@@ -130,16 +130,6 @@ KeyTik Pro version is available at Gumroad at ~~$20~~ **$15 (Big Update Discount
 <div align="center"><a href="https://fajarrahmadjaya.gumroad.com/l/keytik-pro/big-update"><img src=".github\Preview\GumroadButton.png" alt="Gumroad Button" width="240" /></a></div>
 <br>
 
-<div align="center">
-
-## Platform
-
-</div>
-
-KeyTik is available at the following platforms:
-- [KeyTik Website](https://keytik.com)
-- [Source Forge](https://sourceforge.net/projects/keytik/)
-
 <br>
 
 <div align="center">

@@ -26,6 +26,14 @@ repos:
     stages: [pre-commit]
     args: [--autofix, --no-sort-keys]
 
+# Markdown formatter
+- repo: https://github.com/hukkin/mdformat
+  rev: 1.0.0
+  hooks:
+  - id: mdformat
+    additional_dependencies:
+    - mdformat-gfm # GitHub Flavored Markdown
+
 # Synchronize dependencies upon branch checkout, pull or rebase
 - repo: https://github.com/astral-sh/uv-pre-commit
   rev: 0.11.15

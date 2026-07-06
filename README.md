@@ -144,31 +144,6 @@ KeyTik is available at the following platforms:
 
 <div align="center">
 
-## Table Of Content
-</div>
-
-1. [Screenshots Preview](#screenshots-preview)
-2. [Features](#features)
-   - [Key Features](#key-features)
-   - [Additional Feature](#additional-feature)
-3. [Have a Suggestion or Question?](#have-a-suggestion-or-question)
-4. [License](#license)
-5. [Contributing](#contributing)
-6. [Star History](#star-history)
-
-### Other Resources
-1. [Video Guide](https://www.youtube.com/@Fajar-RahmadJaya)
-2. [Installation](https://keytik.com/download/#installation)
-3. [Use Case Example](https://keytik.com/docs/introduction/use-case)
-4. [Automation Tool](https://keytik.com/docs/getting-started/automation-tool)
-5. [KeyTik Mechanism](https://keytik.com/docs/getting-started/mechanism)
-6. [List of Supported Key](https://keytik.com/docs/getting-started/key-list/keyboard)
-7. [Safety](https://keytik.com/docs/introduction/safety)
-8. [Full Documentation](https://keytik.com/docs/introduction/overview)
-<br>
-
-<div align="center">
-
 ## Screenshots Preview
 
 </div>

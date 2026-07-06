@@ -170,7 +170,7 @@ KeyTik Pro version is available at Gumroad at ~~$20~~ **$15 (Big Update Discount
 ### Key Features
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
-| 1      | **Multiple Remap/Macro Profile**                  | Not like most of keyboard remapper, KeyTik can handle multiple keyboard remap. You don't have to set remap again when you need to use another remap then set it back again after done. Just create multiple remap and activate or deactivate it whenever you want. |
+| 1      | **Multi Profile Macro**                  | Not like most of keyboard remapper, KeyTik can handle multiple keyboard remap. You don't have to set remap again when you need to use another remap then set it back again after done. Just create multiple remap and activate or deactivate it whenever you want. |
 | 2      | **Double Click Format**                  | Remap double click into other keys. Example: Double pressing left click will send middle click. |
 | 3      | **Text Format**                  | Remap key into raw text. Example: Pressing Shift + 1 will send "Worcestershire Sauce". |
 | 4      | **Hold Format**                  | Remap key into a hold action. Example: Triggering mouse wheel up will hold left click for 10 seconds. |
@@ -194,10 +194,10 @@ KeyTik Pro version is available at Gumroad at ~~$20~~ **$15 (Big Update Discount
 |--------|-----------------------------------------------------|-----------------|
 | 1      | **Manage Profiles** | Run, Exit, Delete, Store, Edit, Pin each profiles for better control over profiles.|
 | 2      | **Run Profile on Startup**                         | Run profiles on startup, so it will automatically activate when you open your device—no need to manually activate it each time. |
-| 6     | **Make Window Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
-| 7| **Show Stored Profile** | Display your stored profile or restore it to main window. |
-| 8     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
-| 9      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
+| 3     | **Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
+| 4| **Store Profile** | Show or hide your profile from main window. |
+| 5     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
+| 6      | **Custom Appearance**                   | Change KeyTik theme or style based on your preferences.                |
 
 
 <br>

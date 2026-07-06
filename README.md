@@ -249,15 +249,3 @@ Pull requests are welcome! We welcome contributions of all kinds, including bug 
 <br>
 
 <div align="center">
-
-## Star History
-
-</div>
-
-<a href="https://star-history.com/#Fajar-RahmadJaya/KeyTik&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date" />
- </picture>
-</a>

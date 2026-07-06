@@ -25,6 +25,8 @@ An all-in-one multi-profile macro powered by [AutoHotkey](https://www.autohotkey
 
 </div>
 
+<br>
+
 > [!NOTE]
 > Give it a star if you like this project!
 

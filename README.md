@@ -22,14 +22,9 @@
 
 ## Overview
 
-KeyTik is a Python program that uses AutoHotkey to handle many things, including a powerful key mapper and various macros such as clickers and more. It comes with comprehensive [key support](https://keytik.com/docs/getting-started/key-list/keyboard), such as ASCII, ANSI, Unicode, Scan Code, Virtual Keyboard Code, and more.
-
-KeyTik is also packed with [features](#features) like Bind to Programs and Devices, Assign Shortcuts, Text Format, Hold Format, and more.
+An all-in-one multi-profile macro powered by [AutoHotkey](https://www.autohotkey.com) with pre-built macros such as a powerful key mapper, auto clicker, screen clicker, and files opener. Comes with comprehensive [key support](https://keytik.com/docs/getting-started/key-list/keyboard) (ASCII, ANSI, Unicode, Scan Code, Virtual Keyboard Code, and more) and packed with [features](#features) like bind to program or device, assign shortcut, various remap options (remap to text, key hold action, and more), and many more.
 
 </div>
-
-> [!NOTE]
-> If you like KeyTik, don't forget to share and give it a star!
 
 <br>
 
@@ -130,41 +125,6 @@ KeyTik Pro version is available at Gumroad at ~~$20~~ **$15 (Big Update Discount
 <div align="center"><a href="https://fajarrahmadjaya.gumroad.com/l/keytik-pro/big-update"><img src=".github\Preview\GumroadButton.png" alt="Gumroad Button" width="240" /></a></div>
 <br>
 
-<div align="center">
-
-## Platform
-
-</div>
-
-KeyTik is available at the following platforms:
-- [KeyTik Website](https://keytik.com)
-- [Source Forge](https://sourceforge.net/projects/keytik/)
-
-<br>
-
-<div align="center">
-
-## Table Of Content
-</div>
-
-1. [Screenshots Preview](#screenshots-preview)
-2. [Features](#features)
-   - [Key Features](#key-features)
-   - [Additional Feature](#additional-feature)
-3. [Have a Suggestion or Question?](#have-a-suggestion-or-question)
-4. [License](#license)
-5. [Contributing](#contributing)
-6. [Star History](#star-history)
-
-### Other Resources
-1. [Video Guide](https://www.youtube.com/@Fajar-RahmadJaya)
-2. [Installation](https://keytik.com/download/#installation)
-3. [Use Case Example](https://keytik.com/docs/introduction/use-case)
-4. [Automation Tool](https://keytik.com/docs/getting-started/automation-tool)
-5. [KeyTik Mechanism](https://keytik.com/docs/getting-started/mechanism)
-6. [List of Supported Key](https://keytik.com/docs/getting-started/key-list/keyboard)
-7. [Safety](https://keytik.com/docs/introduction/safety)
-8. [Full Documentation](https://keytik.com/docs/introduction/overview)
 <br>
 
 <div align="center">
@@ -210,7 +170,7 @@ KeyTik is available at the following platforms:
 ### Key Features
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
-| 1      | **Multiple Remap/Macro Profile**                  | Not like most of keyboard remapper, KeyTik can handle multiple keyboard remap. You don't have to set remap again when you need to use another remap then set it back again after done. Just create multiple remap and activate or deactivate it whenever you want. |
+| 1      | **Multi Profile Macro**                  | Not like most of keyboard remapper, KeyTik can handle multiple keyboard remap. You don't have to set remap again when you need to use another remap then set it back again after done. Just create multiple remap and activate or deactivate it whenever you want. |
 | 2      | **Double Click Format**                  | Remap double click into other keys. Example: Double pressing left click will send middle click. |
 | 3      | **Text Format**                  | Remap key into raw text. Example: Pressing Shift + 1 will send "Worcestershire Sauce". |
 | 4      | **Hold Format**                  | Remap key into a hold action. Example: Triggering mouse wheel up will hold left click for 10 seconds. |
@@ -234,10 +194,10 @@ KeyTik is available at the following platforms:
 |--------|-----------------------------------------------------|-----------------|
 | 1      | **Manage Profiles** | Run, Exit, Delete, Store, Edit, Pin each profiles for better control over profiles.|
 | 2      | **Run Profile on Startup**                         | Run profiles on startup, so it will automatically activate when you open your device—no need to manually activate it each time. |
-| 6     | **Make Window Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
-| 7| **Show Stored Profile** | Display your stored profile or restore it to main window. |
-| 8     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
-| 9      | **Automatically Take Key Input**                   | A button that can make you click your desired key and it will automatically fill key entry                |
+| 3     | **Always on Top**                      | "Always on top" feature lets you easily remap keys while other windows are open, without minimizing KeyTik window. This is especially useful during gaming. |
+| 4| **Store Profile** | Show or hide your profile from main window. |
+| 5     | **Import Profile**                                 | Use AutoHotkey script from external source like download and make it as profile. |
+| 6      | **Custom Appearance**                   | Change KeyTik theme or style based on your preferences.                |
 
 
 <br>
@@ -249,12 +209,9 @@ KeyTik is available at the following platforms:
 </div>
 
 If you have any suggestions or question, don't hesitate to submit it on the issues page.
-- **[Automation Tool Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Automation+Tool+Suggestion%2C+Supported+Key+Suggestion&projects=&template=automation-tool-suggestion.md&title=Automation+Tool+Suggestion)**: Suggest additions to KeyTik’s built-in automation tools.
-- **[Bug Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=bug&projects=&template=bug-report.md&title=Bug+Report)**: Report any bugs or issue.
-- **[Feature Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Feature+Suggestion&projects=&template=feature_suggestion.md&title=Feature+Suggestion)**: Suggest an idea for a new feature.
-- **[Question](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Question&projects=&template=question.md&title=Question)**: Ask any question.
-- **[Supported Key Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Supported+Key+Suggestion&projects=&template=supported-key-suggestion.md&title=Supported+Key+Suggestion)**: Suggest a key to include in the list.
-- **[Windows Warning Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?assignees=&labels=Windows+Warning+Report&projects=&template=windows-warning-report.md&title=Windows+Warning+Report)**: Report any Windows warnings, such as untrusted author notifications or false positives.
+- **[Bug Report](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?template=bug-report.yaml)**: File a bug report.
+- **[Feature Suggestion](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?template=feature_suggestion.yaml)**: Suggest a feature.
+- **[Question](https://github.com/Fajar-RahmadJaya/KeyTik/issues/new?template=question.yaml)**: Ask any question about KeyTik.
 
 <br>
 
@@ -292,15 +249,3 @@ Pull requests are welcome! We welcome contributions of all kinds, including bug 
 <br>
 
 <div align="center">
-
-## Star History
-
-</div>
-
-<a href="https://star-history.com/#Fajar-RahmadJaya/KeyTik&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Fajar-RahmadJaya/KeyTik&type=Date" />
- </picture>
-</a>

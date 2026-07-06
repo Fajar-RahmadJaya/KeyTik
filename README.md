@@ -189,7 +189,7 @@ KeyTik Pro version is available at Gumroad at ~~$20~~ **$15 (Big Update Discount
 | 16      | **Screen Coordinate Auto Detect And Copy**                   | To make screen clicker editing easier, KeyTik also comes with coordinate finder. On default, you just need to press 'space' then it will show coordinate and automatically copy it. You can also change 'space' part to your preference.|
 | 17      | **Multiple Files Opener**                   | Multiple files opener also comes with KeyTik download. It work with, if you click key or key combination, then it will open the files. You can change the files with your files or programs path to your preference.|
 
-### Additional Feature
+### Additional Features
 | **No** | **Feature**                                         | **Description** |
 |--------|-----------------------------------------------------|-----------------|
 | 1      | **Manage Profiles** | Run, Exit, Delete, Store, Edit, Pin each profiles for better control over profiles.|

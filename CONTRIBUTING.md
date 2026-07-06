@@ -145,5 +145,4 @@ Please **do test your changes** by running it before submitting it. Obvious unte
 - All lint checks have passed
 - Have run `ruff format` manually or by pre-commit before submitting PR
 - Have tested the modifications by running it
-- Referenced all related issues in the PR body (e.g. "Closes #xyz")
-- This PR is AI-assisted, I have reviewed the changes manually and confirmed they are not slop
+- If this PR is AI-assisted, I have reviewed the changes manually and confirmed they are not slop

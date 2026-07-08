@@ -55,17 +55,9 @@ class SettingCombobox(QComboBox):  # pylint: disable=R0903
         event.ignore()
 
 
-class SettingUI:
-    """Setting UI."""
+class SettingTemplate:
+    """Widget template to use across setting UI."""
 
-    def __init__(self):
-        # Composition
-        self.setting_core = SettingCore()
-
-        # Cache
-        self.circle_cache = {}
-
-    # ------------------------------ Template ------------------------------
     def setting_card(self, heading="", subheading=""):
         """Setting card template."""
         card_frame = QFrame()
@@ -112,6 +104,18 @@ class SettingUI:
         setting_header_label.setContentsMargins(0, 0, 0, 4)
 
         return setting_header_label
+
+
+class SettingUI:
+    """Setting UI."""
+
+    def __init__(self):
+        # Composition
+        self.setting_core = SettingCore()
+        self.setting_template = SettingTemplate()
+
+        # Cache
+        self.circle_cache = {}
 
     # ------------------------------ Window ------------------------------
     def setting_window(self, parent):
@@ -165,19 +169,19 @@ class SettingUI:
         pro_version_layout.setContentsMargins(0, 0, 0, 0)
 
         # Header
-        pro_version_label = self.setting_header_label()
+        pro_version_label = self.setting_template.setting_header_label()
         pro_version_label.setText("Pro Version")
         pro_version_layout.addWidget(pro_version_label)
 
         # Upgrade to Pro Version
-        pro_upgrade_button = self.setting_button()
+        pro_upgrade_button = self.setting_template.setting_button()
         pro_upgrade_button.setText("Get KeyTik Pro")
         pro_upgrade_button.clicked.connect(
             lambda: webbrowser.open("https://fajarrahmadjaya.gumroad.com/l/keytik-pro")
         )
         pro_upgrade_button.setObjectName(style.button_highlight())
 
-        pro_upgrade_layout, pro_upgrade_frame = self.setting_card(
+        pro_upgrade_layout, pro_upgrade_frame = self.setting_template.setting_card(
             heading="KeyTik Pro", subheading="Pro version available at $20"
         )
         pro_upgrade_layout.addWidget(pro_upgrade_button)
@@ -193,7 +197,7 @@ class SettingUI:
         appearance_layout.setContentsMargins(0, 0, 0, 0)
 
         # Header
-        appearance_label = self.setting_header_label()
+        appearance_label = self.setting_template.setting_header_label()
         appearance_label.setText("Appearance")
         appearance_layout.addWidget(appearance_label)
 
@@ -214,7 +218,7 @@ class SettingUI:
 
     def style(self):
         """Style Widget."""
-        style_combobox = self.setting_combobox()
+        style_combobox = self.setting_template.setting_combobox()
         style_combobox.addItem("Default")
         style_combobox.addItems(QStyleFactory.keys())
         current_style = utils.get_config().style
@@ -223,7 +227,7 @@ class SettingUI:
             lambda: self.setting_core.save_style(updated_style=style_combobox.currentText())
         )
 
-        style_layout, style_frame = self.setting_card(
+        style_layout, style_frame = self.setting_template.setting_card(
             heading="Style", subheading="Change widget style"
         )
         style_layout.addWidget(style_combobox)
@@ -232,7 +236,7 @@ class SettingUI:
 
     def theme(self, settings_window):
         """Theme Widget."""
-        theme_combobox = self.setting_combobox()
+        theme_combobox = self.setting_template.setting_combobox()
 
         # Default theme
         theme_combobox.addItem("Light", {"type": "default", "value": "light"})
@@ -264,7 +268,7 @@ class SettingUI:
             )
         )
 
-        theme_layout, theme_frame = self.setting_card(
+        theme_layout, theme_frame = self.setting_template.setting_card(
             heading="Theme", subheading="Change widget palette"
         )
         theme_layout.addWidget(theme_combobox)
@@ -274,7 +278,7 @@ class SettingUI:
     def accent(self, settings_window):
         """Theme Widget."""
         config = utils.get_config()
-        accent_combobox = self.setting_combobox()
+        accent_combobox = self.setting_template.setting_combobox()
         accent_combobox.view().setFixedWidth(200)
 
         # Item data should be the color name and color hex
@@ -304,7 +308,7 @@ class SettingUI:
             )
         )
 
-        accent_layout, accent_frame = self.setting_card(
+        accent_layout, accent_frame = self.setting_template.setting_card(
             heading="Accent Color", subheading="Change highlighted widget color"
         )
         accent_layout.addWidget(accent_combobox)
@@ -331,7 +335,7 @@ class SettingUI:
 
     def mica_effect(self, settings_window):
         """Mica Effect Widget."""
-        mica_combobox = self.setting_combobox()
+        mica_combobox = self.setting_template.setting_combobox()
         mica_combobox.addItems(["Default", "Alt", "Disable"])
         mica_combobox.setCurrentText(utils.get_config().mica_effect.capitalize())
         mica_combobox.currentTextChanged.connect(
@@ -340,7 +344,7 @@ class SettingUI:
             )
         )
 
-        mica_layout, mica_frame = self.setting_card(
+        mica_layout, mica_frame = self.setting_template.setting_card(
             heading="Mica Effect", subheading="Windows and surfaces appear translucent"
         )
         mica_layout.addWidget(mica_combobox)
@@ -355,7 +359,7 @@ class SettingUI:
         general_layout.setContentsMargins(0, 0, 0, 0)
 
         # Header
-        general_label = self.setting_header_label()
+        general_label = self.setting_template.setting_header_label()
         general_label.setText("General")
         general_layout.addWidget(general_label)
 
@@ -366,19 +370,19 @@ class SettingUI:
         general_layout.addWidget(self.announcement(settings_window))
 
         # Auto Complete
-        general_layout.addWidget(self.auto_complete(settings_window))
+        general_layout.addWidget(self.auto_complete())
 
         return general_widget
 
     def profile_location(self, settings_window):
         """Profile Location Widget."""
-        profile_location_button = self.setting_button()
+        profile_location_button = self.setting_template.setting_button()
         profile_location_button.setText("Change Location")
         profile_location_button.clicked.connect(
             lambda: self.setting_core.change_data_location(settings_window)
         )
 
-        profile_location_layout, profile_location_frame = self.setting_card(
+        profile_location_layout, profile_location_frame = self.setting_template.setting_card(
             heading="Profile Location", subheading=utils.get_config().profile_path
         )
         profile_location_layout.addWidget(profile_location_button)
@@ -388,22 +392,22 @@ class SettingUI:
     def announcement(self, settings_window):
         """Announcement Widget."""
         announcement = Announcement()  # Composition
-        announcement_button = self.setting_button()
+        announcement_button = self.setting_template.setting_button()
         announcement_button.setText("Announcement")
         announcement_button.clicked.connect(
             lambda: announcement.show_announcement_window(settings_window)
         )
 
-        announcement_layout, announcement_frame = self.setting_card(
+        announcement_layout, announcement_frame = self.setting_template.setting_card(
             heading="Announcement", subheading="Show announcement"
         )
         announcement_layout.addWidget(announcement_button)
 
         return announcement_frame
 
-    def auto_complete(self, settings_window):
+    def auto_complete(self):
         """Entry auto complete widget."""
-        auto_complete_combobox = self.setting_combobox()
+        auto_complete_combobox = self.setting_template.setting_combobox()
 
         # Item
         auto_complete_combobox.addItem("Disable", "disable")
@@ -417,7 +421,7 @@ class SettingUI:
             lambda: self.setting_core.save_auto_complete(auto_complete_combobox.currentData())
         )
 
-        auto_complete_layout, auto_complete_frame = self.setting_card(
+        auto_complete_layout, auto_complete_frame = self.setting_template.setting_card(
             heading="Input Auto Complete", subheading="Enable/Disable key input auto complete"
         )
         auto_complete_layout.addWidget(auto_complete_combobox)
@@ -432,7 +436,7 @@ class SettingUI:
         installation_layout.setContentsMargins(0, 0, 0, 0)
 
         # Header
-        installaation_label = self.setting_header_label()
+        installaation_label = self.setting_template.setting_header_label()
         installaation_label.setText("Installation")
         installation_layout.addWidget(installaation_label)
 
@@ -451,11 +455,11 @@ class SettingUI:
         """AutoHotkey Installation Widget."""
         ahk_installed = os.path.exists(utils.ahkv2_dir)
 
-        ahk_button = self.setting_button()
+        ahk_button = self.setting_template.setting_button()
         ahk_button.setText("Uninstall AutoHotkey" if ahk_installed else "Install AutoHotkey")
         ahk_button.clicked.connect(lambda: self.setting_core.ahk_action(ahk_installed))
 
-        ahk_layout, ahk_frame = self.setting_card(
+        ahk_layout, ahk_frame = self.setting_template.setting_card(
             heading="AutoHotkey Installation",
             subheading=("AutoHotkey is installed" if ahk_installed else "AutoHotkey not installed"),
         )
@@ -467,7 +471,7 @@ class SettingUI:
         """Interception Driver Installation."""
         interception_installed = os.path.exists(constant.DRIVER_PATH)
 
-        interception_button = self.setting_button()
+        interception_button = self.setting_template.setting_button()
         interception_button.setText(
             "Uninstall Interception Driver"
             if interception_installed
@@ -477,7 +481,7 @@ class SettingUI:
             lambda: self.setting_core.driver_action(interception_installed)
         )
 
-        interception_layout, interception_frame = self.setting_card(
+        interception_layout, interception_frame = self.setting_template.setting_card(
             heading="Interception Driver Installation",
             subheading=(
                 "Interception Driver is Installed"
@@ -491,13 +495,13 @@ class SettingUI:
 
     def check_update(self):
         """Check for Update Widget."""
-        check_update_button = self.setting_button()
+        check_update_button = self.setting_template.setting_button()
         check_update_button.setText("Check For Update")
         check_update_button.clicked.connect(
             lambda: self.update_messagebox(show_no_update_message=True)
         )
 
-        check_update_layout, check_update_frame = self.setting_card(
+        check_update_layout, check_update_frame = self.setting_template.setting_card(
             heading="Check for update", subheading="Check for update"
         )
         check_update_layout.addWidget(check_update_button)

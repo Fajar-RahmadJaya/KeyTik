@@ -230,6 +230,16 @@ QPushButton:hover {{
 """
 
 
+HEADERVIEW = """
+QHeaderView::down-arrow, QHeaderView::up-arrow {
+    subcontrol-position: center right;
+    width: 8;
+    height: 8;
+    margin-right: 16;
+}
+"""
+
+
 def card(object_name=None):
     """Card like styling."""
     if object_name == "setting":

@@ -14,7 +14,7 @@
 
 """UI for program selection."""
 
-from PySide6.QtCore import Qt, QTimer  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog,
@@ -37,7 +37,6 @@ class SelectProgramUI:
         # UI
         self.program_tree = None
         self.show_all_button = None
-        self.fit_sorted_column = None
 
     def program_window(self, entry_widget, parent):
         """Select program window."""
@@ -57,12 +56,11 @@ class SelectProgramUI:
         self.program_tree = QTreeWidget(select_program_window)
         self.program_tree.setHeaderLabels(["Window Title", "Class", "Process"])
         self.program_tree.setSortingEnabled(True)
+        self.program_tree.setStyleSheet(style.HEADERVIEW)
         main_layout.addWidget(self.program_tree)
 
         header = self.program_tree.header()
-
-        for col in range(self.program_tree.columnCount()):
-            self.program_tree.setColumnWidth(col, 120)
+        header.setSortIndicator(0, Qt.AscendingOrder)
 
         def fit_sorted_column():
             sort_col = header.sortIndicatorSection()
@@ -75,18 +73,15 @@ class SelectProgramUI:
 
             self.program_tree.setColumnWidth(sort_col, expanded_width)
 
-        self.fit_sorted_column = fit_sorted_column
-
-        header.setSortIndicator(0, Qt.AscendingOrder)
-        QTimer.singleShot(0, fit_sorted_column)
-        header.sectionClicked.connect(lambda _: fit_sorted_column())
+        header.sortIndicatorChanged.connect(fit_sorted_column)
 
         self.program_window_button(main_layout, entry_widget, select_program_window)
 
         self.update_program_treeview(show_all_processes=False)
-        self.fit_sorted_column()
 
-        select_program_window.exec()
+        select_program_window.show()
+
+        fit_sorted_column()
 
     def program_window_button(self, main_layout, entry_widget, select_program_window):
         """Button on program window."""
@@ -138,9 +133,6 @@ class SelectProgramUI:
             if show_all_processes or p_type == "Application":
                 item = select_program_core.multi_check([window_title, class_name, proc_name])
                 self.program_tree.addTopLevelItem(item)
-
-        if hasattr(self, "fit_sorted_column"):
-            self.fit_sorted_column()
 
     def toggle_show_all_processes(self):
         """Update button and pupulate tree view on 'show all process' button click."""

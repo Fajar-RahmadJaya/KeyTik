@@ -118,6 +118,13 @@ class SharedRow:  # pylint: disable=R0903
 
         return separator_widget
 
+    def remap_entry_template(self) -> QLineEdit:
+        """Entry template used across remap row."""
+        entry = QLineEdit()
+        entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        return entry
+
 
 class RemapRow:
     """Remap row on profile creation."""
@@ -127,6 +134,7 @@ class RemapRow:
         # Composition
         self.select_key_ui = SelectKeyUI()
         self.key_listening_comp = KeyListening(edit_frame)
+        self.shared_row = SharedRow()
 
         # Variables
         self.key_rows = []
@@ -249,8 +257,8 @@ class RemapRow:
         )
         default_key_layout.addWidget(default_key_select, 0, 0, 1, 2)
 
-        default_key_entry = QLineEdit(default_key_container)
-        default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        default_key_entry = self.shared_row.remap_entry_template()
+        default_key_entry.setParent(default_key_container)
         default_key_entry.setToolTip(
             "Default key can be a single key, multiple keys, or a double key (eg. double-click)"
         )
@@ -289,9 +297,9 @@ class RemapRow:
         )
         remap_key_layout.addWidget(remap_key_select, 0, 0, 1, 2)
 
-        remap_key_entry = QLineEdit(remap_key_container)
+        remap_key_entry = self.shared_row.remap_entry_template()
+        remap_key_entry.setParent(remap_key_container)
         remap_key_entry.setToolTip("Remap key can be a single key, multiple keys, text, or hold")
-        remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if parsed_remap:
             remap_key_entry.setText(parsed_remap.remap_key)
         remap_key_layout.addWidget(remap_key_entry, 1, 0, 1, 1)
@@ -402,6 +410,7 @@ class ShortcutRow:
 
         # Composition
         self.key_listening_comp = KeyListening(edit_frame)
+        self.shared_row = SharedRow()
 
         # UI
         self.shortcut_entry = None
@@ -485,8 +494,6 @@ class ShortcutRow:
         """Shortcut widget."""
         shortcut_continer = QWidget(shortcut_row_widget)
         shortcut_layout = QGridLayout(shortcut_continer)
-        # shortcut_layout.setContentsMargins(0, 0, 0, 0)
-        # shortcut_layout.setSpacing(2)
 
         shortcut_key_select = QPushButton("Select", shortcut_row_widget)
         shortcut_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -496,11 +503,11 @@ class ShortcutRow:
         )
         shortcut_layout.addWidget(shortcut_key_select, 0, 0, 1, 2)
 
-        self.shortcut_entry = QLineEdit(shortcut_continer)
+        self.shortcut_entry = self.shared_row.remap_entry_template()
+        self.shortcut_entry.setParent(shortcut_continer)
         self.shortcut_entry.setToolTip(
             "Shortcut can be a single key, multiple keys, or shortcut specials (See select key)"
         )
-        self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if parsed_shortcut:
             self.shortcut_entry.setText(parsed_shortcut)
         self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))

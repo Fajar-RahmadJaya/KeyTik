@@ -31,12 +31,6 @@ lint = [
 hook = [
     "pre-commit>=4.6.0",
 ]
-pyinstaller = [
-    "pyinstaller>=6.21.0",
-]
-changelog-generator = [
-    "git-cliff>=2.13.1",
-]
 
 # Build system
 [build-system]

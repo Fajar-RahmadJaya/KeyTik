@@ -151,6 +151,7 @@ class ProfileUI:
         program_select_button.clicked.connect(
             lambda: SelectProgramUI().program_window(program_entry, self.edit_window)
         )
+        program_select_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
     def select_device_widget(self, top_widget, top_layout, lines, parse_script):
@@ -170,6 +171,7 @@ class ProfileUI:
         keyboard_select_button.clicked.connect(
             lambda: SelectDevice().open_device_selection(self.edit_window, keyboard_entry)
         )
+        keyboard_select_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
     def edit_middle(self, lines):
@@ -284,6 +286,7 @@ class ProfileUI:
             lambda: self.save_changes(mode_combobox.currentText().strip().lower(), top_widget)
         )
         save_button.setFixedHeight(28)
+        save_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
@@ -294,6 +297,7 @@ class ProfileUI:
         mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         default_index = diff.mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
+        mode_combobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         mode_combobox.currentIndexChanged.connect(self.build_profile)
 

@@ -291,6 +291,7 @@ class RemapRow:
                 parent_window, default_key_entry, context="default"
             )
         )
+        default_key_choose.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         default_key_layout.addWidget(default_key_choose, 1, 1, 1, 1)
 
         default_key = DefaultKeyWidget(
@@ -330,6 +331,7 @@ class RemapRow:
         remap_key_choose.clicked.connect(
             lambda: self.select_key_ui.select_key(parent_window, remap_key_entry, context="remap")
         )
+        remap_key_choose.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         remap_key_layout.addWidget(remap_key_choose, 1, 1, 1, 1)
 
         remap_key = RemapKeyWidget(
@@ -540,6 +542,7 @@ class ShortcutRow:
         shortcut_choose.clicked.connect(
             lambda: SelectKeyUI().select_key(parent_window, self.shortcut_entry, context="shortcut")
         )
+        shortcut_choose.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         shortcut_layout.addWidget(shortcut_choose, 1, 1)
 
         shortcut_row_layout.addWidget(shortcut_continer, 0, 0)

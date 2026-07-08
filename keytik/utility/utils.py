@@ -22,6 +22,59 @@ from dataclasses import dataclass
 from keytik.utility import constant
 
 
+# ------------------------------ Config ------------------------------
+@dataclass
+class Config:  # pylint: disable=R0902
+    """Dataclass to make config usage easier."""
+
+    show_announcement: bool
+    style: str
+    theme_type: str
+    theme: dict
+    accent: str
+    mica_effect: str
+    profile_path: str
+    pinned_profile: list
+    exit_key: dict
+    auto_complete: str
+
+
+def get_config():
+    """Get config from json file."""
+    if not os.path.exists(constant.config_path):
+        migrate_old_config()
+
+    try:
+        with open(constant.config_path, encoding="utf-8") as config_file:
+            value = json.load(config_file)
+            config = Config(
+                show_announcement=value.get("show_announcement", True),
+                style=value.get("style") or None,
+                theme_type=value.get("theme_type") or "default",
+                theme=value.get("theme") or "system",
+                accent=value.get("accent") or "default",
+                mica_effect=value.get("mica_effect") or "default",
+                profile_path=value.get("profile_path") or constant.appdata_dir,
+                pinned_profile=value.get("pinned_profile", []),
+                exit_key=value.get("exit_key", {}),
+                auto_complete=value.get("auto_complete") or "inline",
+            )
+        return config
+
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+    return None
+
+
+def update_config(config):
+    """Save config into json file."""
+    try:
+        with open(constant.config_path, "w", encoding="utf-8") as f:
+            json.dump(config.__dict__, f, indent=4, sort_keys=True)
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+
+
 # ------------------------------ Migrate Old Config ------------------------------
 def migrate_old_config():
     """Move old config to new centralized one."""
@@ -109,57 +162,6 @@ def load_exit_key():
         exit_key = {}
 
     return exit_key
-
-
-# ------------------------------ Config ------------------------------
-@dataclass
-class Config:  # pylint: disable=R0902
-    """Dataclass to make config usage easier."""
-
-    show_announcement: bool
-    style: str
-    theme_type: str
-    theme: dict
-    accent: str
-    mica_effect: str
-    profile_path: str
-    pinned_profile: list
-    exit_key: dict
-
-
-def get_config():
-    """Get config from json file."""
-    if not os.path.exists(constant.config_path):
-        migrate_old_config()
-
-    try:
-        with open(constant.config_path, encoding="utf-8") as config_file:
-            value = json.load(config_file)
-            config = Config(
-                show_announcement=value.get("show_announcement", True),
-                style=value.get("style") or None,
-                theme_type=value.get("theme_type") or "default",
-                theme=value.get("theme") or "system",
-                accent=value.get("accent") or "default",
-                mica_effect=value.get("mica_effect") or "default",
-                profile_path=value.get("profile_path") or constant.appdata_dir,
-                pinned_profile=value.get("pinned_profile", []),
-                exit_key=value.get("exit_key", {}),
-            )
-        return config
-
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return None
-
-
-def update_config(config):
-    """Save config into json file."""
-    try:
-        with open(constant.config_path, "w", encoding="utf-8") as f:
-            json.dump(config.__dict__, f, indent=4, sort_keys=True)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
 
 
 active_dir = os.path.join(get_config().profile_path, "Active")

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Remap and shortctu row."""
+"""Remap and shortcut row."""
 
 from dataclasses import dataclass
 
@@ -23,6 +23,7 @@ from PySide6.QtGui import QCursor  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QCheckBox,
+    QCompleter,
     QFrame,
     QGridLayout,
     QHBoxLayout,
@@ -36,7 +37,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.script_profile.remap_row_core import RemapRowCore
 from keytik.select_key.select_key_ui import SelectKeyUI
-from keytik.utility import constant, icons, style
+from keytik.utility import constant, icons, style, utils
 
 
 @dataclass
@@ -118,6 +119,27 @@ class SharedRow:  # pylint: disable=R0903
 
         return separator_widget
 
+    def remap_entry_template(self) -> QLineEdit:
+        """Entry template used across remap row."""
+        auto_complete_model = list(RemapRowCore().load_key_list().values())
+        auto_complete_config = utils.get_config().auto_complete
+
+        completer = QCompleter(auto_complete_model)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        if auto_complete_config == "inline":
+            completer.setCompletionMode(QCompleter.InlineCompletion)
+        elif auto_complete_config == "popup":
+            completer.setCompletionMode(QCompleter.PopupCompletion)
+        elif auto_complete_config == "unfiltered_popup":
+            completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+
+        entry = QLineEdit()
+        if auto_complete_config != "disable":
+            entry.setCompleter(completer)
+        entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        return entry
+
 
 class RemapRow:
     """Remap row on profile creation."""
@@ -127,6 +149,7 @@ class RemapRow:
         # Composition
         self.select_key_ui = SelectKeyUI()
         self.key_listening_comp = KeyListening(edit_frame)
+        self.shared_row = SharedRow()
 
         # Variables
         self.key_rows = []
@@ -242,16 +265,18 @@ class RemapRow:
         default_key_layout = QGridLayout(default_key_container)
 
         default_key_select = QPushButton("Select")
+        default_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         default_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         default_key_select.clicked.connect(
             lambda: self.key_listening_comp.key_listening(default_key_entry, default_key_select)
         )
         default_key_layout.addWidget(default_key_select, 0, 0, 1, 2)
 
-        default_key_entry = QLineEdit(default_key_container)
-        default_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        default_key_entry = self.shared_row.remap_entry_template()
+        default_key_entry.setParent(default_key_container)
         default_key_entry.setToolTip(
-            "Default key can be a single key, multiple keys, or a double key (eg. double-click)"
+            "Default key can be a single key, multiple keys, or a double key (eg. double-click)."
+            "\nYou can disable auto complete from setting."
         )
         if parsed_remap:
             default_key_entry.setText(parsed_remap.default_key)
@@ -281,15 +306,19 @@ class RemapRow:
         remap_key_layout = QGridLayout(remap_key_container)
 
         remap_key_select = QPushButton("Select")
+        remap_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(
             lambda: self.key_listening_comp.key_listening(remap_key_entry, remap_key_select)
         )
         remap_key_layout.addWidget(remap_key_select, 0, 0, 1, 2)
 
-        remap_key_entry = QLineEdit(remap_key_container)
-        remap_key_entry.setToolTip("Remap key can be a single key, multiple keys, text, or hold")
-        remap_key_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        remap_key_entry = self.shared_row.remap_entry_template()
+        remap_key_entry.setParent(remap_key_container)
+        remap_key_entry.setToolTip(
+            "Remap key can be a single key, multiple keys, text, or hold."
+            "\nYou can disable auto complete from setting."
+        )
         if parsed_remap:
             remap_key_entry.setText(parsed_remap.remap_key)
         remap_key_layout.addWidget(remap_key_entry, 1, 0, 1, 1)
@@ -358,6 +387,17 @@ class RemapRow:
             "Remap Key Only: Enter the hold interval in seconds (Default is 10 second)"
         )
         hold_interval_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        def hold_interval_entry_status():
+            """Set hold interval entry to be disabled or not."""
+            if hold_format_checkbox.isChecked():
+                hold_interval_entry.setDisabled(False)
+            else:
+                hold_interval_entry.setDisabled(True)
+
+        hold_interval_entry_status()
+        hold_format_checkbox.toggled.connect(hold_interval_entry_status)
+
         if parsed_remap:
             hold_interval_float = float(parsed_remap.hold_interval)
             hold_interval_str = (
@@ -389,6 +429,7 @@ class ShortcutRow:
 
         # Composition
         self.key_listening_comp = KeyListening(edit_frame)
+        self.shared_row = SharedRow()
 
         # UI
         self.shortcut_entry = None
@@ -472,21 +513,21 @@ class ShortcutRow:
         """Shortcut widget."""
         shortcut_continer = QWidget(shortcut_row_widget)
         shortcut_layout = QGridLayout(shortcut_continer)
-        # shortcut_layout.setContentsMargins(0, 0, 0, 0)
-        # shortcut_layout.setSpacing(2)
 
         shortcut_key_select = QPushButton("Select", shortcut_row_widget)
+        shortcut_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         shortcut_key_select.clicked.connect(
             lambda: self.key_listening_comp.key_listening(self.shortcut_entry, shortcut_key_select)
         )
         shortcut_layout.addWidget(shortcut_key_select, 0, 0, 1, 2)
 
-        self.shortcut_entry = QLineEdit(shortcut_continer)
+        self.shortcut_entry = self.shared_row.remap_entry_template()
+        self.shortcut_entry.setParent(shortcut_continer)
         self.shortcut_entry.setToolTip(
-            "Shortcut can be a single key, multiple keys, or shortcut specials (See select key)"
+            "Shortcut can be a single key, multiple keys, or shortcut specials (See select key)."
+            "\nYou can disable auto complete from setting."
         )
-        self.shortcut_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if parsed_shortcut:
             self.shortcut_entry.setText(parsed_shortcut)
         self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))

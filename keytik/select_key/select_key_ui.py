@@ -55,6 +55,8 @@ class SelectKeyUI:
 
     def select_key(self, parent_window, target_entry=None, context=None):
         """Select Key."""
+        self.checked_keys_list.clear()
+
         context_hide = {
             "shortcut": {"ANSI Keys"} | {b[2] for b in constant.unicode_blocks},
             "default": {"Shortcut Special", "ANSI Keys"} | {b[2] for b in constant.unicode_blocks},

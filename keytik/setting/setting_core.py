@@ -171,7 +171,6 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
             config.mica_effect = new_mica.lower()
             utils.update_config(config)
 
-            # setting widget to be translucent pr remove it need restart
             if prev_mica == "disable" or new_mica.lower() == "disable":
                 QMessageBox.information(
                     parent,
@@ -187,6 +186,18 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent, "Error", f"Failed to change style\n{error}")
+
+    def save_auto_complete(self, new_auto_complete):
+        """Write auto complete preferences preference to config file."""
+        try:
+            config = utils.get_config()
+
+            # Update config
+            config.auto_complete = new_auto_complete
+            utils.update_config(config)
+
+        except FileNotFoundError as error:
+            print(f"Error: {error}")
 
     def ahk_action(self, ahk_installed):
         """Uninstall AutoHotkey."""

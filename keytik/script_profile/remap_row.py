@@ -242,6 +242,7 @@ class RemapRow:
         default_key_layout = QGridLayout(default_key_container)
 
         default_key_select = QPushButton("Select")
+        default_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         default_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         default_key_select.clicked.connect(
             lambda: self.key_listening_comp.key_listening(default_key_entry, default_key_select)
@@ -281,6 +282,7 @@ class RemapRow:
         remap_key_layout = QGridLayout(remap_key_container)
 
         remap_key_select = QPushButton("Select")
+        remap_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(
             lambda: self.key_listening_comp.key_listening(remap_key_entry, remap_key_select)
@@ -476,6 +478,7 @@ class ShortcutRow:
         # shortcut_layout.setSpacing(2)
 
         shortcut_key_select = QPushButton("Select", shortcut_row_widget)
+        shortcut_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         shortcut_key_select.clicked.connect(
             lambda: self.key_listening_comp.key_listening(self.shortcut_entry, shortcut_key_select)

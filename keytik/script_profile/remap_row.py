@@ -360,6 +360,17 @@ class RemapRow:
             "Remap Key Only: Enter the hold interval in seconds (Default is 10 second)"
         )
         hold_interval_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        def hold_interval_entry_status():
+            """Set hold interval entry to be disabled or not."""
+            if hold_format_checkbox.isChecked():
+                hold_interval_entry.setDisabled(False)
+            else:
+                hold_interval_entry.setDisabled(True)
+
+        hold_interval_entry_status()
+        hold_format_checkbox.toggled.connect(hold_interval_entry_status)
+
         if parsed_remap:
             hold_interval_float = float(parsed_remap.hold_interval)
             hold_interval_str = (

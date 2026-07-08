@@ -230,7 +230,7 @@ QPushButton:hover {{
 """
 
 
-HEADERVIEW = """
+TREEVIEW = """
 QHeaderView::down-arrow, QHeaderView::up-arrow {
     subcontrol-position: center right;
     width: 8;

@@ -56,7 +56,8 @@ class SelectProgramUI:
         self.program_tree = QTreeWidget(select_program_window)
         self.program_tree.setHeaderLabels(["Window Title", "Class", "Process"])
         self.program_tree.setSortingEnabled(True)
-        self.program_tree.setStyleSheet(style.HEADERVIEW)
+        self.program_tree.setStyleSheet(style.TREEVIEW)
+        self.program_tree.setIndentation(20)
         main_layout.addWidget(self.program_tree)
 
         header = self.program_tree.header()

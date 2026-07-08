@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Remap and shortctu row."""
+"""Remap and shortcut row."""
 
 from dataclasses import dataclass
 
@@ -23,6 +23,7 @@ from PySide6.QtGui import QCursor  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QCheckBox,
+    QCompleter,
     QFrame,
     QGridLayout,
     QHBoxLayout,
@@ -36,7 +37,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.script_profile.remap_row_core import RemapRowCore
 from keytik.select_key.select_key_ui import SelectKeyUI
-from keytik.utility import constant, icons, style
+from keytik.utility import constant, icons, style, utils
 
 
 @dataclass
@@ -120,7 +121,21 @@ class SharedRow:  # pylint: disable=R0903
 
     def remap_entry_template(self) -> QLineEdit:
         """Entry template used across remap row."""
+        auto_complete_model = list(RemapRowCore().load_key_list().values())
+        auto_complete_config = utils.get_config().auto_complete
+
+        completer = QCompleter(auto_complete_model)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        if auto_complete_config == "inline":
+            completer.setCompletionMode(QCompleter.InlineCompletion)
+        elif auto_complete_config == "popup":
+            completer.setCompletionMode(QCompleter.PopupCompletion)
+        elif auto_complete_config == "unfiltered_popup":
+            completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+
         entry = QLineEdit()
+        if auto_complete_config != "disable":
+            entry.setCompleter(completer)
         entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         return entry
@@ -260,7 +275,8 @@ class RemapRow:
         default_key_entry = self.shared_row.remap_entry_template()
         default_key_entry.setParent(default_key_container)
         default_key_entry.setToolTip(
-            "Default key can be a single key, multiple keys, or a double key (eg. double-click)"
+            "Default key can be a single key, multiple keys, or a double key (eg. double-click)."
+            "\nYou can disable auto complete from setting."
         )
         if parsed_remap:
             default_key_entry.setText(parsed_remap.default_key)
@@ -299,7 +315,10 @@ class RemapRow:
 
         remap_key_entry = self.shared_row.remap_entry_template()
         remap_key_entry.setParent(remap_key_container)
-        remap_key_entry.setToolTip("Remap key can be a single key, multiple keys, text, or hold")
+        remap_key_entry.setToolTip(
+            "Remap key can be a single key, multiple keys, text, or hold."
+            "\nYou can disable auto complete from setting."
+        )
         if parsed_remap:
             remap_key_entry.setText(parsed_remap.remap_key)
         remap_key_layout.addWidget(remap_key_entry, 1, 0, 1, 1)
@@ -506,7 +525,8 @@ class ShortcutRow:
         self.shortcut_entry = self.shared_row.remap_entry_template()
         self.shortcut_entry.setParent(shortcut_continer)
         self.shortcut_entry.setToolTip(
-            "Shortcut can be a single key, multiple keys, or shortcut specials (See select key)"
+            "Shortcut can be a single key, multiple keys, or shortcut specials (See select key)."
+            "\nYou can disable auto complete from setting."
         )
         if parsed_shortcut:
             self.shortcut_entry.setText(parsed_shortcut)

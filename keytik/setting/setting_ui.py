@@ -365,6 +365,9 @@ class SettingUI:
         # Announcement
         general_layout.addWidget(self.announcement(settings_window))
 
+        # Auto Complete
+        general_layout.addWidget(self.auto_complete(settings_window))
+
         return general_widget
 
     def profile_location(self, settings_window):
@@ -397,6 +400,29 @@ class SettingUI:
         announcement_layout.addWidget(announcement_button)
 
         return announcement_frame
+
+    def auto_complete(self, settings_window):
+        """Entry auto complete widget."""
+        auto_complete_combobox = self.setting_combobox()
+
+        # Item
+        auto_complete_combobox.addItem("Disable", "disable")
+        auto_complete_combobox.addItem("Inline", "inline")
+        auto_complete_combobox.addItem("Pop Up", "popup")
+        auto_complete_combobox.addItem("Unfiltered Pop UP", "unfiltered_popup")
+
+        current_text = auto_complete_combobox.findData(utils.get_config().auto_complete)
+        auto_complete_combobox.setCurrentIndex(current_text)
+        auto_complete_combobox.currentTextChanged.connect(
+            lambda: self.setting_core.save_auto_complete(auto_complete_combobox.currentData())
+        )
+
+        auto_complete_layout, auto_complete_frame = self.setting_card(
+            heading="Input Auto Complete", subheading="Enable/Disable key input auto complete"
+        )
+        auto_complete_layout.addWidget(auto_complete_combobox)
+
+        return auto_complete_frame
 
     # ------------------------------ Installation ------------------------------
     def installation(self):

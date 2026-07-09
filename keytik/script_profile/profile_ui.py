@@ -318,10 +318,14 @@ class ProfileUI:
             )
             return
 
+        # Make sure shortcut valid
+        write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
+        if not write_script.check_shortcut_integrity():
+            return
+
         try:
             output_path = os.path.join(self.main_core.script_dir, script_name)
             with open(output_path, "w", encoding="utf-8") as file:
-                write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
                 condition_string = write_script.write_condition(top_widget)
 
                 if mode == "text mode":

@@ -130,10 +130,6 @@ class WriteScript:
 
     def handle_text_mode(self, file, condition_string: ConditionString):
         """Write text mode."""
-        # Make sure shortcut valid
-        if not self.check_shortcut_integrity():
-            return
-
         file.write("; text\n")
         self.dashboard_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
@@ -395,10 +391,6 @@ class WriteDefault:
 
     def handle_default_mode(self, file, condition_string: ConditionString):
         """Write default mode."""
-        # Make sure shortcut valid
-        if not self.write_script.check_shortcut_integrity():
-            return
-
         dashboard_core = DashboardCore()  # Composition
 
         file.write("; default\n")

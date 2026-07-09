@@ -21,6 +21,7 @@ import time
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QApplication,
     QDialog,
     QHBoxLayout,
     QMessageBox,
@@ -171,7 +172,7 @@ class SelectDevice:
             return True
 
         reply = QMessageBox.question(
-            None,
+            QApplication.activeWindow(),
             "Driver Not Found",
             "Interception driver is not installed. "
             "This driver is required to use assign on specific device feature.\n \n \n"
@@ -198,12 +199,16 @@ class SelectDevice:
                     )
                 else:
                     QMessageBox.critical(
-                        None,
+                        QApplication.activeWindow(),
                         "Installation Failed",
                         "Installation script not found. Please check your installation.",
                     )
             except FileNotFoundError as e:
-                QMessageBox.critical(None, "Error", f"An error occurred during installation: {e!s}")
+                QMessageBox.critical(
+                    QApplication.activeWindow(),
+                    "Error",
+                    f"An error occurred during installation: {e!s}",
+                )
         return False
 
     def run_monitor(self):

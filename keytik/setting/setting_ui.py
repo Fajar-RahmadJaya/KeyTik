@@ -28,6 +28,7 @@ from PySide6.QtGui import (  # pylint: disable=E0611
     QPixmap,
 )
 from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QApplication,
     QComboBox,
     QDialog,
     QFrame,
@@ -513,7 +514,7 @@ class SettingUI:
         latest_version = self.setting_core.check_for_update()
         if latest_version:
             reply = QMessageBox.question(
-                None,
+                QApplication.activeWindow(),
                 "Update Available",
                 (
                     f"New update available: {diff.PROGRAM_NAME} {latest_version}\n\n"
@@ -525,7 +526,7 @@ class SettingUI:
                 webbrowser.open(diff.RELEASE_LINK)
         elif show_no_update_message:
             QMessageBox.information(
-                None,
+                QApplication.activeWindow(),
                 "Check For Update",
                 "You are using the latest version of KeyTik.",
             )

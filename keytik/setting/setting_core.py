@@ -89,13 +89,13 @@ class SettingCore:
                 dashboard_core.activate_script(script)
 
             QMessageBox.information(
-                None,
+                QApplication.activeWindow(),
                 "Change Profile Location",
                 "Profile location changed successfully!",
             )
         except PermissionError as e:
             print(f"An error occurred: {e}")
-            QMessageBox.critical(None, "Error", f"An error occurred: {e}")
+            QMessageBox.critical(QApplication.activeWindow(), "Error", f"An error occurred: {e}")
 
     def save_theme(self, theme: dict, parent):
         """Write theme preference to config file."""
@@ -208,7 +208,7 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
 
             except FileNotFoundError:
                 QMessageBox.critical(
-                    None,
+                    QApplication.activeWindow(),
                     "Error",
                     "Failed to uninstall: AutoHotkey installation path not found",
                 )
@@ -228,7 +228,9 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
                 )
         except FileNotFoundError:
             QMessageBox.critical(
-                None, "Error", "Failed to uninstall: inter_uninstall.bat not found"
+                QApplication.activeWindow(),
+                "Error",
+                "Failed to uninstall: inter_uninstall.bat not found",
             )
 
     def check_for_update(self):

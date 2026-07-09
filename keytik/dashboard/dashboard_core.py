@@ -25,6 +25,7 @@ import winshell
 from pynput.keyboard import Controller, Key
 from PySide6.QtCore import QObject, Signal  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QApplication,
     QFileDialog,
     QInputDialog,
     QMessageBox,
@@ -60,7 +61,9 @@ class DashboardCore(QObject):
                 selected_file = selected_files[0]
 
                 if not selected_file.endswith(".ahk"):
-                    QMessageBox.warning(None, "Error", "Only .ahk files are allowed.")
+                    QMessageBox.warning(
+                        QApplication.activeWindow(), "Error", "Only .ahk files are allowed."
+                    )
                     return
 
                 file_name = os.path.basename(selected_file)
@@ -69,7 +72,9 @@ class DashboardCore(QObject):
                 try:
                     shutil.move(selected_file, destination_path)
                 except NotADirectoryError as e:
-                    QMessageBox.warning(None, "Error", f"Failed to move file: {e}")
+                    QMessageBox.warning(
+                        QApplication.activeWindow(), "Error", f"Failed to move file: {e}"
+                    )
                     return
 
                 self.validate_imported_files(destination_path, file_name)
@@ -208,14 +213,14 @@ class DashboardCore(QObject):
             shutil.copy(source_path, destination_path)
             self.update_script_signal.emit()
         except NotADirectoryError as e:
-            QMessageBox.warning(None, "Error", f"Error copying script: {e}")
+            QMessageBox.warning(QApplication.activeWindow(), "Error", f"Error copying script: {e}")
 
     def delete_script(self, script_name):
         """Delete profile."""
         script_path = os.path.join(self.script_dir, script_name)
         if os.path.isfile(script_path):
             reply = QMessageBox.question(
-                None,
+                QApplication.activeWindow(),
                 "Delete Script",
                 f"Are you sure you want to delete '{script_name}'?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
@@ -226,9 +231,13 @@ class DashboardCore(QObject):
                 os.remove(script_path)
                 self.update_script_signal.emit()
             except FileNotFoundError as e:
-                QMessageBox.warning(None, "Error", f"Failed to delete the script: {e}")
+                QMessageBox.warning(
+                    QApplication.activeWindow(), "Error", f"Failed to delete the script: {e}"
+                )
         else:
-            QMessageBox.warning(None, "Error", f"{script_name} does not exist.")
+            QMessageBox.warning(
+                QApplication.activeWindow(), "Error", f"{script_name} does not exist."
+            )
 
     def activate_script(self, script_name):
         """Run profile."""
@@ -240,7 +249,9 @@ class DashboardCore(QObject):
         if os.path.isfile(script_path):
             os.startfile(script_path)
         else:
-            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(
+                QApplication.activeWindow(), "Error", f"{script_name} does not exist."
+            )
 
     def exit_script(self, script_name):
         """Exit profile."""
@@ -253,7 +264,9 @@ class DashboardCore(QObject):
             exit_keys = utils.get_config().exit_key
             exit_combo = exit_keys.get(script_name)
             if not exit_combo:
-                QMessageBox.critical(None, "Error", f"No exit key found for {script_name}")
+                QMessageBox.critical(
+                    QApplication.activeWindow(), "Error", f"No exit key found for {script_name}"
+                )
                 return
 
             keyboard = Controller()
@@ -271,7 +284,9 @@ class DashboardCore(QObject):
             if "^" in exit_combo:
                 keyboard.release(Key.ctrl)
         else:
-            QMessageBox.critical(None, "Error", f"{script_path} does not exist.")
+            QMessageBox.critical(
+                QApplication.activeWindow(), "Error", f"{script_path} does not exist."
+            )
 
     def store_script(self, script_name):
         """Move profile to store directory."""
@@ -285,9 +300,13 @@ class DashboardCore(QObject):
                 shutil.move(script_path, target_path)
                 self.update_script_signal.emit()
             except NotADirectoryError as e:
-                QMessageBox.critical(None, "Error", f"Failed to move the script: {e}")
+                QMessageBox.critical(
+                    QApplication.activeWindow(), "Error", f"Failed to move the script: {e}"
+                )
         else:
-            QMessageBox.critical(None, "Error", f"{script_name} does not exist.")
+            QMessageBox.critical(
+                QApplication.activeWindow(), "Error", f"{script_name} does not exist."
+            )
 
     def toggle_script_dir(self, show_stored):
         """Change current directory based on store/active profile."""

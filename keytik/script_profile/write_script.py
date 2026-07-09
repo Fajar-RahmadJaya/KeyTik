@@ -20,7 +20,12 @@ import re
 from dataclasses import dataclass
 
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
-from PySide6.QtWidgets import QCheckBox, QLineEdit, QMessageBox  # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QApplication,
+    QCheckBox,
+    QLineEdit,
+    QMessageBox,
+)
 
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.script_profile.remap_row_core import RemapRowCore
@@ -87,8 +92,8 @@ class WriteScript:
                         shortcut_types["normal"].append(shortcut)
 
         if shortcut_types["normal"] and shortcut_types["caps"]:
-            msg = QMessageBox(None)
-            msg.setIcon(QMessageBox.Warning)
+            msg = QMessageBox(QApplication.activeWindow())
+            msg.setIcon(QMessageBox.Icon.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText(
                 "You cannot use 'CapsLock On' or 'CapsLock Off' "
@@ -100,8 +105,8 @@ class WriteScript:
             msg.exec()
             return False
         if caps_on_present and caps_off_present:
-            msg = QMessageBox(None)
-            msg.setIcon(QMessageBox.Warning)
+            msg = QMessageBox(QApplication.activeWindow())
+            msg.setIcon(QMessageBox.Icon.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText(
                 "You cannot use both 'CapsLock ON' and 'CapsLock OFF' at the same time. "
@@ -111,8 +116,8 @@ class WriteScript:
             msg.exec()
             return False
         if num_on_present and num_off_present:
-            msg = QMessageBox(None)
-            msg.setIcon(QMessageBox.Warning)
+            msg = QMessageBox(QApplication.activeWindow())
+            msg.setIcon(QMessageBox.Icon.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText(
                 "You cannot use both 'NumLock ON' and 'NumLock OFF' at the same time. "

@@ -19,6 +19,7 @@ import os
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QApplication,
     QComboBox,
     QDialog,
     QGridLayout,
@@ -312,7 +313,9 @@ class ProfileUI:
         script_name = script_name_entry.text().strip() + ".ahk"
 
         if not script_name_entry.text():
-            QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
+            QMessageBox.warning(
+                QApplication.activeWindow(), "Input Error", "Please enter a Profile name."
+            )
             return
 
         try:

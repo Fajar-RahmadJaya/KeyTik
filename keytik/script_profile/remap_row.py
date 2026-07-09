@@ -433,9 +433,6 @@ class ShortcutRow:
         self.key_listening_comp = KeyListening(edit_frame)
         self.shared_row = SharedRow()
 
-        # UI
-        self.shortcut_entry = None
-
     def shortcut_row(self, parent_window, parsed_shortcuts_list: list | None = None):
         """Build shortcut row."""
         # Widget and layout
@@ -520,27 +517,27 @@ class ShortcutRow:
         shortcut_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         shortcut_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(self.shortcut_entry, shortcut_key_select)
+            lambda: self.key_listening_comp.key_listening(shortcut_entry, shortcut_key_select)
         )
         shortcut_layout.addWidget(shortcut_key_select, 0, 0, 1, 2)
 
-        self.shortcut_entry = self.shared_row.remap_entry_template()
-        self.shortcut_entry.setParent(shortcut_continer)
-        self.shortcut_entry.setToolTip(
+        shortcut_entry = self.shared_row.remap_entry_template()
+        shortcut_entry.setParent(shortcut_continer)
+        shortcut_entry.setToolTip(
             "Shortcut can be a single key, multiple keys, or shortcut specials (See select key)."
             "\nYou can disable auto complete from setting."
         )
         if parsed_shortcut:
-            self.shortcut_entry.setText(parsed_shortcut)
-        self.shortcut_rows.append((self.shortcut_entry, shortcut_key_select))
-        shortcut_layout.addWidget(self.shortcut_entry, 1, 0)
+            shortcut_entry.setText(parsed_shortcut)
+        self.shortcut_rows.append((shortcut_entry, shortcut_key_select))
+        shortcut_layout.addWidget(shortcut_entry, 1, 0)
 
         shortcut_choose = QPushButton(shortcut_continer)
         shortcut_choose.setFixedWidth(28)
         shortcut_choose.setIcon(icons.get_icon(icons.search))
         shortcut_choose.setToolTip("Choose Shortcut key")
         shortcut_choose.clicked.connect(
-            lambda: SelectKeyUI().select_key(parent_window, self.shortcut_entry, context="shortcut")
+            lambda: SelectKeyUI().select_key(parent_window, shortcut_entry, context="shortcut")
         )
         shortcut_choose.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         shortcut_layout.addWidget(shortcut_choose, 1, 1)

@@ -329,7 +329,7 @@ class ProfileUI:
                 condition_string = write_script.write_condition(top_widget)
 
                 if mode == "text mode":
-                    write_script.handle_text_mode(file, condition_string)
+                    write_script.handle_text_mode(file, self.edit_frame, condition_string)
                 elif mode == "default mode":
                     write_default = WriteDefault(write_script)
                     write_default.handle_default_mode(file, condition_string)

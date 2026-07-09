@@ -25,6 +25,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QCheckBox,
     QLineEdit,
     QMessageBox,
+    QTextEdit,
+    QWidget,
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
@@ -128,7 +130,7 @@ class WriteScript:
             return False
         return True
 
-    def handle_text_mode(self, file, condition_string: ConditionString):
+    def handle_text_mode(self, file, edit_frame: QWidget, condition_string: ConditionString):
         """Write text mode."""
         file.write("; text\n")
         self.dashboard_core.generate_exit_key(os.path.basename(file.name), file)
@@ -140,7 +142,7 @@ class WriteScript:
             file.write(condition_string.device_string)
             file.write(condition_string.hotif_string)
 
-        text_content = self.remap_row_comp.text_block.toPlainText().strip()
+        text_content = edit_frame.findChild(QTextEdit).toPlainText().strip()
         if text_content:
             file.write("; Text mode start\n")
             file.write(text_content + "\n")

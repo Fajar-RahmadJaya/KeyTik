@@ -311,7 +311,7 @@ class ProfileUI:
         script_name_entry = top_widget.findChild(QLineEdit, "ScriptNameEntry")
         script_name = script_name_entry.text().strip() + ".ahk"
 
-        if not script_name:
+        if not script_name_entry.text():
             QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
             return
 

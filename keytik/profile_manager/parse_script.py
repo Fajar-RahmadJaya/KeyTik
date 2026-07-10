@@ -17,7 +17,7 @@
 import re
 from dataclasses import dataclass
 
-from keytik.script_profile.remap_row_core import RemapRowCore
+from keytik.profile_mode.profile_mode_core import ProfileModeCore
 
 
 @dataclass
@@ -37,7 +37,7 @@ class ParseScript:
     """Parse AutoHotkey script."""
 
     def __init__(self):
-        self.key_map = RemapRowCore().load_key_list()
+        self.key_map = ProfileModeCore().load_key_list()
 
     def parse_device(self, lines):
         """Parse device type for device binding."""

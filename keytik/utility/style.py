@@ -261,7 +261,6 @@ def card(object_name=None):
 
 # -------------------- Dashboard --------------------
 PROFILE_ROW_LABEL = "font-size: 13px; font-weight: bold;"
-TEXT_BLOCK = "font-family: Consolas; font-size: 10pt;"
 PLUS_LABEL = """
     color: gray;
     padding: 0 5px;

@@ -194,6 +194,7 @@ dependencies = [
     { name = "markdown" },
     { name = "psutil" },
     { name = "pynput" },
+    { name = "pyqcodeeditor" },
     { name = "pyside6" },
     { name = "pywin32" },
     { name = "qt-themes" },
@@ -219,6 +220,7 @@ requires-dist = [
     { name = "markdown", specifier = ">=3.10.2,<4.0.0" },
     { name = "psutil", specifier = ">=7.2.2,<8.0.0" },
     { name = "pynput", specifier = ">=1.8.2,<2.0.0" },
+    { name = "pyqcodeeditor", specifier = ">=0.3.7" },
     { name = "pyside6", specifier = "==6.11.1" },
     { name = "pywin32", specifier = ">=312,<313" },
     { name = "qt-themes", specifier = ">=0.4.0" },
@@ -260,6 +262,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/24/bf/d1bda4f6168e0b2e9e5958945e01910052158313224ada5ce1fb2e1113b8/nodeenv-1.10.0.tar.gz", hash = "sha256:996c191ad80897d076bdfba80a41994c2b47c68e224c542b48feba42ba00f8bb", size = 55611, upload-time = "2025-12-20T14:08:54.006Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/88/b2/d0896bdcdc8d28a7fc5717c305f1a861c26e18c05047949fb371034d98bd/nodeenv-1.10.0-py2.py3-none-any.whl", hash = "sha256:5bb13e3eed2923615535339b3c620e76779af4cb4c6a90deccc9e36b274d3827", size = 23438, upload-time = "2025-12-20T14:08:52.782Z" },
+]
+
+[[package]]
+name = "packaging"
+version = "26.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/f1/e7a6dd94a8d4a5626c03e4e99c87f241ba9e350cd9e6d75123f992427270/packaging-26.2.tar.gz", hash = "sha256:ff452ff5a3e828ce110190feff1178bb1f2ea2281fa2075aadb987c2fb221661", size = 228134, upload-time = "2026-04-24T20:15:23.917Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/b2/87e62e8c3e2f4b32e5fe99e0b86d576da1312593b39f47d8ceef365e95ed/packaging-26.2-py3-none-any.whl", hash = "sha256:5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e", size = 100195, upload-time = "2026-04-24T20:15:22.081Z" },
 ]
 
 [[package]]
@@ -2841,6 +2852,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pyqcodeeditor"
+version = "0.3.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "qtpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/31/4f/ac4acc743496d1be8062e2bfb7ed3ca4f86b0686340624942f6b380b8e5f/pyqcodeeditor-0.3.7.tar.gz", hash = "sha256:b153a15d4514ffec0417db6a5e1335901ed205dcaac0cdadfd7a790c050c8df5", size = 17936, upload-time = "2024-11-07T12:54:41.415Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/84/da/8160a149c9868f71f8d145505d0140ce3e5b46c000ad30eb063ab7914c9f/pyqcodeeditor-0.3.7-py3-none-any.whl", hash = "sha256:4adc216e207a8648783834cb78782f86a777765801627cebcadd5b426629bb8c", size = 28811, upload-time = "2024-11-07T12:54:39.897Z" },
+]
+
+[[package]]
 name = "pyside6"
 version = "6.11.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2973,6 +2996,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ad/ec/8b966d8021e908a80dea7fe8a89641b2b950efdc02fd5d506f26fd71e8d4/qt_themes-0.4.0.tar.gz", hash = "sha256:81f5fad08338d54654cd914eec6cc42e8701cbcd1595900b98ae32d48f615237", size = 8569, upload-time = "2025-12-06T21:32:45.713Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ac/b4/8d2276d1ff41e7178cb8bfd374977614ed90eb2b1da3ac7a4d872932c73f/qt_themes-0.4.0-py3-none-any.whl", hash = "sha256:ff754bd5ecd0bd54caf49260939c9d1454d2967240bd6973420bd3fb9ef32c1e", size = 11331, upload-time = "2025-12-06T21:32:44.435Z" },
+]
+
+[[package]]
+name = "qtpy"
+version = "2.4.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/70/01/392eba83c8e47b946b929d7c46e0f04b35e9671f8bb6fc36b6f7945b4de8/qtpy-2.4.3.tar.gz", hash = "sha256:db744f7832e6d3da90568ba6ccbca3ee2b3b4a890c3d6fbbc63142f6e4cdf5bb", size = 66982, upload-time = "2025-02-11T15:09:25.759Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/69/76/37c0ccd5ab968a6a438f9c623aeecc84c202ab2fabc6a8fd927580c15b5a/QtPy-2.4.3-py3-none-any.whl", hash = "sha256:72095afe13673e017946cc258b8d5da43314197b741ed2890e563cf384b51aa1", size = 95045, upload-time = "2025-02-11T15:09:24.162Z" },
 ]
 
 [[package]]

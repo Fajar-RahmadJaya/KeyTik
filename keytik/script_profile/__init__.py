@@ -1,1 +1,0 @@
-"""Script profile package."""

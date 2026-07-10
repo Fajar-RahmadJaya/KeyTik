@@ -19,7 +19,7 @@ import json
 from keytik.utility import constant
 
 
-class RemapRowCore:
+class ProfileModeCore:
     """Create/edit profile logic."""
 
     def __init__(self):

@@ -20,7 +20,7 @@ import keyboard
 from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
 from keytik.dashboard.dashboard_core import DashboardCore
-from keytik.script_profile.write_script import WriteScript
+from keytik.profile_manager.write_script import WriteScript
 from keytik.setting.setting_core import SettingCore
 from keytik.utility import utils
 

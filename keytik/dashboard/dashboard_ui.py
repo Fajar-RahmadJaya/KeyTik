@@ -33,7 +33,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
-from keytik.script_profile.profile_ui import ProfileUI
+from keytik.profile_manager.profile_ui import ProfileUI
 from keytik.setting.setting_ui import SettingUI
 from keytik.utility import constant, diff, icons, style, utils
 

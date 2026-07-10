@@ -20,10 +20,17 @@ import re
 from dataclasses import dataclass
 
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
-from PySide6.QtWidgets import QCheckBox, QLineEdit, QMessageBox  # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QApplication,
+    QCheckBox,
+    QLineEdit,
+    QMessageBox,
+    QTextEdit,
+    QWidget,
+)
 
 from keytik.dashboard.dashboard_core import DashboardCore
-from keytik.script_profile.remap_row_core import RemapRowCore
+from keytik.profile_mode.profile_mode_core import ProfileModeCore
 from keytik.select_key.select_key_core import SelectKeyCore
 from keytik.utility import constant, utils
 
@@ -52,13 +59,13 @@ class ConditionString:
 class WriteScript:
     """Write script based on profile input."""
 
-    def __init__(self, remap_row_comp=None, shortcut_row_comp=None):
-        self.remap_row_comp = remap_row_comp
+    def __init__(self, default_mode_comp=None, shortcut_row_comp=None):
+        self.default_mode_comp = default_mode_comp
         self.shortcut_row_comp = shortcut_row_comp
 
         # Composition
         self.dashboard_core = DashboardCore()
-        self.remap_row_core = RemapRowCore()
+        self.profile_mode_core = ProfileModeCore()
 
     def check_shortcut_integrity(self):
         """Make sure there is no conflict on profile input."""
@@ -87,8 +94,8 @@ class WriteScript:
                         shortcut_types["normal"].append(shortcut)
 
         if shortcut_types["normal"] and shortcut_types["caps"]:
-            msg = QMessageBox(None)
-            msg.setIcon(QMessageBox.Warning)
+            msg = QMessageBox(QApplication.activeWindow())
+            msg.setIcon(QMessageBox.Icon.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText(
                 "You cannot use 'CapsLock On' or 'CapsLock Off' "
@@ -100,8 +107,8 @@ class WriteScript:
             msg.exec()
             return False
         if caps_on_present and caps_off_present:
-            msg = QMessageBox(None)
-            msg.setIcon(QMessageBox.Warning)
+            msg = QMessageBox(QApplication.activeWindow())
+            msg.setIcon(QMessageBox.Icon.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText(
                 "You cannot use both 'CapsLock ON' and 'CapsLock OFF' at the same time. "
@@ -111,8 +118,8 @@ class WriteScript:
             msg.exec()
             return False
         if num_on_present and num_off_present:
-            msg = QMessageBox(None)
-            msg.setIcon(QMessageBox.Warning)
+            msg = QMessageBox(QApplication.activeWindow())
+            msg.setIcon(QMessageBox.Icon.Warning)
             msg.setWindowTitle("Shortcut Conflict")
             msg.setText(
                 "You cannot use both 'NumLock ON' and 'NumLock OFF' at the same time. "
@@ -123,12 +130,8 @@ class WriteScript:
             return False
         return True
 
-    def handle_text_mode(self, file, condition_string: ConditionString):
+    def handle_text_mode(self, file, edit_frame: QWidget, condition_string: ConditionString):
         """Write text mode."""
-        # Make sure shortcut valid
-        if not self.check_shortcut_integrity():
-            return
-
         file.write("; text\n")
         self.dashboard_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
@@ -139,7 +142,7 @@ class WriteScript:
             file.write(condition_string.device_string)
             file.write(condition_string.hotif_string)
 
-        text_content = self.remap_row_comp.text_block.toPlainText().strip()
+        text_content = edit_frame.findChild(QTextEdit).toPlainText().strip()
         if text_content:
             file.write("; Text mode start\n")
             file.write(text_content + "\n")
@@ -363,7 +366,7 @@ cm1 := AHI.CreateContextManager(id1)\n
         keys = key.split("+")
         translated_keys = []
 
-        key_translations = self.remap_row_core.read_keylist()
+        key_translations = self.profile_mode_core.read_keylist()
 
         for single_key in keys:
             translated_key = key_translations.get(single_key.strip().lower())
@@ -390,10 +393,6 @@ class WriteDefault:
 
     def handle_default_mode(self, file, condition_string: ConditionString):
         """Write default mode."""
-        # Make sure shortcut valid
-        if not self.write_script.check_shortcut_integrity():
-            return
-
         dashboard_core = DashboardCore()  # Composition
 
         file.write("; default\n")
@@ -413,7 +412,7 @@ class WriteDefault:
 
     def process_key_remaps(self, file):
         """Handle key remap write."""
-        for key_widget in self.write_script.remap_row_comp.key_rows:
+        for key_widget in self.write_script.default_mode_comp.key_rows:
             self.remap_widget = RemapWidget(
                 default_key_entry=key_widget.default_key.default_key_entry,
                 remap_key_entry=key_widget.remap_key.remap_key_entry,

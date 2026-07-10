@@ -19,6 +19,7 @@ import os
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QApplication,
     QComboBox,
     QDialog,
     QGridLayout,
@@ -29,14 +30,15 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QScrollArea,
     QSizePolicy,
     QSpacerItem,
-    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
 
-from keytik.script_profile.parse_script import ParseScript
-from keytik.script_profile.remap_row import RemapRow, ShortcutRow
-from keytik.script_profile.write_script import WriteDefault, WriteScript
+from keytik.profile_manager.parse_script import ParseScript
+from keytik.profile_manager.write_script import WriteDefault, WriteScript
+from keytik.profile_mode.default_mode import DefaultMode
+from keytik.profile_mode.shortcut_row import ShortcutRow
+from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
 from keytik.select_program.select_program_ui import SelectProgramUI
 from keytik.utility import constant, diff, style
@@ -52,7 +54,7 @@ class ProfileUI:
         # Composition
         # Used for save change since it need for
         # current remap row composition (Mode changed or edit middle)
-        self.remap_row_comp = None
+        self.default_mode_comp = None
         self.shortcut_row_comp = None
 
         # UI
@@ -151,6 +153,7 @@ class ProfileUI:
         program_select_button.clicked.connect(
             lambda: SelectProgramUI().program_window(program_entry, self.edit_window)
         )
+        program_select_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         top_layout.addWidget(program_select_button, 1, 3, 1, 1)
 
     def select_device_widget(self, top_widget, top_layout, lines, parse_script):
@@ -170,6 +173,7 @@ class ProfileUI:
         keyboard_select_button.clicked.connect(
             lambda: SelectDevice().open_device_selection(self.edit_window, keyboard_entry)
         )
+        keyboard_select_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
     def edit_middle(self, lines):
@@ -216,14 +220,14 @@ class ProfileUI:
 
         # Build remap and shortcut row instance
         self.shortcut_row_comp = ShortcutRow(self.edit_frame)
-        self.remap_row_comp = RemapRow(self.edit_frame)
+        self.default_mode_comp = DefaultMode(self.edit_frame)
 
         # Add profile widget
         if index == 0:
             self.default_mode_widget(self.edit_window, lines)
 
         elif index == 1:
-            text_block = self.text_block(lines)
+            text_block = TextMode().text_block(lines)
             self.edit_frame_layout.addWidget(text_block)
 
         else:
@@ -239,38 +243,8 @@ class ProfileUI:
         self.edit_frame_layout.addWidget(shortcut_widget)
 
         parsed_remap_list = parse_script.parse_default_mode(lines) if lines else None
-        remap_widget = self.remap_row_comp.remap_row(parent_window, parsed_remap_list)
+        remap_widget = self.default_mode_comp.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)
-
-    def text_block(self, lines=None):
-        """Text mode frame(to do: fix)."""
-        text_block = QTextEdit()
-        text_block.setLineWrapMode(QTextEdit.WidgetWidth)
-        text_block.setFixedHeight(14 * text_block.fontMetrics().height())
-        text_block.setFontPointSize(10)
-        text_block.setReadOnly(False)
-        text_block.setStyleSheet(style.TEXT_BLOCK)
-        text_content = self.extract_and_filter_content(lines).strip() if lines else None
-        text_block.setPlainText(text_content)
-
-        return text_block
-
-    def extract_and_filter_content(self, lines):
-        """Get text block value from the marker."""
-        inside = False
-        result_lines = []
-        for line in lines:
-            stripped = line.strip()
-            if stripped == "; Text mode start":
-                inside = True
-                continue
-            if stripped == "; Text mode end":
-                inside = False
-                continue
-            if inside:
-                result_lines.append(line)
-
-        return "".join(result_lines)
 
     def edit_bottom(self, first_line, top_widget):
         """Bottom part of profile manager."""
@@ -284,6 +258,7 @@ class ProfileUI:
             lambda: self.save_changes(mode_combobox.currentText().strip().lower(), top_widget)
         )
         save_button.setFixedHeight(28)
+        save_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         bottom_layout.addWidget(save_button, 0, 0, 1, 1)
 
         mode_combobox = QComboBox(self.edit_window)
@@ -294,6 +269,7 @@ class ProfileUI:
         mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         default_index = diff.mode_map.get(first_line.lower(), 0)
         mode_combobox.setCurrentIndex(default_index)
+        mode_combobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         mode_combobox.currentIndexChanged.connect(self.build_profile)
 
@@ -307,18 +283,24 @@ class ProfileUI:
         script_name_entry = top_widget.findChild(QLineEdit, "ScriptNameEntry")
         script_name = script_name_entry.text().strip() + ".ahk"
 
-        if not script_name:
-            QMessageBox.warning(None, "Input Error", "Please enter a Profile name.")
+        if not script_name_entry.text():
+            QMessageBox.warning(
+                QApplication.activeWindow(), "Input Error", "Please enter a Profile name."
+            )
+            return
+
+        # Make sure shortcut valid
+        write_script = WriteScript(self.default_mode_comp, self.shortcut_row_comp)
+        if not write_script.check_shortcut_integrity():
             return
 
         try:
             output_path = os.path.join(self.main_core.script_dir, script_name)
             with open(output_path, "w", encoding="utf-8") as file:
-                write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
                 condition_string = write_script.write_condition(top_widget)
 
                 if mode == "text mode":
-                    write_script.handle_text_mode(file, condition_string)
+                    write_script.handle_text_mode(file, self.edit_frame, condition_string)
                 elif mode == "default mode":
                     write_default = WriteDefault(write_script)
                     write_default.handle_default_mode(file, condition_string)

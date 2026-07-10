@@ -55,7 +55,7 @@ class TextMode:
                 ).name()
 
         syntax_style = QSyntaxStyle()
-        syntax_style._processStyleSchema(data)  # pyint: disable=w0212
+        syntax_style._processStyleSchema(data)  # pylint: disable=w0212
 
         code_editor = QCodeEditor()
         code_editor.setSyntaxStyle(syntax_style)

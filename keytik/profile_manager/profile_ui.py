@@ -17,7 +17,7 @@
 import os
 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
-from PySide6.QtGui import QFont, QIcon  # pylint: disable=E0611
+from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
     QComboBox,
@@ -30,7 +30,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QScrollArea,
     QSizePolicy,
     QSpacerItem,
-    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -39,6 +38,7 @@ from keytik.profile_manager.parse_script import ParseScript
 from keytik.profile_manager.write_script import WriteDefault, WriteScript
 from keytik.profile_mode.default_mode import DefaultMode
 from keytik.profile_mode.shortcut_row import ShortcutRow
+from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
 from keytik.select_program.select_program_ui import SelectProgramUI
 from keytik.utility import constant, diff, style
@@ -227,7 +227,7 @@ class ProfileUI:
             self.default_mode_widget(self.edit_window, lines)
 
         elif index == 1:
-            text_block = self.text_block(lines)
+            text_block = TextMode().text_block(lines)
             self.edit_frame_layout.addWidget(text_block)
 
         else:
@@ -245,33 +245,6 @@ class ProfileUI:
         parsed_remap_list = parse_script.parse_default_mode(lines) if lines else None
         remap_widget = self.default_mode_comp.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)
-
-    def text_block(self, lines=None):
-        """Text mode frame(to do: fix)."""
-        text_block = QTextEdit()
-
-        text_block.setFont(QFont("Consolas", 10))
-        text_content = self.extract_and_filter_content(lines).strip() if lines else None
-        text_block.setPlainText(text_content)
-
-        return text_block
-
-    def extract_and_filter_content(self, lines):
-        """Get text block value from the marker."""
-        inside = False
-        result_lines = []
-        for line in lines:
-            stripped = line.strip()
-            if stripped == "; Text mode start":
-                inside = True
-                continue
-            if stripped == "; Text mode end":
-                inside = False
-                continue
-            if inside:
-                result_lines.append(line)
-
-        return "".join(result_lines)
 
     def edit_bottom(self, first_line, top_widget):
         """Bottom part of profile manager."""

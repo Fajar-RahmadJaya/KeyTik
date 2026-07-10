@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
-from keytik.script_profile.remap_row_core import RemapRowCore
+from keytik.profile_mode.profile_mode_core import ProfileModeCore
 from keytik.select_key.select_key_core import SelectKeyCore
 from keytik.utility import constant, utils
 
@@ -59,13 +59,13 @@ class ConditionString:
 class WriteScript:
     """Write script based on profile input."""
 
-    def __init__(self, remap_row_comp=None, shortcut_row_comp=None):
-        self.remap_row_comp = remap_row_comp
+    def __init__(self, default_mode_comp=None, shortcut_row_comp=None):
+        self.default_mode_comp = default_mode_comp
         self.shortcut_row_comp = shortcut_row_comp
 
         # Composition
         self.dashboard_core = DashboardCore()
-        self.remap_row_core = RemapRowCore()
+        self.profile_mode_core = ProfileModeCore()
 
     def check_shortcut_integrity(self):
         """Make sure there is no conflict on profile input."""
@@ -366,7 +366,7 @@ cm1 := AHI.CreateContextManager(id1)\n
         keys = key.split("+")
         translated_keys = []
 
-        key_translations = self.remap_row_core.read_keylist()
+        key_translations = self.profile_mode_core.read_keylist()
 
         for single_key in keys:
             translated_key = key_translations.get(single_key.strip().lower())
@@ -412,7 +412,7 @@ class WriteDefault:
 
     def process_key_remaps(self, file):
         """Handle key remap write."""
-        for key_widget in self.write_script.remap_row_comp.key_rows:
+        for key_widget in self.write_script.default_mode_comp.key_rows:
             self.remap_widget = RemapWidget(
                 default_key_entry=key_widget.default_key.default_key_entry,
                 remap_key_entry=key_widget.remap_key.remap_key_entry,

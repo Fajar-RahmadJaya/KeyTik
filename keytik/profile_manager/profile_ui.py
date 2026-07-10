@@ -35,9 +35,10 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget,
 )
 
-from keytik.script_profile.parse_script import ParseScript
-from keytik.script_profile.remap_row import RemapRow, ShortcutRow
-from keytik.script_profile.write_script import WriteDefault, WriteScript
+from keytik.profile_manager.parse_script import ParseScript
+from keytik.profile_manager.write_script import WriteDefault, WriteScript
+from keytik.profile_mode.default_mode import DefaultMode
+from keytik.profile_mode.shortcut_row import ShortcutRow
 from keytik.select_device.select_device import SelectDevice
 from keytik.select_program.select_program_ui import SelectProgramUI
 from keytik.utility import constant, diff, style
@@ -53,7 +54,7 @@ class ProfileUI:
         # Composition
         # Used for save change since it need for
         # current remap row composition (Mode changed or edit middle)
-        self.remap_row_comp = None
+        self.default_mode_comp = None
         self.shortcut_row_comp = None
 
         # UI
@@ -219,7 +220,7 @@ class ProfileUI:
 
         # Build remap and shortcut row instance
         self.shortcut_row_comp = ShortcutRow(self.edit_frame)
-        self.remap_row_comp = RemapRow(self.edit_frame)
+        self.default_mode_comp = DefaultMode(self.edit_frame)
 
         # Add profile widget
         if index == 0:
@@ -242,7 +243,7 @@ class ProfileUI:
         self.edit_frame_layout.addWidget(shortcut_widget)
 
         parsed_remap_list = parse_script.parse_default_mode(lines) if lines else None
-        remap_widget = self.remap_row_comp.remap_row(parent_window, parsed_remap_list)
+        remap_widget = self.default_mode_comp.remap_row(parent_window, parsed_remap_list)
         self.edit_frame_layout.addWidget(remap_widget)
 
     def text_block(self, lines=None):
@@ -316,7 +317,7 @@ class ProfileUI:
             return
 
         # Make sure shortcut valid
-        write_script = WriteScript(self.remap_row_comp, self.shortcut_row_comp)
+        write_script = WriteScript(self.default_mode_comp, self.shortcut_row_comp)
         if not write_script.check_shortcut_integrity():
             return
 

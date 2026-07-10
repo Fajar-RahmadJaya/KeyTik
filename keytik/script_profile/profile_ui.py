@@ -17,7 +17,7 @@
 import os
 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
-from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtGui import QFont, QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
     QComboBox,
@@ -248,11 +248,8 @@ class ProfileUI:
     def text_block(self, lines=None):
         """Text mode frame(to do: fix)."""
         text_block = QTextEdit()
-        text_block.setLineWrapMode(QTextEdit.WidgetWidth)
-        text_block.setFixedHeight(14 * text_block.fontMetrics().height())
-        text_block.setFontPointSize(10)
-        text_block.setReadOnly(False)
-        text_block.setStyleSheet(style.TEXT_BLOCK)
+
+        text_block.setFont(QFont("Consolas", 10))
         text_content = self.extract_and_filter_content(lines).strip() if lines else None
         text_block.setPlainText(text_content)
 

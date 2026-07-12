@@ -28,8 +28,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMessageBox,
     QPushButton,
     QScrollArea,
-    QSizePolicy,
-    QSpacerItem,
     QVBoxLayout,
     QWidget,
 )
@@ -215,9 +213,6 @@ class ProfileUI:
             if widget:
                 widget.setParent(None)
 
-        # Spacer to coupled row tightly
-        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
         # Build remap and shortcut row instance
         self.shortcut_row_comp = ShortcutRow(self.edit_frame)
         self.default_mode_comp = DefaultMode(self.edit_frame)
@@ -232,7 +227,6 @@ class ProfileUI:
 
         else:
             diff.pro_mode(index, lines, self)
-            self.edit_frame_layout.addItem(spacer)
 
     def default_mode_widget(self, parent_window, lines=None):
         """Default mode frame."""
@@ -299,13 +293,14 @@ class ProfileUI:
             with open(output_path, "w", encoding="utf-8") as file:
                 condition_string = write_script.write_condition(top_widget)
 
-                if mode == "text mode":
-                    write_script.handle_text_mode(file, self.edit_frame, condition_string)
-                elif mode == "default mode":
+                if mode == "default mode":
                     write_default = WriteDefault(write_script)
                     write_default.handle_default_mode(file, condition_string)
+                # Check if pro version mode
+                elif diff.pro_write(file, mode, condition_string):
+                    pass
                 else:
-                    diff.pro_write(file, mode, condition_string)
+                    write_script.handle_text_mode(file, self.edit_frame, condition_string)
 
         except FileNotFoundError as error:
             print(f"Error: {error}")

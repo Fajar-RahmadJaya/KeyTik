@@ -12,16 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Containing code for pro version and normal version to make migration easier.
+"""Containing code for pro version and normal version to make migration easier."""
 
-The only import allowed should be diff_comp.
-"""
+from textwrap import dedent
 
-mode_item = ["Default Mode", "Text Mode"]
+from keytik.profile_mode.text_mode import TextMode
+
+mode_item = [
+    "Default Mode",
+    "Text Mode",
+    "Auto Clicker",
+    "Screen Clicker",
+    "Files Opener",
+    "Screen Coordinate Finder",
+]
 
 mode_map = {
     "; default": 0,
     "; text": 1,
+    "; auto clicker script": 2,
+    "; screen clicker script": 3,
+    "; files opener script": 4,
+    "; screen coordinate finder script": 5,
 }
 
 PROGRAM_NAME = "KeyTik"
@@ -34,6 +46,105 @@ CHECK_UPDATE_LINK = "https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releas
 
 RELEASE_LINK = "https://github.com/Fajar-RahmadJaya/KeyTik/releases"
 
+AUTO_CLICKER = dedent("""\
+ClickInterval := 100 ; Change this if you want to change the interval
+
+global isClicking := false
+
+$e:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+{
+    global isClicking
+    isClicking := true
+    while (isClicking)
+    {
+        Click ; Change this if you want to change left click to another key for auto clicker
+        Sleep(ClickInterval)
+    }
+}
+
+$e up:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+{
+    global isClicking
+    isClicking := false
+}
+
+""")
+
+SCREEN_CLICKER = dedent("""\
+toggle := false
+
+q & e:: ; Change this to toogle screen clicker on or off
+{
+global
+    toggle := !toggle
+
+    if (toggle) {
+        SetTimer(ClickLoop,100)
+    } else {
+        SetTimer(ClickLoop,0)
+    }
+    return
+}
+
+ClickLoop()
+{
+global
+    coordinates := [[500, 300], [600, 400], [700, 500]] ; Change the interval to your preference
+
+    Loop coordinates.Length != 0 ? coordinates.Length : ""
+    {
+        x := coordinates[A_Index][1]
+        y := coordinates[A_Index][2]
+
+        MouseMove(x, y)
+        Click()
+
+        interval := 500 ; Change the interval to your preference in milisecond
+
+        Sleep(interval)
+    }
+    return
+}
+""")
+
+FILES_OPENER = dedent("""\
+Alt & Left::
+    {
+        Run("C:\\path\\to\\your\\file1.txt") ; Made sure to change this with your file path
+        Run("C:\\path\\to\\your\\file2.txt") ; You can also copy and paste this line for more file like this
+        Run("C:\\path\\to\\your\\file3.txt")
+    }
+    return
+""")  # noqa
+
+SCREEN_COORDINATE_FINDER = dedent("""\
+Persistent
+SetTitleMatchMode(2)
+
+Space:: ; Change this for script to take coordinate
+{
+    MouseGetPos(&mouseX, &mouseY)
+
+    coordFormat := "[" mouseX "," mouseY "]"
+
+    A_Clipboard := coordFormat
+
+    ToolTip("The coordinate has been copied:`n" coordFormat)
+
+    SetTimer(RemoveToolTip,-2000)
+
+    return
+}
+
+RemoveToolTip()
+{
+global
+    ToolTip()
+    return
+}
+; Text mode end
+""")
+
 
 def parse_update_response(response):
     """Parse the response from check for update."""
@@ -45,10 +156,22 @@ def parse_update_response(response):
 
 
 def pro_mode(index, lines, profile_ui):
-    """Dummy mode on normal version."""
-    print(f"Invalid {index}, {lines}, {profile_ui}")
+    """Some of pro version mode in non ui version."""
+    text_block = TextMode().text_block(lines)
+    if index == 2:  # noqa
+        text_block.setPlainText(AUTO_CLICKER)
+    elif index == 3:  # noqa
+        text_block.setPlainText(SCREEN_CLICKER)
+
+    elif index == 4:  # noqa
+        text_block.setPlainText(FILES_OPENER)
+
+    elif index == 5:  # noqa
+        text_block.setPlainText(SCREEN_COORDINATE_FINDER)
+
+    profile_ui.edit_frame_layout.addWidget(text_block)
 
 
-def pro_write(file, mode, condition_string):
+def pro_write(file, mode, condition_string):  # pylint: disable=W0613
     """Dummy write on normal version."""
-    print(f"Invalid {file}, {mode}", {condition_string})
+    return None

@@ -20,7 +20,7 @@ from pyqcodeeditor import utils as pyqcodeeditor_utils
 from pyqcodeeditor.QCodeEditor import QCodeEditor
 from pyqcodeeditor.QSyntaxStyle import QSyntaxStyle
 from PySide6.QtGui import QPalette  # pylint: disable=E0611
-from PySide6.QtWidgets import QSizePolicy  # pylint: disable=E0611
+from PySide6.QtWidgets import QSizePolicy, QTextEdit  # pylint: disable=E0611
 
 from keytik.utility import style
 
@@ -60,6 +60,7 @@ class TextMode:
 
         code_editor = QCodeEditor()
         code_editor.setSyntaxStyle(syntax_style)
+        code_editor.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
 
         text_content = self.extract_and_filter_content(lines).strip() if lines else None
         code_editor.setPlainText(text_content)

@@ -29,6 +29,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QPushButton,
     QScrollArea,
     QStackedWidget,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -197,7 +198,7 @@ class ProfileUI:
 
         self.middle_stack = QStackedWidget()
         self.middle_stack.addWidget(edit_scroll)
-        text_block = TextMode().text_block(lines)
+        text_block = TextMode().text_mode_widget(self.edit_window, self.edit_frame, lines)
         self.middle_stack.addWidget(text_block)
         edit_layout.addWidget(self.middle_stack, 1, 0, 1, 4)
 
@@ -227,7 +228,8 @@ class ProfileUI:
 
         elif index == 1:
             if not lines:
-                self.middle_stack.widget(1).clear()
+                text_mode = self.middle_stack.widget(1)
+                text_mode.findChild(QTextEdit).clear()
             self.middle_stack.setCurrentIndex(1)
 
         else:

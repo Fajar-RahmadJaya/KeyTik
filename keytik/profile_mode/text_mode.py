@@ -19,17 +19,110 @@ import json
 from pyqcodeeditor import utils as pyqcodeeditor_utils
 from pyqcodeeditor.QCodeEditor import QCodeEditor
 from pyqcodeeditor.QSyntaxStyle import QSyntaxStyle
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette, QTextCharFormat, QTextCursor  # pylint: disable=E0611
-from PySide6.QtWidgets import QSizePolicy, QTextEdit  # pylint: disable=E0611
+from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QFrame,
+    QPushButton,
+    QScrollArea,
+    QSizePolicy,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
 
+from keytik.profile_manager.parse_script import ParseScript
+from keytik.profile_mode.shortcut_row import ShortcutRow
 from keytik.utility import style
 
 
 class TextMode:
     """Text mode code."""
 
+    def text_mode_widget(self, parent_window, edit_frame, lines=None):
+        """Build text mode widget."""
+        widget = QWidget()
+        layout = QVBoxLayout()
+        widget.setLayout(layout)
+
+        layout.addWidget(self.collapsible_shortcuts(parent_window, edit_frame, lines))
+        layout.addWidget(self.text_block(lines))
+
+        return widget
+
+    def collapsible_shortcuts(self, parent_window, edit_frame, lines=None):
+        """Hide or unhide shortcuts."""
+        widget = QWidget()
+        widget.setObjectName("shortcutHeader")
+        widget.setStyleSheet("""
+        QWidget#shortcutHeader {
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+        """)
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        palette = style.get_palette()
+        hover_palette = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Midlight)
+
+        header_button = QPushButton()
+        header_button.setText("Expand Shortcut")
+        header_button.setStyleSheet(f"""
+        QPushButton{{
+            border: none;
+            font-size: 13px;
+            font-weight: bold;
+        }}
+
+        QPushButton:hover {{
+            background-color: {hover_palette.name()};
+            border-radius: 4px;
+        }}
+        """)
+        header_button.setFixedHeight(28)
+        header_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        layout.addWidget(header_button)
+
+        shortcut_scrollview = QScrollArea()
+        shortcut_scrollview.setWidgetResizable(True)
+        shortcut_scrollview.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        shortcut_scrollview.setObjectName("editScroll")
+        shortcut_scrollview.setFrameShape(QFrame.Shape.NoFrame)
+        shortcut_scrollview.setStyleSheet("""
+            #editScroll {
+                background-color: transparent;
+                margin: 8px;
+            }
+        """)
+        shortcut_scrollview.setFixedHeight(140)
+        shortcut_scrollview.setHidden(True)
+        layout.addWidget(shortcut_scrollview)
+
+        parsed_shortcuts_list = ParseScript().parse_shortcuts(lines) if lines else None
+        shortcut_row_widget = ShortcutRow(edit_frame).shortcut_row(
+            parent_window, parsed_shortcuts_list, title=False
+        )
+        shortcut_scrollview.setWidget(shortcut_row_widget)
+
+        def button_event():
+            """Hide shortcut scrollview."""
+            if not shortcut_scrollview.isHidden():
+                shortcut_scrollview.setHidden(True)
+                header_button.setText("Expand Shortcut")
+            else:
+                shortcut_scrollview.setHidden(False)
+                header_button.setText("Collapse Shortcut")
+
+        header_button.clicked.connect(button_event)
+
+        return widget
+
     def text_block(self, lines=None):
-        """Text mode frame(to do: fix)."""
+        """Text mode frame."""
         palette = style.get_palette()
 
         default_style = pyqcodeeditor_utils.get_resource_file("default_style.json")

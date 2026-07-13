@@ -17,6 +17,8 @@
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
+from PySide6.QtWidgets import QTextEdit  # pylint: disable=E0611
+
 if TYPE_CHECKING:
     from keytik.profile_manager.profile_ui import ProfileUI
 
@@ -166,7 +168,8 @@ def parse_update_response(response):
 def pro_mode(index, lines, profile_ui: "ProfileUI"):  # pylint: disable=W0613
     """Some of pro version mode in non ui version."""
     profile_ui.middle_stack.setCurrentIndex(1)
-    text_block = profile_ui.middle_stack.widget(1)
+    text_mode = profile_ui.middle_stack.widget(1)
+    text_block = text_mode.findChild(QTextEdit)
     text_block.clear()
 
     if index == 2:  # noqa

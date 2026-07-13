@@ -43,7 +43,7 @@ class ShortcutRow:
         self.key_listening_comp = KeyListening(edit_frame)
         self.shared_row = SharedRow()
 
-    def shortcut_row(self, parent_window, parsed_shortcuts_list: list | None = None):
+    def shortcut_row(self, parent_window, parsed_shortcuts_list: list | None = None, title=True):
         """Build shortcut row."""
         # Widget and layout
         shortcut_widget = QWidget()
@@ -52,8 +52,9 @@ class ShortcutRow:
         shortcut_layout.setContentsMargins(0, 0, 0, 0)
 
         # Shortcut title
-        shortcut_title = self.shortcut_title()
-        shortcut_layout.addWidget(shortcut_title)
+        if title:
+            shortcut_title = self.shortcut_title()
+            shortcut_layout.addWidget(shortcut_title)
 
         # Shortcut row
         shared_row = SharedRow()

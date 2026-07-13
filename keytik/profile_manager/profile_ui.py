@@ -193,9 +193,6 @@ class ProfileUI:
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.edit_frame.setLayout(self.edit_frame_layout)
 
-        # Spacer to coupled row tightly
-        # spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
         # Add profile mode widget
         index = diff.mode_map.get(lines[0].strip().lower())
         self.build_profile(index, lines=lines)

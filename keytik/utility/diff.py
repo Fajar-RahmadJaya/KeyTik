@@ -47,6 +47,8 @@ CHECK_UPDATE_LINK = "https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releas
 RELEASE_LINK = "https://github.com/Fajar-RahmadJaya/KeyTik/releases"
 
 AUTO_CLICKER = dedent("""\
+; See how to configure auto clicker at https://keytik.com/docs/getting-started/automation-tool
+
 ClickInterval := 100 ; Change this if you want to change the interval (keytik: highlight)
 
 global isClicking := false
@@ -70,6 +72,8 @@ $e up:: ; Change this if you want to change hold 'e' for condition to do autocli
 """)  # noqa
 
 SCREEN_CLICKER = dedent("""\
+; See how to configure screen clicker at https://keytik.com/docs/getting-started/automation-tool
+
 toggle := false
 
 q & e:: ; Change this to toogle screen clicker on or off (keytik: highlight)
@@ -107,6 +111,8 @@ global
 """)  # noqa
 
 FILES_OPENER = dedent("""\
+; See how to configure files opener at https://keytik.com/docs/getting-started/automation-tool
+
 Alt & Left::
     {
         Run("C:\\path\\to\\your\\file1.txt") ; Made sure to change this with your file path (keytik: highlight)
@@ -117,6 +123,8 @@ Alt & Left::
 """)  # noqa
 
 SCREEN_COORDINATE_FINDER = dedent("""\
+; See how to configure screen coordinate finder at https://keytik.com/docs/getting-started/automation-tool
+
 Persistent
 SetTitleMatchMode(2)
 

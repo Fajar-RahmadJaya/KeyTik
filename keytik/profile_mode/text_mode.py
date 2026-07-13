@@ -19,7 +19,7 @@ import json
 from pyqcodeeditor import utils as pyqcodeeditor_utils
 from pyqcodeeditor.QCodeEditor import QCodeEditor
 from pyqcodeeditor.QSyntaxStyle import QSyntaxStyle
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QPalette, QTextCharFormat, QTextCursor  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QFrame,

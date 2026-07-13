@@ -19,7 +19,7 @@ import json
 from pyqcodeeditor import utils as pyqcodeeditor_utils
 from pyqcodeeditor.QCodeEditor import QCodeEditor
 from pyqcodeeditor.QSyntaxStyle import QSyntaxStyle
-from PySide6.QtGui import QPalette  # pylint: disable=E0611
+from PySide6.QtGui import QPalette, QTextCharFormat, QTextCursor  # pylint: disable=E0611
 from PySide6.QtWidgets import QSizePolicy, QTextEdit  # pylint: disable=E0611
 
 from keytik.utility import style
@@ -66,7 +66,37 @@ class TextMode:
         code_editor.setPlainText(text_content)
         code_editor.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
+        code_editor.cursorPositionChanged.connect(lambda: self.highlight_line(code_editor))
         return code_editor
+
+    def highlight_line(self, code_editor: QTextEdit) -> QTextEdit.ExtraSelection:
+        """Highlight line containing (keytik: highlight)."""
+        selections = []
+        text_document = code_editor.document()
+        line = text_document.firstBlock()
+
+        palette = style.get_palette()
+        accent = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Accent)
+        accent.setAlpha(60)
+
+        while line.isValid():
+            text = line.text()
+            if "(keytik: highlight)" in text:
+                selection = QTextEdit.ExtraSelection()
+
+                fmt = QTextCharFormat()
+                fmt.setBackground(accent)
+
+                selection.format = fmt
+                selection.cursor = QTextCursor(line)
+                selection.cursor.clearSelection()
+                selection.cursor.select(QTextCursor.SelectionType.LineUnderCursor)
+
+                selections.append(selection)
+
+            line = line.next()
+
+        code_editor.setExtraSelections(selections)
 
     def extract_and_filter_content(self, lines):
         """Get text block value from the marker."""

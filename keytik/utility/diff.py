@@ -47,32 +47,32 @@ CHECK_UPDATE_LINK = "https://api.github.com/repos/Fajar-RahmadJaya/KeyTik/releas
 RELEASE_LINK = "https://github.com/Fajar-RahmadJaya/KeyTik/releases"
 
 AUTO_CLICKER = dedent("""\
-ClickInterval := 100 ; Change this if you want to change the interval
+ClickInterval := 100 ; Change this if you want to change the interval (keytik: highlight)
 
 global isClicking := false
 
-$e:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+$e:: ; Change this if you want to change hold 'e' for condition to do autoclicker (keytik: highlight)
 {
     global isClicking
     isClicking := true
     while (isClicking)
     {
-        Click ; Change this if you want to change left click to another key for auto clicker
+        Click ; Change this if you want to change left click to another key for auto clicker (keytik: highlight)
         Sleep(ClickInterval)
     }
 }
 
-$e up:: ; Change this if you want to change hold 'e' for condition to do autoclicker
+$e up:: ; Change this if you want to change hold 'e' for condition to do autoclicker (keytik: highlight)
 {
     global isClicking
     isClicking := false
 }
-""")
+""")  # noqa
 
 SCREEN_CLICKER = dedent("""\
 toggle := false
 
-q & e:: ; Change this to toogle screen clicker on or off
+q & e:: ; Change this to toogle screen clicker on or off (keytik: highlight)
 {
 global
     toggle := !toggle
@@ -88,7 +88,7 @@ global
 ClickLoop()
 {
 global
-    coordinates := [[500, 300], [600, 400], [700, 500]] ; Change the interval to your preference
+    coordinates := [[500, 300], [600, 400], [700, 500]] ; Change the interval to your preference (keytik: highlight)
 
     Loop coordinates.Length != 0 ? coordinates.Length : ""
     {
@@ -98,20 +98,20 @@ global
         MouseMove(x, y)
         Click()
 
-        interval := 500 ; Change the interval to your preference in milisecond
+        interval := 500 ; Change the interval to your preference in milisecond (keytik: highlight)
 
         Sleep(interval)
     }
     return
 }
-""")
+""")  # noqa
 
 FILES_OPENER = dedent("""\
 Alt & Left::
     {
-        Run("C:\\path\\to\\your\\file1.txt") ; Made sure to change this with your file path
-        Run("C:\\path\\to\\your\\file2.txt") ; You can also copy and paste this line for more file like this
-        Run("C:\\path\\to\\your\\file3.txt")
+        Run("C:\\path\\to\\your\\file1.txt") ; Made sure to change this with your file path (keytik: highlight)
+        Run("C:\\path\\to\\your\\file2.txt") ; You can also copy and paste this line for more file like this (keytik: highlight)
+        Run("C:\\path\\to\\your\\file3.txt") ; (keytik: highlight)
     }
     return
 """)  # noqa
@@ -120,7 +120,7 @@ SCREEN_COORDINATE_FINDER = dedent("""\
 Persistent
 SetTitleMatchMode(2)
 
-Space:: ; Change this for script to take coordinate
+Space:: ; Change this for script to take coordinate (keytik: highlight)
 {
     MouseGetPos(&mouseX, &mouseY)
 
@@ -141,7 +141,6 @@ global
     ToolTip()
     return
 }
-; Text mode end
 """)
 
 

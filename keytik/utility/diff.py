@@ -67,7 +67,6 @@ $e up:: ; Change this if you want to change hold 'e' for condition to do autocli
     global isClicking
     isClicking := false
 }
-
 """)
 
 SCREEN_CLICKER = dedent("""\

@@ -72,6 +72,7 @@ class TextMode:
     def highlight_line(self, code_editor: QTextEdit) -> QTextEdit.ExtraSelection:
         """Highlight line containing (keytik: highlight)."""
         selections = []
+        highlight_syntax = "(keytik: highlight)"
         text_document = code_editor.document()
         line = text_document.firstBlock()
 
@@ -81,13 +82,17 @@ class TextMode:
 
         while line.isValid():
             text = line.text()
-            if "(keytik: highlight)" in text:
+            if (
+                highlight_syntax in text
+                and ";" in text
+                and text.index(";") < text.index(highlight_syntax)
+            ):
                 selection = QTextEdit.ExtraSelection()
 
-                fmt = QTextCharFormat()
-                fmt.setBackground(accent)
+                text_format = QTextCharFormat()
+                text_format.setBackground(accent)
 
-                selection.format = fmt
+                selection.format = text_format
                 selection.cursor = QTextCursor(line)
                 selection.cursor.clearSelection()
                 selection.cursor.select(QTextCursor.SelectionType.LineUnderCursor)

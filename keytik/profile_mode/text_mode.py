@@ -78,7 +78,7 @@ class TextMode:
 
         palette = style.get_palette()
         accent = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Accent)
-        accent.setAlpha(60)
+        accent.setAlpha(20)
 
         while line.isValid():
             text = line.text()

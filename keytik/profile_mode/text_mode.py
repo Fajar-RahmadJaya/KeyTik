@@ -66,6 +66,7 @@ class TextMode:
         code_editor.setPlainText(text_content)
         code_editor.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
+        self.highlight_line(code_editor)
         code_editor.cursorPositionChanged.connect(lambda: self.highlight_line(code_editor))
         return code_editor
 

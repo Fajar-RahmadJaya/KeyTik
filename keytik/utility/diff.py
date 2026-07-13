@@ -15,8 +15,10 @@
 """Containing code for pro version and normal version to make migration easier."""
 
 from textwrap import dedent
+from typing import TYPE_CHECKING
 
-from keytik.profile_mode.text_mode import TextMode
+if TYPE_CHECKING:
+    from keytik.profile_manager.profile_ui import ProfileUI
 
 mode_item = [
     "Default Mode",
@@ -161,9 +163,12 @@ def parse_update_response(response):
     return None
 
 
-def pro_mode(index, lines, profile_ui):
+def pro_mode(index, lines, profile_ui: "ProfileUI"):  # pylint: disable=W0613
     """Some of pro version mode in non ui version."""
-    text_block = TextMode().text_block(lines)
+    profile_ui.middle_stack.setCurrentIndex(1)
+    text_block = profile_ui.middle_stack.widget(1)
+    text_block.clear()
+
     if index == 2:  # noqa
         text_block.setPlainText(AUTO_CLICKER)
     elif index == 3:  # noqa
@@ -174,8 +179,6 @@ def pro_mode(index, lines, profile_ui):
 
     elif index == 5:  # noqa
         text_block.setPlainText(SCREEN_COORDINATE_FINDER)
-
-    profile_ui.edit_frame_layout.addWidget(text_block)
 
 
 def pro_write(file, mode, condition_string):  # pylint: disable=W0613

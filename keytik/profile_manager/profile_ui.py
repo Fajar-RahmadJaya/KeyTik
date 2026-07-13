@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -59,6 +60,7 @@ class ProfileUI:
         self.edit_window = None
         self.edit_frame = QWidget()
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+        self.middle_stack = None
 
     def edit_script(self, script_name, parent):
         """Create/edit profile window."""
@@ -94,8 +96,7 @@ class ProfileUI:
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
         # Middle part of profile manager
-        edit_scroll = self.edit_middle(lines)
-        edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
+        self.edit_middle(lines, edit_layout)
 
         # Bottom part of profile manager
         bottom_widget = self.edit_bottom(first_line, top_widget)
@@ -174,7 +175,7 @@ class ProfileUI:
         keyboard_select_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
-    def edit_middle(self, lines):
+    def edit_middle(self, lines, edit_layout: QGridLayout):
         """Middle part of profile manager."""
         edit_scroll = QScrollArea(self.edit_window)
         edit_scroll.setWidgetResizable(True)
@@ -192,12 +193,17 @@ class ProfileUI:
 
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.edit_frame.setLayout(self.edit_frame_layout)
+        edit_scroll.setWidget(self.edit_frame)
+
+        self.middle_stack = QStackedWidget()
+        self.middle_stack.addWidget(edit_scroll)
+        text_block = TextMode().text_block(lines)
+        self.middle_stack.addWidget(text_block)
+        edit_layout.addWidget(self.middle_stack, 1, 0, 1, 4)
 
         # Add profile mode widget
         index = diff.mode_map.get(lines[0].strip().lower())
         self.build_profile(index, lines=lines)
-
-        edit_scroll.setWidget(self.edit_frame)
 
         return edit_scroll
 
@@ -215,12 +221,14 @@ class ProfileUI:
         self.default_mode_comp = DefaultMode(self.edit_frame)
 
         # Add profile widget
+        self.middle_stack.setCurrentIndex(0)
         if index == 0:
             self.default_mode_widget(self.edit_window, lines)
 
         elif index == 1:
-            text_block = TextMode().text_block(lines)
-            self.edit_frame_layout.addWidget(text_block)
+            if not lines:
+                self.middle_stack.widget(1).clear()
+            self.middle_stack.setCurrentIndex(1)
 
         else:
             diff.pro_mode(index, lines, self)
@@ -297,7 +305,9 @@ class ProfileUI:
                 elif diff.pro_write(file, mode, condition_string):
                     pass
                 else:
-                    write_script.handle_text_mode(file, self.edit_frame, condition_string)
+                    write_script.handle_text_mode(
+                        file, self.middle_stack.widget(1), condition_string
+                    )
 
         except FileNotFoundError as error:
             print(f"Error: {error}")

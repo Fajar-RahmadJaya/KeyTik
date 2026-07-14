@@ -193,9 +193,9 @@ def get_palette_role():
         subtext = None
         overlay = None
 
-    palette_role = _PaletteRole(surface=surface, mantle=mantle, subtext=subtext, overlay=overlay)
+    role = _PaletteRole(surface=surface, mantle=mantle, subtext=subtext, overlay=overlay)
 
-    return palette_role
+    return role
 
 
 palette_role = get_palette_role()

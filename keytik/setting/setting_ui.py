@@ -70,8 +70,9 @@ class SettingTemplate:
         card_layout.setContentsMargins(16, 16, 16, 16)
 
         theme_label = QLabel(
-            f"<div style='{style.HEADING_STYLE}'> {heading} </div>"
-            f"<div style=' {style.SUBHEADING_STYLE}'> {subheading} </div>"
+            f"<div style='font-size:13px; margin-bottom:2px'> {heading} </div>"
+            f""" <div style='font-size:11px; color: {style.palette_role.subtext};'>
+            {subheading} </div>"""
         )
 
         card_layout.addWidget(theme_label)

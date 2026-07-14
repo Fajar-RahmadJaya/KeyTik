@@ -164,7 +164,7 @@ IS_BASE_LIGHT = is_light(PALETTE.color(QPalette.Base))
 
 
 @dataclass
-class Color:
+class _PaletteRole:
     """Dataclass to hold palette used on styling."""
 
     surface: str
@@ -173,7 +173,7 @@ class Color:
     overlay: str
 
 
-def get_color():
+def get_palette_role():
     """Get color palette on various theme."""
     config = utils.get_config()
     theme = config.theme
@@ -193,12 +193,12 @@ def get_color():
         subtext = None
         overlay = None
 
-    color = Color(surface=surface, mantle=mantle, subtext=subtext, overlay=overlay)
+    palette_role = _PaletteRole(surface=surface, mantle=mantle, subtext=subtext, overlay=overlay)
 
-    return color
+    return palette_role
 
 
-COLOR = get_color()
+palette_role = get_palette_role()
 
 
 # ---------------------------- Styling ------------------------------
@@ -215,19 +215,21 @@ def get_geometry(parent_window, width, height):
     return QRect(x, y, width, height)
 
 
-# -------------------- Shared --------------------
-WIN11_BUTTON = f"""
-QPushButton{{
-    background-color: {COLOR.surface};
-    border: 1px solid {COLOR.mantle};
-    border-radius: 4px;
-    margin: 2px;
-}}
+# -------------------- Shared Stylesheet --------------------
+# --- This stylesheet mimix Win11 button style assigned by QT. ---
+# --- Currently unused ---
+# WIN11_BUTTON = f"""
+# QPushButton{{
+#     background-color: {COLOR.surface};
+#     border: 1px solid {COLOR.mantle};
+#     border-radius: 4px;
+#     margin: 2px;
+# }}
 
-QPushButton:hover {{
-    background-color: {COLOR.overlay};
-}}
-"""
+# QPushButton:hover {{
+#     background-color: {COLOR.overlay};
+# }}
+# """
 
 
 TREEVIEW = """
@@ -251,7 +253,7 @@ def card(object_name=None):
 
     style_sheet = f"""
     {widget} {{
-        background: {COLOR.surface};
+        background: {palette_role.surface};
         border-radius: {border_radius};
     }}
     """
@@ -259,18 +261,11 @@ def card(object_name=None):
     return style_sheet
 
 
-# -------------------- Dashboard --------------------
 PROFILE_ROW_LABEL = "font-size: 13px; font-weight: bold;"
-PLUS_LABEL = """
-    color: gray;
-    padding: 0 5px;
-    font-size: 14px;
-    font-weight: bold;
-"""
 GROUP_BOX = f"""
 QGroupBox {{
-    background-color: {COLOR.surface};
-    border: 1px solid {COLOR.mantle};
+    background-color: {palette_role.surface};
+    border: 1px solid {palette_role.mantle};
     border-radius: 8;
     margin-top: 1.5ex;
 }}
@@ -280,10 +275,6 @@ QGroupBox:title {{
     subcontrol-position: top left;
     left: 8px;
 }}"""
-
-# -------------------- Setting --------------------
-HEADING_STYLE = "font-size:13px; margin-bottom:2px"
-SUBHEADING_STYLE = f"font-size:11px; color: {COLOR.subtext};"
 
 
 def button_highlight(style_sheet=False):

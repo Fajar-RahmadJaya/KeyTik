@@ -237,14 +237,10 @@ class ProfileUI:
 
     def default_mode_widget(self, parent_window, lines=None):
         """Default mode frame."""
-        parse_script = ParseScript()  # Composition
-
-        parsed_shortcuts_list = parse_script.parse_shortcuts(lines) if lines else None
-        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
+        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, lines)
         self.edit_frame_layout.addWidget(shortcut_widget)
 
-        parsed_remap_list = parse_script.parse_default_mode(lines) if lines else None
-        remap_widget = self.default_mode_comp.remap_row(parent_window, parsed_remap_list)
+        remap_widget = self.default_mode_comp.remap_row(parent_window, lines)
         self.edit_frame_layout.addWidget(remap_widget)
 
     def edit_bottom(self, first_line, top_widget):

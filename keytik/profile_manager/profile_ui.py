@@ -94,6 +94,7 @@ class ProfileUI:
 
         # Top part of profile manager
         top_widget = self.edit_top(script_name, lines)
+        top_widget.setObjectName("TopWidget")
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
         # Middle part of profile manager
@@ -101,6 +102,7 @@ class ProfileUI:
 
         # Bottom part of profile manager
         bottom_widget = self.edit_bottom(first_line, top_widget)
+        bottom_widget.setObjectName("BottomWidget")
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
         self.edit_window.setLayout(edit_layout)
@@ -206,8 +208,6 @@ class ProfileUI:
         index = diff.mode_map.get(lines[0].strip().lower())
         self.build_profile(index, lines=lines)
 
-        return edit_scroll
-
     def build_profile(self, index, lines=None):
         """Add profile into layout."""
         # Clear Layout
@@ -303,8 +303,9 @@ class ProfileUI:
                 elif diff.pro_write(file, mode, condition_string):
                     pass
                 else:
+                    text_mode = self.middle_stack.widget(1)
                     write_script.handle_text_mode(
-                        file, self.middle_stack.widget(1), condition_string
+                        file, text_mode.findChild(QTextEdit), condition_string
                     )
 
         except FileNotFoundError as error:

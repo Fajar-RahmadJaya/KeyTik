@@ -19,31 +19,101 @@ import json
 from pyqcodeeditor import utils as pyqcodeeditor_utils
 from pyqcodeeditor.QCodeEditor import QCodeEditor
 from pyqcodeeditor.QSyntaxStyle import QSyntaxStyle
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QPalette, QTextCharFormat, QTextCursor  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
+    QDialog,
+    QGridLayout,
     QSizePolicy,
+    QStackedWidget,
     QTextEdit,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
 from keytik.profile_mode.shortcut_row import ShortcutRow
-from keytik.utility import style
+from keytik.utility import icons, style
 
 
 class TextMode:
     """Text mode code."""
 
-    def text_mode_widget(self, parent_window, edit_frame, lines=None):
+    def text_mode_widget(self, parent_window: QDialog, edit_frame, lines=None):
         """Build text mode widget."""
         widget = QWidget()
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
         widget.setLayout(layout)
 
         layout.addWidget(ShortcutRow(edit_frame).collapsible_shortcuts(parent_window, lines))
-        layout.addWidget(self.text_block(lines))
+
+        text_block_widget = QWidget()
+        layout.addWidget(text_block_widget)
+
+        text_block_layout = QGridLayout()
+        text_block_layout.setContentsMargins(0, 0, 0, 0)
+        text_block_layout.setSpacing(0)
+        text_block_widget.setLayout(text_block_layout)
+        text_block = self.text_block(lines)
+        text_block_layout.addWidget(text_block, 0, 0, 1, 2)
+
+        expand_button = QToolButton()
+        expand_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        expand_button.setIcon(icons.get_icon(icons.fullscreen))
+        expand_button.setIconSize(QSize(16, 16))
+        expand_button.setToolTip("Maximize")
+        expand_button.setFixedSize(40, 40)
+        expand_button.setCheckable(True)
+        palette = style.get_palette()
+        palette.setColor(QPalette.ColorRole.Accent, palette.color(QPalette.ColorRole.Button))
+        expand_button.setPalette(palette)
+        expand_button.setStyleSheet("""
+        QToolButton{
+            margin: 8px;
+        }
+        """)
+        text_block_layout.addWidget(expand_button, 0, 1, Qt.AlignTop | Qt.AlignRight)
+
+        edit_layout = parent_window.findChild(QGridLayout)
+        prev_layout_margin = edit_layout.contentsMargins()
+
+        def button_click_event():
+            """Set expand button icon."""
+            ischecked = expand_button.isChecked()
+
+            if ischecked:
+                expand_button.setToolTip("Minimize")
+                expand_button.setIcon(icons.get_icon(icons.fullscreen_exit))
+            else:
+                expand_button.setToolTip("Maximize")
+                expand_button.setIcon(icons.get_icon(icons.fullscreen))
+
+            self.expand_text_block(parent_window, ischecked, prev_layout_margin)
+
+        expand_button.clicked.connect(button_click_event)
 
         return widget
+
+    def expand_text_block(self, parent_window: QDialog, ischecked, prev_layout_margin):
+        """Hide other widget except text block."""
+        hidden = bool(ischecked)
+
+        edit_layout = parent_window.findChild(QGridLayout)
+        if ischecked:
+            edit_layout.setContentsMargins(0, 0, 0, 0)
+        else:
+            edit_layout.setContentsMargins(prev_layout_margin)
+
+        top_widget = parent_window.findChild(QWidget, "TopWidget")
+        top_widget.setHidden(hidden)
+
+        bottom_widget = parent_window.findChild(QWidget, "BottomWidget")
+        bottom_widget.setHidden(hidden)
+
+        middle_stack = parent_window.findChild(QStackedWidget)
+        collapsible_shortcut = middle_stack.widget(1).findChild(QWidget)
+        collapsible_shortcut.setHidden(hidden)
 
     def text_block(self, lines=None):
         """Text mode frame."""
@@ -85,6 +155,7 @@ class TextMode:
 
         self.highlight_line(code_editor)
         code_editor.cursorPositionChanged.connect(lambda: self.highlight_line(code_editor))
+
         return code_editor
 
     def highlight_line(self, code_editor: QTextEdit) -> QTextEdit.ExtraSelection:

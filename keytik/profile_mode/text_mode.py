@@ -148,6 +148,9 @@ class TextMode:
         code_editor = QCodeEditor()
         code_editor.setSyntaxStyle(syntax_style)
         code_editor.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+        code_editor.setFontFamily("Consolas")
+        code_editor.setFontWeight(400)
+        code_editor.setFontPointSize(10)
 
         text_content = self.extract_and_filter_content(lines).strip() if lines else None
         code_editor.setPlainText(text_content)

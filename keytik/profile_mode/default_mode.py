@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget,
 )
 
+from keytik.profile_manager.parse_script import ParseScript
 from keytik.profile_mode.key_listening import KeyListening
 from keytik.profile_mode.shared_row import SharedRow
 from keytik.select_key.select_key_ui import SelectKeyUI
@@ -87,7 +88,7 @@ class DefaultMode:
         self.key_rows = []
         self.edit_frame = edit_frame
 
-    def remap_row(self, parent_window, parsed_remap_list: list | None = None):
+    def remap_row(self, parent_window, lines=None):
         """Build remap row."""
         # Remap
         remap_widget = QWidget()
@@ -112,6 +113,7 @@ class DefaultMode:
             separator_widget = shared_row.separator_widget(add_empty_row, remap_widget)
             remap_layout.addWidget(separator_widget)
 
+        parsed_remap_list = ParseScript().parse_default_mode(lines) if lines else None
         if parsed_remap_list:
             for parsed_remap in parsed_remap_list:
                 # Remap row

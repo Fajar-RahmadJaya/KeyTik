@@ -28,8 +28,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMessageBox,
     QPushButton,
     QScrollArea,
-    QSizePolicy,
-    QSpacerItem,
+    QStackedWidget,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -61,6 +61,7 @@ class ProfileUI:
         self.edit_window = None
         self.edit_frame = QWidget()
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
+        self.middle_stack = None
 
     def edit_script(self, script_name, parent):
         """Create/edit profile window."""
@@ -93,14 +94,15 @@ class ProfileUI:
 
         # Top part of profile manager
         top_widget = self.edit_top(script_name, lines)
+        top_widget.setObjectName("TopWidget")
         edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
         # Middle part of profile manager
-        edit_scroll = self.edit_middle(lines)
-        edit_layout.addWidget(edit_scroll, 1, 0, 1, 4)
+        self.edit_middle(lines, edit_layout)
 
         # Bottom part of profile manager
         bottom_widget = self.edit_bottom(first_line, top_widget)
+        bottom_widget.setObjectName("BottomWidget")
         edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
         self.edit_window.setLayout(edit_layout)
@@ -176,7 +178,7 @@ class ProfileUI:
         keyboard_select_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
-    def edit_middle(self, lines):
+    def edit_middle(self, lines, edit_layout: QGridLayout):
         """Middle part of profile manager."""
         edit_scroll = QScrollArea(self.edit_window)
         edit_scroll.setWidgetResizable(True)
@@ -194,17 +196,17 @@ class ProfileUI:
 
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.edit_frame.setLayout(self.edit_frame_layout)
+        edit_scroll.setWidget(self.edit_frame)
 
-        # Spacer to coupled row tightly
-        # spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.middle_stack = QStackedWidget()
+        self.middle_stack.addWidget(edit_scroll)
+        text_block = TextMode().text_mode_widget(self.edit_window, self.edit_frame, lines)
+        self.middle_stack.addWidget(text_block)
+        edit_layout.addWidget(self.middle_stack, 1, 0, 1, 4)
 
         # Add profile mode widget
         index = diff.mode_map.get(lines[0].strip().lower())
         self.build_profile(index, lines=lines)
-
-        edit_scroll.setWidget(self.edit_frame)
-
-        return edit_scroll
 
     def build_profile(self, index, lines=None):
         """Add profile into layout."""
@@ -215,35 +217,30 @@ class ProfileUI:
             if widget:
                 widget.setParent(None)
 
-        # Spacer to coupled row tightly
-        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
         # Build remap and shortcut row instance
         self.shortcut_row_comp = ShortcutRow(self.edit_frame)
         self.default_mode_comp = DefaultMode(self.edit_frame)
 
         # Add profile widget
+        self.middle_stack.setCurrentIndex(0)
         if index == 0:
             self.default_mode_widget(self.edit_window, lines)
 
         elif index == 1:
-            text_block = TextMode().text_block(lines)
-            self.edit_frame_layout.addWidget(text_block)
+            if not lines:
+                text_mode = self.middle_stack.widget(1)
+                text_mode.findChild(QTextEdit).clear()
+            self.middle_stack.setCurrentIndex(1)
 
         else:
             diff.pro_mode(index, lines, self)
-            self.edit_frame_layout.addItem(spacer)
 
     def default_mode_widget(self, parent_window, lines=None):
         """Default mode frame."""
-        parse_script = ParseScript()  # Composition
-
-        parsed_shortcuts_list = parse_script.parse_shortcuts(lines) if lines else None
-        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, parsed_shortcuts_list)
+        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, lines)
         self.edit_frame_layout.addWidget(shortcut_widget)
 
-        parsed_remap_list = parse_script.parse_default_mode(lines) if lines else None
-        remap_widget = self.default_mode_comp.remap_row(parent_window, parsed_remap_list)
+        remap_widget = self.default_mode_comp.remap_row(parent_window, lines)
         self.edit_frame_layout.addWidget(remap_widget)
 
     def edit_bottom(self, first_line, top_widget):
@@ -299,13 +296,17 @@ class ProfileUI:
             with open(output_path, "w", encoding="utf-8") as file:
                 condition_string = write_script.write_condition(top_widget)
 
-                if mode == "text mode":
-                    write_script.handle_text_mode(file, self.edit_frame, condition_string)
-                elif mode == "default mode":
+                if mode == "default mode":
                     write_default = WriteDefault(write_script)
                     write_default.handle_default_mode(file, condition_string)
+                # Check if pro version mode
+                elif diff.pro_write(file, mode, condition_string):
+                    pass
                 else:
-                    diff.pro_write(file, mode, condition_string)
+                    text_mode = self.middle_stack.widget(1)
+                    write_script.handle_text_mode(
+                        file, text_mode.findChild(QTextEdit), condition_string
+                    )
 
         except FileNotFoundError as error:
             print(f"Error: {error}")

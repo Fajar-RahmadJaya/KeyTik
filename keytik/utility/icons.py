@@ -87,3 +87,8 @@ icon_filter = os.path.join(icon_dir, "filter.svg")
 search = os.path.join(icon_dir, "search.svg")
 file_search = os.path.join(icon_dir, "file_search.svg")
 question = os.path.join(icon_dir, "question.svg")
+
+# Material symbols
+_material_symbols_dir = os.path.join(icon_dir, "material-symbols")
+fullscreen = os.path.join(_material_symbols_dir, "fullscreen.svg")
+fullscreen_exit = os.path.join(_material_symbols_dir, "fullscreen-exit.svg")

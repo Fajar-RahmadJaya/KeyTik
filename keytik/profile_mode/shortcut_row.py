@@ -15,16 +15,19 @@
 """Shortcut row used across profile mode."""
 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtGui import QPalette  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QFrame,
     QGridLayout,
     QLabel,
     QPushButton,
+    QScrollArea,
     QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
 
+from keytik.profile_manager.parse_script import ParseScript
 from keytik.profile_mode.key_listening import KeyListening
 from keytik.profile_mode.shared_row import SharedRow
 from keytik.select_key.select_key_ui import SelectKeyUI
@@ -43,7 +46,7 @@ class ShortcutRow:
         self.key_listening_comp = KeyListening(edit_frame)
         self.shared_row = SharedRow()
 
-    def shortcut_row(self, parent_window, parsed_shortcuts_list: list | None = None):
+    def shortcut_row(self, parent_window, lines=None, title=True):
         """Build shortcut row."""
         # Widget and layout
         shortcut_widget = QWidget()
@@ -52,8 +55,9 @@ class ShortcutRow:
         shortcut_layout.setContentsMargins(0, 0, 0, 0)
 
         # Shortcut title
-        shortcut_title = self.shortcut_title()
-        shortcut_layout.addWidget(shortcut_title)
+        if title:
+            shortcut_title = self.shortcut_title()
+            shortcut_layout.addWidget(shortcut_title)
 
         # Shortcut row
         shared_row = SharedRow()
@@ -68,6 +72,8 @@ class ShortcutRow:
             separator_widget = shared_row.separator_widget(add_empty_row, shortcut_widget)
             shortcut_layout.addWidget(separator_widget)
 
+        parsed_shortcuts_list = ParseScript().parse_shortcuts(lines) if lines else None
+
         if parsed_shortcuts_list:
             for parsed_shortcut in parsed_shortcuts_list:
                 # Shortcut row
@@ -81,6 +87,73 @@ class ShortcutRow:
             add_empty_row(None)
 
         return shortcut_widget
+
+    def collapsible_shortcuts(self, parent_window, lines=None):
+        """Hide or unhide shortcuts."""
+        widget = QWidget()
+        widget.setObjectName("shortcutFrame")
+        widget.setStyleSheet("""
+        QWidget#shortcutFrame {
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+        """)
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        palette = style.get_palette()
+        hover_palette = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Midlight)
+
+        header_button = QPushButton()
+        header_button.setText("Expand Shortcut")
+        header_button.setStyleSheet(f"""
+        QPushButton{{
+            border: none;
+            {style.PROFILE_ROW_LABEL}
+        }}
+
+        QPushButton:hover {{
+            background-color: {hover_palette.name()};
+            border-radius: 4px;
+        }}
+        """)
+        header_button.setFixedHeight(28)
+        header_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        layout.addWidget(header_button)
+
+        shortcut_scrollview = QScrollArea()
+        shortcut_scrollview.setWidgetResizable(True)
+        shortcut_scrollview.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        shortcut_scrollview.setObjectName("editScroll")
+        shortcut_scrollview.setFrameShape(QFrame.Shape.NoFrame)
+        shortcut_scrollview.setStyleSheet("""
+            #editScroll {
+                background-color: transparent;
+                margin: 8px;
+            }
+        """)
+        shortcut_scrollview.setFixedHeight(140)
+        shortcut_scrollview.setHidden(True)
+        layout.addWidget(shortcut_scrollview)
+
+        shortcut_row_widget = self.shortcut_row(parent_window, lines, title=False)
+        shortcut_scrollview.setWidget(shortcut_row_widget)
+
+        def button_event():
+            """Hide shortcut scrollview."""
+            if not shortcut_scrollview.isHidden():
+                shortcut_scrollview.setHidden(True)
+                header_button.setText("Expand Shortcut")
+            else:
+                shortcut_scrollview.setHidden(False)
+                header_button.setText("Collapse Shortcut")
+
+        header_button.clicked.connect(button_event)
+
+        return widget
 
     def shortcut_title(self):
         """Shortcuts row tittle label."""

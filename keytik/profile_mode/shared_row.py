@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.profile_mode.profile_mode_core import ProfileModeCore
-from keytik.utility import style, utils
+from keytik.utility import utils
 
 
 class SharedRow:  # pylint: disable=R0903
@@ -49,7 +49,12 @@ class SharedRow:  # pylint: disable=R0903
         separator_layout.addWidget(left_sep)
 
         plus_label = QLabel("+", separator_widget)
-        plus_label.setStyleSheet(style.PLUS_LABEL)
+        plus_label.setStyleSheet("""
+        color: gray;
+        padding: 0 5px;
+        font-size: 14px;
+        font-weight: bold;
+        """)
         plus_label.setCursor(Qt.CursorShape.PointingHandCursor)
         plus_label.setFixedWidth(20)
         plus_label.setFixedHeight(20)

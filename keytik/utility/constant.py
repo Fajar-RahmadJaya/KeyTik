@@ -49,6 +49,22 @@ changes_key = {
     "scrolllock": "Scroll Lock",
 }
 
+# Modifier keys symbol
+modifier_keys = {
+    "Windows": "#",
+    "Left Windows": "<#",
+    "Right Windows": ">#",
+    "Alt": "!",
+    "Left Alt": "<!",
+    "Right Alt": ">!",
+    "Ctrl": "^",
+    "Left Ctrl": "<^",
+    "Right Ctrl": ">^",
+    "Shift": "+",
+    "Left Shift": "<+",
+    "Right Shift": ">+",
+}
+
 # Unicode
 unicode_blocks = [
     (0x0000, 0x007F, "Basic Latin"),

@@ -152,13 +152,13 @@ class ParseScript:
 
     def parse_default_key(self, default_key):
         """Parse default key line."""
-        raw_Key = default_key.replace("~", "").replace("*", "")
-        if " & " in raw_Key:
-            keys = [k.strip() for k in raw_Key.split(" & ")]
+        raw_key = default_key.replace("~", "").replace("*", "")
+        if " & " in raw_key:
+            keys = [k.strip() for k in raw_key.split(" & ")]
             translated = [self.key_map.get(k, k) for k in keys]
         else:
             translated = []
-            for key in raw_Key:
+            for key in raw_key:
                 is_modifier = False
                 for modifier, symbol in constant.modifier_keys.items():
                     if key == symbol:

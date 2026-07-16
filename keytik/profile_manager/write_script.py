@@ -367,27 +367,30 @@ cm1 := AHI.CreateContextManager(id1)\n
         translated_key = []
         modifier_keys = constant.modifier_keys
 
-        is_multi_modifier = sum(1 for single_key in keys if single_key in modifier_keys) > 1
+        is_multi_modifier = sum(1 for single_key in keys if single_key.title() in modifier_keys) > 1
 
-        nonmodifier_key_sum = sum(1 for single_key in keys if single_key not in modifier_keys)
+        nonmodifier_key_sum = sum(
+            1 for single_key in keys if single_key.title() not in modifier_keys
+        )
 
         # Check key integrity
         max_modifier_single_key = 1
         max_single_key = 2
-        if (
-            is_default_key and is_multi_modifier and nonmodifier_key_sum > max_modifier_single_key
-        ) or (is_default_key and not is_multi_modifier and nonmodifier_key_sum > max_single_key):
-            QMessageBox.warning(
-                QApplication.activeWindow(),
-                "Error",
-                "KeyTik currently doesn't support this operation",
-            )
+        if (is_multi_modifier and nonmodifier_key_sum > max_modifier_single_key) or (
+            not is_multi_modifier and nonmodifier_key_sum > max_single_key
+        ):
+            if is_default_key:
+                QMessageBox.warning(
+                    QApplication.activeWindow(),
+                    "Error",
+                    "KeyTik currently doesn't support this operation",
+                )
 
             return None
 
         for single_key in keys:
-            if is_multi_modifier and single_key in modifier_keys:
-                modifier = "".join(modifier_keys.get(single_key))
+            if is_multi_modifier and single_key.title() in modifier_keys:
+                modifier = "".join(modifier_keys.get(single_key.title()))
                 translated_key.append(modifier)
             else:
                 key = key_translations.get(single_key.strip().lower())
@@ -467,15 +470,16 @@ class WriteDefault:
                 if len(keys) == double_click_length and keys[0] == keys[1]:
                     self.write_double_click(file, keys[0], remap_key)
                     continue
-                else:
-                    key_translation = self.handle_default_type(default_key)
-                    if not key_translation:
-                        return False
+
+                key_translation = self.handle_default_type(default_key)
+                if not key_translation:
+                    return False
 
                 self.handle_remap_type(file, key_translation, remap_key)
 
             except ValueError:
                 continue
+        return True
 
     def handle_default_type(self, default_key):
         """Handle default key write."""

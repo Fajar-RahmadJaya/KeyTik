@@ -298,7 +298,9 @@ class ProfileUI:
 
                 if mode == "default mode":
                     write_default = WriteDefault(write_script)
-                    write_default.handle_default_mode(file, condition_string)
+                    default_mode = write_default.handle_default_mode(file, condition_string)
+                    if not default_mode:
+                        return
                 # Check if pro version mode
                 elif diff.pro_write(file, mode, condition_string):
                     pass

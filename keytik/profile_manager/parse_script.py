@@ -18,6 +18,7 @@ import re
 from dataclasses import dataclass
 
 from keytik.profile_mode.profile_mode_core import ProfileModeCore
+from keytik.utility import constant
 
 
 @dataclass
@@ -151,24 +152,34 @@ class ParseScript:
 
     def parse_default_key(self, default_key):
         """Parse default key line."""
-        key = default_key.replace("~", "").replace("*", "")
-        if " & " in key:
-            keys = [k.strip() for k in key.split(" & ")]
+        raw_key = default_key.replace("~", "").replace("*", "")
+        if " & " in raw_key:
+            keys = [k.strip() for k in raw_key.split(" & ")]
             translated = [self.key_map.get(k, k) for k in keys]
-            key = " + ".join(translated)
         else:
-            key = self.key_map.get(key, key)
+            translated = []
+            for key in raw_key:
+                is_modifier = False
+                for modifier, symbol in constant.modifier_keys.items():
+                    if key == symbol:
+                        translated.append(modifier)
+                        is_modifier = True
+                        break
+                if not is_modifier:
+                    translated.append(self.key_map.get(key, key))
+
+        key = " + ".join(translated)
         return key
 
     def parse_remap_key(self, line):
         """Parse remap key line."""
         parts = line.split("::")
-        default_key = parts[0].strip()
-        remap_or_action = parts[1].strip() if len(parts) > 1 else ""
+        default = parts[0].strip()
+        remap = parts[1].strip() if len(parts) > 1 else ""
 
-        default_key = self.parse_default_key(default_key)
+        default_key = self.parse_default_key(default)
 
-        if remap_or_action:
+        if remap:
             is_text_format = False
             is_hold_format = False
             is_first_key = False
@@ -182,16 +193,16 @@ class ParseScript:
             if default_key.startswith("SC") or default_key.startswith("~SC"):
                 is_sc = True
 
-            if remap_or_action.startswith("SendText"):
-                remap_key = self.parse_text_format(remap_or_action)
+            if remap.startswith("SendText"):
+                remap_key = self.parse_text_format(remap)
                 is_text_format = True
-            elif "SetTimer" in remap_or_action:
-                remap_key, hold_interval = self.parse_hold_format(remap_or_action)
+            elif "SetTimer" in remap:
+                remap_key, hold_interval = self.parse_hold_format(remap)
                 is_hold_format = True
-            elif remap_or_action.startswith("Send") or remap_or_action.startswith("SendInput"):
-                remap_key = self.parse_send_remap(remap_or_action)
+            elif remap.startswith("Send") or remap.startswith("SendInput"):
+                remap_key = self.parse_send_remap(remap)
             else:
-                remap_key = remap_or_action
+                remap_key = remap
 
             remap_key = self.key_map.get(remap_key, remap_key)
 

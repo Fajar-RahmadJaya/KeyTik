@@ -360,18 +360,43 @@ cm1 := AHI.CreateContextManager(id1)\n
         except ValueError:
             return False
 
-    def translate_key(self, key):
+    def translate_key(self, key, is_default_key=False):
         """Translate raw key into readable key."""
-        keys = key.split("+")
-        translated_keys = []
-
+        keys = [k.strip().lower() for k in key.split("+")]
         key_translations = self.profile_mode_core.read_keylist()
+        translated_key = []
+        modifier_keys = constant.modifier_keys
+
+        is_multi_modifier = sum(1 for single_key in keys if single_key.title() in modifier_keys) > 1
+
+        nonmodifier_key_sum = sum(
+            1 for single_key in keys if single_key.title() not in modifier_keys
+        )
+
+        # Check key integrity
+        max_modifier_single_key = 1
+        max_single_key = 2
+        if (is_multi_modifier and nonmodifier_key_sum > max_modifier_single_key) or (
+            not is_multi_modifier and nonmodifier_key_sum > max_single_key
+        ):
+            if is_default_key:
+                QMessageBox.warning(
+                    QApplication.activeWindow(),
+                    "Error",
+                    "KeyTik currently doesn't support this operation",
+                )
+
+            return None
 
         for single_key in keys:
-            translated_key = key_translations.get(single_key.strip().lower())
-            translated_keys.append(translated_key)
+            if is_multi_modifier and single_key.title() in modifier_keys:
+                modifier = "".join(modifier_keys.get(single_key.title()))
+                translated_key.append(modifier)
+            else:
+                key = key_translations.get(single_key.strip().lower())
+                translated_key.append(key)
 
-        return " & ".join(translated_keys)
+        return "".join(translated_key) if is_multi_modifier else " & ".join(translated_key)
 
     def is_unicode_key(self, key):
         """Determine whether it's unicode or hard coded key."""
@@ -404,10 +429,12 @@ class WriteDefault:
             file.write(condition_string.device_string)
             file.write(condition_string.hotif_string)
 
-        self.process_key_remaps(file)
+        remap = self.process_key_remaps(file)
 
         if condition_string:
             file.write("#HotIf\n")
+
+        return True if remap is None else remap
 
     def process_key_remaps(self, file):
         """Handle key remap write."""
@@ -425,26 +452,49 @@ class WriteDefault:
                 default_key = key_widget.default_key.default_key_entry.text().strip()
                 remap_key = key_widget.remap_key.remap_key_entry.text().strip()
 
-                if not default_key or not remap_key:
+                if not default_key:
+                    QMessageBox.warning(
+                        QApplication.activeWindow(), "Error", "Default key can't empty."
+                    )
+
+                    return False
+
+                if not remap_key:
+                    QMessageBox.warning(
+                        QApplication.activeWindow(), "Error", "Remap key can't empty."
+                    )
+                    return False
+
+                keys = [k.strip() for k in default_key.split("+")]
+                double_click_length = 2
+                if len(keys) == double_click_length and keys[0] == keys[1]:
+                    self.write_double_click(file, keys[0], remap_key)
                     continue
 
-                has_multiple_keys = "+" in default_key
+                key_translation = self.handle_default_type(default_key)
+                if not key_translation:
+                    return False
 
-                if has_multiple_keys:
-                    keys = [k.strip() for k in default_key.split("+")]
-                    double_click_length = 2
-                    if len(keys) == double_click_length and keys[0] == keys[1]:
-                        self.write_double_click(file, keys[0], remap_key)
-                        continue
-                    default_translated = self.write_multiple_key_default(default_key)
-
-                else:
-                    default_translated = self.write_single_key_default(default_key)
-
-                self.handle_remap_type(file, default_translated, remap_key)
+                self.handle_remap_type(file, key_translation, remap_key)
 
             except ValueError:
                 continue
+        return True
+
+    def handle_default_type(self, default_key):
+        """Handle default key write."""
+        key = self.write_script.translate_key(default_key, is_default_key=True)
+        if not key:
+            return False
+        if (
+            self.remap_widget.first_key_checkbox is not None
+            and self.remap_widget.first_key_checkbox.isChecked()
+        ):
+            default_translated = key
+        else:
+            default_translated = "~" + key
+
+        return default_translated
 
     def handle_remap_type(self, file, default_translated, remap_key):
         """Handle text, hold, single, multiple key mode."""
@@ -601,19 +651,3 @@ class WriteDefault:
             f'        (SendInput("{down_sequence}"), '
             f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
         )
-
-    def write_multiple_key_default(self, default_key):
-        """Write multiple key case on default key."""
-        if (
-            self.remap_widget.first_key_checkbox is not None
-            and self.remap_widget.first_key_checkbox.isChecked()
-        ):
-            translated_key = self.write_script.translate_key(default_key)
-        else:
-            translated_key = "~" + self.write_script.translate_key(default_key)
-        return translated_key
-
-    def write_single_key_default(self, default_key):
-        """Write single key case on default key."""
-        translated_key = self.write_script.translate_key(default_key)
-        return translated_key

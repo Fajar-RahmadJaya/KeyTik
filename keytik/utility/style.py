@@ -171,6 +171,7 @@ class _PaletteRole:
     mantle: str
     subtext: str
     overlay: str
+    base_rgba: str
 
 
 def get_palette_role():
@@ -182,18 +183,22 @@ def get_palette_role():
         mantle = "rgba(0, 0, 0, 0.06)"
         subtext = "rgba(0, 0, 0, 0.6)"
         overlay = "rgba(0, 0, 0, 0.04)"
+        base_rgba = "rgba(255, 255, 255, 0.7)"
     elif theme == "dark" or not IS_BASE_LIGHT:
         surface = "rgba(255, 255, 255, 0.06)"
         mantle = "rgba(255, 255, 255, 0.11)"
         subtext = "rgba(255, 255, 255, 0.566)"
         overlay = "rgba(255, 255, 255, 0.085)"
+        base_rgba = "rgba(255, 255, 255, 9)"
     else:
         surface = None
         mantle = None
         subtext = None
         overlay = None
 
-    role = _PaletteRole(surface=surface, mantle=mantle, subtext=subtext, overlay=overlay)
+    role = _PaletteRole(
+        surface=surface, mantle=mantle, subtext=subtext, overlay=overlay, base_rgba=base_rgba
+    )
 
     return role
 
@@ -230,6 +235,29 @@ def get_geometry(parent_window, width, height):
 #     background-color: {COLOR.overlay};
 # }}
 # """
+
+
+def get_global_stylesheet():
+    """Get widget global stylesheet."""
+    stylesheet = []
+    config = utils.get_config()
+
+    global_treeview = f"""
+    QTreeWidget {{
+        background-color: {palette_role.base_rgba};
+    }}
+
+    QHeaderView {{
+        background-color: rgba(255, 255, 255, 0.07)
+    }}
+    """
+
+    stylesheet.append(button_highlight(style_sheet=True))
+
+    if config.mica_effect != "disable" and mica_supported:
+        stylesheet.append(global_treeview)
+
+    return "\n".join(stylesheet)
 
 
 TREEVIEW = """
@@ -279,8 +307,10 @@ QGroupBox:title {{
 
 def button_highlight(style_sheet=False):
     """Pass empty parameter to get object name only."""
+    object_name = "ButtonHighlight"
+
     if not style_sheet:
-        return "ButtonHighlight"
+        return object_name
 
     palette = get_palette()
     accent = palette.color(QPalette.Accent)
@@ -289,11 +319,11 @@ def button_highlight(style_sheet=False):
     invert_button_text = invert_color(button_text)
 
     style_sheet = f"""
-    QPushButton#ButtonHighlight {{
+    QPushButton#{object_name} {{
         background-color: {accent.name()};
         color: {invert_button_text.name()};
     }}
-    QPushButton#ButtonHighlight::hover {{
+    QPushButton#{object_name}::hover {{
         background-color: {color_rgba(accent, 0.85)};
         color: {invert_button_text.name()};
     }}

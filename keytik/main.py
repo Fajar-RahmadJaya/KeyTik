@@ -43,7 +43,7 @@ def main():
     app.setStyle(style_config)
     app.setPalette(style.PALETTE)
     # Set accent button highlight stylesheet
-    app.setStyleSheet(style.button_highlight(style_sheet=True))
+    app.setStyleSheet(style.get_global_stylesheet())
 
     main_window = DashboardUI()
     main_window.show()

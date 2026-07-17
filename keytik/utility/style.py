@@ -195,6 +195,7 @@ def get_palette_role():
         mantle = None
         subtext = None
         overlay = None
+        base_rgba = None
 
     role = _PaletteRole(
         surface=surface, mantle=mantle, subtext=subtext, overlay=overlay, base_rgba=base_rgba

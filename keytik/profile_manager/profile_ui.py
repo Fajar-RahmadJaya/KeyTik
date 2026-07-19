@@ -287,7 +287,7 @@ class ProfileUI:
             return
 
         # Make sure shortcut valid
-        write_script = WriteScript(self.default_mode_comp, self.shortcut_row_comp)
+        write_script = WriteScript(self.middle_stack.widget(0), self.shortcut_row_comp)
         if not write_script.check_shortcut_integrity():
             return
 

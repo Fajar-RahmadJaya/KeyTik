@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QCheckBox,
     QLineEdit,
     QPushButton,
+    QWidget,
 )
 
 from keytik.profile_mode.profile_mode_core import ProfileModeCore
@@ -47,7 +48,7 @@ class KeyListening(QObject):
         self.copas_rows = []
 
         # UI
-        self.edit_frame = edit_frame
+        self.edit_frame: QWidget = edit_frame
 
     def eventFilter(self, _, event):  # pylint: disable=C0103
         """Filter event by key press and window."""
@@ -123,20 +124,19 @@ class KeyListening(QObject):
             # Enable other button
             self.toggle_other_buttons(target_button, other_button_enabled=True)
 
-    def multi_key_event(self, event, entry_widget, button):
+    def multi_key_event(self, event, entry_widget: QLineEdit, button):
         """Action when multiple key is pressed, set timer before saving the key."""
         if not self.is_listening or self.profile_mode_core.active_entry != entry_widget:
             return
 
-        # if sc_checkbox.isChecked():
-        #     key = f"SC{event.scan_code:02X}"
-        # else:
-        #     key = event.name
-
         key = event.name
-        key_lower = key.lower()
-        if key_lower in constant.changes_key:
-            key = constant.changes_key[key_lower]
+        sc_checkbox = self.edit_frame.findChild(QCheckBox, "ScanCodeCheckbox")
+
+        if entry_widget.objectName() == "DefaultKeyEntry" and sc_checkbox.isChecked():
+            key = f"SC{event.scan_code:02X}"
+
+        if key.lower() in constant.changes_key:
+            key = constant.changes_key[key.lower()]
 
         if len(key) == 1 and key.isupper() and key.isalpha():
             key = key.lower()

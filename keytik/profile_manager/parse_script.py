@@ -25,13 +25,13 @@ from keytik.utility import constant
 class ParsedRemap:
     """Data class containing parsed remap."""
 
-    default_key: str
-    remap_key: str
-    hold_interval: int
-    is_hold_format: bool
-    is_first_key: bool
-    is_sc: bool
-    is_text_format: bool
+    default_key: str = ""
+    remap_key: str = ""
+    hold_interval: int = 10
+    is_hold_format: bool = False
+    is_first_key: bool = False
+    is_sc: bool = False
+    is_text_format: bool = False
 
 
 class ParseScript:
@@ -158,100 +158,80 @@ class ParseScript:
             translated = [self.key_map.get(k, k) for k in keys]
         else:
             translated = []
+            non_modifier = []
+            reverse_modifier_keys = {
+                symbol: modifier for modifier, symbol in constant.modifier_keys.items()
+            }
             for key in raw_key:
-                is_modifier = False
-                for modifier, symbol in constant.modifier_keys.items():
-                    if key == symbol:
-                        translated.append(modifier)
-                        is_modifier = True
-                        break
-                if not is_modifier:
-                    translated.append(self.key_map.get(key, key))
+                if key in constant.modifier_keys.values():
+                    modifier = reverse_modifier_keys.get(key)
+                    translated.append(modifier)
+                else:
+                    non_modifier.append(key)
+
+            non_modifier_string = "".join(non_modifier)
+            translated.append(self.key_map.get(non_modifier_string, non_modifier_string))
 
         key = " + ".join(translated)
         return key
 
-    def parse_remap_key(self, line):
+    def parse_remap_key(self, line: str):
         """Parse remap key line."""
         parts = line.split("::")
         default = parts[0].strip()
         remap = parts[1].strip() if len(parts) > 1 else ""
+        parsed_remap = ParsedRemap()
 
         default_key = self.parse_default_key(default)
+        parsed_remap.default_key = default_key
 
-        if remap:
-            is_text_format = False
-            is_hold_format = False
-            is_first_key = False
-            is_sc = False
-            remap_key = ""
-            hold_interval = "10"
+        if not default.startswith("~") and "&" in default:
+            parsed_remap.is_first_key = True
 
-            if not default_key.startswith("~") and "&" in default_key:
-                is_first_key = True
+        if default.startswith(("SC", "~SC")):
+            parsed_remap.is_sc = True
+            parsed_remap.default_key = default.replace("&", "+")
 
-            if default_key.startswith("SC") or default_key.startswith("~SC"):
-                is_sc = True
+        if remap.startswith("SendText"):
+            key = self.parse_text_format(remap)
+            parsed_remap.is_text_format = True
+        elif "SetTimer" in remap:
+            key = self.parse_hold_format(remap, parsed_remap)
+            parsed_remap.is_hold_format = True
+        elif remap.startswith("Send") or remap.startswith("SendInput"):
+            key = self.parse_send_remap(remap)
+        else:
+            key = remap
 
-            if remap.startswith("SendText"):
-                remap_key = self.parse_text_format(remap)
-                is_text_format = True
-            elif "SetTimer" in remap:
-                remap_key, hold_interval = self.parse_hold_format(remap)
-                is_hold_format = True
-            elif remap.startswith("Send") or remap.startswith("SendInput"):
-                remap_key = self.parse_send_remap(remap)
-            else:
-                remap_key = remap
+        parsed_remap.remap_key = self.key_map.get(key, key)
 
-            remap_key = self.key_map.get(remap_key, remap_key)
+        return parsed_remap
 
-            return ParsedRemap(
-                default_key=default_key,
-                remap_key=remap_key,
-                hold_interval=hold_interval,
-                is_hold_format=is_hold_format,
-                is_first_key=is_first_key,
-                is_sc=is_sc,
-                is_text_format=is_text_format,
-            )
-        return None
-
-    def parse_double_click(self, default_key, block_text):
+    def parse_double_click(self, default_key: str, block_text):
         """Parse double click mode from default key."""
-        is_text_format = False
-        is_hold_format = False
-        hold_interval = "10"
-        remap_key = ""
-        is_first_key = False
-        is_sc = False
+        parsed_remap = ParsedRemap()
+        parsed_remap.default_key = f"{default_key} + {default_key}"
 
         if not default_key.startswith("~") and "&" in default_key:
-            is_first_key = True
+            parsed_remap.is_first_key = True
 
         if default_key.startswith("SC") or default_key.startswith("~SC"):
-            is_sc = True
+            parsed_remap.is_sc = True
 
         if "A_PriorHotkey" in block_text and "A_TimeSincePriorHotkey < 400" in block_text:
             if "SendText" in block_text:
-                remap_key = self.parse_text_format(block_text)
-                is_text_format = True
+                parsed_remap.remap_key = self.parse_text_format(block_text)
+                parsed_remap.is_text_format = True
             elif "SetTimer" in block_text:
-                remap_key, hold_interval = self.parse_hold_format(block_text)
-                is_hold_format = True
+                parsed_remap.remap_key = self.parse_hold_format(block_text, parsed_remap)
+                parsed_remap.is_hold_format = True
             else:
                 send_match = re.search(r'Send(?:Input)?\("(.+?)"\)', block_text)
-                remap_key = self.parse_send_remap(send_match.group(0)) if send_match else ""
+                parsed_remap.remap_key = (
+                    self.parse_send_remap(send_match.group(0)) if send_match else ""
+                )
 
-        return ParsedRemap(
-            default_key=f"{default_key} + {default_key}",
-            remap_key=remap_key,
-            is_hold_format=is_hold_format,
-            hold_interval=hold_interval,
-            is_first_key=is_first_key,
-            is_sc=is_sc,
-            is_text_format=is_text_format,
-        )
+        return parsed_remap
 
     def get_unicode(self, text):
         """Parse Unicode fron SendInput."""
@@ -265,10 +245,9 @@ class ParseScript:
         text = re.sub(r"Chr\((\d+)\)", chr_replacer, text)
         return text
 
-    def parse_hold_format(self, remap_or_action):
+    def parse_hold_format(self, remap_or_action, parsed_remap: ParsedRemap):
         """Parse hold format key and interval from SendInput."""
         remap_key = ""
-        hold_interval = "10"
 
         send_match = re.search(r"Send(?:Input)?\((.+)\)", remap_or_action)
         if send_match:
@@ -278,10 +257,11 @@ class ParseScript:
             if down_keys:
                 remap_key = " + ".join(down_keys)
                 interval_match = re.search(r"-\s*(\d+)", remap_or_action)
-                if interval_match:
-                    hold_interval = str(int(interval_match.group(1)) / 1000)
+                parsed_remap.hold_interval = (
+                    str(int(interval_match.group(1)) / 1000) if interval_match else "10"
+                )
 
-        return remap_key, hold_interval
+        return remap_key
 
     def parse_send_remap(self, remap_or_action):
         """Parse SendInput line."""

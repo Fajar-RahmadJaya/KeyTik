@@ -25,25 +25,15 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QCheckBox,
     QLineEdit,
     QMessageBox,
+    QScrollArea,
     QTextEdit,
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
+from keytik.profile_mode.default_mode import RemapObject
 from keytik.profile_mode.profile_mode_core import ProfileModeCore
 from keytik.select_key.select_key_core import SelectKeyCore
 from keytik.utility import constant, utils
-
-
-@dataclass
-class RemapWidget:
-    """Dataclass containing key rows tuple."""
-
-    default_key_entry: QLineEdit = None
-    remap_key_entry: QLineEdit = None
-    text_format_checkbox: QCheckBox = None
-    hold_format_checkbox: QCheckBox = None
-    hold_interval_entry: QLineEdit = None
-    first_key_checkbox: QCheckBox = None
 
 
 @dataclass
@@ -58,9 +48,9 @@ class ConditionString:
 class WriteScript:
     """Write script based on profile input."""
 
-    def __init__(self, default_mode_comp=None, shortcut_row_comp=None):
-        self.default_mode_comp = default_mode_comp
+    def __init__(self, remap_scroll=None, shortcut_row_comp=None):
         self.shortcut_row_comp = shortcut_row_comp
+        self.remap_scroll: QScrollArea = remap_scroll
 
         # Composition
         self.dashboard_core = DashboardCore()
@@ -360,9 +350,9 @@ cm1 := AHI.CreateContextManager(id1)\n
         except ValueError:
             return False
 
-    def translate_key(self, key, is_default_key=False):
+    def translate_key(self, key: str, is_default_key=False):
         """Translate raw key into readable key."""
-        keys = [k.strip().lower() for k in key.split("+")]
+        keys = [k.strip() for k in key.split("+")]
         key_translations = self.profile_mode_core.read_keylist()
         translated_key = []
         modifier_keys = constant.modifier_keys
@@ -393,7 +383,11 @@ cm1 := AHI.CreateContextManager(id1)\n
                 modifier = "".join(modifier_keys.get(single_key.title()))
                 translated_key.append(modifier)
             else:
-                key = key_translations.get(single_key.strip().lower())
+                key = (
+                    key_translations.get(single_key.strip().lower())
+                    if not single_key.startswith("SC")
+                    else single_key
+                )
                 translated_key.append(key)
 
         return "".join(translated_key) if is_multi_modifier else " & ".join(translated_key)
@@ -405,6 +399,19 @@ cm1 := AHI.CreateContextManager(id1)\n
         return all(key not in child_item for child_item in key_data.values())
 
 
+@dataclass
+class RemapWidget:
+    """Dataclass containing key rows tuple."""
+
+    default_key_entry: QLineEdit = None
+    remap_key_entry: QLineEdit = None
+    text_format_checkbox: QCheckBox = None
+    hold_format_checkbox: QCheckBox = None
+    hold_interval_entry: QLineEdit = None
+    first_key_checkbox: QCheckBox = None
+    sc_checkbox: QCheckBox = None
+
+
 class WriteDefault:
     """Default mode writing."""
 
@@ -412,8 +419,29 @@ class WriteDefault:
         # Parameter
         self.write_script = write_script
 
-        # Composition
-        self.remap_widget = RemapWidget()
+        self.remap_widget = RemapWidget(
+            default_key_entry=self.write_script.remap_scroll.findChild(
+                QLineEdit, RemapObject.default_key_entry
+            ),
+            remap_key_entry=self.write_script.remap_scroll.findChild(
+                QLineEdit, RemapObject.remap_key_entry
+            ),
+            text_format_checkbox=self.write_script.remap_scroll.findChild(
+                QCheckBox, RemapObject.text_format_checkbox
+            ),
+            hold_format_checkbox=self.write_script.remap_scroll.findChild(
+                QCheckBox, RemapObject.hold_format_checkbox
+            ),
+            hold_interval_entry=self.write_script.remap_scroll.findChild(
+                QLineEdit, RemapObject.hold_interval_entry
+            ),
+            first_key_checkbox=self.write_script.remap_scroll.findChild(
+                QCheckBox, RemapObject.first_key_checkbox
+            ),
+            sc_checkbox=self.write_script.remap_scroll.findChild(
+                QCheckBox, RemapObject.scan_code_checkbox
+            ),
+        )
 
     def handle_default_mode(self, file, condition_string: ConditionString):
         """Write default mode."""
@@ -438,63 +466,35 @@ class WriteDefault:
 
     def process_key_remaps(self, file):
         """Handle key remap write."""
-        for key_widget in self.write_script.default_mode_comp.key_rows:
-            self.remap_widget = RemapWidget(
-                default_key_entry=key_widget.default_key.default_key_entry,
-                remap_key_entry=key_widget.remap_key.remap_key_entry,
-                text_format_checkbox=key_widget.option.text_format_checkbox,
-                hold_format_checkbox=key_widget.option.hold_format_checkbox,
-                hold_interval_entry=key_widget.option.hold_interval_entry,
-                first_key_checkbox=key_widget.option.first_key_checkbox,
-            )
+        default_key = self.remap_widget.default_key_entry.text().strip()
+        remap_key = self.remap_widget.remap_key_entry.text().strip()
 
-            try:
-                default_key = key_widget.default_key.default_key_entry.text().strip()
-                remap_key = key_widget.remap_key.remap_key_entry.text().strip()
+        if not default_key:
+            QMessageBox.warning(QApplication.activeWindow(), "Error", "Default key can't empty.")
 
-                if not default_key:
-                    QMessageBox.warning(
-                        QApplication.activeWindow(), "Error", "Default key can't empty."
-                    )
-
-                    return False
-
-                if not remap_key:
-                    QMessageBox.warning(
-                        QApplication.activeWindow(), "Error", "Remap key can't empty."
-                    )
-                    return False
-
-                keys = [k.strip() for k in default_key.split("+")]
-                double_click_length = 2
-                if len(keys) == double_click_length and keys[0] == keys[1]:
-                    self.write_double_click(file, keys[0], remap_key)
-                    continue
-
-                key_translation = self.handle_default_type(default_key)
-                if not key_translation:
-                    return False
-
-                self.handle_remap_type(file, key_translation, remap_key)
-
-            except ValueError:
-                continue
-        return True
-
-    def handle_default_type(self, default_key):
-        """Handle default key write."""
-        key = self.write_script.translate_key(default_key, is_default_key=True)
-        if not key:
             return False
-        if (
-            self.remap_widget.first_key_checkbox is not None
-            and self.remap_widget.first_key_checkbox.isChecked()
-        ):
-            default_translated = key
-        else:
-            default_translated = "~" + key
 
-        return default_translated
+        if not remap_key:
+            QMessageBox.warning(QApplication.activeWindow(), "Error", "Remap key can't empty.")
+            return False
+
+        keys = [k.strip() for k in default_key.split("+")]
+        double_click_length = 2
+        if len(keys) == double_click_length and keys[0] == keys[1]:
+            self.write_double_click(file, keys[0], remap_key)
+
+        translated_key = self.write_script.translate_key(default_key, is_default_key=True)
+        if not translated_key:
+            return False
+
+        if not self.remap_widget.first_key_checkbox.isChecked() and "+" in default_key:
+            key = "~" + translated_key
+        else:
+            key = translated_key
+
+        self.handle_remap_type(file, key, remap_key)
+
+        return True
 
     def handle_remap_type(self, file, default_translated, remap_key):
         """Handle text, hold, single, multiple key mode."""

@@ -14,8 +14,6 @@
 
 """Remap and shortcut row."""
 
-from dataclasses import dataclass
-
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
@@ -38,40 +36,18 @@ from keytik.select_key.select_key_ui import SelectKeyUI
 from keytik.utility import icons, style
 
 
-@dataclass
-class OptionWidget:
-    """Data class containing option widget."""
+class RemapObject:  # pylint: disable=R0903
+    """Hold remap widget object name."""
 
-    text_format_checkbox: QCheckBox = None
-    hold_format_checkbox: QCheckBox = None
-    hold_interval_entry: QLineEdit = None
-    first_key_checkbox: QCheckBox = None
-    sc_checkbox: QCheckBox = None
-
-
-@dataclass
-class DefaultKeyWidget:
-    """Data class containing default key widget."""
-
-    default_key_entry: QLineEdit = None
-    default_key_select: QPushButton = None
-
-
-@dataclass
-class RemapKeyWidget:
-    """Data class containing remap key widget."""
-
-    remap_key_entry: QLineEdit = None
-    remap_key_select: QPushButton = None
-
-
-@dataclass
-class KeyWidget:
-    """Data class containing key widget."""
-
-    default_key: DefaultKeyWidget = None
-    remap_key: RemapKeyWidget = None
-    option: OptionWidget = None
+    default_key_select = "DefaultKeySelect"
+    default_key_entry = "DefaultKeyEntry"
+    remap_key_select = "RemapKeySelect"
+    remap_key_entry = "RemapKeyEntry"
+    first_key_checkbox = "FirstKeyCheckbox"
+    scan_code_checkbox = "ScanCodeCheckbox"
+    text_format_checkbox = "TextFormatCheckbox"
+    hold_format_checkbox = "HoldFormatCheckbox"
+    hold_interval_entry = "HoldIntervalEntry"
 
 
 class DefaultMode:
@@ -85,7 +61,7 @@ class DefaultMode:
         self.shared_row = SharedRow()
 
         # Variables
-        self.key_rows = []
+        self.remap_frame = None
         self.edit_frame = edit_frame
 
     def remap_row(self, parent_window, lines=None):
@@ -152,44 +128,31 @@ class DefaultMode:
     def remap_card(self, parent_window=None, parsed_remap=None):
         """Remap row."""
         # Remap row card
-        remap_card_frame = QFrame()
-        remap_card_frame.setFrameShape(QFrame.NoFrame)
-        remap_card_frame.setStyleSheet(style.card())
+        self.remap_frame = QFrame()
+        self.remap_frame.setFrameShape(QFrame.NoFrame)
+        self.remap_frame.setStyleSheet(style.card())
+        self.remap_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
 
-        card_layout = QVBoxLayout(remap_card_frame)
-        card_layout.setContentsMargins(8, 8, 8, 8)
-
-        # Remap row layout
-        remap_row_widget = QWidget(remap_card_frame)
-        remap_row_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        card_layout.addWidget(remap_row_widget)
-
-        remap_row_layout = QGridLayout(remap_row_widget)
-        remap_row_widget.setLayout(remap_row_layout)
-        remap_row_layout.setContentsMargins(16, 0, 16, 4)
-        remap_row_layout.setVerticalSpacing(0)
+        card_layout = QGridLayout(self.remap_frame)
+        self.remap_frame.setLayout(card_layout)
+        card_layout.setContentsMargins(24, 8, 24, 12)
+        card_layout.setVerticalSpacing(0)
 
         # Default Key Widget
-        default_key, default_key_widget = self.default_key_widget(parsed_remap, parent_window)
-        remap_row_layout.addWidget(default_key_widget, 0, 0)
+        card_layout.addWidget(self.default_key_widget(parsed_remap, parent_window), 0, 0)
 
         # Arrow Widget
         arrow_icon = QSvgWidget(icons.arrow)
         arrow_icon.setFixedSize(32, 24)
-        remap_row_layout.addWidget(arrow_icon, 0, 1)
+        card_layout.addWidget(arrow_icon, 0, 1)
 
         # Remap Key Widget
-        remap_key, remap_key_widget = self.remap_key_widget(parsed_remap, parent_window)
-        remap_row_layout.addWidget(remap_key_widget, 0, 2)
+        card_layout.addWidget(self.remap_key_widget(parsed_remap, parent_window), 0, 2)
 
         # Option widget
-        option, option_widget = self.option_widget(parsed_remap)
-        remap_row_layout.addWidget(option_widget, 1, 0, 1, 3)
+        card_layout.addWidget(self.option_widget(parsed_remap), 1, 0, 1, 3)
 
-        # Set key_rows
-        self.key_rows.append(KeyWidget(default_key=default_key, remap_key=remap_key, option=option))
-
-        return remap_card_frame
+        return self.remap_frame
 
     def default_key_widget(self, parsed_remap, parent_window):
         """Default key widget on remap row."""
@@ -199,6 +162,7 @@ class DefaultMode:
         default_key_layout = QGridLayout(default_key_container)
 
         default_key_select = QPushButton("Select")
+        default_key_select.setObjectName(RemapObject.default_key_select)
         default_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         default_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         default_key_select.clicked.connect(
@@ -207,6 +171,7 @@ class DefaultMode:
         default_key_layout.addWidget(default_key_select, 0, 0, 1, 2)
 
         default_key_entry = self.shared_row.remap_entry_template()
+        default_key_entry.setObjectName(RemapObject.default_key_entry)
         default_key_entry.setParent(default_key_container)
         default_key_entry.setToolTip(
             "Default key can be a single key, multiple keys, or a double key (eg. double-click)."
@@ -228,10 +193,7 @@ class DefaultMode:
         default_key_choose.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         default_key_layout.addWidget(default_key_choose, 1, 1, 1, 1)
 
-        default_key = DefaultKeyWidget(
-            default_key_entry=default_key_entry, default_key_select=default_key_select
-        )
-        return default_key, default_key_container
+        return default_key_container
 
     def remap_key_widget(self, parsed_remap, parent_window):
         """Remap key widget on remap row."""
@@ -241,6 +203,7 @@ class DefaultMode:
         remap_key_layout = QGridLayout(remap_key_container)
 
         remap_key_select = QPushButton("Select")
+        remap_key_select.setObjectName(RemapObject.remap_key_select)
         remap_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(
@@ -249,6 +212,7 @@ class DefaultMode:
         remap_key_layout.addWidget(remap_key_select, 0, 0, 1, 2)
 
         remap_key_entry = self.shared_row.remap_entry_template()
+        remap_key_entry.setObjectName(RemapObject.remap_key_entry)
         remap_key_entry.setParent(remap_key_container)
         remap_key_entry.setToolTip(
             "Remap key can be a single key, multiple keys, text, or hold."
@@ -268,11 +232,7 @@ class DefaultMode:
         remap_key_choose.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         remap_key_layout.addWidget(remap_key_choose, 1, 1, 1, 1)
 
-        remap_key = RemapKeyWidget(
-            remap_key_entry=remap_key_entry, remap_key_select=remap_key_select
-        )
-
-        return remap_key, remap_key_container
+        return remap_key_container
 
     def option_widget(self, parsed_remap):
         """Remap option widget on remap row."""
@@ -281,6 +241,7 @@ class DefaultMode:
         options_layout.setContentsMargins(0, 5, 0, 0)
 
         first_key_checkbox = QCheckBox("Disable First Key", option_widget)
+        first_key_checkbox.setObjectName(RemapObject.first_key_checkbox)
         first_key_checkbox.setToolTip(
             "Default Key Only: Check this to disable the first key when using multiple keys.\n"
         )
@@ -289,7 +250,7 @@ class DefaultMode:
         options_layout.addWidget(first_key_checkbox)
 
         sc_checkbox = QCheckBox("Use Scan Code", option_widget)
-        sc_checkbox.setObjectName("sc_checkbox")
+        sc_checkbox.setObjectName(RemapObject.scan_code_checkbox)
         sc_checkbox.setToolTip(
             "Default Key Only: "
             "Check this to make the Select button use Scan Code (SC) instead.\n"
@@ -301,6 +262,7 @@ class DefaultMode:
         options_layout.addWidget(sc_checkbox)
 
         text_format_checkbox = QCheckBox("Text Format", option_widget)
+        text_format_checkbox.setObjectName(RemapObject.text_format_checkbox)
         text_format_checkbox.setToolTip(
             "Remap Key Only: Check this to send the actual text instead of a key"
         )
@@ -309,6 +271,7 @@ class DefaultMode:
         options_layout.addWidget(text_format_checkbox)
 
         hold_format_checkbox = QCheckBox("Hold Format", option_widget)
+        hold_format_checkbox.setObjectName(RemapObject.hold_format_checkbox)
         hold_format_checkbox.setToolTip(
             "Remap Key Only: Simulate holding the key for a set interval"
         )
@@ -317,6 +280,7 @@ class DefaultMode:
         options_layout.addWidget(hold_format_checkbox)
 
         hold_interval_entry = QLineEdit(option_widget)
+        hold_interval_entry.setObjectName(RemapObject.hold_interval_entry)
         hold_interval_entry.setPlaceholderText("Int")
         hold_interval_entry.setFixedWidth(40)
         hold_interval_entry.setToolTip(
@@ -344,12 +308,4 @@ class DefaultMode:
             hold_interval_entry.setText(hold_interval_str)
         options_layout.addWidget(hold_interval_entry)
 
-        option = OptionWidget(
-            text_format_checkbox=text_format_checkbox,
-            hold_format_checkbox=hold_format_checkbox,
-            hold_interval_entry=hold_interval_entry,
-            first_key_checkbox=first_key_checkbox,
-            sc_checkbox=sc_checkbox,
-        )
-
-        return option, option_widget
+        return option_widget

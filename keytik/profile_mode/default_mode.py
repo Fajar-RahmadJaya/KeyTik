@@ -36,7 +36,7 @@ from keytik.select_key.select_key_ui import SelectKeyUI
 from keytik.utility import icons, style
 
 
-class RemapObject:
+class RemapObject:  # pylint: disable=R0903
     """Hold remap widget object name."""
 
     default_key_select = "DefaultKeySelect"

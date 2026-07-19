@@ -207,41 +207,31 @@ class ParseScript:
 
         return parsed_remap
 
-    def parse_double_click(self, default_key, block_text):
+    def parse_double_click(self, default_key: str, block_text):
         """Parse double click mode from default key."""
-        is_text_format = False
-        is_hold_format = False
-        hold_interval = "10"
-        remap_key = ""
-        is_first_key = False
-        is_sc = False
+        parsed_remap = ParsedRemap()
+        parsed_remap.default_key = f"{default_key} + {default_key}"
 
         if not default_key.startswith("~") and "&" in default_key:
-            is_first_key = True
+            parsed_remap.is_first_key = True
 
         if default_key.startswith("SC") or default_key.startswith("~SC"):
-            is_sc = True
+            parsed_remap.is_sc = True
 
         if "A_PriorHotkey" in block_text and "A_TimeSincePriorHotkey < 400" in block_text:
             if "SendText" in block_text:
-                remap_key = self.parse_text_format(block_text)
-                is_text_format = True
+                parsed_remap.remap_key = self.parse_text_format(block_text)
+                parsed_remap.is_text_format = True
             elif "SetTimer" in block_text:
-                remap_key, hold_interval = self.parse_hold_format(block_text)
-                is_hold_format = True
+                parsed_remap.remap_key = self.parse_hold_format(block_text, parsed_remap)
+                parsed_remap.is_hold_format = True
             else:
                 send_match = re.search(r'Send(?:Input)?\("(.+?)"\)', block_text)
-                remap_key = self.parse_send_remap(send_match.group(0)) if send_match else ""
+                parsed_remap.remap_key = (
+                    self.parse_send_remap(send_match.group(0)) if send_match else ""
+                )
 
-        return ParsedRemap(
-            default_key=f"{default_key} + {default_key}",
-            remap_key=remap_key,
-            is_hold_format=is_hold_format,
-            hold_interval=hold_interval,
-            is_first_key=is_first_key,
-            is_sc=is_sc,
-            is_text_format=is_text_format,
-        )
+        return parsed_remap
 
     def get_unicode(self, text):
         """Parse Unicode fron SendInput."""

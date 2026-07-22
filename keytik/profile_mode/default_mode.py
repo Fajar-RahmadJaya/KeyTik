@@ -68,6 +68,7 @@ class DefaultMode:
         """Build remap row."""
         # Remap
         remap_widget = QWidget()
+        remap_widget.setObjectName("RemapWidget")
         remap_layout = QVBoxLayout(remap_widget)
         remap_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -128,6 +129,7 @@ class DefaultMode:
         """Remap row."""
         # Remap row card
         self.remap_frame = QFrame()
+        self.remap_frame.setObjectName("RemapRowWidget")
         self.remap_frame.setFrameShape(QFrame.NoFrame)
         self.remap_frame.setStyleSheet(style.card())
         self.remap_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)

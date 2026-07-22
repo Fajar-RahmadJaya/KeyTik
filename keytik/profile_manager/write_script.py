@@ -23,10 +23,12 @@ from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
     QCheckBox,
+    QFrame,
     QLineEdit,
     QMessageBox,
     QScrollArea,
     QTextEdit,
+    QWidget,
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
@@ -419,29 +421,7 @@ class WriteDefault:
         # Parameter
         self.write_script = write_script
 
-        self.remap_widget = RemapWidget(
-            default_key_entry=self.write_script.remap_scroll.findChild(
-                QLineEdit, RemapObject.default_key_entry
-            ),
-            remap_key_entry=self.write_script.remap_scroll.findChild(
-                QLineEdit, RemapObject.remap_key_entry
-            ),
-            text_format_checkbox=self.write_script.remap_scroll.findChild(
-                QCheckBox, RemapObject.text_format_checkbox
-            ),
-            hold_format_checkbox=self.write_script.remap_scroll.findChild(
-                QCheckBox, RemapObject.hold_format_checkbox
-            ),
-            hold_interval_entry=self.write_script.remap_scroll.findChild(
-                QLineEdit, RemapObject.hold_interval_entry
-            ),
-            first_key_checkbox=self.write_script.remap_scroll.findChild(
-                QCheckBox, RemapObject.first_key_checkbox
-            ),
-            sc_checkbox=self.write_script.remap_scroll.findChild(
-                QCheckBox, RemapObject.scan_code_checkbox
-            ),
-        )
+        self.remap_widget = RemapWidget
 
     def handle_default_mode(self, file, condition_string: ConditionString):
         """Write default mode."""
@@ -457,7 +437,26 @@ class WriteDefault:
             file.write(condition_string.device_string)
             file.write(condition_string.hotif_string)
 
-        remap = self.process_key_remaps(file)
+        remap_widget = self.write_script.remap_scroll.findChild(QWidget, "RemapWidget")
+        remap_row_widgets = remap_widget.findChildren(QFrame, "RemapRowWidget")
+
+        for row_widget in remap_row_widgets:
+            self.remap_widget = RemapWidget(
+                default_key_entry=row_widget.findChild(QLineEdit, RemapObject.default_key_entry),
+                remap_key_entry=row_widget.findChild(QLineEdit, RemapObject.remap_key_entry),
+                text_format_checkbox=row_widget.findChild(
+                    QCheckBox, RemapObject.text_format_checkbox
+                ),
+                hold_format_checkbox=row_widget.findChild(
+                    QCheckBox, RemapObject.hold_format_checkbox
+                ),
+                hold_interval_entry=row_widget.findChild(
+                    QLineEdit, RemapObject.hold_interval_entry
+                ),
+                first_key_checkbox=row_widget.findChild(QCheckBox, RemapObject.first_key_checkbox),
+                sc_checkbox=row_widget.findChild(QCheckBox, RemapObject.scan_code_checkbox),
+            )
+            remap = self.process_key_remaps(file)
 
         if condition_string:
             file.write("#HotIf\n")

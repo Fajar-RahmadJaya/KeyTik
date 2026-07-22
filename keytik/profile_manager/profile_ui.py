@@ -28,6 +28,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
+    QSpacerItem,
     QStackedWidget,
     QTextEdit,
     QVBoxLayout,
@@ -240,24 +242,23 @@ class ProfileUI:
         # Add profile widget
         self.middle_stack.setCurrentIndex(0)
         if index == 0:
-            self.default_mode_widget(self.edit_window, lines)
+            shortcut_widget = self.shortcut_row_comp.shortcut_row(self.edit_window, lines)
+            self.edit_frame_layout.addWidget(shortcut_widget)
+
+            remap_widget = self.default_mode_comp.remap_row(self.edit_window, lines)
+            self.edit_frame_layout.addWidget(remap_widget)
+
+            # Spacer to coupled row tightly
+            spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            self.edit_frame_layout.addItem(spacer)
 
         elif index == 1:
             if not lines:
                 text_mode = self.middle_stack.widget(1)
                 text_mode.findChild(QTextEdit).clear()
             self.middle_stack.setCurrentIndex(1)
-
         else:
             diff.pro_mode(index, lines, self)
-
-    def default_mode_widget(self, parent_window, lines=None):
-        """Default mode frame."""
-        shortcut_widget = self.shortcut_row_comp.shortcut_row(parent_window, lines)
-        self.edit_frame_layout.addWidget(shortcut_widget)
-
-        remap_widget = self.default_mode_comp.remap_row(parent_window, lines)
-        self.edit_frame_layout.addWidget(remap_widget)
 
     def edit_bottom(self, first_line, top_widget):
         """Bottom part of profile manager."""

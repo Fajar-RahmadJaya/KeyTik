@@ -59,7 +59,7 @@ class SettingCombobox(QComboBox):  # pylint: disable=R0903
 class SettingTemplate:
     """Widget template to use across setting UI."""
 
-    def setting_card(self, heading="", subheading=""):
+    def setting_card(self, heading=None, subheading=None):
         """Setting card template."""
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -69,13 +69,14 @@ class SettingTemplate:
         card_layout = QHBoxLayout(card_frame)
         card_layout.setContentsMargins(16, 16, 16, 16)
 
-        theme_label = QLabel(
-            f"<div style='font-size:13px; margin-bottom:2px'> {heading} </div>"
-            f""" <div style='font-size:11px; color: {style.palette_role.subtext};'>
-            {subheading} </div>"""
-        )
+        if heading and subheading:
+            theme_label = QLabel(
+                f"<div style='font-size:13px; margin-bottom:2px'> {heading} </div>"
+                f""" <div style='font-size:11px; color: {style.palette_role.subtext};'>
+                {subheading} </div>"""
+            )
 
-        card_layout.addWidget(theme_label)
+            card_layout.addWidget(theme_label)
 
         return card_layout, card_frame
 
@@ -384,9 +385,21 @@ class SettingUI:
             lambda: self.setting_core.change_data_location(settings_window)
         )
 
-        profile_location_layout, profile_location_frame = self.setting_template.setting_card(
-            heading="Profile Location", subheading=utils.get_config().profile_path
+        profile_location_layout, profile_location_frame = self.setting_template.setting_card()
+
+        profile_dir = utils.get_config().profile_path
+        theme_label = QLabel(
+            "<div style='font-size:13px; margin-bottom:2px'>Profile Location</div>"
+            "<div style='font-size:11px;'>"
+            f"<a href='subheading_click'> {profile_dir} </a>"
+            "</div>"
         )
+        theme_label.setTextFormat(Qt.RichText)
+        theme_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        theme_label.setOpenExternalLinks(False)
+        theme_label.linkActivated.connect(lambda: os.startfile(profile_dir))
+        profile_location_layout.addWidget(theme_label)
+
         profile_location_layout.addWidget(profile_location_button)
 
         return profile_location_frame

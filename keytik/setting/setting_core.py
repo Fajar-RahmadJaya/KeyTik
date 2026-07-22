@@ -38,8 +38,11 @@ class SettingCore:
 
     def restart_app(self):
         """Run new instance and remove the old one."""
-        subprocess.Popen([sys.executable, *sys.argv], close_fds=True)
-        sys.exit(0)
+        try:
+            subprocess.Popen([sys.executable, *sys.argv], close_fds=True)  # pylint: disable=R1732
+            sys.exit(0)
+        except (OSError, ValueError) as error:
+            print(error)
 
     def change_data_location(self, parent):
         """Change active and stored profile directory for 'change profile location'."""
@@ -227,8 +230,7 @@ class SettingCore:
         """Uninstall AutoHotkey."""
         if ahk_installed:
             try:
-                with subprocess.Popen(utils.ahk_uninstall_path, shell=True) as proc:
-                    proc.wait()
+                subprocess.run(utils.ahk_uninstall_path, shell=True, check=True)
 
             except FileNotFoundError:
                 QMessageBox.critical(

@@ -142,7 +142,7 @@ class DashboardUI(QMainWindow):
 
         return button_frame
 
-    def create_new_button(self, button_layout):
+    def create_new_button(self, button_layout: QGridLayout):
         """Crate new button with dummy label to give it more space."""
         dummy_left = QLabel()
         dummy_left.setFixedWidth(12)
@@ -225,36 +225,27 @@ class DashboardUI(QMainWindow):
         """Profile card run/exit button."""
         run_button = QPushButton()
         run_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        run_button.setCheckable(True)
         if script in self.dashboard_core.get_running_ahk():
-            self.run_state(run_button, script)
+            run_button.setChecked(True)
         else:
-            self.exit_state(run_button, script)
+            run_button.setChecked(False)
 
-        return run_button
+        def run_button_event():
+            """Run utton event on checked and unchecked state."""
+            if run_button.isChecked():
+                self.dashboard_core.activate_script(script)
+                run_button.setText("Exit")
+                run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
+                run_button.setIcon(icons.get_icon(icons.icon_exit, highlighted=True))
+            else:
+                self.dashboard_core.exit_script(script)
+                run_button.setText("Run")
+                run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
+                run_button.setIcon(icons.get_icon(icons.run))
 
-    def run_state(self, run_button: QPushButton, script, connect=False):
-        """Button setting on run state."""
-        if connect:
-            self.dashboard_core.activate_script(script)
-            run_button.clicked.disconnect()
-
-        run_button.setText(" Exit")
-        run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
-        run_button.setIcon(icons.get_icon(icons.icon_exit))
-        run_button.clicked.connect(lambda: self.exit_state(run_button, script, connect=True))
-
-        return run_button
-
-    def exit_state(self, run_button: QPushButton, script, connect=False):
-        """Button setting on exit state."""
-        if connect:
-            self.dashboard_core.exit_script(script)
-            run_button.clicked.disconnect()
-
-        run_button.setText(" Run")
-        run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
-        run_button.setIcon(icons.get_icon(icons.run))
-        run_button.clicked.connect(lambda: self.run_state(run_button, script, connect=True))
+        run_button_event()
+        run_button.clicked.connect(run_button_event)
 
         return run_button
 

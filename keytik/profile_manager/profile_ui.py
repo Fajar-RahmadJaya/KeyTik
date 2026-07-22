@@ -37,6 +37,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from keytik.profile_manager.parse_script import ParseScript
 from keytik.profile_manager.write_script import WriteDefault, WriteScript
 from keytik.profile_mode.default_mode import DefaultMode
+from keytik.profile_mode.shared_row import SharedRow
 from keytik.profile_mode.shortcut_row import ShortcutRow
 from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
@@ -180,7 +181,26 @@ class ProfileUI:
 
     def edit_middle(self, lines, edit_layout: QGridLayout):
         """Middle part of profile manager."""
+        self.middle_stack = QStackedWidget()
+        self.middle_stack.addWidget(self.scroll_area())
+        text_block = TextMode().text_mode_widget(self.edit_window, self.edit_frame, lines)
+        self.middle_stack.addWidget(text_block)
+        edit_layout.addWidget(self.middle_stack, 1, 0, 1, 4)
+
+        # Add profile mode widget
+        index = diff.mode_map.get(lines[0].strip().lower())
+        self.build_profile(index, lines=lines)
+
+    def scroll_area(self):
+        """Scroll area with expand button."""
+        widget = QWidget()
+        layout = QGridLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
         edit_scroll = QScrollArea(self.edit_window)
+        layout.addWidget(edit_scroll, 0, 0, 1, 2)
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         edit_scroll.setObjectName("editScroll")
@@ -198,15 +218,11 @@ class ProfileUI:
         self.edit_frame.setLayout(self.edit_frame_layout)
         edit_scroll.setWidget(self.edit_frame)
 
-        self.middle_stack = QStackedWidget()
-        self.middle_stack.addWidget(edit_scroll)
-        text_block = TextMode().text_mode_widget(self.edit_window, self.edit_frame, lines)
-        self.middle_stack.addWidget(text_block)
-        edit_layout.addWidget(self.middle_stack, 1, 0, 1, 4)
+        layout.addWidget(
+            SharedRow().expand_button(self.edit_window), 0, 1, Qt.AlignTop | Qt.AlignRight
+        )
 
-        # Add profile mode widget
-        index = diff.mode_map.get(lines[0].strip().lower())
-        self.build_profile(index, lines=lines)
+        return widget
 
     def build_profile(self, index, lines=None):
         """Add profile into layout."""

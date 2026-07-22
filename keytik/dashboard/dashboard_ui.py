@@ -142,7 +142,7 @@ class DashboardUI(QMainWindow):
 
         return button_frame
 
-    def create_new_button(self, button_layout):
+    def create_new_button(self, button_layout: QGridLayout):
         """Crate new button with dummy label to give it more space."""
         dummy_left = QLabel()
         dummy_left.setFixedWidth(12)
@@ -201,8 +201,8 @@ class DashboardUI(QMainWindow):
         # Button
         group_layout.addWidget(self.run_button(script), 0, 0)
         group_layout.addWidget(self.edit_button(script), 0, 1)
-        group_layout.addWidget(self.startup_button(script), 0, 2)
-        group_layout.addWidget(self.copy_button(script), 1, 0)
+        group_layout.addWidget(self.copy_button(script), 0, 2)
+        group_layout.addWidget(self.startup_button(script), 1, 0)
         group_layout.addWidget(self.store_button(script), 1, 1)
         group_layout.addWidget(self.delete_button(script), 1, 2)
 
@@ -225,36 +225,34 @@ class DashboardUI(QMainWindow):
         """Profile card run/exit button."""
         run_button = QPushButton()
         run_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        run_button.setCheckable(True)
+
         if script in self.dashboard_core.get_running_ahk():
-            self.run_state(run_button, script)
+            run_button.setChecked(True)
         else:
-            self.exit_state(run_button, script)
+            run_button.setChecked(False)
 
-        return run_button
+        def build_button():
+            if run_button.isChecked():
+                run_button.setText("Exit")
+                run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
+                run_button.setIcon(icons.get_icon(icons.icon_exit, highlighted=True))
+            else:
+                run_button.setText("Run")
+                run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
+                run_button.setIcon(icons.get_icon(icons.run))
 
-    def run_state(self, run_button: QPushButton, script, connect=False):
-        """Button setting on run state."""
-        if connect:
-            self.dashboard_core.activate_script(script)
-            run_button.clicked.disconnect()
+        def button_event():
+            """Run utton event on checked and unchecked state."""
+            if run_button.isChecked():
+                self.dashboard_core.activate_script(script)
+                build_button()
+            else:
+                self.dashboard_core.exit_script(script)
+                build_button()
 
-        run_button.setText(" Exit")
-        run_button.setToolTip(f'Stop "{os.path.splitext(script)[0]}"')
-        run_button.setIcon(icons.get_icon(icons.icon_exit))
-        run_button.clicked.connect(lambda: self.exit_state(run_button, script, connect=True))
-
-        return run_button
-
-    def exit_state(self, run_button: QPushButton, script, connect=False):
-        """Button setting on exit state."""
-        if connect:
-            self.dashboard_core.exit_script(script)
-            run_button.clicked.disconnect()
-
-        run_button.setText(" Run")
-        run_button.setToolTip(f'Start "{os.path.splitext(script)[0]}"')
-        run_button.setIcon(icons.get_icon(icons.run))
-        run_button.clicked.connect(lambda: self.run_state(run_button, script, connect=True))
+        build_button()
+        run_button.clicked.connect(button_event)
 
         return run_button
 
@@ -270,24 +268,46 @@ class DashboardUI(QMainWindow):
 
     def startup_button(self, script):
         """Profile card startup button."""
-        startup_button = QPushButton(" Startup")
+        startup_button = QPushButton()
+        startup_button.setCheckable(True)
         startup_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
         if self.is_startup(script):
-            startup_button.setIcon(icons.get_icon(icons.rocket_fill))
-            startup_button.setToolTip(
-                f'Remove from startup: Dont run"{os.path.splitext(script)[0]}" '
-                "automatically when computer starts"
-            )
-            startup_button.clicked.connect(
-                lambda: self.dashboard_core.remove_ahk_from_startup(script)
-            )
+            startup_button.setChecked(True)
         else:
-            startup_button.setIcon(icons.get_icon(icons.rocket))
-            startup_button.setToolTip(
-                f'Add to startup: Run "{os.path.splitext(script)[0]}" '
-                "automatically when computer starts"
-            )
-            startup_button.clicked.connect(lambda: self.dashboard_core.add_ahk_to_startup(script))
+            startup_button.setChecked(False)
+
+        def build_button():
+            """Buid button configuration bassed on check state."""
+            if self.is_startup(script):
+                font = startup_button.font()
+                font.setPointSize(8)
+                startup_button.setFont(font)
+                startup_button.setText(" Unstartup")
+                startup_button.setIcon(icons.get_icon(icons.rocket_fill, highlighted=True))
+                startup_button.setToolTip(
+                    f'Remove from startup: Dont run"{os.path.splitext(script)[0]}" '
+                    "automatically when computer starts"
+                )
+            else:
+                startup_button.setText(" Startup")
+                startup_button.setIcon(icons.get_icon(icons.rocket))
+                startup_button.setToolTip(
+                    f'Add to startup: Run "{os.path.splitext(script)[0]}" '
+                    "automatically when computer starts"
+                )
+
+        def button_event():
+            """Call appropriate function based on check state."""
+            if startup_button.isChecked():
+                self.dashboard_core.remove_ahk_from_startup(script)
+                build_button()
+            else:
+                self.dashboard_core.add_ahk_to_startup(script)
+                build_button()
+
+        build_button()
+        startup_button.clicked.connect(button_event)
 
         return startup_button
 

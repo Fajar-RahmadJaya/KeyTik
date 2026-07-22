@@ -18,6 +18,7 @@ import ctypes
 import os
 import shutil
 import subprocess
+import sys
 import webbrowser
 
 import requests
@@ -34,6 +35,11 @@ from keytik.utility import constant, diff, style, utils
 
 class SettingCore:
     """Setting logic."""
+
+    def restart_app(self):
+        """Run new instance and remove the old one."""
+        subprocess.Popen([sys.executable, *sys.argv], close_fds=True)
+        sys.exit(0)
 
     def change_data_location(self, parent):
         """Change active and stored profile directory for 'change profile location'."""
@@ -116,12 +122,21 @@ class SettingCore:
                 "light",
                 "dark",
             ):
-                QMessageBox.information(
-                    parent,
-                    "Success",
-                    f"""Theme changed to {config.theme}.
-Please restart {diff.PROGRAM_NAME} to apply change.""",
+                messagebox = QMessageBox(parent)
+                messagebox.setIcon(QMessageBox.Icon.Information)
+                messagebox.setWindowTitle("Success")
+                messagebox.setText(
+                    f"Theme changed to {config.theme}. "
+                    f"Please restart {diff.PROGRAM_NAME} to apply change.\n\n"
+                    f"Would you like to restart {diff.PROGRAM_NAME}?",
                 )
+                messagebox.setStandardButtons(
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+
+                response = messagebox.exec()
+                if response == QMessageBox.StandardButton.Yes:
+                    self.restart_app()
             else:
                 # Set palette
                 QApplication.setPalette(palette)
@@ -172,12 +187,21 @@ Please restart {diff.PROGRAM_NAME} to apply change.""",
             utils.update_config(config)
 
             if prev_mica == "disable" or new_mica.lower() == "disable":
-                QMessageBox.information(
-                    parent,
-                    "Success",
-                    f"""Mica effect enabled.
-Please restart {diff.PROGRAM_NAME} to apply change.""",
+                messagebox = QMessageBox(parent)
+                messagebox.setIcon(QMessageBox.Icon.Information)
+                messagebox.setWindowTitle("Success")
+                messagebox.setText(
+                    f"Mica effect changed to {new_mica}. "
+                    f"Please restart {diff.PROGRAM_NAME} to apply change.\n\n"
+                    f"Would you like to restart {diff.PROGRAM_NAME}?",
                 )
+                messagebox.setStandardButtons(
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+
+                response = messagebox.exec()
+                if response == QMessageBox.StandardButton.Yes:
+                    self.restart_app()
             else:
                 # Apply mica on setting window
                 style.apply_mica(parent)

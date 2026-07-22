@@ -403,11 +403,7 @@ class DashboardCore(QObject):
         shortcut_path = os.path.join(startup_folder, f"{shortcut_name}.lnk")
 
         try:
-            if os.path.exists(shortcut_path):
-                os.remove(shortcut_path)
-                print(f"Removed {shortcut_path} from startup.")
-            else:
-                print(f"{shortcut_path} does not exist in startup.")
+            os.remove(shortcut_path)
 
             self.update_script_signal.emit()
 

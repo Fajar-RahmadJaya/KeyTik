@@ -201,8 +201,8 @@ class DashboardUI(QMainWindow):
         # Button
         group_layout.addWidget(self.run_button(script), 0, 0)
         group_layout.addWidget(self.edit_button(script), 0, 1)
-        group_layout.addWidget(self.startup_button(script), 0, 2)
-        group_layout.addWidget(self.copy_button(script), 1, 0)
+        group_layout.addWidget(self.copy_button(script), 0, 2)
+        group_layout.addWidget(self.startup_button(script), 1, 0)
         group_layout.addWidget(self.store_button(script), 1, 1)
         group_layout.addWidget(self.delete_button(script), 1, 2)
 

@@ -210,6 +210,8 @@ Note:
 
 <br>
 
+<div align="center">
+
 ## Contributing
 
 </div>

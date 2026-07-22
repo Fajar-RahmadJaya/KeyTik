@@ -68,7 +68,6 @@ class DefaultMode:
         """Build remap row."""
         # Remap
         remap_widget = QWidget()
-        remap_widget.setContentsMargins(0, 0, 0, 0)
         remap_layout = QVBoxLayout(remap_widget)
         remap_layout.setContentsMargins(0, 0, 0, 0)
 

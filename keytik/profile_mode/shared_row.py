@@ -14,19 +14,24 @@
 
 """Row utility used across profile mode."""
 
-from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtCore import QMargins, QSize, Qt  # pylint: disable=E0611
+from PySide6.QtGui import QPalette  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QCompleter,
+    QDialog,
     QFrame,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QSizePolicy,
+    QStackedWidget,
+    QToolButton,
     QWidget,
 )
 
 from keytik.profile_mode.profile_mode_core import ProfileModeCore
-from keytik.utility import utils
+from keytik.utility import icons, style, utils
 
 
 class SharedRow:  # pylint: disable=R0903
@@ -97,3 +102,57 @@ class SharedRow:  # pylint: disable=R0903
         entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         return entry
+
+    def expand_button(self, parent_window: QDialog):
+        """Button to expand profile mode."""
+        button = QToolButton()
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        button.setIcon(icons.get_icon(icons.fullscreen))
+        button.setIconSize(QSize(16, 16))
+        button.setToolTip("Maximize")
+        button.setFixedSize(40, 40)
+        button.setCheckable(True)
+        palette = style.get_palette()
+        palette.setColor(QPalette.ColorRole.Accent, palette.color(QPalette.ColorRole.Button))
+        button.setPalette(palette)
+        button.setStyleSheet("""
+        QToolButton{
+            margin: 8px;
+        }
+        """)
+
+        edit_layout = parent_window.findChild(QGridLayout)
+        prev_layout_margin = edit_layout.contentsMargins()
+        button.clicked.connect(
+            lambda: self.expand_text_block(button, prev_layout_margin, parent_window)
+        )
+
+        return button
+
+    def expand_text_block(
+        self, button: QToolButton, prev_layout_margin: QMargins, parent_window: QDialog
+    ):
+        """Hide other widget except text block."""
+        layout = parent_window.findChild(QGridLayout)
+        isexpand = button.isChecked()
+
+        if isexpand:
+            button.setToolTip("Minimize")
+            button.setIcon(icons.get_icon(icons.fullscreen_exit))
+            layout.setContentsMargins(0, 0, 0, 0)
+        else:
+            button.setToolTip("Maximize")
+            button.setIcon(icons.get_icon(icons.fullscreen))
+            layout.setContentsMargins(prev_layout_margin)
+
+        top_widget = parent_window.findChild(QWidget, "TopWidget")
+        top_widget.setHidden(isexpand)
+
+        bottom_widget = parent_window.findChild(QWidget, "BottomWidget")
+        bottom_widget.setHidden(isexpand)
+
+        # Collapsible shortcut on text mode
+        middle_stack = parent_window.findChild(QStackedWidget)
+        collapsible_shortcut = middle_stack.widget(1).findChild(QWidget)
+        if collapsible_shortcut:
+            collapsible_shortcut.setHidden(isexpand)

@@ -19,21 +19,20 @@ import json
 from pyqcodeeditor import utils as pyqcodeeditor_utils
 from pyqcodeeditor.QCodeEditor import QCodeEditor
 from pyqcodeeditor.QSyntaxStyle import QSyntaxStyle
-from PySide6.QtCore import QSize, Qt  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QPalette, QTextCharFormat, QTextCursor  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog,
     QGridLayout,
     QSizePolicy,
-    QStackedWidget,
     QTextEdit,
-    QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
+from keytik.profile_mode.shared_row import SharedRow
 from keytik.profile_mode.shortcut_row import ShortcutRow
-from keytik.utility import icons, style
+from keytik.utility import style
 
 
 class TextMode:
@@ -58,62 +57,11 @@ class TextMode:
         text_block = self.text_block(lines)
         text_block_layout.addWidget(text_block, 0, 0, 1, 2)
 
-        expand_button = QToolButton()
-        expand_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        expand_button.setIcon(icons.get_icon(icons.fullscreen))
-        expand_button.setIconSize(QSize(16, 16))
-        expand_button.setToolTip("Maximize")
-        expand_button.setFixedSize(40, 40)
-        expand_button.setCheckable(True)
-        palette = style.get_palette()
-        palette.setColor(QPalette.ColorRole.Accent, palette.color(QPalette.ColorRole.Button))
-        expand_button.setPalette(palette)
-        expand_button.setStyleSheet("""
-        QToolButton{
-            margin: 8px;
-        }
-        """)
-        text_block_layout.addWidget(expand_button, 0, 1, Qt.AlignTop | Qt.AlignRight)
-
-        edit_layout = parent_window.findChild(QGridLayout)
-        prev_layout_margin = edit_layout.contentsMargins()
-
-        def button_click_event():
-            """Set expand button icon."""
-            ischecked = expand_button.isChecked()
-
-            if ischecked:
-                expand_button.setToolTip("Minimize")
-                expand_button.setIcon(icons.get_icon(icons.fullscreen_exit))
-            else:
-                expand_button.setToolTip("Maximize")
-                expand_button.setIcon(icons.get_icon(icons.fullscreen))
-
-            self.expand_text_block(parent_window, ischecked, prev_layout_margin)
-
-        expand_button.clicked.connect(button_click_event)
+        text_block_layout.addWidget(
+            SharedRow().expand_button(parent_window), 0, 1, Qt.AlignTop | Qt.AlignRight
+        )
 
         return widget
-
-    def expand_text_block(self, parent_window: QDialog, ischecked, prev_layout_margin):
-        """Hide other widget except text block."""
-        hidden = bool(ischecked)
-
-        edit_layout = parent_window.findChild(QGridLayout)
-        if ischecked:
-            edit_layout.setContentsMargins(0, 0, 0, 0)
-        else:
-            edit_layout.setContentsMargins(prev_layout_margin)
-
-        top_widget = parent_window.findChild(QWidget, "TopWidget")
-        top_widget.setHidden(hidden)
-
-        bottom_widget = parent_window.findChild(QWidget, "BottomWidget")
-        bottom_widget.setHidden(hidden)
-
-        middle_stack = parent_window.findChild(QStackedWidget)
-        collapsible_shortcut = middle_stack.widget(1).findChild(QWidget)
-        collapsible_shortcut.setHidden(hidden)
 
     def text_block(self, lines=None):
         """Text mode frame."""

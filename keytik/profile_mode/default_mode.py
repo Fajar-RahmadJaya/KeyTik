@@ -89,6 +89,8 @@ class DefaultMode:
             separator_widget = shared_row.separator_widget(add_empty_row, remap_widget)
             remap_layout.addWidget(separator_widget)
 
+            self.entry_subscription(remap_widget, add_empty_row)
+
         parsed_remap_list = ParseScript().parse_default_mode(lines) if lines else None
         if parsed_remap_list:
             for parsed_remap in parsed_remap_list:
@@ -100,10 +102,34 @@ class DefaultMode:
                 # Separator
                 separator_widget = shared_row.separator_widget(add_empty_row, remap_widget)
                 remap_layout.addWidget(separator_widget)
+
+                self.entry_subscription(remap_widget, add_empty_row)
         else:
             add_empty_row(None)
 
         return remap_widget
+
+    def entry_subscription(self, remap_widget: QWidget, event):
+        """Add event subscription to last entry."""
+        default_key_list = remap_widget.findChildren(QLineEdit, "DefaultKeyEntry")
+        if len(default_key_list) != 1:
+            prev_default = default_key_list[-2]
+            prev_default.textChanged.disconnect()
+        last_default = default_key_list[-1]
+
+        remap_key_list = remap_widget.findChildren(QLineEdit, "RemapKeyEntry")
+        if len(remap_key_list) != 1:
+            prev_remap = remap_key_list[-2]
+            prev_remap.textChanged.disconnect()
+        last_remap = remap_key_list[-1]
+
+        def entry_changed_event():
+            """Add row only when both entry is not empty."""
+            if last_remap.text() and last_default.text():
+                event(None)
+
+        last_default.textChanged.connect(entry_changed_event)
+        last_remap.textChanged.connect(entry_changed_event)
 
     def remap_title(self):
         """Key remap row tittle label."""
@@ -172,6 +198,7 @@ class DefaultMode:
         default_key_layout.addWidget(default_key_select, 0, 0, 1, 2)
 
         default_key_entry = self.shared_row.remap_entry_template()
+        default_key_entry.setObjectName("DefaultKeyEntry")
         default_key_entry.setObjectName(RemapObject.default_key_entry)
         default_key_entry.setParent(default_key_container)
         default_key_entry.setToolTip(
@@ -213,6 +240,7 @@ class DefaultMode:
         remap_key_layout.addWidget(remap_key_select, 0, 0, 1, 2)
 
         remap_key_entry = self.shared_row.remap_entry_template()
+        remap_key_entry.setObjectName("RemapKeyEntry")
         remap_key_entry.setObjectName(RemapObject.remap_key_entry)
         remap_key_entry.setParent(remap_key_container)
         remap_key_entry.setToolTip(

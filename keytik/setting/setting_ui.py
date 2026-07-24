@@ -39,6 +39,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QScrollArea,
     QSizePolicy,
     QStyleFactory,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -512,9 +513,7 @@ class SettingUI:
         """Check for Update Widget."""
         check_update_button = self.setting_template.setting_button()
         check_update_button.setText("Check For Update")
-        check_update_button.clicked.connect(
-            lambda: self.update_messagebox(show_no_update_message=True)
-        )
+        check_update_button.clicked.connect(self.update_messagebox)
 
         check_update_layout, check_update_frame = self.setting_template.setting_card(
             heading="Check for update", subheading="Check for update"
@@ -523,24 +522,89 @@ class SettingUI:
 
         return check_update_frame
 
-    def update_messagebox(self, show_no_update_message=False):
+    def update_messagebox(self):
         """Message when there is update avalible."""
-        latest_version = self.setting_core.check_for_update()
+        latest_version, changelog_md = self.setting_core.get_update_data()
         if latest_version:
-            reply = QMessageBox.question(
-                QApplication.activeWindow(),
-                "Update Available",
-                (
-                    f"New update available: {diff.PROGRAM_NAME} {latest_version}\n\n"
-                    "Would you like to go to the update page?"
-                ),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            )
-            if reply == QMessageBox.StandardButton.Yes:
-                webbrowser.open(diff.RELEASE_LINK)
-        elif show_no_update_message:
+            self.update_changelog(latest_version, changelog_md)
+        else:
             QMessageBox.information(
                 QApplication.activeWindow(),
                 "Check For Update",
                 "You are using the latest version of KeyTik.",
             )
+
+    def update_changelog(self, new_version: str, changelog_md: str):
+        """Show update changelog window."""
+        parent = QApplication.activeWindow()
+
+        window = QDialog(parent)
+        window.setWindowTitle(f"New version of {diff.PROGRAM_NAME} is available")
+        window.setGeometry(style.get_geometry(parent, 520, 360))
+        window.setWindowIcon(QIcon(constant.icon_path))
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(16)
+        window.setLayout(layout)
+
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.document().setDocumentMargin(8)
+        text_edit.document().setIndentWidth(20)
+
+        text_edit.setMarkdown(
+            "## What's Changed\n\n"
+            f"`Latest: {new_version} - Current: {diff.CURRENT_VERSION}`\n"
+            "\n---\n\n"
+            f"{changelog_md.replace('## Changelog', '')}"
+        )
+
+        layout.addWidget(text_edit)
+
+        button_widget = QWidget()
+        button_widget.setMaximumHeight(32)
+        button_layout = QHBoxLayout()
+        button_layout.setContentsMargins(16, 0, 16, 0)
+        button_layout.setSpacing(32)
+        button_widget.setLayout(button_layout)
+
+        update_button = QPushButton()
+        update_button.setText("Update now")
+        update_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        update_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        def update_button_event():
+            """Open release in web browser and close dialog."""
+            webbrowser.open(diff.RELEASE_LINK)
+            window.accept()
+
+        update_button.clicked.connect(update_button_event)
+        button_layout.addWidget(update_button)
+
+        cencel_button = QPushButton()
+        cencel_button.setText("Skip This Version")
+        cencel_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        cencel_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        def cencel_button_event():
+            """Save current version to skip version config."""
+            try:
+                config = utils.get_config()
+
+                # Update config
+                config.skip_update = new_version
+                utils.update_config(config)
+
+                window.reject()
+
+            except FileNotFoundError as error:
+                print(f"Error: {error}")
+                window.reject()
+
+        cencel_button.clicked.connect(cencel_button_event)
+        button_layout.addWidget(cencel_button)
+
+        layout.addWidget(button_widget)
+
+        window.exec()

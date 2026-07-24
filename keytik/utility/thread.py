@@ -28,7 +28,7 @@ from keytik.utility import utils
 class Thread(QThread):  # pylint: disable=R0903
     """Startup thread worker."""
 
-    update_found = Signal()
+    update_found = Signal(str, str)
     show_announcement = Signal()
     ahk_not_installed = Signal()
 
@@ -43,9 +43,9 @@ class Thread(QThread):  # pylint: disable=R0903
         write_script.initialize_exit_keys()
 
         # Check for update
-        latest_version = setting_core.check_for_update()
-        if latest_version:
-            self.update_found.emit()
+        latest_version, changelog_md = setting_core.get_update_data()
+        if latest_version and latest_version != utils.get_config().skip_update:
+            self.update_found.emit(latest_version, changelog_md)
 
         # Check whether AutoHotkey is installed
         if not os.path.exists(utils.ahkv2_dir):

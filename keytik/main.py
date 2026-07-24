@@ -55,9 +55,7 @@ def main():
 
     main_window.startup_worker = thread.Thread(main_window)
     # Connect signal from thread
-    main_window.startup_worker.update_found.connect(
-        lambda: setting_ui.update_messagebox(show_no_update_message=False)
-    )
+    main_window.startup_worker.update_found.connect(setting_ui.update_changelog)
     main_window.startup_worker.show_announcement.connect(
         lambda: announcement.show_announcement_window(main_window)
     )

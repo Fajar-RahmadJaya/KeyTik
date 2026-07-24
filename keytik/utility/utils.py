@@ -37,6 +37,7 @@ class Config:  # pylint: disable=R0902
     pinned_profile: list
     exit_key: dict
     auto_complete: str
+    skip_update: str
 
 
 def get_config():
@@ -58,6 +59,7 @@ def get_config():
                 pinned_profile=value.get("pinned_profile", []),
                 exit_key=value.get("exit_key", {}),
                 auto_complete=value.get("auto_complete") or "inline",
+                skip_update=value.get("skip_update") or None,
             )
         return config
 

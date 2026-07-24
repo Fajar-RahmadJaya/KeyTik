@@ -259,13 +259,13 @@ class SettingCore:
                 "Failed to uninstall: inter_uninstall.bat not found",
             )
 
-    def check_for_update(self):
+    def get_update_data(self) -> str:
         """Check for update comparing current version and latest version."""
         try:
             success_code = 200
             response = requests.get(diff.CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == success_code:
-                return diff.parse_update_response(response)
+                return diff.parse_update_response(response), response.json()["body"]
         except requests.exceptions.ConnectionError:
             pass
         return None

@@ -265,7 +265,8 @@ class SettingCore:
             success_code = 200
             response = requests.get(diff.CHECK_UPDATE_LINK, timeout=5)
             if response.status_code == success_code:
-                return diff.parse_update_response(response), response.json()["body"]
+                latest_version, changelog = diff.parse_update_response(response)
+                return latest_version, changelog
         except requests.exceptions.ConnectionError:
             pass
         return None

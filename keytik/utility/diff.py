@@ -18,6 +18,7 @@ from textwrap import dedent
 from typing import TYPE_CHECKING
 
 from PySide6.QtWidgets import QTextEdit  # pylint: disable=E0611
+from requests import Response
 
 if TYPE_CHECKING:
     from keytik.profile_manager.profile_ui import ProfileUI
@@ -156,13 +157,13 @@ global
 """)
 
 
-def parse_update_response(response):
+def parse_update_response(response: Response):
     """Parse the response from check for update."""
-    release_data = response.json()
-    latest_version = release_data.get("tag_name")
+    latest_version = response.json().get("tag_name")
+    changelog = response.json()["body"]
     if latest_version != CURRENT_VERSION:
-        return latest_version
-    return None
+        return latest_version, changelog
+    return None, "Failed to fetch changelog"
 
 
 def pro_mode(index, lines, profile_ui: "ProfileUI"):  # pylint: disable=W0613

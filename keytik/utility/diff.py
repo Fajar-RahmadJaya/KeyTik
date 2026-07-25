@@ -17,6 +17,7 @@
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
+import requests
 from PySide6.QtWidgets import QTextEdit  # pylint: disable=E0611
 
 if TYPE_CHECKING:
@@ -156,12 +157,17 @@ global
 """)
 
 
-def parse_update_response(response):
-    """Parse the response from check for update."""
-    release_data = response.json()
-    latest_version = release_data.get("tag_name")
-    if latest_version != CURRENT_VERSION:
-        return latest_version
+def get_update_data() -> str:
+    """Check for update comparing current version and latest version."""
+    try:
+        success_code = 200
+        response = requests.get(CHECK_UPDATE_LINK, timeout=5)
+        if response.status_code == success_code:
+            latest_version = response.json().get("tag_name")
+            changelog = response.json()["body"]
+            return latest_version, changelog
+    except requests.exceptions.ConnectionError:
+        pass
     return None
 
 

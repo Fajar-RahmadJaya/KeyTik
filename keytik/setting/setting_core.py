@@ -21,7 +21,6 @@ import subprocess
 import sys
 import webbrowser
 
-import requests
 from PySide6.QtGui import QPalette  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
@@ -258,17 +257,6 @@ class SettingCore:
                 "Error",
                 "Failed to uninstall: inter_uninstall.bat not found",
             )
-
-    def check_for_update(self):
-        """Check for update comparing current version and latest version."""
-        try:
-            success_code = 200
-            response = requests.get(diff.CHECK_UPDATE_LINK, timeout=5)
-            if response.status_code == success_code:
-                return diff.parse_update_response(response)
-        except requests.exceptions.ConnectionError:
-            pass
-        return None
 
     def get_custom_theme(self) -> list[str]:
         """Return list containing custom theme."""

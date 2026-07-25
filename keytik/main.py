@@ -22,7 +22,7 @@ from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.dashboard.dashboard_ui import DashboardUI
 from keytik.setting.announcement import Announcement
-from keytik.setting.setting_ui import SettingUI
+from keytik.setting.setting_ui import SettingAbout
 from keytik.utility import style, thread, utils
 
 
@@ -50,14 +50,12 @@ def main():
 
     # Thread
     announcement = Announcement()
-    setting_ui = SettingUI()
+    setting = SettingAbout()
     dashboad_core = DashboardCore()
 
     main_window.startup_worker = thread.Thread(main_window)
     # Connect signal from thread
-    main_window.startup_worker.update_found.connect(
-        lambda: setting_ui.update_messagebox(show_no_update_message=False)
-    )
+    main_window.startup_worker.update_found.connect(setting.update_changelog)
     main_window.startup_worker.show_announcement.connect(
         lambda: announcement.show_announcement_window(main_window)
     )

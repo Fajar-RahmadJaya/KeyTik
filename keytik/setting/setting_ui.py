@@ -39,6 +39,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QScrollArea,
     QSizePolicy,
     QStyleFactory,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -117,9 +118,6 @@ class SettingUI:
         self.setting_core = SettingCore()
         self.setting_template = SettingTemplate()
 
-        # Cache
-        self.circle_cache = {}
-
     # ------------------------------ Window ------------------------------
     def setting_window(self, parent):
         """Setting window."""
@@ -153,13 +151,16 @@ class SettingUI:
             content_layout.addWidget(self.pro_version())
 
         # Appearance
-        content_layout.addWidget(self.appearance(settings_window))
+        content_layout.addWidget(SettingAppearance().appearance(settings_window))
 
         # General
-        content_layout.addWidget(self.general(settings_window))
+        content_layout.addWidget(SettingGeneral().general(settings_window))
 
         # Advanced
-        content_layout.addWidget(self.installation())
+        content_layout.addWidget(SettingInstallation().installation())
+
+        # About
+        content_layout.addWidget(SettingAbout().about())
 
         setting_layout.addWidget(scroll_area)
         settings_window.exec()
@@ -192,7 +193,17 @@ class SettingUI:
 
         return pro_version_widget
 
-    # ------------------------------ Appearance ------------------------------
+
+class SettingAppearance:
+    """Appearance section on setting."""
+
+    def __init__(self):
+        self.setting_template = SettingTemplate()
+        self.setting_core = SettingCore()
+
+        # Cache
+        self.circle_cache = {}
+
     def appearance(self, settings_window):
         """Appearance setting."""
         appearance_widget = QWidget()
@@ -354,7 +365,14 @@ class SettingUI:
 
         return mica_frame
 
-    # ------------------------------ General ------------------------------
+
+class SettingGeneral:
+    """General section on setting."""
+
+    def __init__(self):
+        self.setting_template = SettingTemplate()
+        self.setting_core = SettingCore()
+
     def general(self, settings_window):
         """General setting."""
         general_widget = QWidget()
@@ -443,7 +461,14 @@ class SettingUI:
 
         return auto_complete_frame
 
-    # ------------------------------ Installation ------------------------------
+
+class SettingInstallation:
+    """Installation section on setting."""
+
+    def __init__(self):
+        self.setting_template = SettingTemplate()
+        self.setting_core = SettingCore()
+
     def installation(self):
         """Advanced setting."""
         installation_widget = QWidget()
@@ -460,9 +485,6 @@ class SettingUI:
 
         # Interception Driver Installation
         installation_layout.addWidget(self.interception_installation())
-
-        # Check for Update
-        installation_layout.addWidget(self.check_update())
 
         return installation_widget
 
@@ -508,39 +530,177 @@ class SettingUI:
 
         return interception_frame
 
-    def check_update(self):
+
+class SettingAbout:
+    """About section on setting."""
+
+    def __init__(self):
+        self.setting_template = SettingTemplate()
+
+    def about(self):
+        """About section."""
+        about_widget = QWidget()
+        about_layout = QVBoxLayout(about_widget)
+        about_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Header
+        installaation_label = self.setting_template.setting_header_label()
+        installaation_label.setText("About")
+        about_layout.addWidget(installaation_label)
+
+        # Check for Update
+        about_layout.addWidget(self.version())
+
+        # Changelog
+        about_layout.addWidget(self.changelog())
+
+        return about_widget
+
+    def version(self):
         """Check for Update Widget."""
-        check_update_button = self.setting_template.setting_button()
-        check_update_button.setText("Check For Update")
-        check_update_button.clicked.connect(
-            lambda: self.update_messagebox(show_no_update_message=True)
+        layout, frame = self.setting_template.setting_card(
+            heading="Version", subheading=diff.CURRENT_VERSION
         )
 
-        check_update_layout, check_update_frame = self.setting_template.setting_card(
-            heading="Check for update", subheading="Check for update"
+        button = self.setting_template.setting_button()
+        button.setText("Check For Updates")
+
+        def button_event():
+            """Check for update."""
+            data = utils.get_data()
+            latest_version = data.latest_version
+
+            if latest_version != diff.CURRENT_VERSION:
+                self.update_changelog()
+            else:
+                QMessageBox.information(
+                    QApplication.activeWindow(),
+                    "Check For Update",
+                    "You are using the latest version of KeyTik.",
+                )
+
+        button.clicked.connect(button_event)
+        layout.addWidget(button)
+
+        return frame
+
+    def changelog(self):
+        """Changelog Widget."""
+        changelog_layout, changelog_frame = self.setting_template.setting_card(
+            heading="What's New", subheading="Show changelog"
         )
-        check_update_layout.addWidget(check_update_button)
 
-        return check_update_frame
+        button = self.setting_template.setting_button()
+        button.setText("Changelog")
+        button.clicked.connect(lambda: self.update_changelog(ischangelog=True))
+        changelog_layout.addWidget(button)
 
-    def update_messagebox(self, show_no_update_message=False):
-        """Message when there is update avalible."""
-        latest_version = self.setting_core.check_for_update()
-        if latest_version:
-            reply = QMessageBox.question(
-                QApplication.activeWindow(),
-                "Update Available",
-                (
-                    f"New update available: {diff.PROGRAM_NAME} {latest_version}\n\n"
-                    "Would you like to go to the update page?"
-                ),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        return changelog_frame
+
+    def update_changelog(self, new_version=None, changelog_md=None, ischangelog=False):
+        """Show update changelog window."""
+        parent = QApplication.activeWindow()
+        if not new_version and not changelog_md:
+            data = utils.get_data()
+            new_version = data.latest_version
+            changelog_md = data.changelog
+
+        window = QDialog(parent)
+        if new_version != diff.CURRENT_VERSION:
+            window.setWindowTitle(f"New version of {diff.PROGRAM_NAME} is available")
+        else:
+            window.setWindowTitle("Changelog")
+        window.setGeometry(style.get_geometry(parent, 520, 360))
+        window.setWindowIcon(QIcon(constant.icon_path))
+        style.apply_mica(window)
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(16)
+        window.setLayout(layout)
+
+        layout.addWidget(self.changelog_text(new_version, changelog_md))
+
+        button_widget = QWidget()
+        button_widget.setMaximumHeight(32)
+        button_layout = QHBoxLayout()
+        button_layout.setContentsMargins(16, 0, 16, 0)
+        button_layout.setSpacing(32)
+        button_widget.setLayout(button_layout)
+
+        button_layout.addWidget(self.update_button(window))
+        button_layout.addWidget(self.skip_button(new_version, window))
+
+        if not ischangelog:
+            layout.addWidget(button_widget)
+
+        window.exec()
+
+    def changelog_text(
+        self,
+        new_version: str = "(Failed to fetch latest version)",
+        changelog_md: str = "Failed to fetch changelog",
+    ):
+        """Return changelog text edit."""
+        text_edit = QTextEdit()
+        text_edit.setObjectName("ChangelogText")
+        text_edit.setReadOnly(True)
+        text_edit.document().setDocumentMargin(8)
+        text_edit.document().setIndentWidth(20)
+
+        if utils.get_config().mica_effect != "disable" and style.mica_supported:
+            text_edit.setStyleSheet(
+                f"#ChangelogText {{background-color: {style.palette_role.base_rgba}}}"
             )
-            if reply == QMessageBox.StandardButton.Yes:
-                webbrowser.open(diff.RELEASE_LINK)
-        elif show_no_update_message:
-            QMessageBox.information(
-                QApplication.activeWindow(),
-                "Check For Update",
-                "You are using the latest version of KeyTik.",
-            )
+
+        text_edit.setMarkdown(
+            "## What's Changed\n\n"
+            f"`Latest: {new_version} - Current: {diff.CURRENT_VERSION}`\n"
+            "\n---\n\n"
+            f"{changelog_md.replace('## Changelog', '')}"
+        )
+
+        return text_edit
+
+    def update_button(self, window: QDialog):
+        """Retrun update button opening update link."""
+        button = QPushButton()
+        button.setObjectName(style.button_highlight())
+        button.setText("Update now")
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        def button_event():
+            """Open release in web browser and close dialog."""
+            webbrowser.open(diff.RELEASE_LINK)
+            window.accept()
+
+        button.clicked.connect(button_event)
+
+        return button
+
+    def skip_button(self, new_version: str, window: QDialog):
+        """Return skip button appending new version to skip version config."""
+        button = QPushButton()
+        button.setText("Skip This Version")
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        def button_event():
+            """Save current version to skip version config."""
+            try:
+                config = utils.get_config()
+
+                # Update config
+                config.skip_update = new_version
+                utils.update_config(config)
+
+                window.reject()
+
+            except FileNotFoundError as error:
+                print(f"Error: {error}")
+                window.reject()
+
+        button.clicked.connect(button_event)
+
+        return button

@@ -255,7 +255,8 @@ def get_global_stylesheet():
 
     stylesheet.append(button_highlight(style_sheet=True))
 
-    if config.mica_effect != "disable" and mica_supported:
+    # Only set global tree view on dark mica
+    if config.mica_effect != "disable" and mica_supported and config.theme == "dark":
         stylesheet.append(global_treeview)
 
     return "\n".join(stylesheet)

@@ -14,7 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: changelog
           fetch-depth: 0
 
       - name: Generate changelog

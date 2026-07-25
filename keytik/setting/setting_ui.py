@@ -656,6 +656,7 @@ class SettingAbout:
     def update_button(self, window: QDialog):
         """Retrun update button opening update link."""
         button = QPushButton()
+        button.setObjectName(style.button_highlight())
         button.setText("Update now")
         button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         button.setFocusPolicy(Qt.FocusPolicy.NoFocus)

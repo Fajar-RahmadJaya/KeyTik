@@ -100,8 +100,8 @@ output = "CHANGELOG.md"
 
 [tool.git-cliff.git]
 commit_parsers = [
-    { message = "^feat", group = "<!-- 0 -->New Features" },
     { message = "^feat\\([^)]*\\):", group = "<!-- 1 -->Improvements" },
+    { message = "^feat", group = "<!-- 0 -->New Features" },
     { message = "^fix", group = "<!-- 2 -->Fixes" },
     { message = "^chore", skip = true },
     { message = "^refactor", skip = true },

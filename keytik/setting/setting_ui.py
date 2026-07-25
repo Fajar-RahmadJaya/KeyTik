@@ -549,20 +549,21 @@ class SettingAbout:
         about_layout.addWidget(installaation_label)
 
         # Check for Update
-        about_layout.addWidget(self.check_update())
+        about_layout.addWidget(self.version())
 
         # Changelog
         about_layout.addWidget(self.changelog())
 
         return about_widget
 
-    def check_update(self):
+    def version(self):
         """Check for Update Widget."""
-        check_update_button = self.setting_template.setting_button()
-        check_update_button.setText("Check For Updates")
-        check_update_layout, check_update_frame = self.setting_template.setting_card(
-            heading="Check for updates", subheading="Check for updates"
+        layout, frame = self.setting_template.setting_card(
+            heading="Version", subheading=diff.CURRENT_VERSION
         )
+
+        button = self.setting_template.setting_button()
+        button.setText("Check For Updates")
 
         def button_event():
             """Check for update."""
@@ -578,10 +579,10 @@ class SettingAbout:
                     "You are using the latest version of KeyTik.",
                 )
 
-        check_update_button.clicked.connect(button_event)
-        check_update_layout.addWidget(check_update_button)
+        button.clicked.connect(button_event)
+        layout.addWidget(button)
 
-        return check_update_frame
+        return frame
 
     def changelog(self):
         """Changelog Widget."""

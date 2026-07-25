@@ -157,7 +157,7 @@ global
 """)
 
 
-def get_update_data(self) -> str:
+def get_update_data() -> str:
     """Check for update comparing current version and latest version."""
     try:
         success_code = 200

@@ -1,4 +1,4 @@
-name: git-cliff
+name: Changelog Generator
 
 on:
    push:

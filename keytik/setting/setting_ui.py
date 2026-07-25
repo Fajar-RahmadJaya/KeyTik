@@ -118,9 +118,6 @@ class SettingUI:
         self.setting_core = SettingCore()
         self.setting_template = SettingTemplate()
 
-        # Cache
-        self.circle_cache = {}
-
     # ------------------------------ Window ------------------------------
     def setting_window(self, parent):
         """Setting window."""
@@ -154,16 +151,16 @@ class SettingUI:
             content_layout.addWidget(self.pro_version())
 
         # Appearance
-        content_layout.addWidget(self.appearance(settings_window))
+        content_layout.addWidget(SettingAppearance().appearance(settings_window))
 
         # General
-        content_layout.addWidget(self.general(settings_window))
+        content_layout.addWidget(SettingGeneral().general(settings_window))
 
         # Advanced
-        content_layout.addWidget(self.installation())
+        content_layout.addWidget(SettingInstallation().installation())
 
         # About
-        content_layout.addWidget(self.about())
+        content_layout.addWidget(SettingAbout().about())
 
         setting_layout.addWidget(scroll_area)
         settings_window.exec()
@@ -196,7 +193,17 @@ class SettingUI:
 
         return pro_version_widget
 
-    # ------------------------------ Appearance ------------------------------
+
+class SettingAppearance:
+    """Appearance section on setting."""
+
+    def __init__(self):
+        self.setting_template = SettingTemplate()
+        self.setting_core = SettingCore()
+
+        # Cache
+        self.circle_cache = {}
+
     def appearance(self, settings_window):
         """Appearance setting."""
         appearance_widget = QWidget()
@@ -358,7 +365,14 @@ class SettingUI:
 
         return mica_frame
 
-    # ------------------------------ General ------------------------------
+
+class SettingGeneral:
+    """General section on setting."""
+
+    def __init__(self):
+        self.setting_template = SettingTemplate()
+        self.setting_core = SettingCore()
+
     def general(self, settings_window):
         """General setting."""
         general_widget = QWidget()
@@ -447,7 +461,14 @@ class SettingUI:
 
         return auto_complete_frame
 
-    # ------------------------------ Installation ------------------------------
+
+class SettingInstallation:
+    """Installation section on setting."""
+
+    def __init__(self):
+        self.setting_template = SettingTemplate()
+        self.setting_core = SettingCore()
+
     def installation(self):
         """Advanced setting."""
         installation_widget = QWidget()
@@ -509,7 +530,13 @@ class SettingUI:
 
         return interception_frame
 
-    # ------------------------------ About ------------------------------
+
+class SettingAbout:
+    """About section on setting."""
+
+    def __init__(self):
+        self.setting_template = SettingTemplate()
+
     def about(self):
         """About section."""
         about_widget = QWidget()

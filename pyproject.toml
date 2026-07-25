@@ -83,7 +83,7 @@ max-line-length = 100 # Match pylint default
 [tool.git-cliff.changelog]
 body = """
 {% if version %}\
-    ## KeyTik v{{ version | trim_start_matches(pat="v") }}
+    ## KeyTik v{{ version | trim_start_matches(pat="v") }} Preview
 {% else %}\
     ## [unreleased]
 {% endif %}\

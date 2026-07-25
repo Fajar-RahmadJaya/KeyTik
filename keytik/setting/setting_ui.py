@@ -162,6 +162,9 @@ class SettingUI:
         # Advanced
         content_layout.addWidget(self.installation())
 
+        # About
+        content_layout.addWidget(self.about())
+
         setting_layout.addWidget(scroll_area)
         settings_window.exec()
 
@@ -462,9 +465,6 @@ class SettingUI:
         # Interception Driver Installation
         installation_layout.addWidget(self.interception_installation())
 
-        # Check for Update
-        installation_layout.addWidget(self.check_update())
-
         return installation_widget
 
     def ahk_installation(self):
@@ -509,37 +509,79 @@ class SettingUI:
 
         return interception_frame
 
+    # ------------------------------ About ------------------------------
+    def about(self):
+        """About section."""
+        about_widget = QWidget()
+        about_layout = QVBoxLayout(about_widget)
+        about_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Header
+        installaation_label = self.setting_template.setting_header_label()
+        installaation_label.setText("About")
+        about_layout.addWidget(installaation_label)
+
+        # Check for Update
+        about_layout.addWidget(self.check_update())
+
+        # Changelog
+        about_layout.addWidget(self.changelog())
+
+        return about_widget
+
     def check_update(self):
         """Check for Update Widget."""
         check_update_button = self.setting_template.setting_button()
-        check_update_button.setText("Check For Update")
-        check_update_button.clicked.connect(self.update_messagebox)
-
+        check_update_button.setText("Check For Updates")
         check_update_layout, check_update_frame = self.setting_template.setting_card(
-            heading="Check for update", subheading="Check for update"
+            heading="Check for updates", subheading="Check for updates"
         )
+
+        def button_event():
+            """Check for update."""
+            data = utils.get_data()
+            latest_version = data.latest_version
+
+            if latest_version != diff.CURRENT_VERSION:
+                self.update_changelog()
+            else:
+                QMessageBox.information(
+                    QApplication.activeWindow(),
+                    "Check For Update",
+                    "You are using the latest version of KeyTik.",
+                )
+
+        check_update_button.clicked.connect(button_event)
         check_update_layout.addWidget(check_update_button)
 
         return check_update_frame
 
-    def update_messagebox(self):
-        """Message when there is update avalible."""
-        latest_version, changelog_md = self.setting_core.get_update_data()
-        if latest_version:
-            self.update_changelog(latest_version, changelog_md)
-        else:
-            QMessageBox.information(
-                QApplication.activeWindow(),
-                "Check For Update",
-                "You are using the latest version of KeyTik.",
-            )
+    def changelog(self):
+        """Changelog Widget."""
+        changelog_layout, changelog_frame = self.setting_template.setting_card(
+            heading="What's New", subheading="Show changelog"
+        )
 
-    def update_changelog(self, new_version: str, changelog_md: str):
+        button = self.setting_template.setting_button()
+        button.setText("Changelog")
+        button.clicked.connect(self.update_changelog)
+        changelog_layout.addWidget(button)
+
+        return changelog_frame
+
+    def update_changelog(self, new_version=None, changelog_md=None):
         """Show update changelog window."""
         parent = QApplication.activeWindow()
+        if not new_version and not changelog_md:
+            data = utils.get_data()
+            new_version = data.latest_version
+            changelog_md = data.changelog
 
         window = QDialog(parent)
-        window.setWindowTitle(f"New version of {diff.PROGRAM_NAME} is available")
+        if new_version != diff.CURRENT_VERSION:
+            window.setWindowTitle(f"New version of {diff.PROGRAM_NAME} is available")
+        else:
+            window.setWindowTitle("Changelog")
         window.setGeometry(style.get_geometry(parent, 520, 360))
         window.setWindowIcon(QIcon(constant.icon_path))
 
@@ -548,19 +590,7 @@ class SettingUI:
         layout.setSpacing(16)
         window.setLayout(layout)
 
-        text_edit = QTextEdit()
-        text_edit.setReadOnly(True)
-        text_edit.document().setDocumentMargin(8)
-        text_edit.document().setIndentWidth(20)
-
-        text_edit.setMarkdown(
-            "## What's Changed\n\n"
-            f"`Latest: {new_version} - Current: {diff.CURRENT_VERSION}`\n"
-            "\n---\n\n"
-            f"{changelog_md.replace('## Changelog', '')}"
-        )
-
-        layout.addWidget(text_edit)
+        layout.addWidget(self.changelog_text(new_version, changelog_md))
 
         button_widget = QWidget()
         button_widget.setMaximumHeight(32)
@@ -569,25 +599,56 @@ class SettingUI:
         button_layout.setSpacing(32)
         button_widget.setLayout(button_layout)
 
-        update_button = QPushButton()
-        update_button.setText("Update now")
-        update_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        update_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        button_layout.addWidget(self.update_button(window))
+        button_layout.addWidget(self.skip_button(new_version, window))
 
-        def update_button_event():
+        layout.addWidget(button_widget)
+
+        window.exec()
+
+    def changelog_text(
+        self,
+        new_version: str = "(Failed to fetch latest version)",
+        changelog_md: str = "Failed to fetch changelog",
+    ):
+        """Return changelog text edit."""
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.document().setDocumentMargin(8)
+        text_edit.document().setIndentWidth(20)
+        text_edit.setMarkdown(
+            "## What's Changed\n\n"
+            f"`Latest: {new_version} - Current: {diff.CURRENT_VERSION}`\n"
+            "\n---\n\n"
+            f"{changelog_md.replace('## Changelog', '')}"
+        )
+
+        return text_edit
+
+    def update_button(self, window: QDialog):
+        """Retrun update button opening update link."""
+        button = QPushButton()
+        button.setText("Update now")
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        def button_event():
             """Open release in web browser and close dialog."""
             webbrowser.open(diff.RELEASE_LINK)
             window.accept()
 
-        update_button.clicked.connect(update_button_event)
-        button_layout.addWidget(update_button)
+        button.clicked.connect(button_event)
 
-        cencel_button = QPushButton()
-        cencel_button.setText("Skip This Version")
-        cencel_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        cencel_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        return button
 
-        def cencel_button_event():
+    def skip_button(self, new_version: str, window: QDialog):
+        """Return skip button appending new version to skip version config."""
+        button = QPushButton()
+        button.setText("Skip This Version")
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        def button_event():
             """Save current version to skip version config."""
             try:
                 config = utils.get_config()
@@ -602,9 +663,6 @@ class SettingUI:
                 print(f"Error: {error}")
                 window.reject()
 
-        cencel_button.clicked.connect(cencel_button_event)
-        button_layout.addWidget(cencel_button)
+        button.clicked.connect(button_event)
 
-        layout.addWidget(button_widget)
-
-        window.exec()
+        return button

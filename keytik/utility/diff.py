@@ -17,8 +17,8 @@
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
+import requests
 from PySide6.QtWidgets import QTextEdit  # pylint: disable=E0611
-from requests import Response
 
 if TYPE_CHECKING:
     from keytik.profile_manager.profile_ui import ProfileUI
@@ -157,13 +157,18 @@ global
 """)
 
 
-def parse_update_response(response: Response):
-    """Parse the response from check for update."""
-    latest_version = response.json().get("tag_name")
-    changelog = response.json()["body"]
-    if latest_version != CURRENT_VERSION:
-        return latest_version, changelog
-    return None, "Failed to fetch changelog"
+def get_update_data(self) -> str:
+    """Check for update comparing current version and latest version."""
+    try:
+        success_code = 200
+        response = requests.get(CHECK_UPDATE_LINK, timeout=5)
+        if response.status_code == success_code:
+            latest_version = response.json().get("tag_name")
+            changelog = response.json()["body"]
+            return latest_version, changelog
+    except requests.exceptions.ConnectionError:
+        pass
+    return None
 
 
 def pro_mode(index, lines, profile_ui: "ProfileUI"):  # pylint: disable=W0613

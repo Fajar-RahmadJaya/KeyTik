@@ -15,14 +15,14 @@
 """Thread handler."""
 
 import os
+from datetime import date
 
 import keyboard
 from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.write_script import WriteScript
-from keytik.setting.setting_core import SettingCore
-from keytik.utility import utils
+from keytik.utility import diff, utils
 
 
 class Thread(QThread):  # pylint: disable=R0903
@@ -36,15 +36,30 @@ class Thread(QThread):  # pylint: disable=R0903
         """Run check update on thread to increase dashborad initialization time."""
         # Composition
         write_script = WriteScript()
-        setting_core = SettingCore()
         dashboard_core = DashboardCore()
 
         # Make sure all exit keys on script valid
         write_script.initialize_exit_keys()
 
         # Check for update
-        latest_version, changelog_md = setting_core.get_update_data()
-        if latest_version and latest_version != utils.get_config().skip_update:
+        data = utils.get_data()
+        config = utils.get_config()
+        latest_version = data.latest_version
+        changelog_md = data.changelog
+
+        current_date = str(date.today())
+
+        # Check update only once a day
+        if current_date != data.latest_update_check or not latest_version or not changelog_md:
+            latest_version, changelog_md = diff.get_update_data()
+
+            # Add to data
+            data.latest_update_check = current_date
+            data.latest_version = latest_version
+            data.changelog = changelog_md
+            utils.update_data(data)
+
+        if latest_version not in (diff.CURRENT_VERSION, config.skip_update):
             self.update_found.emit(latest_version, changelog_md)
 
         # Check whether AutoHotkey is installed

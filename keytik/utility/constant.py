@@ -29,6 +29,7 @@ theme_dir = os.path.join(data_dir, "theme")
 
 # General
 config_path = os.path.join(appdata_dir, "config.json")
+data_path = os.path.join(appdata_dir, "data.json")
 
 icon_path = os.path.join(data_dir, "icon.ico")
 keylist_path = os.path.join(data_dir, "key_list.json")

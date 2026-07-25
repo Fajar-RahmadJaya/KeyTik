@@ -592,12 +592,12 @@ class SettingAbout:
 
         button = self.setting_template.setting_button()
         button.setText("Changelog")
-        button.clicked.connect(self.update_changelog)
+        button.clicked.connect(lambda: self.update_changelog(ischangelog=True))
         changelog_layout.addWidget(button)
 
         return changelog_frame
 
-    def update_changelog(self, new_version=None, changelog_md=None):
+    def update_changelog(self, new_version=None, changelog_md=None, ischangelog=False):
         """Show update changelog window."""
         parent = QApplication.activeWindow()
         if not new_version and not changelog_md:
@@ -631,7 +631,8 @@ class SettingAbout:
         button_layout.addWidget(self.update_button(window))
         button_layout.addWidget(self.skip_button(new_version, window))
 
-        layout.addWidget(button_widget)
+        if not ischangelog:
+            layout.addWidget(button_widget)
 
         window.exec()
 

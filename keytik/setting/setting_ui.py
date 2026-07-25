@@ -612,6 +612,7 @@ class SettingAbout:
             window.setWindowTitle("Changelog")
         window.setGeometry(style.get_geometry(parent, 520, 360))
         window.setWindowIcon(QIcon(constant.icon_path))
+        style.apply_mica(window)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(16, 16, 16, 16)
@@ -641,9 +642,16 @@ class SettingAbout:
     ):
         """Return changelog text edit."""
         text_edit = QTextEdit()
+        text_edit.setObjectName("ChangelogText")
         text_edit.setReadOnly(True)
         text_edit.document().setDocumentMargin(8)
         text_edit.document().setIndentWidth(20)
+
+        if utils.get_config().mica_effect != "disable" and style.mica_supported:
+            text_edit.setStyleSheet(
+                f"#ChangelogText {{background-color: {style.palette_role.base_rgba}}}"
+            )
+
         text_edit.setMarkdown(
             "## What's Changed\n\n"
             f"`Latest: {new_version} - Current: {diff.CURRENT_VERSION}`\n"

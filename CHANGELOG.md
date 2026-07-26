@@ -35,6 +35,7 @@
 - *(update)* Allow window to use mica effect
 - *(tree-view)* Only set color on mica dark
 - *(changelog)* Hide button on changelog
+- *(setting)* Add upcoming changelog
 
 ### Fixes
 

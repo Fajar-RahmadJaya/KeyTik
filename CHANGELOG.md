@@ -51,3 +51,4 @@
 - Fix text mode save changes error
 - Fix multi modifier keys error
 - Fix scan code error
+- App_data_dir return none

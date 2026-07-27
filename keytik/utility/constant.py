@@ -24,6 +24,7 @@ script_path_data = os.path.join(script_path, "_internal", "Data")
 cwd_path_data = os.path.join(cwd_path, "_internal", "Data")
 data_dir = script_path_data if os.path.exists(script_path_data) else cwd_path_data
 appdata_dir = os.path.join(os.getenv("APPDATA"), "KeyTik")
+os.makedirs(appdata_dir, exist_ok=True)  # Create one if not present
 ahi_dir = os.path.join(data_dir, "Active", "AutoHotkey Interception")
 theme_dir = os.path.join(data_dir, "theme")
 

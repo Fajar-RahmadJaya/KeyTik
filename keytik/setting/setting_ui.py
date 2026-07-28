@@ -147,7 +147,7 @@ class SettingUI:
         content_layout.setContentsMargins(8, 8, 8, 8)
 
         # Pro Version
-        if diff.PROGRAM_NAME != "KeyTik Pro":
+        if utils.program_name != "KeyTik Pro":
             content_layout.addWidget(self.pro_version())
 
         # Appearance
@@ -562,7 +562,7 @@ class SettingAbout:
     def version(self):
         """Check for Update Widget."""
         layout, frame = self.setting_template.setting_card(
-            heading="Version", subheading=diff.CURRENT_VERSION
+            heading="Version", subheading=utils.current_version
         )
 
         button = self.setting_template.setting_button()
@@ -573,7 +573,7 @@ class SettingAbout:
             data = utils.get_data()
             latest_version = data.latest_version
 
-            if latest_version != diff.CURRENT_VERSION:
+            if latest_version != utils.current_version:
                 self.update_changelog()
             else:
                 QMessageBox.information(
@@ -632,8 +632,8 @@ class SettingAbout:
         window = QDialog(parent)
         if unreleased:
             window.setWindowTitle("Upcoming Changelog")
-        elif new_version != diff.CURRENT_VERSION:
-            window.setWindowTitle(f"New version of {diff.PROGRAM_NAME} is available")
+        elif new_version != utils.current_version:
+            window.setWindowTitle(f"New version of {utils.program_name} is available")
         else:
             window.setWindowTitle("Changelog")
         window.setGeometry(style.get_geometry(parent, 520, 360))
@@ -683,7 +683,7 @@ class SettingAbout:
         version_indicator = "Latest" if not unreleased else "Upcoming"
         text_edit.setMarkdown(
             "## What's Changed\n\n"
-            f"`{version_indicator}: {new_version} - Current: {diff.CURRENT_VERSION}`\n"
+            f"`{version_indicator}: {new_version} - Current: {utils.current_version}`\n"
             "\n---\n\n"
             f"{changelog_md.replace('## Changelog', '')}"
         )

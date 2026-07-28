@@ -207,6 +207,23 @@ def update_data(data: Data):
         print(f"Error: {error}")
 
 
+# ------------------------------ Metadata ------------------------------
+def get_metadata():
+    """Get program metadata.."""
+    try:
+        with open(constant.meta_path, encoding="utf-8") as data_file:
+            value = json.load(data_file)
+            name = value.get("name", "KeyTik")
+            version = value.get("version") or "Unkown"
+        return name, version
+
+    except (json.JSONDecodeError, FileNotFoundError) as error:
+        print(f"Error: {error}")
+    return "KeyTik", "Unkown"
+
+
+program_name, current_version = get_metadata()
+
 active_dir = os.path.join(get_config().profile_path, "Active")
 store_dir = os.path.join(get_config().profile_path, "Store")
 

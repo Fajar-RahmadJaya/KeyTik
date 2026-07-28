@@ -59,7 +59,7 @@ class Thread(QThread):  # pylint: disable=R0903
             data.changelog = changelog_md
             utils.update_data(data)
 
-        if latest_version not in (diff.CURRENT_VERSION, config.skip_update):
+        if latest_version not in (utils.current_version, config.skip_update):
             self.update_found.emit(latest_version, changelog_md)
 
         # Check whether AutoHotkey is installed

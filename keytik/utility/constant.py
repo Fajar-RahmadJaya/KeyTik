@@ -27,6 +27,7 @@ appdata_dir = os.path.join(os.getenv("APPDATA"), "KeyTik")
 os.makedirs(appdata_dir, exist_ok=True)  # Create one if not present
 ahi_dir = os.path.join(data_dir, "Active", "AutoHotkey Interception")
 theme_dir = os.path.join(data_dir, "theme")
+meta_path = os.path.join(data_dir, "metadata.json")
 
 # General
 config_path = os.path.join(appdata_dir, "config.json")

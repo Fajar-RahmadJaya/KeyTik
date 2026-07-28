@@ -7,6 +7,7 @@ env/
 venv/
 .env/
 .venv/
+dist/
 eggs/
 *.egg-info/
 

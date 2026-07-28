@@ -64,7 +64,7 @@ class Build:
         try:
             print("Generating changelog . . .")
 
-            calculate_version = subprocess.Popen(
+            calculate_version = subprocess.Popen(  # pylint: disable=R1732
                 [
                     "uvx",
                     "git-cliff@latest",
@@ -85,7 +85,7 @@ class Build:
 
             print("Get version number . . .")
 
-            with Path(output_file).open("r") as f:
+            with Path(output_file).open("r", encoding="utf-8") as f:
                 first_line = f.readline().strip()
 
             match = re.search(r"v([0-9]+(?:\.[0-9]+)+(?:-[A-Za-z0-9.]+)?)", first_line)
@@ -102,30 +102,35 @@ class Build:
         try:
             print("Building executable . . .")
 
-            build_exec = subprocess.Popen(
-                [
-                    "uv",
-                    "run",
-                    "--refresh-package",
-                    "pyinstaller",
-                    "--with",
-                    "pyinstaller",
-                    "--",
-                    "pyinstaller",
-                    f"--workpath={work_path}/build/build",
-                    f"--distpath={work_path}/build/dist",
-                    "-y",
-                    "build/pyinstaller.spec",
-                    "--",
-                    "--version",
-                    version,
-                ],
+            command = [
+                # Pyinstaller on UV
+                "uv",
+                "run",
+                "--refresh-package",
+                "pyinstaller",
+                "--with",
+                "pyinstaller",
+                # Pyinstaller command
+                "--",
+                "pyinstaller",
+                f"--workpath={work_path}/build/build",
+                f"--distpath={work_path}/build/dist",
+                "-y",
+                "build/pyinstaller.spec",
+                # Spec command
+                "--",
+                "--version",
+                version,
+            ]
+
+            if isdevelopment:
+                command.append("--dev")
+
+            build_exec = subprocess.Popen(  # pylint: disable=R1732
+                args=command,
                 stdout=subprocess.PIPE,
                 text=True,
             )
-
-            if isdevelopment:
-                build_exec.append("--dev")
 
             for result in build_exec.stdout:
                 print(result, end="")
@@ -161,7 +166,7 @@ class Build:
         try:
             print("Bumping project version . . .")
 
-            bump_project = subprocess.Popen(
+            bump_project = subprocess.Popen(  # pylint: disable=R1732
                 ["uv", "version", version],
                 stdout=subprocess.PIPE,
                 text=True,
@@ -213,6 +218,8 @@ class Build:
         if program_files_64:
             return program_files_64
 
+        return None
+
     def build_installer(self, version: str) -> int:
         """Build installer using inno setup."""
         issc_path = self.get_iscc_path()
@@ -221,7 +228,7 @@ class Build:
         try:
             print("Building installer . . .")
 
-            bump_project = subprocess.Popen(
+            bump_project = subprocess.Popen(  # pylint: disable=R1732
                 [issc_path, f"/DAppVersion={version}", "build/inno_setup.iss"],
                 stdout=subprocess.PIPE,
                 text=True,

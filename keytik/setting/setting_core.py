@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
-from keytik.utility import constant, diff, style, utils
+from keytik.utility import constant, style, utils
 
 
 class SettingCore:
@@ -130,8 +130,8 @@ class SettingCore:
                 messagebox.setWindowTitle("Success")
                 messagebox.setText(
                     f"Theme changed to {config.theme}. "
-                    f"Please restart {diff.PROGRAM_NAME} to apply change.\n\n"
-                    f"Would you like to restart {diff.PROGRAM_NAME}?",
+                    f"Please restart {utils.program_name} to apply change.\n\n"
+                    f"Would you like to restart {utils.program_name}?",
                 )
                 messagebox.setStandardButtons(
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -195,8 +195,8 @@ class SettingCore:
                 messagebox.setWindowTitle("Success")
                 messagebox.setText(
                     f"Mica effect changed to {new_mica}. "
-                    f"Please restart {diff.PROGRAM_NAME} to apply change.\n\n"
-                    f"Would you like to restart {diff.PROGRAM_NAME}?",
+                    f"Please restart {utils.program_name} to apply change.\n\n"
+                    f"Would you like to restart {utils.program_name}?",
                 )
                 messagebox.setStandardButtons(
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No

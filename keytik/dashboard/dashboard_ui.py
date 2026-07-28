@@ -35,7 +35,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.profile_ui import ProfileUI
 from keytik.setting.setting_ui import SettingUI
-from keytik.utility import constant, diff, icons, style, utils
+from keytik.utility import constant, icons, style, utils
 
 
 class DashboardUI(QMainWindow):
@@ -51,7 +51,7 @@ class DashboardUI(QMainWindow):
         self.dashboard_core.update_script_signal.connect(self.update_script_list)
 
         # UI initialization
-        self.setWindowTitle(diff.PROGRAM_NAME)
+        self.setWindowTitle(utils.program_name)
         self.setFixedSize(660, 500)
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()

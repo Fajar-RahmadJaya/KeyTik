@@ -7,8 +7,6 @@ env/
 venv/
 .env/
 .venv/
-build/
-dist/
 eggs/
 *.egg-info/
 
@@ -22,3 +20,7 @@ eggs/
 # Operating System Files
 .DS_Store
 Thumbs.db
+
+# Build
+build/build/
+build/dist/

@@ -18,23 +18,34 @@ class Build:
     def main(self):
         """Entry point."""
         # Argument
-        parser = argparse.ArgumentParser(description="Development build")
+        parser = argparse.ArgumentParser(description="Build KeyTik Pro executable and installer")
         parser.add_argument(
             "--dev", action="store_true", help="Only build executable with conslo enabled"
         )
-        arg = parser.parse_args()
-        isdevelopment = bool(arg.dev)
+        parser.add_argument("--bump", type=str, help="Bump type")
+        args = parser.parse_args()
+        bump = args.bump
+        isdevelopment = bool(args.dev)
 
         # Variable
         work_path = os.getcwd()
 
-        version = self.get_version()
+        # Get version number
+        version = self.get_version(bump)
         if not version:
             return
 
+        if not isdevelopment:
+            # Bump pyproject.toml version
+            if not self.bump_version(version):
+                return
+
+            # Bump project metadata
+            if not self.bump_metadata():
+                return
+
         # Build executable
-        build_executable = self.build_executable(work_path, version, isdevelopment)
-        if not build_executable and build_executable != 0:
+        if not self.build_executable(work_path, version, isdevelopment):
             return
 
         if not isdevelopment:
@@ -47,16 +58,7 @@ class Build:
             if not build_installer and build_installer != 0:
                 return
 
-            # Bump pyproject.toml version
-            bump_project = self.bump_version(version)
-            if not bump_project and build_executable != 0:
-                return
-
-            # Bump project metadata
-            if not self.bump_metadata():
-                return
-
-    def get_version(self):
+    def get_version(self, bump_type: str) -> str:
         """Genearate changelog and calculate next version number using git-cliff."""
         version = None
         output_file = "build/dist/CHANGELOG.md"
@@ -64,15 +66,22 @@ class Build:
         try:
             print("Generating changelog . . .")
 
+            command = [
+                "uvx",
+                "git-cliff@latest",
+                "--output",
+                output_file,
+                "--verbose",
+            ]
+
+            if bump_type:
+                command.append("--bump")
+                command.append(bump_type)
+            else:
+                command.append("--bump")
+
             calculate_version = subprocess.Popen(  # pylint: disable=R1732
-                [
-                    "uvx",
-                    "git-cliff@latest",
-                    "--bump",
-                    "--output",
-                    output_file,
-                    "--verbose",
-                ],
+                args=command,
                 stdout=subprocess.PIPE,
                 text=True,
             )
@@ -97,7 +106,7 @@ class Build:
             print(f"Failed to build executable\n{error}")
             return None
 
-    def build_executable(self, work_path: str, version: str, isdevelopment: bool):
+    def build_executable(self, work_path: str, version: str, isdevelopment: bool) -> bool:
         """Build executable using Pyinstaller."""
         try:
             print("Building executable . . .")
@@ -135,11 +144,11 @@ class Build:
             for result in build_exec.stdout:
                 print(result, end="")
 
-            return build_exec.wait()
+            return build_exec.wait() == 0
 
         except (FileNotFoundError, PermissionError, ValueError) as error:
             print(f"Failed to build executable\n{error}")
-            return None
+            return False
 
     def build_zip(self, work_path: str, version: str) -> bool:
         """Build zip from Pyinstaller result."""
@@ -161,7 +170,7 @@ class Build:
             print(f"Failed to build zip. \n{error}")
             return False
 
-    def bump_version(self, version: str) -> int:
+    def bump_version(self, version: str) -> bool:
         """Bump project version."""
         try:
             print("Bumping project version . . .")
@@ -175,11 +184,11 @@ class Build:
             for result in bump_project.stdout:
                 print(result, end="")
 
-            return bump_project.wait()
+            return bump_project.wait() == 0
 
         except (FileNotFoundError, PermissionError, ValueError) as error:
             print(f"Failed to bump version.\n{error}")
-            return None
+            return False
 
     def bump_metadata(self) -> bool:
         """Bump project metadata."""
@@ -220,7 +229,7 @@ class Build:
 
         return None
 
-    def build_installer(self, version: str) -> int:
+    def build_installer(self, version: str) -> bool:
         """Build installer using inno setup."""
         issc_path = self.get_iscc_path()
         version = version.replace("v", "")
@@ -237,7 +246,7 @@ class Build:
             for result in bump_project.stdout:
                 print(result, end="")
 
-            return bump_project.wait()
+            return bump_project.wait() == 0
 
         except (FileNotFoundError, PermissionError, ValueError) as error:
             print(f"Failed to build installer.\n{error}")

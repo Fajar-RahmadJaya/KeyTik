@@ -457,30 +457,32 @@ class WriteDefault:
                 sc_checkbox=row_widget.findChild(QCheckBox, RemapObject.scan_code_checkbox),
             )
 
-            if (
-                self.remap_widget.default_key_entry.text()
-                and self.remap_widget.remap_key_entry.text()
-            ):
-                remap = self.process_key_remaps(file)
+            default_key = self.remap_widget.default_key_entry.text()
+            remap_key = self.remap_widget.remap_key_entry.text()
+
+            if not default_key and remap_key:
+                QMessageBox.warning(
+                    QApplication.activeWindow(), "Error", "Default key can't empty."
+                )
+
+                return False
+
+            if not remap_key and default_key:
+                QMessageBox.warning(QApplication.activeWindow(), "Error", "Remap key can't empty.")
+                return False
+
+            if remap_key and default_key:
+                self.process_key_remaps(file)
 
         if condition_string:
             file.write("#HotIf\n")
 
-        return True if remap is None else remap
+        return True
 
     def process_key_remaps(self, file):
         """Handle key remap write."""
         default_key = self.remap_widget.default_key_entry.text().strip()
         remap_key = self.remap_widget.remap_key_entry.text().strip()
-
-        if not default_key and remap_key:
-            QMessageBox.warning(QApplication.activeWindow(), "Error", "Default key can't empty.")
-
-            return False
-
-        if not remap_key and default_key:
-            QMessageBox.warning(QApplication.activeWindow(), "Error", "Remap key can't empty.")
-            return False
 
         keys = [k.strip() for k in default_key.split("+")]
         double_click_length = 2

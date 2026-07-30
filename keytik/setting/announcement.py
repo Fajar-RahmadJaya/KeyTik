@@ -85,6 +85,7 @@ class Announcement:
 
             announcement_dialog = QDialog(parent)
             announcement_dialog.setWindowTitle("Announcement")
+            style.apply_mica(announcement_dialog)
 
             geometry = style.get_geometry(parent, 525, 290)
             announcement_dialog.setGeometry(geometry)

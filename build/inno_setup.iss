@@ -14,7 +14,7 @@ SourceDir=.\dist\KeyTik v{#AppVersion}
 OutputDir=..
 OutputBaseFilename=KeyTik v{#AppVersion} Installer
 SetupIconFile=_internal\Data\icon.ico
-UninstallDisplayIcon=_internal\Data\icon.ico
+UninstallDisplayIcon={app}\KeyTik.exe
 UninstallDisplayName=KeyTik
 DisableDirPage=no
 DisableProgramGroupPage=yes
@@ -35,15 +35,15 @@ Source: "*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\KeyTik.exe"; ValueType: string; ValueName: ""; ValueData: "{app}\KeyTik.exe"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\KeyTik.exe"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "SOFTWARE\Classes\Applications\KeyTik.exe"; ValueType: string; ValueName: "FriendlyAppName"; ValueData: "KeyTik"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SOFTWARE\Classes\Applications\KeyTik.exe\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\icon.ico"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "SOFTWARE\Classes\Applications\KeyTik.exe\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\KeyTik.exe"; Flags: uninsdeletekey
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"
 
 [Icons]
-Name: "{group}\KeyTik"; Filename: "{app}\KeyTik.exe"; IconFilename: "_internal\Data\icon.ico"
+Name: "{group}\KeyTik"; Filename: "{app}\KeyTik.exe"; IconFilename: "{app}\KeyTik.exe"
 Name: "{group}\Uninstall KeyTik"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\KeyTik"; Filename: "{app}\KeyTik.exe"; IconFilename: "_internal\Data\icon.ico"; Tasks: desktopicon
+Name: "{commondesktop}\KeyTik"; Filename: "{app}\KeyTik.exe"; IconFilename: "{app}\KeyTik.exe"; Tasks: desktopicon
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}"

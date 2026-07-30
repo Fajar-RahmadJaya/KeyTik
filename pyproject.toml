@@ -89,10 +89,10 @@ body = """
 {% endif %}\
 {% for group, commits in commits | group_by(attribute="group") %}
     ### {{ group | striptags | trim | upper_first }}
-    {% for commit in commits %}
+    {% for commit in commits | unique(attribute="message") %}
         - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
             {% if commit.breaking %}[**breaking**] {% endif %}\
-            {{ commit.message | upper_first }}
+            {{ commit.message | upper_first }}\
     {% endfor %}
 {% endfor %}
 """

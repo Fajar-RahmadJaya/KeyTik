@@ -108,3 +108,5 @@ commit_parsers = [
     { message = "^style", skip = true },
     { message = "^docs", skip = true },
 ]
+conventional_commits = true
+filter_unconventional = false

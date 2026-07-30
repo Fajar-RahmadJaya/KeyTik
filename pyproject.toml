@@ -83,13 +83,13 @@ max-line-length = 100 # Match pylint default
 [tool.git-cliff.changelog]
 body = """
 {% if version %}\
-    ## KeyTik v{{ version | trim_start_matches(pat="v") }} Preview
+    ## KeyTik v{{ version | trim_start_matches(pat="v") }}
 {% else %}\
     ## [unreleased]
 {% endif %}\
 {% for group, commits in commits | group_by(attribute="group") %}
     ### {{ group | striptags | trim | upper_first }}
-    {% for commit in commits %}
+    {% for commit in commits | unique(attribute="message") %}
         - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
             {% if commit.breaking %}[**breaking**] {% endif %}\
             {{ commit.message | upper_first }}\
@@ -108,5 +108,4 @@ commit_parsers = [
     { message = "^style", skip = true },
     { message = "^docs", skip = true },
 ]
-conventional_commits = true
-filter_unconventional = false
+skip_tags = "beta"

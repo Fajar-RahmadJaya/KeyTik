@@ -456,7 +456,12 @@ class WriteDefault:
                 first_key_checkbox=row_widget.findChild(QCheckBox, RemapObject.first_key_checkbox),
                 sc_checkbox=row_widget.findChild(QCheckBox, RemapObject.scan_code_checkbox),
             )
-            remap = self.process_key_remaps(file)
+
+            if (
+                self.remap_widget.default_key_entry.text()
+                and self.remap_widget.remap_key_entry.text()
+            ):
+                remap = self.process_key_remaps(file)
 
         if condition_string:
             file.write("#HotIf\n")
@@ -468,12 +473,12 @@ class WriteDefault:
         default_key = self.remap_widget.default_key_entry.text().strip()
         remap_key = self.remap_widget.remap_key_entry.text().strip()
 
-        if not default_key:
+        if not default_key and remap_key:
             QMessageBox.warning(QApplication.activeWindow(), "Error", "Default key can't empty.")
 
             return False
 
-        if not remap_key:
+        if not remap_key and default_key:
             QMessageBox.warning(QApplication.activeWindow(), "Error", "Remap key can't empty.")
             return False
 

@@ -1,8 +1,10 @@
-name: Changelog Generator
+name: Git-Cliff
 
 on:
    push:
      branches: [ "main" ]
+   release:
+     types: [published]
 
 jobs:
   changelog:

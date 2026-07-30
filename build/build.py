@@ -200,7 +200,7 @@ class Build:
 
             project = data.get("project", {})
             meta = {
-                "name": project.get("name", ""),
+                "name": "KeyTik",
                 "version": f"v{project.get('version', '')}",
             }
 

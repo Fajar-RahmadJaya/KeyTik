@@ -1,6 +1,6 @@
 [project]
 name = "keytik"
-version = "2.3.6"
+version = "2.4.0"
 description = "A Powerful Multi-Profile Key Mapper, Clicker, Macro, and More."
 authors = [
     {name = "Fajar Rahmad Jaya",email = "Fajar.Rahmad.Jaya.Profile@gmail.com"}

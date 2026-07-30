@@ -1,1 +1,5 @@
-## KeyTik v2.4.1 Preview
+## KeyTik v2.5.0 Preview
+
+### Improvements
+
+- *(announcement)* Set mica style on announcement

@@ -8,6 +8,8 @@ jobs:
   lint:
     name: Checking Pylint
     runs-on: windows-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

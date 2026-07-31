@@ -15,6 +15,7 @@
 """Remap and shortcut row."""
 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtGui import QPalette
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QCheckBox,
@@ -71,6 +72,7 @@ class DefaultMode:
         remap_widget.setObjectName("RemapWidget")
         remap_layout = QVBoxLayout(remap_widget)
         remap_layout.setContentsMargins(0, 0, 0, 0)
+        remap_layout.setSpacing(8)
 
         # Remap title
         remap_title_widget = self.remap_title()
@@ -162,7 +164,7 @@ class DefaultMode:
 
         card_layout = QGridLayout(self.remap_frame)
         self.remap_frame.setLayout(card_layout)
-        card_layout.setContentsMargins(24, 8, 24, 12)
+        card_layout.setContentsMargins(0, 8, 0, 0)
         card_layout.setVerticalSpacing(0)
 
         # Default Key Widget
@@ -184,7 +186,7 @@ class DefaultMode:
     def default_key_widget(self, parsed_remap, parent_window):
         """Default key widget on remap row."""
         default_key_container = QWidget()
-        default_key_container.setContentsMargins(8, 0, 8, 0)
+        default_key_container.setContentsMargins(32, 0, 8, 0)
 
         default_key_layout = QGridLayout(default_key_container)
 
@@ -226,7 +228,7 @@ class DefaultMode:
     def remap_key_widget(self, parsed_remap, parent_window):
         """Remap key widget on remap row."""
         remap_key_container = QWidget()
-        remap_key_container.setContentsMargins(8, 0, 8, 0)
+        remap_key_container.setContentsMargins(8, 0, 32, 0)
 
         remap_key_layout = QGridLayout(remap_key_container)
 
@@ -264,21 +266,158 @@ class DefaultMode:
         return remap_key_container
 
     def option_widget(self, parsed_remap):
-        """Remap option widget on remap row."""
-        option_widget = QWidget()
-        options_layout = QHBoxLayout(option_widget)
-        options_layout.setContentsMargins(0, 5, 0, 0)
+        """Remap option collapsible widget."""
+        widget = QWidget()
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
 
-        first_key_checkbox = QCheckBox("Disable First Key", option_widget)
+        content_widget = QWidget()
+        content_layout = QHBoxLayout()
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
+        content_widget.setLayout(content_layout)
+
+        default_option_content = self.default_option_content(parsed_remap)
+        default_option_content.setHidden(True)
+        content_layout.addWidget(default_option_content)
+
+        remap_option_content = self.remap_option_content(parsed_remap)
+        remap_option_content.setHidden(True)
+        content_layout.addWidget(remap_option_content)
+
+        layout.addWidget(self.option_header(default_option_content, remap_option_content))
+
+        layout.addWidget(content_widget)
+
+        return widget
+
+    def option_header(self, default_option_content: QWidget, remap_option_content: QWidget):
+        """Get option header widget."""
+        widget = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        palette = style.get_palette()
+        midlight = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Midlight)
+        header_style = f"""
+        QPushButton {{
+            border-radius: 0px;
+        }}
+        QPushButton:hover {{
+            background-color: {midlight.name()}
+        }}
+        """
+
+        header_clicked_style = f"""
+        QPushButton {{
+            border-radius: 0px;
+            background-color: {style.palette_role.surface}
+        }}
+        QPushButton:hover {{
+            background-color: {midlight.name()}
+        }}
+        """
+
+        keyboard_arrow_down = icons.get_icon(icons.keyboard_arrow_down).pixmap(16, 16)
+        keyboard_arrow_up = icons.get_icon(icons.keyboard_arrow_up).pixmap(16, 16)
+
+        default_header, default_header_icon = self.option_header_button("Default Key Option")
+        default_header_icon.setPixmap(keyboard_arrow_down)
+        default_header.setStyleSheet(header_style)
+        layout.addWidget(default_header)
+
+        vertical_separator = QWidget()
+        vertical_separator.setStyleSheet(f"background-color: {style.palette_role.surface}")
+        vertical_separator.setFixedWidth(3)
+        vertical_separator.setFixedHeight(20)
+        layout.addWidget(vertical_separator)
+
+        remap_header, remap_header_icon = self.option_header_button("Remap Key Option")
+        remap_header_icon.setPixmap(keyboard_arrow_down)
+        remap_header.setStyleSheet(header_style)
+        layout.addWidget(remap_header)
+
+        def default_click_event(ischecked: bool):
+            """Change default option button stylesheet and show default content."""
+            if ischecked:
+                default_header_icon.setPixmap(keyboard_arrow_up)
+                default_header.setStyleSheet(header_clicked_style)
+                default_option_content.setHidden(False)
+                remap_click_event(False)
+            else:
+                default_header_icon.setPixmap(keyboard_arrow_down)
+                default_header.setChecked(False)
+                default_header.setStyleSheet(header_style)
+                default_option_content.setHidden(True)
+
+        def remap_click_event(ischecked: bool):
+            if ischecked:
+                remap_header_icon.setPixmap(keyboard_arrow_up)
+                remap_header.setStyleSheet(header_clicked_style)
+                remap_option_content.setHidden(False)
+                default_click_event(False)
+            else:
+                remap_header_icon.setPixmap(keyboard_arrow_down)
+                remap_header.setChecked(False)
+                remap_header.setStyleSheet(header_style)
+                remap_option_content.setHidden(True)
+
+        default_header.clicked.connect(lambda: default_click_event(default_header.isChecked()))
+        remap_header.clicked.connect(lambda: remap_click_event(remap_header.isChecked()))
+
+        return widget
+
+    def option_header_button(self, title_string: str):
+        """Get remap option header widget."""
+        button = QPushButton()
+        button.setCheckable(True)
+        button.setFlat(True)
+        button.setFixedHeight(28)
+
+        layout = QGridLayout(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        title = QLabel(title_string)
+        title.setStyleSheet("background-color: transparent;")
+        layout.addWidget(title, 0, 0, 1, 2, Qt.AlignCenter)
+
+        icon = QLabel()
+        icon.setFixedSize(32, 32)
+        icon.setStyleSheet("background-color: transparent;")
+        icon.setContentsMargins(0, 0, 16, 0)
+        layout.addWidget(icon, 0, 1, 1, 1)
+
+        return button, icon
+
+    def default_option_content(self, parsed_remap):
+        """Get default key option widget."""
+        widget = QWidget()
+        widget.setObjectName("DefaultOptionContent")
+        widget.setStyleSheet(f"""
+        QWidget#DefaultOptionContent {{
+            background-color: {style.palette_role.surface};
+        }}
+        """)
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        first_key_checkbox = QCheckBox("Disable First Key")
         first_key_checkbox.setObjectName(RemapObject.first_key_checkbox)
         first_key_checkbox.setToolTip(
             "Default Key Only: Check this to disable the first key when using multiple keys.\n"
         )
         if parsed_remap:
             first_key_checkbox.setChecked(parsed_remap.is_first_key)
-        options_layout.addWidget(first_key_checkbox)
+        layout.addWidget(first_key_checkbox, alignment=Qt.AlignCenter)
 
-        sc_checkbox = QCheckBox("Use Scan Code", option_widget)
+        sc_checkbox = QCheckBox("Use Scan Code")
         sc_checkbox.setObjectName(RemapObject.scan_code_checkbox)
         sc_checkbox.setToolTip(
             "Default Key Only: "
@@ -288,27 +427,50 @@ class DefaultMode:
         )
         if parsed_remap:
             sc_checkbox.setChecked(parsed_remap.is_sc)
-        options_layout.addWidget(sc_checkbox)
+        layout.addWidget(sc_checkbox, alignment=Qt.AlignCenter)
 
-        text_format_checkbox = QCheckBox("Text Format", option_widget)
+        return widget
+
+    def remap_option_content(self, parsed_remap):
+        """Get remap key option widget."""
+        widget = QWidget()
+        widget.setObjectName("RemapOptionContent")
+        widget.setStyleSheet(f"""
+        QWidget#RemapOptionContent {{
+            background-color: {style.palette_role.surface};
+        }}
+        """)
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        text_format_checkbox = QCheckBox("Text Format")
+        text_format_checkbox.setObjectName("Test")
         text_format_checkbox.setObjectName(RemapObject.text_format_checkbox)
         text_format_checkbox.setToolTip(
             "Remap Key Only: Check this to send the actual text instead of a key"
         )
         if parsed_remap:
             text_format_checkbox.setChecked(parsed_remap.is_text_format)
-        options_layout.addWidget(text_format_checkbox)
+        layout.addWidget(text_format_checkbox, alignment=Qt.AlignCenter)
 
-        hold_format_checkbox = QCheckBox("Hold Format", option_widget)
+        hold_format_widget = QWidget()
+        hold_format_layout = QHBoxLayout()
+        hold_format_layout.setContentsMargins(0, 0, 0, 0)
+        hold_format_widget.setLayout(hold_format_layout)
+        layout.addWidget(hold_format_widget, alignment=Qt.AlignCenter)
+
+        hold_format_checkbox = QCheckBox("Hold Format")
         hold_format_checkbox.setObjectName(RemapObject.hold_format_checkbox)
         hold_format_checkbox.setToolTip(
             "Remap Key Only: Simulate holding the key for a set interval"
         )
         if parsed_remap:
             hold_format_checkbox.setChecked(parsed_remap.is_hold_format)
-        options_layout.addWidget(hold_format_checkbox)
+        hold_format_layout.addWidget(hold_format_checkbox)
 
-        hold_interval_entry = QLineEdit(option_widget)
+        hold_interval_entry = QLineEdit()
         hold_interval_entry.setObjectName(RemapObject.hold_interval_entry)
         hold_interval_entry.setPlaceholderText("Int")
         hold_interval_entry.setFixedWidth(40)
@@ -335,6 +497,6 @@ class DefaultMode:
                 else str(hold_interval_float)
             )
             hold_interval_entry.setText(hold_interval_str)
-        options_layout.addWidget(hold_interval_entry)
+        hold_format_layout.addWidget(hold_interval_entry)
 
-        return option_widget
+        return widget

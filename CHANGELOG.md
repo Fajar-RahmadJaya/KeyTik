@@ -1,1 +1,5 @@
-## KeyTik v2.4.2
+## KeyTik v2.5.0
+
+### Improvements
+
+- *(remap-options)* Allow option to be collapsed

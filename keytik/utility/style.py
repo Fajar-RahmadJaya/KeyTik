@@ -332,3 +332,29 @@ def button_highlight(style_sheet=False):
     """
 
     return style_sheet
+
+
+def option_header_style(isclicked: bool = False):
+    """Get remap option header stylesheet."""
+    midlight = get_palette().color(QPalette.ColorGroup.Active, QPalette.ColorRole.Midlight)
+
+    header_style = f"""
+    QPushButton {{
+        border-radius: 0px;
+    }}
+    QPushButton:hover {{
+        background-color: {midlight.name()}
+    }}
+    """
+
+    header_clicked_style = f"""
+    QPushButton {{
+        border-radius: 0px;
+        background-color: {palette_role.surface}
+    }}
+    QPushButton:hover {{
+        background-color: {midlight.name()}
+    }}
+    """
+
+    return header_clicked_style if isclicked else header_style

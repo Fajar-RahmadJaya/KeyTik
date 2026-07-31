@@ -15,7 +15,6 @@
 """Remap and shortcut row."""
 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
-from PySide6.QtGui import QPalette
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QCheckBox,
@@ -301,33 +300,12 @@ class DefaultMode:
         layout.setSpacing(0)
         widget.setLayout(layout)
 
-        palette = style.get_palette()
-        midlight = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Midlight)
-        header_style = f"""
-        QPushButton {{
-            border-radius: 0px;
-        }}
-        QPushButton:hover {{
-            background-color: {midlight.name()}
-        }}
-        """
-
-        header_clicked_style = f"""
-        QPushButton {{
-            border-radius: 0px;
-            background-color: {style.palette_role.surface}
-        }}
-        QPushButton:hover {{
-            background-color: {midlight.name()}
-        }}
-        """
-
         keyboard_arrow_down = icons.get_icon(icons.keyboard_arrow_down).pixmap(16, 16)
         keyboard_arrow_up = icons.get_icon(icons.keyboard_arrow_up).pixmap(16, 16)
 
         default_header, default_header_icon = self.option_header_button("Default Key Option")
         default_header_icon.setPixmap(keyboard_arrow_down)
-        default_header.setStyleSheet(header_style)
+        default_header.setStyleSheet(style.option_header_style())
         layout.addWidget(default_header)
 
         vertical_separator = QWidget()
@@ -338,32 +316,32 @@ class DefaultMode:
 
         remap_header, remap_header_icon = self.option_header_button("Remap Key Option")
         remap_header_icon.setPixmap(keyboard_arrow_down)
-        remap_header.setStyleSheet(header_style)
+        remap_header.setStyleSheet(style.option_header_style())
         layout.addWidget(remap_header)
 
         def default_click_event(ischecked: bool):
             """Change default option button stylesheet and show default content."""
             if ischecked:
                 default_header_icon.setPixmap(keyboard_arrow_up)
-                default_header.setStyleSheet(header_clicked_style)
+                default_header.setStyleSheet(style.option_header_style(isclicked=True))
                 default_option_content.setHidden(False)
                 remap_click_event(False)
             else:
                 default_header_icon.setPixmap(keyboard_arrow_down)
                 default_header.setChecked(False)
-                default_header.setStyleSheet(header_style)
+                default_header.setStyleSheet(style.option_header_style())
                 default_option_content.setHidden(True)
 
         def remap_click_event(ischecked: bool):
             if ischecked:
                 remap_header_icon.setPixmap(keyboard_arrow_up)
-                remap_header.setStyleSheet(header_clicked_style)
+                remap_header.setStyleSheet(style.option_header_style(isclicked=True))
                 remap_option_content.setHidden(False)
                 default_click_event(False)
             else:
                 remap_header_icon.setPixmap(keyboard_arrow_down)
                 remap_header.setChecked(False)
-                remap_header.setStyleSheet(header_style)
+                remap_header.setStyleSheet(style.option_header_style())
                 remap_option_content.setHidden(True)
 
         default_header.clicked.connect(lambda: default_click_event(default_header.isChecked()))

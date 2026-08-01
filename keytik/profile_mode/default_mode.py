@@ -57,7 +57,6 @@ class DefaultMode:
         super().__init__()
         # Composition
         self.select_key_ui = SelectKeyUI()
-        self.key_listening_comp = KeyListening(edit_frame)
         self.shared_row = SharedRow()
 
         # Variables
@@ -194,7 +193,9 @@ class DefaultMode:
         default_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         default_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         default_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(default_key_entry, default_key_select)
+            lambda: KeyListening(self.edit_frame).key_listening(
+                default_key_entry, default_key_select
+            )
         )
         default_key_layout.addWidget(default_key_select, 0, 0, 1, 2)
 
@@ -236,7 +237,7 @@ class DefaultMode:
         remap_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(remap_key_entry, remap_key_select)
+            lambda: KeyListening(self.edit_frame).key_listening(remap_key_entry, remap_key_select)
         )
         remap_key_layout.addWidget(remap_key_select, 0, 0, 1, 2)
 

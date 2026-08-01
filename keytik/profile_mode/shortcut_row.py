@@ -43,7 +43,7 @@ class ShortcutRow:
         self.shortcut_rows = []
 
         # Composition
-        self.key_listening_comp = KeyListening(edit_frame)
+        self.edit_frame = edit_frame
         self.shared_row = SharedRow()
 
     def shortcut_row(self, parent_window, lines=None, title=True):
@@ -200,7 +200,7 @@ class ShortcutRow:
         shortcut_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         shortcut_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         shortcut_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(shortcut_entry, shortcut_key_select)
+            lambda: KeyListening(self.edit_frame).key_listening(shortcut_entry, shortcut_key_select)
         )
         shortcut_layout.addWidget(shortcut_key_select, 0, 0, 1, 2)
 

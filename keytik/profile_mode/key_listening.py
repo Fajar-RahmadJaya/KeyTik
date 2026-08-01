@@ -129,8 +129,7 @@ class KeyListening(QObject):
             return
 
         key = event.name
-        sc_checkbox = self.edit_frame.findChild(QCheckBox, "ScanCodeCheckbox")
-
+        sc_checkbox = target_entry.parent().parent().findChild(QCheckBox, "ScanCodeCheckbox")
         if target_entry.objectName() == "DefaultKeyEntry" and sc_checkbox.isChecked():
             key = f"SC{event.scan_code:02X}"
 
@@ -193,7 +192,7 @@ class KeyListening(QObject):
         widget = self.edit_frame.childAt(local_pos)
         return isinstance(widget, (QPushButton, QLineEdit, QCheckBox))
 
-    def update_widget(self, entry_widget: QLineEdit):
+    def update_widget(self, target_entry: QLineEdit):
         """Insert saved key into entry."""
         combo = None
 
@@ -210,4 +209,4 @@ class KeyListening(QObject):
 
         combo = " + ".join(format_key(k) for k in self.pressed_keys)
 
-        entry_widget.setText(combo)
+        target_entry.setText(combo)

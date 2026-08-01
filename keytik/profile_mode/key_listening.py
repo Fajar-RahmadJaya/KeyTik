@@ -14,6 +14,8 @@
 
 """Key listening package."""
 
+import threading
+
 import keyboard
 import pynput
 from PySide6.QtCore import QEvent, QObject, QTimer, Signal  # pylint: disable=E0611
@@ -39,13 +41,11 @@ class KeyListening(QObject):
         self.set_timer = None
         self.request_timer_start.connect(lambda: self.set_timer.start(400))
 
-        # Thread
-        pynput.mouse.Listener(on_click=self.mouse_listening).start()
-
         # Variable
         self.is_listening = False
         self.pressed_keys = []
         self.active_entry = None
+        self.mouse_listener = None
 
         # UI
         self.edit_frame: QWidget = edit_frame
@@ -92,6 +92,10 @@ class KeyListening(QObject):
             self.active_entry = target_entry
             self.pressed_keys.clear()
 
+            # Start pynput mouse listener thread
+            self.mouse_listener = pynput.mouse.Listener(on_click=self.mouse_listening)
+            self.mouse_listener.start()
+
             # Dsiable other entry
             self.toggle_other_entry(target_entry, other_entry_enabled=False)
 
@@ -108,6 +112,9 @@ class KeyListening(QObject):
             self.is_listening = False
             self.active_entry = None
             self.pressed_keys.clear()
+
+            # Destroy pynput mouse listener thread
+            self.stop_mouse_listening()
 
             # Enable other entry
             self.toggle_other_entry(target_entry, other_entry_enabled=True)
@@ -167,6 +174,17 @@ class KeyListening(QObject):
             if not self.pressed_keys:
                 self.key_listening(self.active_entry, None)
                 self.request_timer_start.emit()
+
+    def stop_mouse_listening(self):
+        """Stop pynput mouse listening thread from different thread.."""
+        if self.mouse_listener is not None:
+            listener = self.mouse_listener
+            self.mouse_listener = None
+
+            listener.stop()
+
+            if threading.current_thread() is not listener:
+                listener.join()
 
     def check_mouse_event(self):
         """Check if cursor is over any widget in key_rows."""

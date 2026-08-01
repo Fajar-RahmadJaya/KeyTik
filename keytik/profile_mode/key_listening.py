@@ -36,16 +36,17 @@ class KeyListening(QObject):
     def __init__(self, edit_frame):
         super().__init__()
         # Signal
+        self.set_timer = None
         self.request_timer_start.connect(lambda: self.set_timer.start(400))
 
+        # Thread
+        pynput.mouse.Listener(on_click=self.mouse_listening).start()
+
         # Variable
-        self.mouse_listening_initialized = False
         self.is_listening = False
         self.pressed_keys = []
         self.last_combination = ""
-
         self.active_entry = None
-        self.set_timer = None
 
         # UI
         self.edit_frame: QWidget = edit_frame
@@ -87,12 +88,6 @@ class KeyListening(QObject):
 
     def key_listening(self, target_entry, target_button):
         """Get and Listen to key press."""
-        # Initialize mouse listening thread once
-        if not self.mouse_listening_initialized:
-            mouse_listener = pynput.mouse.Listener(on_click=self.mouse_listening)
-            mouse_listener.start()
-            self.mouse_listening_initialized = True
-
         if not self.is_listening:
             self.is_listening = True
             self.active_entry = target_entry
@@ -105,9 +100,13 @@ class KeyListening(QObject):
             # Disbale other button
             self.toggle_other_buttons(target_button, other_button_enabled=False)
 
+            def finalize_combination():
+                target_entry.setText(self.last_combination)
+                self.pressed_keys = []
+
             self.set_timer = QTimer()
             self.set_timer.setSingleShot(True)
-            self.set_timer.timeout.connect(lambda: self.finalize_combination(target_entry))
+            self.set_timer.timeout.connect(finalize_combination)
 
             keyboard.hook(lambda event: self.multi_key_event(event, target_entry, target_button))
 
@@ -191,15 +190,10 @@ class KeyListening(QObject):
             return k[:1].upper() + k[1:] if k else k
 
         if isinstance(self.pressed_keys, (list, set)):
-            keys = list(self.pressed_keys)
-        if len(keys) == 1:
-            combo = format_key(keys[0])
-        combo = " + ".join(format_key(k) for k in keys)
+            self.pressed_key = list(self.pressed_keys)
+        if len(self.pressed_key) == 1:
+            combo = format_key(self.pressed_key[0])
+        combo = " + ".join(format_key(k) for k in self.pressed_key)
 
         entry_widget.setText(combo)
         self.last_combination = combo
-
-    def finalize_combination(self, entry_widget):
-        """Save the combination."""
-        entry_widget.setText(self.last_combination)
-        self.pressed_keys = []

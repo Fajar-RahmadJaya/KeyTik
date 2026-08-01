@@ -25,7 +25,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget,
 )
 
-from keytik.profile_mode.profile_mode_core import ProfileModeCore
 from keytik.utility import constant
 
 
@@ -36,16 +35,18 @@ class KeyListening(QObject):
 
     def __init__(self, edit_frame):
         super().__init__()
-        # Composition
-        self.profile_mode_core = ProfileModeCore()
-
         # Signal
-        self.request_timer_start.connect(self.profile_mode_core.release_timer)
+        self.request_timer_start.connect(self.release_timer)
 
         # Variable
         self.mouse_listening_initialized = False
         self.is_listening = False
         self.copas_rows = []
+        self.pressed_keys = []
+        self.last_combination = ""
+
+        self.active_entry = None
+        self.set_timer = None
 
         # UI
         self.edit_frame: QWidget = edit_frame
@@ -95,9 +96,9 @@ class KeyListening(QObject):
 
         if not self.is_listening:
             self.is_listening = True
-            self.profile_mode_core.active_entry = target_entry
-            self.profile_mode_core.pressed_keys = []
-            self.profile_mode_core.last_combination = ""
+            self.active_entry = target_entry
+            self.pressed_keys = []
+            self.last_combination = ""
 
             # Dsiable other entry
             self.toggle_other_entry(target_entry, other_entry_enabled=False)
@@ -105,18 +106,16 @@ class KeyListening(QObject):
             # Disbale other button
             self.toggle_other_buttons(target_button, other_button_enabled=False)
 
-            self.profile_mode_core.set_timer = QTimer()
-            self.profile_mode_core.set_timer.setSingleShot(True)
-            self.profile_mode_core.set_timer.timeout.connect(
-                lambda: self.profile_mode_core.finalize_combination(target_entry)
-            )
+            self.set_timer = QTimer()
+            self.set_timer.setSingleShot(True)
+            self.set_timer.timeout.connect(lambda: self.finalize_combination(target_entry))
 
             keyboard.hook(lambda event: self.multi_key_event(event, target_entry, target_button))
 
         else:
             self.is_listening = False
-            self.profile_mode_core.active_entry = None
-            self.profile_mode_core.pressed_keys = []
+            self.active_entry = None
+            self.pressed_keys = []
 
             # Enable other entry
             self.toggle_other_entry(target_entry, other_entry_enabled=True)
@@ -126,7 +125,7 @@ class KeyListening(QObject):
 
     def multi_key_event(self, event, entry_widget: QLineEdit, button):
         """Action when multiple key is pressed, set timer before saving the key."""
-        if not self.is_listening or self.profile_mode_core.active_entry != entry_widget:
+        if not self.is_listening or self.active_entry != entry_widget:
             return
 
         key = event.name
@@ -142,16 +141,16 @@ class KeyListening(QObject):
             key = key.lower()
 
         if event.event_type == "down":
-            if key not in self.profile_mode_core.pressed_keys:
-                self.profile_mode_core.pressed_keys.append(key)
-                self.profile_mode_core.update_widget(entry_widget)
-            if hasattr(self, "release_timer") and self.profile_mode_core.set_timer.isActive():
-                self.profile_mode_core.set_timer.stop()
+            if key not in self.pressed_keys:
+                self.pressed_keys.append(key)
+                self.update_widget(entry_widget)
+            if hasattr(self, "release_timer") and self.set_timer.isActive():
+                self.set_timer.stop()
 
         elif event.event_type == "up":
-            if key in self.profile_mode_core.pressed_keys:
-                self.profile_mode_core.pressed_keys.remove(key)
-                if not self.profile_mode_core.pressed_keys:
+            if key in self.pressed_keys:
+                self.pressed_keys.remove(key)
+                if not self.pressed_keys:
                     self.key_listening(entry_widget, button)
                     self.request_timer_start.emit()
 
@@ -160,7 +159,7 @@ class KeyListening(QObject):
 
     def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
         """Get and listen to mouse key press. Pynput on_click."""
-        if not (self.is_listening and self.profile_mode_core.active_entry):
+        if not (self.is_listening and self.active_entry):
             return
 
         button_map = {
@@ -171,13 +170,13 @@ class KeyListening(QObject):
         mouse_button = button_map.get(button, getattr(button, "name", str(button)))
 
         if pressed and not self.check_mouse_event():
-            if mouse_button not in self.profile_mode_core.pressed_keys:
-                self.profile_mode_core.pressed_keys.append(mouse_button)
-                self.profile_mode_core.update_widget(self.profile_mode_core.active_entry)
-        elif mouse_button in self.profile_mode_core.pressed_keys:
-            self.profile_mode_core.pressed_keys.remove(mouse_button)
-            if not self.profile_mode_core.pressed_keys:
-                self.key_listening(self.profile_mode_core.active_entry, None)
+            if mouse_button not in self.pressed_keys:
+                self.pressed_keys.append(mouse_button)
+                self.update_widget(self.active_entry)
+        elif mouse_button in self.pressed_keys:
+            self.pressed_keys.remove(mouse_button)
+            if not self.pressed_keys:
+                self.key_listening(self.active_entry, None)
                 self.request_timer_start.emit()
 
     def check_mouse_event(self):
@@ -185,3 +184,33 @@ class KeyListening(QObject):
         local_pos = self.edit_frame.mapFromGlobal(QCursor.pos())
         widget = self.edit_frame.childAt(local_pos)
         return isinstance(widget, (QPushButton, QLineEdit, QCheckBox))
+
+    def release_timer(self):
+        """Start the timer."""
+        if hasattr(self, "release_timer"):
+            self.set_timer.start(400)
+
+    def format_key_combo(self, keys):
+        """Format for multiple key press."""
+
+        def format_key(k):
+            if len(k) == 1 and k.islower():
+                return k
+            return k[:1].upper() + k[1:] if k else k
+
+        if isinstance(keys, (list, set)):
+            keys = list(keys)
+        if len(keys) == 1:
+            return format_key(keys[0])
+        return " + ".join(format_key(k) for k in keys)
+
+    def update_widget(self, entry_widget):
+        """Insert saved key into entry."""
+        combo = self.format_key_combo(self.pressed_keys)
+        entry_widget.setText(combo)
+        self.last_combination = combo
+
+    def finalize_combination(self, entry_widget):
+        """Save the combination."""
+        entry_widget.setText(self.last_combination)
+        self.pressed_keys = []

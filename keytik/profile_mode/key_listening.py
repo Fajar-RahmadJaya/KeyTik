@@ -190,10 +190,12 @@ class KeyListening(QObject):
             return k[:1].upper() + k[1:] if k else k
 
         if isinstance(self.pressed_keys, (list, set)):
-            self.pressed_key = list(self.pressed_keys)
-        if len(self.pressed_key) == 1:
-            combo = format_key(self.pressed_key[0])
-        combo = " + ".join(format_key(k) for k in self.pressed_key)
+            self.pressed_keys = list(self.pressed_keys)
+
+        if len(self.pressed_keys) == 1:
+            combo = format_key(self.pressed_keys[0])
+
+        combo = " + ".join(format_key(k) for k in self.pressed_keys)
 
         entry_widget.setText(combo)
         self.last_combination = combo

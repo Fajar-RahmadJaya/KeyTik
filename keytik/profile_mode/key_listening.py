@@ -45,7 +45,6 @@ class KeyListening(QObject):
         # Variable
         self.is_listening = False
         self.pressed_keys = []
-        self.last_combination = ""
         self.active_entry = None
 
         # UI
@@ -69,14 +68,14 @@ class KeyListening(QObject):
             QEvent.Leave,
         )
 
-    def toggle_other_buttons(self, target_button, other_button_enabled: bool):
+    def toggle_other_buttons(self, target_button: QPushButton, other_button_enabled: bool):
         """Change the state of non selected button."""
         button_list = self.edit_frame.findChildren(QPushButton)
         for button in button_list:
             if button != target_button:
                 button.setEnabled(other_button_enabled)
 
-    def toggle_other_entry(self, target_entry, other_entry_enabled: bool):
+    def toggle_other_entry(self, target_entry: QPushButton, other_entry_enabled: bool):
         """Install or remove event filter to enable/disable entry."""
         entry_list = self.edit_frame.findChildren(QLineEdit)
         for entry in entry_list:
@@ -86,13 +85,12 @@ class KeyListening(QObject):
                 else:
                     entry.installEventFilter(self)
 
-    def key_listening(self, target_entry, target_button):
+    def key_listening(self, target_entry: QLineEdit, target_button: QPushButton):
         """Get and Listen to key press."""
         if not self.is_listening:
             self.is_listening = True
             self.active_entry = target_entry
-            self.pressed_keys = []
-            self.last_combination = ""
+            self.pressed_keys.clear()
 
             # Dsiable other entry
             self.toggle_other_entry(target_entry, other_entry_enabled=False)
@@ -100,20 +98,16 @@ class KeyListening(QObject):
             # Disbale other button
             self.toggle_other_buttons(target_button, other_button_enabled=False)
 
-            def finalize_combination():
-                target_entry.setText(self.last_combination)
-                self.pressed_keys = []
-
             self.set_timer = QTimer()
             self.set_timer.setSingleShot(True)
-            self.set_timer.timeout.connect(finalize_combination)
+            self.set_timer.timeout.connect(self.pressed_keys.clear)
 
             keyboard.hook(lambda event: self.multi_key_event(event, target_entry, target_button))
 
         else:
             self.is_listening = False
             self.active_entry = None
-            self.pressed_keys = []
+            self.pressed_keys.clear()
 
             # Enable other entry
             self.toggle_other_entry(target_entry, other_entry_enabled=True)
@@ -121,7 +115,7 @@ class KeyListening(QObject):
             # Enable other button
             self.toggle_other_buttons(target_button, other_button_enabled=True)
 
-    def multi_key_event(self, event, entry_widget: QLineEdit, button):
+    def multi_key_event(self, event, entry_widget: QLineEdit, button: QPushButton):
         """Action when multiple key is pressed, set timer before saving the key."""
         if not self.is_listening or self.active_entry != entry_widget:
             return
@@ -180,7 +174,7 @@ class KeyListening(QObject):
         widget = self.edit_frame.childAt(local_pos)
         return isinstance(widget, (QPushButton, QLineEdit, QCheckBox))
 
-    def update_widget(self, entry_widget):
+    def update_widget(self, entry_widget: QLineEdit):
         """Insert saved key into entry."""
         combo = None
 
@@ -198,4 +192,3 @@ class KeyListening(QObject):
         combo = " + ".join(format_key(k) for k in self.pressed_keys)
 
         entry_widget.setText(combo)
-        self.last_combination = combo

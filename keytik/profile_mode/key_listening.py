@@ -156,7 +156,7 @@ class KeyListening(QObject):
 
     def mouse_listening(self, x, y, button, pressed, target_entry: QLineEdit):  # pylint: disable=W0613
         """Get and listen to mouse key press. Pynput on_click."""
-        if not (self.is_listening):
+        if self.is_listening:
             return
 
         button_map = {

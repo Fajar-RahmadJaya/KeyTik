@@ -44,7 +44,6 @@ class KeyListening(QObject):
         # Variable
         self.is_listening = False
         self.pressed_keys = []
-        self.active_entry = None
         self.mouse_listener = None
 
         # UI
@@ -89,11 +88,14 @@ class KeyListening(QObject):
         """Get and Listen to key press."""
         if not self.is_listening:
             self.is_listening = True
-            self.active_entry = target_entry
             self.pressed_keys.clear()
 
             # Start pynput mouse listener thread
-            self.mouse_listener = pynput.mouse.Listener(on_click=self.mouse_listening)
+            self.mouse_listener = pynput.mouse.Listener(
+                on_click=lambda x, y, button, pressed: self.mouse_listening(
+                    x, y, button, pressed, target_entry
+                )
+            )
             self.mouse_listener.start()
 
             # Dsiable other entry
@@ -110,7 +112,6 @@ class KeyListening(QObject):
 
         else:
             self.is_listening = False
-            self.active_entry = None
             self.pressed_keys.clear()
 
             # Destroy pynput mouse listener thread
@@ -122,15 +123,15 @@ class KeyListening(QObject):
             # Enable other button
             self.toggle_other_buttons(target_button, other_button_enabled=True)
 
-    def multi_key_event(self, event, entry_widget: QLineEdit, button: QPushButton):
+    def multi_key_event(self, event, target_entry: QLineEdit, button: QPushButton):
         """Action when multiple key is pressed, set timer before saving the key."""
-        if not self.is_listening or self.active_entry != entry_widget:
+        if not self.is_listening:
             return
 
         key = event.name
         sc_checkbox = self.edit_frame.findChild(QCheckBox, "ScanCodeCheckbox")
 
-        if entry_widget.objectName() == "DefaultKeyEntry" and sc_checkbox.isChecked():
+        if target_entry.objectName() == "DefaultKeyEntry" and sc_checkbox.isChecked():
             key = f"SC{event.scan_code:02X}"
 
         if key.lower() in constant.changes_key:
@@ -142,7 +143,7 @@ class KeyListening(QObject):
         if event.event_type == "down":
             if key not in self.pressed_keys:
                 self.pressed_keys.append(key)
-                self.update_widget(entry_widget)
+                self.update_widget(target_entry)
             if self.set_timer.isActive():
                 self.set_timer.stop()
 
@@ -150,12 +151,12 @@ class KeyListening(QObject):
             if key in self.pressed_keys:
                 self.pressed_keys.remove(key)
                 if not self.pressed_keys:
-                    self.key_listening(entry_widget, button)
+                    self.key_listening(target_entry, button)
                     self.request_timer_start.emit()
 
-    def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
+    def mouse_listening(self, x, y, button, pressed, target_entry: QLineEdit):  # pylint: disable=W0613
         """Get and listen to mouse key press. Pynput on_click."""
-        if not (self.is_listening and self.active_entry):
+        if not (self.is_listening):
             return
 
         button_map = {
@@ -168,11 +169,11 @@ class KeyListening(QObject):
         if pressed and not self.check_mouse_event():
             if mouse_button not in self.pressed_keys:
                 self.pressed_keys.append(mouse_button)
-                self.update_widget(self.active_entry)
+                self.update_widget(target_entry)
         elif mouse_button in self.pressed_keys:
             self.pressed_keys.remove(mouse_button)
             if not self.pressed_keys:
-                self.key_listening(self.active_entry, None)
+                self.key_listening(target_entry, None)
                 self.request_timer_start.emit()
 
     def stop_mouse_listening(self):

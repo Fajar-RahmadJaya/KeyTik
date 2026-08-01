@@ -36,12 +36,11 @@ class KeyListening(QObject):
     def __init__(self, edit_frame):
         super().__init__()
         # Signal
-        self.request_timer_start.connect(self.release_timer)
+        self.request_timer_start.connect(lambda: self.set_timer.start(400))
 
         # Variable
         self.mouse_listening_initialized = False
         self.is_listening = False
-        self.copas_rows = []
         self.pressed_keys = []
         self.last_combination = ""
 
@@ -144,7 +143,7 @@ class KeyListening(QObject):
             if key not in self.pressed_keys:
                 self.pressed_keys.append(key)
                 self.update_widget(entry_widget)
-            if hasattr(self, "release_timer") and self.set_timer.isActive():
+            if self.set_timer.isActive():
                 self.set_timer.stop()
 
         elif event.event_type == "up":
@@ -152,9 +151,6 @@ class KeyListening(QObject):
                 self.pressed_keys.remove(key)
                 if not self.pressed_keys:
                     self.key_listening(entry_widget, button)
-                    self.request_timer_start.emit()
-
-                elif hasattr(self, "release_timer"):
                     self.request_timer_start.emit()
 
     def mouse_listening(self, x, y, button, pressed):  # pylint: disable=W0613
@@ -185,28 +181,21 @@ class KeyListening(QObject):
         widget = self.edit_frame.childAt(local_pos)
         return isinstance(widget, (QPushButton, QLineEdit, QCheckBox))
 
-    def release_timer(self):
-        """Start the timer."""
-        if hasattr(self, "release_timer"):
-            self.set_timer.start(400)
-
-    def format_key_combo(self, keys):
-        """Format for multiple key press."""
+    def update_widget(self, entry_widget):
+        """Insert saved key into entry."""
+        combo = None
 
         def format_key(k):
             if len(k) == 1 and k.islower():
                 return k
             return k[:1].upper() + k[1:] if k else k
 
-        if isinstance(keys, (list, set)):
-            keys = list(keys)
+        if isinstance(self.pressed_keys, (list, set)):
+            keys = list(self.pressed_keys)
         if len(keys) == 1:
-            return format_key(keys[0])
-        return " + ".join(format_key(k) for k in keys)
+            combo = format_key(keys[0])
+        combo = " + ".join(format_key(k) for k in keys)
 
-    def update_widget(self, entry_widget):
-        """Insert saved key into entry."""
-        combo = self.format_key_combo(self.pressed_keys)
         entry_widget.setText(combo)
         self.last_combination = combo
 

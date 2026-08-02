@@ -89,8 +89,15 @@ file_search = os.path.join(icon_dir, "file_search.svg")
 question = os.path.join(icon_dir, "question.svg")
 
 # Material symbols
+# https://github.com/google/material-design-icons
 _material_symbols_dir = os.path.join(icon_dir, "material-symbols")
 fullscreen = os.path.join(_material_symbols_dir, "fullscreen.svg")
 fullscreen_exit = os.path.join(_material_symbols_dir, "fullscreen-exit.svg")
 keyboard_arrow_up = os.path.join(_material_symbols_dir, "keyboard_arrow_up.svg")
 keyboard_arrow_down = os.path.join(_material_symbols_dir, "keyboard_arrow_down.svg")
+
+# Lucide icons
+# https://github.com/lucide-icons/lucide
+_lucide_icons_dir = os.path.join(icon_dir, "lucide")
+eye_closed = os.path.join(_lucide_icons_dir, "eye-closed.svg")
+eye = os.path.join(_lucide_icons_dir, "eye.svg")

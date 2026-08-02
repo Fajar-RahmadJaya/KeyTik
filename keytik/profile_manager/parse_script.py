@@ -190,7 +190,7 @@ class ParseScript:
 
         if default.startswith(("SC", "~SC")):
             parsed_remap.is_sc = True
-            parsed_remap.default_key = default.replace("&", "+")
+            parsed_remap.default_key = default.replace("&", "+").replace("~", "")
 
         if remap.startswith("SendText"):
             key = self.parse_text_format(remap)

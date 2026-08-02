@@ -17,7 +17,7 @@
 import os
 
 import winshell
-from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtCore import QPoint, QSize, Qt, Signal  # pylint: disable=E0611
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
@@ -28,14 +28,44 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QMainWindow,
     QPushButton,
     QSizePolicy,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.profile_ui import ProfileUI
+from keytik.profile_mode.text_mode import TextMode
 from keytik.setting.setting_ui import SettingUI
 from keytik.utility import constant, icons, style, utils
+
+
+class PeekButton(QToolButton):
+    """Subclass QToolButton with hover event."""
+
+    hovered = Signal()
+    unhovered = Signal()
+
+    def enterEvent(self, event):  # pylint: disable=C0103
+        """Hover event."""
+        self.hovered.emit()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):  # pylint: disable=C0103
+        """Unhover event."""
+        self.unhovered.emit()
+        super().leaveEvent(event)
+
+
+class PeekTooltip(QWidget):  # pylint: disable=R0903:
+    """Subclass QWidget to allow hidden event."""
+
+    hidden = Signal()
+
+    def hideEvent(self, event):  # pylint: disable=C0103
+        """Hudden event."""
+        self.hidden.emit()
+        super().hideEvent(event)
 
 
 class DashboardUI(QMainWindow):
@@ -71,7 +101,7 @@ class DashboardUI(QMainWindow):
         self.profile_frame = QFrame()
         self.profile_layout = QGridLayout(self.profile_frame)
         self.profile_layout.setContentsMargins(0, 0, 0, 10)
-        self.profile_layout.setHorizontalSpacing(15)
+        self.profile_layout.setHorizontalSpacing(10)
         self.profile_layout.setVerticalSpacing(10)
         self.profile_layout.setColumnStretch(0, 1)
         self.profile_layout.setColumnStretch(1, 1)
@@ -177,7 +207,7 @@ class DashboardUI(QMainWindow):
             column = index % 2
             if index < len(scripts_to_display):
                 script = scripts_to_display[index]
-                self.profile_card(script, row, column)
+                self.profile_layout.addWidget(self.profile_card(script), row, column)
             else:
                 dummy_box = QGroupBox(" ")
                 dummy_box.setStyleSheet(
@@ -185,18 +215,23 @@ class DashboardUI(QMainWindow):
                 )
                 self.profile_layout.addWidget(dummy_box, row, column)
 
-    def profile_card(self, script, row, column):
+    def profile_card(self, script):
         """Profile action."""
+        card_widget = QWidget()
+        # widget.setStyleSheet("background-color: rgba(255, 255, 255, 50)")
+        layout = QGridLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        card_widget.setLayout(layout)
+
         group_box = QGroupBox(os.path.splitext(script)[0])
         group_box.setStyleSheet(style.GROUP_BOX)
+        layout.addWidget(group_box, 0, 0, 1, 3)
 
         group_layout = QGridLayout(group_box)
         group_layout.setContentsMargins(12, 14, 12, 12)
         group_layout.setHorizontalSpacing(8)
         group_layout.setVerticalSpacing(8)
-
-        # Pin icon
-        self.pin_icon(script, parent=group_box)
 
         # Button
         group_layout.addWidget(self.run_button(script), 0, 0)
@@ -206,20 +241,125 @@ class DashboardUI(QMainWindow):
         group_layout.addWidget(self.store_button(script), 1, 1)
         group_layout.addWidget(self.delete_button(script), 1, 2)
 
-        self.profile_layout.addWidget(group_box, row, column)
+        # Pin icon
+        layout.addWidget(self.pin_icon(script), 0, 2, 1, 1, Qt.AlignTop | Qt.AlignRight)
 
-    def pin_icon(self, script, parent):
-        """Pin icon."""
+        # Peek icon
+        layout.addWidget(self.peek_icon(script), 0, 0, 1, 1, Qt.AlignTop | Qt.AlignLeft)
+
+        return card_widget
+
+    def pin_icon(self, script):
+        """Get pin profile widget."""
+        widget = QWidget()
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 4, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        icon = QSvgWidget()
         if script in self.dashboard_core.pinned_profiles:
-            icon_label = QSvgWidget(icons.pin_fill, parent)
+            icon.load(icons.pin_fill)
         else:
-            icon_label = QSvgWidget(icons.pin, parent)
+            icon.load(icons.pin)
 
-        icon_label.setFixedSize(17, 17)
-        icon_label.setToolTip(f'Pin "{os.path.splitext(script)[0]}"')
-        icon_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        icon_label.mousePressEvent = lambda _: self.dashboard_core.toggle_pin(script)
-        icon_label.move(285, 3)
+        icon.setFixedSize(17, 17)
+        icon.setToolTip(f'Pin "{os.path.splitext(script)[0]}"')
+        icon.setCursor(Qt.CursorShape.PointingHandCursor)
+        icon.mousePressEvent = lambda _: self.dashboard_core.toggle_pin(script)
+        layout.addWidget(icon)
+
+        return widget
+
+    def peek_icon(self, script):
+        """Get pin profile widget."""
+        widget = QWidget()
+        layout = QVBoxLayout()
+        layout.setContentsMargins(4, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        button = PeekButton()
+        button.setCheckable(True)
+        button.setFixedSize(20, 20)
+        button.setObjectName("PeekButton")
+        button.setIconSize(QSize(14, 14))
+        button.setToolTip(f"Click to see {os.path.splitext(script)[0]} source script")
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setStyleSheet(f"""
+        QToolButton#PeekButton {{
+                border-radius: {button.size().height() / 2};
+                background-color: {style.palette_role.surface};
+        }}
+        """)
+
+        button.setIcon(icons.get_icon(icons.eye_closed))
+
+        content = None
+
+        def click_event():
+            """Show content tooltip."""
+            nonlocal content
+
+            button.setIcon(icons.get_icon(icons.eye))
+
+            # Cache the content
+            if not content:
+                try:
+                    script_path = os.path.join(self.dashboard_core.script_dir, script)
+                    with open(script_path, encoding="utf-8") as file:
+                        content = file.read()
+                except FileNotFoundError as error:
+                    print(f"Failed to get script content: {error} ")
+
+            peek_tooltip = self.peek_tooltip(content)
+
+            def tooltip_event():
+                """Set peek button to eye closed and unchecek button."""
+                button.setChecked(False)
+                button.setIcon(icons.get_icon(icons.eye_closed))
+
+            peek_tooltip.hidden.connect(tooltip_event)
+
+            peek_tooltip.show()
+            pos = button.mapToGlobal(QPoint(0, button.height() + 4))
+            pos.setX(pos.x() + (button.width() - peek_tooltip.width()) // 2)
+            peek_tooltip.move(pos)
+
+        def hover_event():
+            """Set peek icon button to eye."""
+            if not button.isChecked():
+                button.setIcon(icons.get_icon(icons.eye))
+
+        def unhover_event():
+            """Set peek button icon to eye closed."""
+            if not button.isChecked():
+                button.setIcon(icons.get_icon(icons.eye_closed))
+
+        button.hovered.connect(hover_event)
+        button.unhovered.connect(unhover_event)
+        button.clicked.connect(click_event)
+        layout.addWidget(button)
+
+        return widget
+
+    def peek_tooltip(self, content: str):
+        """Show tooltip containing script content."""
+        widget = PeekTooltip(self, Qt.WindowType.Popup)
+        widget.setFixedSize(360, 200)
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        text_block = TextMode().text_block()
+        text_block.setReadOnly(True)
+        text_block.setFontPointSize(8)
+        text_block.setPlainText(content)
+        layout.addWidget(text_block)
+
+        return widget
 
     def run_button(self, script):
         """Profile card run/exit button."""
@@ -371,7 +511,8 @@ class DashboardUI(QMainWindow):
     def find_run_button(self, s):
         """Find run button since it get destroyed on update script list."""
         for i in range(self.profile_layout.count()):
-            group_box = self.profile_layout.itemAt(i).widget()
+            widget = self.profile_layout.itemAt(i).widget()
+            group_box = widget.findChild(QGroupBox)
 
             if isinstance(group_box, QGroupBox) and group_box.title() == os.path.splitext(s)[0]:
                 layout = group_box.layout()

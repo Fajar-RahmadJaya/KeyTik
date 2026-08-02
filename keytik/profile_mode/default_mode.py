@@ -57,7 +57,6 @@ class DefaultMode:
         super().__init__()
         # Composition
         self.select_key_ui = SelectKeyUI()
-        self.key_listening_comp = KeyListening(edit_frame)
         self.shared_row = SharedRow()
 
         # Variables
@@ -194,7 +193,9 @@ class DefaultMode:
         default_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         default_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         default_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(default_key_entry, default_key_select)
+            lambda: KeyListening(self.edit_frame).key_listening(
+                default_key_entry, default_key_select
+            )
         )
         default_key_layout.addWidget(default_key_select, 0, 0, 1, 2)
 
@@ -236,7 +237,7 @@ class DefaultMode:
         remap_key_select.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         remap_key_select.setToolTip("Press any key or shortcut to capture it automatically")
         remap_key_select.clicked.connect(
-            lambda: self.key_listening_comp.key_listening(remap_key_entry, remap_key_select)
+            lambda: KeyListening(self.edit_frame).key_listening(remap_key_entry, remap_key_select)
         )
         remap_key_layout.addWidget(remap_key_select, 0, 0, 1, 2)
 
@@ -273,6 +274,12 @@ class DefaultMode:
         widget.setLayout(layout)
 
         content_widget = QWidget()
+        content_widget.setObjectName("OptionContent")
+        content_widget.setStyleSheet(f"""
+        QWidget#OptionContent {{
+            background-color: {style.palette_role.surface};
+        }}
+        """)
         content_layout = QHBoxLayout()
         content_layout.setContentsMargins(0, 0, 0, 0)
         content_layout.setSpacing(0)
@@ -375,14 +382,8 @@ class DefaultMode:
     def default_option_content(self, parsed_remap):
         """Get default key option widget."""
         widget = QWidget()
-        widget.setObjectName("DefaultOptionContent")
-        widget.setStyleSheet(f"""
-        QWidget#DefaultOptionContent {{
-            background-color: {style.palette_role.surface};
-        }}
-        """)
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(0)
         widget.setLayout(layout)
 
@@ -412,14 +413,8 @@ class DefaultMode:
     def remap_option_content(self, parsed_remap):
         """Get remap key option widget."""
         widget = QWidget()
-        widget.setObjectName("RemapOptionContent")
-        widget.setStyleSheet(f"""
-        QWidget#RemapOptionContent {{
-            background-color: {style.palette_role.surface};
-        }}
-        """)
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(0)
         widget.setLayout(layout)
 
@@ -452,6 +447,7 @@ class DefaultMode:
         hold_interval_entry.setObjectName(RemapObject.hold_interval_entry)
         hold_interval_entry.setPlaceholderText("Int")
         hold_interval_entry.setFixedWidth(40)
+        hold_interval_entry.setFixedHeight(hold_format_checkbox.sizeHint().height())
         hold_interval_entry.setToolTip(
             "Remap Key Only: Enter the hold interval in seconds (Default is 10 second)"
         )

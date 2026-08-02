@@ -298,12 +298,13 @@ QGroupBox {{
     border: 1px solid {palette_role.mantle};
     border-radius: 8;
     margin-top: 1.5ex;
+    margin-right: 5px;
 }}
 
 QGroupBox:title {{
     subcontrol-origin: margin;
     subcontrol-position: top left;
-    left: 8px;
+    left: 26px;
 }}"""
 
 

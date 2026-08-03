@@ -192,7 +192,7 @@ class ParseScript:
             parsed_remap.is_sc = True
             parsed_remap.default_key = default.replace("&", "+").replace("~", "")
 
-        if ("A_Clipboard :=") in remap and (', Send("^v")') in remap:
+        if "A_Clipboard :=" in remap and ', Send("^v")' in remap:
             key = self.parse_text_format(remap)
             parsed_remap.is_text_format = True
         elif "SetTimer" in remap:
@@ -219,7 +219,7 @@ class ParseScript:
             parsed_remap.is_sc = True
 
         if "A_PriorHotkey" in block_text and "A_TimeSincePriorHotkey < 400" in block_text:
-            if ("A_Clipboard :=") in block_text and (', Send("^v")') in block_text:
+            if "A_Clipboard :=" in block_text and ', Send("^v")' in block_text:
                 parsed_remap.remap_key = self.parse_text_format(block_text)
                 parsed_remap.is_text_format = True
             elif "SetTimer" in block_text:

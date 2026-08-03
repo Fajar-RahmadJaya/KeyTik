@@ -14,3 +14,5 @@
 
 - Fix scan code affecting other rows
 - Fix multi scan code parsing "~"
+- Fix text format sending incorrect string
+- Fix normal click is written on double click

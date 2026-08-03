@@ -488,6 +488,7 @@ class WriteDefault:
         double_click_length = 2
         if len(keys) == double_click_length and keys[0] == keys[1]:
             self.write_double_click(file, keys[0], remap_key)
+            return True
 
         translated_key = self.write_script.translate_key(default_key, is_default_key=True)
         if not translated_key:
@@ -595,7 +596,7 @@ class WriteDefault:
         )
 
         if self.remap_widget.text_format_checkbox.isChecked():
-            file.write(f'        SendText("{remap_key}")\n')
+            file.write(f'        A_Clipboard := "{remap_key}", Send("^v")\n')
         elif self.remap_widget.hold_format_checkbox.isChecked():
             self.hold_format_double_click(remap_key, file)
         elif "+" in remap_key:

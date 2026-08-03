@@ -515,7 +515,7 @@ class WriteDefault:
 
     def write_text_format(self, file, default_translated, remap_key):
         """Write text format (Send literal string)."""
-        file.write(f'{default_translated}::SendText("{remap_key}")\n')
+        file.write(f'{default_translated}::A_Clipboard := "{remap_key}", Send("^v")\n')
 
     def write_hold_format(self, file, default_translated, remap_key):
         """Write hold format."""

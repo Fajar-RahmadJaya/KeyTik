@@ -192,7 +192,7 @@ class ParseScript:
             parsed_remap.is_sc = True
             parsed_remap.default_key = default.replace("&", "+").replace("~", "")
 
-        if remap.startswith("SendText"):
+        if ("A_Clipboard :=") in remap and (', Send("^v")') in remap:
             key = self.parse_text_format(remap)
             parsed_remap.is_text_format = True
         elif "SetTimer" in remap:
@@ -219,7 +219,7 @@ class ParseScript:
             parsed_remap.is_sc = True
 
         if "A_PriorHotkey" in block_text and "A_TimeSincePriorHotkey < 400" in block_text:
-            if "SendText" in block_text:
+            if ("A_Clipboard :=") in block_text and (', Send("^v")') in block_text:
                 parsed_remap.remap_key = self.parse_text_format(block_text)
                 parsed_remap.is_text_format = True
             elif "SetTimer" in block_text:
@@ -291,8 +291,13 @@ class ParseScript:
 
     def parse_text_format(self, block_text):
         """Parse text format from SendText line."""
+        clipboard_match = re.search(r'A_Clipboard\s*:=\s*"(.+?)"', block_text)
+        if clipboard_match:
+            return clipboard_match.group(1)
+
+        # Legacy text format
         text_match = re.search(r'SendText\("(.+?)"\)', block_text)
-        remap_key = ""
         if text_match:
-            remap_key = text_match.group(1)
-        return remap_key
+            return text_match.group(1)
+
+        return None

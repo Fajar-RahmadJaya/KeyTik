@@ -34,7 +34,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.select_key.select_key_core import SelectKeyCore
-from keytik.utility import constant, icons, style
+from keytik.utility import constant, icons
+from keytik.utility.style import Styling
 
 
 class SelectKeyUI:
@@ -68,9 +69,9 @@ class SelectKeyUI:
         select_key_window = QDialog(parent_window)
         select_key_window.setWindowTitle("Select Key")
         select_key_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = style.get_geometry(parent_window, 400, 430)
+        geometry = Styling().get_geometry(parent_window, 400, 430)
         select_key_window.setGeometry(geometry)
-        style.apply_mica(select_key_window)
+        Styling().apply_mica(select_key_window)
 
         main_layout = QVBoxLayout(select_key_window)
         # Top part

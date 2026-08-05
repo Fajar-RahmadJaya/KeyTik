@@ -24,7 +24,7 @@ from keytik.utility import constant
 
 # ------------------------------ Config ------------------------------
 @dataclass
-class Config:  # pylint: disable=R0902
+class ConfigData:  # pylint: disable=R0902
     """Dataclass to make config usage easier."""
 
     show_announcement: bool
@@ -40,135 +40,131 @@ class Config:  # pylint: disable=R0902
     skip_update: str
 
 
-def get_config():
-    """Get config from json file."""
-    if not os.path.exists(constant.config_path):
-        migrate_old_config()
+class Config:
+    """Program config."""
 
-    try:
-        with open(constant.config_path, encoding="utf-8") as config_file:
-            value = json.load(config_file)
-            config = Config(
-                show_announcement=value.get("show_announcement", True),
-                style=value.get("style") or None,
-                theme_type=value.get("theme_type") or "default",
-                theme=value.get("theme") or "system",
-                accent=value.get("accent") or "default",
-                mica_effect=value.get("mica_effect") or "default",
-                profile_path=value.get("profile_path") or constant.appdata_dir,
-                pinned_profile=value.get("pinned_profile", []),
-                exit_key=value.get("exit_key", {}),
-                auto_complete=value.get("auto_complete") or "inline",
-                skip_update=value.get("skip_update") or None,
-            )
-        return config
+    def get_config(self):
+        """Get config from json file."""
+        if not os.path.exists(constant.config_path):
+            self.migrate_old_config()
 
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return None
+        try:
+            with open(constant.config_path, encoding="utf-8") as config_file:
+                value = json.load(config_file)
+                config = ConfigData(
+                    show_announcement=value.get("show_announcement", True),
+                    style=value.get("style") or None,
+                    theme_type=value.get("theme_type") or "default",
+                    theme=value.get("theme") or "system",
+                    accent=value.get("accent") or "default",
+                    mica_effect=value.get("mica_effect") or "default",
+                    profile_path=value.get("profile_path") or constant.appdata_dir,
+                    pinned_profile=value.get("pinned_profile", []),
+                    exit_key=value.get("exit_key", {}),
+                    auto_complete=value.get("auto_complete") or "inline",
+                    skip_update=value.get("skip_update") or None,
+                )
+            return config
 
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+        return None
 
-def update_config(config):
-    """Save config into json file."""
-    try:
-        with open(constant.config_path, "w", encoding="utf-8") as f:
-            json.dump(config.__dict__, f, indent=4, sort_keys=True)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
+    def update_config(self, config):
+        """Save config into json file."""
+        try:
+            with open(constant.config_path, "w", encoding="utf-8") as f:
+                json.dump(config.__dict__, f, indent=4, sort_keys=True)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
 
+    # ------------------------------ Migrate Old Config ------------------------------
+    def migrate_old_config(self):
+        """Move old config to new centralized one."""
+        try:
+            config_structure = {
+                "show_announcement": self.load_show_announcement(),
+                "theme": self.load_theme(),
+                "profile_path": self.load_profile_path(),
+                "pinned_profile": self.load_pinned_profile(),
+                "exit_key": self.load_exit_key(),
+            }
+            with open(constant.config_path, "w", encoding="utf-8") as config_file:
+                json.dump(config_structure, config_file, indent=4, sort_keys=True)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
 
-# ------------------------------ Migrate Old Config ------------------------------
-def migrate_old_config():
-    """Move old config to new centralized one."""
-    try:
-        config_structure = {
-            "show_announcement": load_show_announcement(),
-            "theme": load_theme(),
-            "profile_path": load_profile_path(),
-            "pinned_profile": load_pinned_profile(),
-            "exit_key": load_exit_key(),
-        }
-        with open(constant.config_path, "w", encoding="utf-8") as config_file:
-            json.dump(config_structure, config_file, indent=4, sort_keys=True)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
+    def load_profile_path(self):
+        """Load old config profile path."""
+        try:
+            condition_path = os.path.join(constant.appdata_dir, "path.json")
+            with open(condition_path, encoding="utf-8") as condition_file:
+                value = json.load(condition_file)
+                profile_path = value.get("path", constant.appdata_dir)
+            os.remove(condition_path)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+            profile_path = constant.appdata_dir
 
+        return profile_path
 
-def load_profile_path():
-    """Load old config profile path."""
-    try:
-        condition_path = os.path.join(constant.appdata_dir, "path.json")
-        with open(condition_path, encoding="utf-8") as condition_file:
-            value = json.load(condition_file)
-            profile_path = value.get("path", constant.appdata_dir)
-        os.remove(condition_path)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        profile_path = constant.appdata_dir
+    def load_theme(self):
+        """Load old config theme."""
+        try:
+            theme_path = os.path.join(constant.appdata_dir, "theme.json")
+            with open(theme_path, encoding="utf-8") as theme_file:
+                theme = theme_file.read().strip().lower()
+            os.remove(theme_path)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+            theme = None
 
-    return profile_path
+        return theme
 
+    def load_show_announcement(self):
+        """Load old config show announcement."""
+        try:
+            show_announcement_path = os.path.join(constant.appdata_dir, "dont_show.json")
+            with open(show_announcement_path, encoding="utf-8") as dont_show_file:
+                value = json.load(dont_show_file)
+                show_announcement = value.get("welcome_condition", True)
+            os.remove(show_announcement_path)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+            show_announcement = True
 
-def load_theme():
-    """Load old config theme."""
-    try:
-        theme_path = os.path.join(constant.appdata_dir, "theme.json")
-        with open(theme_path, encoding="utf-8") as theme_file:
-            theme = theme_file.read().strip().lower()
-        os.remove(theme_path)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        theme = None
+        return show_announcement
 
-    return theme
+    def load_pinned_profile(self):
+        """Load old config pinned profile."""
+        try:
+            pinned_profile_path = os.path.join(constant.appdata_dir, "pinned_profiles.json")
+            with open(pinned_profile_path, encoding="utf-8") as pin_file:
+                pinned_profile = json.load(pin_file)
+            os.remove(pinned_profile_path)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+            pinned_profile = []
 
+        return pinned_profile
 
-def load_show_announcement():
-    """Load old config show announcement."""
-    try:
-        show_announcement_path = os.path.join(constant.appdata_dir, "dont_show.json")
-        with open(show_announcement_path, encoding="utf-8") as dont_show_file:
-            value = json.load(dont_show_file)
-            show_announcement = value.get("welcome_condition", True)
-        os.remove(show_announcement_path)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        show_announcement = True
+    def load_exit_key(self):
+        """Load old config exit key."""
+        try:
+            exit_keys_path = os.path.join(constant.appdata_dir, "exit_keys.json")
+            with open(exit_keys_path, encoding="utf-8") as exit_key_file:
+                exit_key = json.load(exit_key_file)
+            os.remove(exit_keys_path)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+            exit_key = {}
 
-    return show_announcement
-
-
-def load_pinned_profile():
-    """Load old config pinned profile."""
-    try:
-        pinned_profile_path = os.path.join(constant.appdata_dir, "pinned_profiles.json")
-        with open(pinned_profile_path, encoding="utf-8") as pin_file:
-            pinned_profile = json.load(pin_file)
-        os.remove(pinned_profile_path)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        pinned_profile = []
-
-    return pinned_profile
-
-
-def load_exit_key():
-    """Load old config exit key."""
-    try:
-        exit_keys_path = os.path.join(constant.appdata_dir, "exit_keys.json")
-        with open(exit_keys_path, encoding="utf-8") as exit_key_file:
-            exit_key = json.load(exit_key_file)
-        os.remove(exit_keys_path)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-        exit_key = {}
-
-    return exit_key
+        return exit_key
 
 
 # ------------------------------ Data ------------------------------
 @dataclass
-class Data:  # pylint: disable=R0902
+class Datas:  # pylint: disable=R0902
     """Dataclass to make data usage easier."""
 
     latest_update_check: str
@@ -176,87 +172,77 @@ class Data:  # pylint: disable=R0902
     changelog: str
 
 
-def get_data():
-    """Get config from json file."""
-    data_path = constant.data_path
-    if not os.path.exists(data_path):
-        with open(data_path, "w", encoding="utf-8") as f:
-            json.dump({}, f)
+class Data:
+    """Program data."""
 
-    try:
-        with open(data_path, encoding="utf-8") as data_file:
-            value = json.load(data_file)
-            data = Data(
-                latest_update_check=value.get("latest_update_check", True),
-                latest_version=value.get("latest_version") or None,
-                changelog=value.get("changelog") or None,
-            )
-        return data
+    def get_data(self):
+        """Get config from json file."""
+        data_path = constant.data_path
+        if not os.path.exists(data_path):
+            with open(data_path, "w", encoding="utf-8") as f:
+                json.dump({}, f)
 
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return None
-
-
-def update_data(data: Data):
-    """Save data into json file."""
-    try:
-        with open(constant.data_path, "w", encoding="utf-8") as f:
-            json.dump(data.__dict__, f, indent=4, sort_keys=True)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-
-
-# ------------------------------ Metadata ------------------------------
-def get_metadata():
-    """Get program metadata.."""
-    try:
-        with open(constant.meta_path, encoding="utf-8") as data_file:
-            value = json.load(data_file)
-            name = value.get("name", "KeyTik")
-            version = value.get("version") or "Unkown"
-        return name, version
-
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return "KeyTik", "Unkown"
-
-
-program_name, current_version = get_metadata()
-
-active_dir = os.path.join(get_config().profile_path, "Active")
-store_dir = os.path.join(get_config().profile_path, "Store")
-
-if not os.path.exists(active_dir):
-    os.makedirs(active_dir)
-
-if not os.path.exists(store_dir):
-    os.makedirs(store_dir)
-
-if not os.path.exists(constant.appdata_dir):
-    os.makedirs(constant.appdata_dir)
-
-device_list_path = os.path.join(active_dir, "Autohotkey Interception", "shared_device_info.txt")
-device_finder_path = os.path.join(active_dir, "Autohotkey Interception", "find_device.ahk")
-coordinate_path = os.path.join(active_dir, "Autohotkey Interception", "Coordinate.ahk")
-
-
-def get_ahk_install_dir():
-    """Get AutoHotkey installation directory in case not installed via other method."""
-    reg_paths = [r"SOFTWARE\AutoHotkey", r"SOFTWARE\WOW6432Node\AutoHotkey"]
-    for reg_path in reg_paths:
         try:
-            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
-                install_dir, _ = winreg.QueryValueEx(key, "InstallDir")
-                return install_dir
-        except FileNotFoundError:
-            continue
-    return None
+            with open(data_path, encoding="utf-8") as data_file:
+                value = json.load(data_file)
+                data = Datas(
+                    latest_update_check=value.get("latest_update_check", True),
+                    latest_version=value.get("latest_version") or None,
+                    changelog=value.get("changelog") or None,
+                )
+            return data
+
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+        return None
+
+    def update_data(self, data: Datas):
+        """Save data into json file."""
+        try:
+            with open(constant.data_path, "w", encoding="utf-8") as f:
+                json.dump(data.__dict__, f, indent=4, sort_keys=True)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
 
 
-ahk_uninstall_path = os.path.join(
-    get_ahk_install_dir() or r"C:\Program Files\AutoHotkey",
-    "UX",
-    "ui-uninstall.ahk",
-)
-ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")
+class Utility:
+    """Program utility."""
+
+    active_dir = os.path.join(Config().get_config().profile_path, "Active")
+    store_dir = os.path.join(Config().get_config().profile_path, "Store")
+    if not os.path.exists(active_dir):
+        os.makedirs(active_dir)
+
+    if not os.path.exists(store_dir):
+        os.makedirs(store_dir)
+
+    def __init__(self):
+        self.program_name, self.current_version = self.get_metadata()
+        self.ahkv2_dir = os.path.join(
+            self.get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2"
+        )
+
+    def get_metadata(self):
+        """Get program metadata.."""
+        try:
+            with open(constant.meta_path, encoding="utf-8") as data_file:
+                value = json.load(data_file)
+                name = value.get("name", "KeyTik")
+                version = value.get("version") or "Unknown"
+            return name, version
+
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+        return "KeyTik", "Unknown"
+
+    def get_ahk_install_dir(self):
+        """Get AutoHotkey installation directory in case not installed via other method."""
+        reg_paths = [r"SOFTWARE\AutoHotkey", r"SOFTWARE\WOW6432Node\AutoHotkey"]
+        for reg_path in reg_paths:
+            try:
+                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
+                    install_dir, _ = winreg.QueryValueEx(key, "InstallDir")
+                    return install_dir
+            except FileNotFoundError:
+                continue
+        return None

@@ -37,7 +37,9 @@ from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.profile_ui import ProfileUI
 from keytik.profile_mode.text_mode import TextMode
 from keytik.setting.setting_ui import SettingUI
-from keytik.utility import constant, icons, style, utils
+from keytik.utility import constant, icons
+from keytik.utility.style import Palette, Styling
+from keytik.utility.utils import Utility
 
 
 class PeekButton(QToolButton):
@@ -81,12 +83,12 @@ class DashboardUI(QMainWindow):
         self.dashboard_core.update_script_signal.connect(self.update_script_list)
 
         # UI initialization
-        self.setWindowTitle(utils.program_name)
+        self.setWindowTitle(Utility().program_name)
         self.setFixedSize(660, 500)
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        style.apply_mica(self)
+        Styling().apply_mica(self)
 
         # Startup
         self.create_ui()
@@ -179,7 +181,7 @@ class DashboardUI(QMainWindow):
         button_layout.addWidget(dummy_left, 0, 3)
 
         create_button = QPushButton(" Create New Profile")
-        create_button.setObjectName(style.button_highlight())
+        create_button.setObjectName(Styling().button_highlight())
         create_button.setIcon(icons.get_icon(icons.plus, highlighted=True))
         create_button.setFixedWidth(152)
         create_button.setFixedHeight(36)
@@ -225,7 +227,7 @@ class DashboardUI(QMainWindow):
         card_widget.setLayout(layout)
 
         group_box = QGroupBox(os.path.splitext(script)[0])
-        group_box.setStyleSheet(style.GROUP_BOX)
+        group_box.setStyleSheet(Styling().group_box)
         layout.addWidget(group_box, 0, 0, 1, 3)
 
         group_layout = QGridLayout(group_box)
@@ -289,7 +291,7 @@ class DashboardUI(QMainWindow):
         button.setStyleSheet(f"""
         QToolButton#PeekButton {{
                 border-radius: {button.size().height() / 2};
-                background-color: {style.palette_role.surface};
+                background-color: {Palette().get_palette_role().surface};
         }}
         """)
 
@@ -417,9 +419,9 @@ class DashboardUI(QMainWindow):
         else:
             startup_button.setChecked(False)
 
-        def build_button():
+        def build_button(checked: bool):
             """Buid button configuration bassed on check state."""
-            if self.is_startup(script):
+            if checked:
                 font = startup_button.font()
                 font.setPointSize(8)
                 startup_button.setFont(font)
@@ -439,14 +441,16 @@ class DashboardUI(QMainWindow):
 
         def button_event():
             """Call appropriate function based on check state."""
-            if startup_button.isChecked():
-                self.dashboard_core.remove_ahk_from_startup(script)
-                build_button()
-            else:
-                self.dashboard_core.add_ahk_to_startup(script)
-                build_button()
+            ischecked = startup_button.isChecked()
 
-        build_button()
+            if ischecked:
+                self.dashboard_core.add_ahk_to_startup(script)
+            else:
+                self.dashboard_core.remove_ahk_from_startup(script)
+
+            build_button(ischecked)
+
+        build_button(self.is_startup(script))
         startup_button.clicked.connect(button_event)
 
         return startup_button
@@ -473,12 +477,14 @@ class DashboardUI(QMainWindow):
 
     def store_button(self, script):
         """Profile card store button."""
+        utility = Utility()
+
         store_button = QPushButton(
-            " Store" if self.dashboard_core.script_dir == utils.active_dir else " Restore"
+            " Store" if self.dashboard_core.script_dir == utility.active_dir else " Restore"
         )
         store_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         store_button.setIcon(icons.get_icon(icons.store))
-        if self.dashboard_core.script_dir == utils.active_dir:
+        if self.dashboard_core.script_dir == utility.active_dir:
             store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"')
         else:
             store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"')

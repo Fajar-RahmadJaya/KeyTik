@@ -32,7 +32,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 from win32com.client import Dispatch
 
-from keytik.utility import constant, icons, utils
+from keytik.utility import constant, icons
+from keytik.utility.utils import Config, Utility
 
 
 class DashboardCore(QObject):
@@ -42,12 +43,14 @@ class DashboardCore(QObject):
 
     def __init__(self):
         super().__init__()
+        self.utility = Utility()
+
         # UI initialization
-        self.script_dir = utils.active_dir
+        self.script_dir = self.utility.active_dir
 
         # Variable
         self.current_page = 0
-        self.pinned_profiles = utils.get_config().pinned_profile
+        self.pinned_profiles = Config().get_config().pinned_profile
 
     def import_button_clicked(self, parent):
         """Select AHK script and add necessary line."""
@@ -127,14 +130,14 @@ class DashboardCore(QObject):
                 file.write("\n".join(result_lines) + "\n")
         except FileNotFoundError as e:
             print(f"Error modifying script: {e}")
-            exit_keys = utils.get_config().exit_key
+            exit_keys = Config().get_config().exit_key
 
             if file_name in exit_keys:
                 del exit_keys[file_name]
 
-            config = utils.get_config()
+            config = Config().get_config()
             config.exit_key = exit_keys
-            utils.update_config(config)
+            Config().update_config(config)
 
     def generate_exit_key(self, script_name, file=None):
         """Generate key for profile exit."""
@@ -167,7 +170,7 @@ class DashboardCore(QObject):
             "z",
         ]
 
-        exit_keys = utils.get_config().exit_key
+        exit_keys = Config().get_config().exit_key
 
         used_keys = set(key[-1] for key in exit_keys.values())
         available_keys = [k for k in possible_keys if k not in used_keys]
@@ -180,9 +183,9 @@ class DashboardCore(QObject):
         exit_keys[script_name] = exit_combo
 
         try:
-            config = utils.get_config()
+            config = Config().get_config()
             config.exit_key = exit_keys
-            utils.update_config(config)
+            Config().update_config(config)
 
             if file:
                 file.write(f"{exit_combo}::ExitApp\n\n")
@@ -241,10 +244,10 @@ class DashboardCore(QObject):
 
     def activate_script(self, script_name):
         """Run profile."""
-        if os.path.isfile(os.path.join(utils.active_dir, script_name)):
-            script_path = os.path.join(utils.active_dir, script_name)
+        if os.path.isfile(os.path.join(self.utility.active_dir, script_name)):
+            script_path = os.path.join(self.utility.active_dir, script_name)
         else:
-            script_path = os.path.join(utils.store_dir, script_name)
+            script_path = os.path.join(self.utility.store_dir, script_name)
 
         if os.path.isfile(script_path):
             os.startfile(script_path)
@@ -255,13 +258,13 @@ class DashboardCore(QObject):
 
     def exit_script(self, script_name):
         """Exit profile."""
-        if os.path.isfile(os.path.join(utils.active_dir, script_name)):
-            script_path = os.path.join(utils.active_dir, script_name)
+        if os.path.isfile(os.path.join(self.utility.active_dir, script_name)):
+            script_path = os.path.join(self.utility.active_dir, script_name)
         else:
-            script_path = os.path.join(utils.store_dir, script_name)
+            script_path = os.path.join(self.utility.store_dir, script_name)
 
         if os.path.isfile(script_path):
-            exit_keys = utils.get_config().exit_key
+            exit_keys = Config().get_config().exit_key
             exit_combo = exit_keys.get(script_name)
             if not exit_combo:
                 QMessageBox.critical(
@@ -291,7 +294,11 @@ class DashboardCore(QObject):
     def store_script(self, script_name):
         """Move profile to store directory."""
         script_path = os.path.join(self.script_dir, script_name)
-        target_dir = utils.store_dir if self.script_dir == utils.active_dir else utils.active_dir
+        target_dir = (
+            self.utility.store_dir
+            if self.script_dir == self.utility.active_dir
+            else self.utility.active_dir
+        )
 
         target_path = os.path.join(target_dir, script_name)
 
@@ -310,12 +317,12 @@ class DashboardCore(QObject):
 
     def toggle_script_dir(self, show_stored):
         """Change current directory based on store/active profile."""
-        if self.script_dir == utils.active_dir:
-            self.script_dir = utils.store_dir
+        if self.script_dir == self.utility.active_dir:
+            self.script_dir = self.utility.store_dir
             show_stored.setToolTip("Show Active Profile")
             show_stored.setIcon(icons.get_icon(icons.show_stored_fill))
         else:
-            self.script_dir = utils.active_dir
+            self.script_dir = self.utility.active_dir
             show_stored.setToolTip("Show Stored Profile")
             show_stored.setIcon(icons.get_icon(icons.show_stored))
 
@@ -345,9 +352,9 @@ class DashboardCore(QObject):
             self.pinned_profiles.insert(0, script)
 
         # Update config
-        config = utils.get_config()
+        config = Config().get_config()
         config.pinned_profile = self.pinned_profiles
-        utils.update_config(config)
+        Config().update_config(config)
 
         self.update_script_signal.emit()
 
@@ -393,7 +400,6 @@ class DashboardCore(QObject):
 
         del shell
 
-        self.update_script_signal.emit()
         return shortcut_path
 
     def remove_ahk_from_startup(self, script_name):
@@ -405,14 +411,12 @@ class DashboardCore(QObject):
         try:
             os.remove(shortcut_path)
 
-            self.update_script_signal.emit()
-
         except NotADirectoryError as e:
             print(f"Error removing {shortcut_path}: {e}")
 
     def check_ahi_dir(self):
         """Make sure AutoHotkey Interception folder is in active profile folder."""
-        target_folder = os.path.join(utils.active_dir, "AutoHotkey Interception")
+        target_folder = os.path.join(self.utility.active_dir, "AutoHotkey Interception")
 
         def get_all_relative_paths(base_dir):
             rel_paths = set()

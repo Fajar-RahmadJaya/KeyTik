@@ -30,11 +30,16 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
-from keytik.utility import constant, style, utils
+from keytik.utility import constant
+from keytik.utility.style import Palette, Styling
+from keytik.utility.utils import Config, Utility
 
 
 class SettingCore:
     """Setting logic."""
+
+    def __init__(self):
+        self.utility = Utility()
 
     def restart_app(self):
         """Run new instance and remove the old one."""
@@ -69,29 +74,29 @@ class SettingCore:
             new_active_dir = os.path.join(new_path, "Active")
             new_store_dir = os.path.join(new_path, "Store")
 
-            if os.path.exists(utils.active_dir):
-                shutil.move(utils.active_dir, new_path)
+            if os.path.exists(self.utility.active_dir):
+                shutil.move(self.utility.active_dir, new_path)
                 print(f"Moved Active folder to {new_path}")
             else:
-                print(f"Active folder does not exist at {utils.active_dir}")
+                print(f"Active folder does not exist at {self.utility.active_dir}")
 
-            if os.path.exists(utils.store_dir):
-                shutil.move(utils.store_dir, new_path)
+            if os.path.exists(self.utility.store_dir):
+                shutil.move(self.utility.store_dir, new_path)
                 print(f"Moved Store folder to {new_path}")
             else:
-                print(f"Store folder does not exist at {utils.store_dir}")
+                print(f"Store folder does not exist at {self.utility.store_dir}")
 
             # Save profile path to config
-            config = utils.get_config()
+            config = Config().get_config()
             config.profile_path = new_path
-            utils.update_config(config)
+            Config().update_config(config)
 
             print(f"Updated condition.json with the new path: {new_path}")
 
-            utils.active_dir = new_active_dir
-            utils.store_dir = new_store_dir
-            print(f"Global active_dir updated to: {utils.active_dir}")
-            print(f"Global store_dir updated to: {utils.store_dir}")
+            self.utility.active_dir = new_active_dir
+            self.utility.store_dir = new_store_dir
+            print(f"Global active_dir updated to: {self.utility.active_dir}")
+            print(f"Global store_dir updated to: {self.utility.store_dir}")
 
             # Reactive script after move profile successfully
             for script in running_scripts:
@@ -109,15 +114,16 @@ class SettingCore:
     def save_theme(self, theme: dict, parent):
         """Write theme preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
 
             config.theme_type = theme.get("type")
             config.theme = theme.get("value")
-            utils.update_config(config)
+            Config().update_config(config)
 
             # Apply palette directly when theme is in the same default color
-            palette = style.get_palette()
-            base_light = style.is_light(palette.color(QPalette.Base))
+            palette_comp = Palette()
+            palette = palette_comp.get_palette()
+            base_light = palette_comp.is_light(palette.color(QPalette.Base))
             default_theme_light = os.environ.get("QT_QPA_PLATFORM") == "windows:darkmode=1"
 
             # Palette with different default theme need restart
@@ -130,8 +136,8 @@ class SettingCore:
                 messagebox.setWindowTitle("Success")
                 messagebox.setText(
                     f"Theme changed to {config.theme}. "
-                    f"Please restart {utils.program_name} to apply change.\n\n"
-                    f"Would you like to restart {utils.program_name}?",
+                    f"Please restart {self.utility.program_name} to apply change.\n\n"
+                    f"Would you like to restart {self.utility.program_name}?",
                 )
                 messagebox.setStandardButtons(
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -144,7 +150,7 @@ class SettingCore:
                 # Set palette
                 QApplication.setPalette(palette)
                 QApplication.setStyleSheet(
-                    QApplication.instance(), style.button_highlight(style_sheet=True)
+                    QApplication.instance(), Styling().button_highlight(style_sheet=True)
                 )
 
         except FileNotFoundError as error:
@@ -153,14 +159,14 @@ class SettingCore:
     def save_accent(self, accent: list, parent):
         """Write accent preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
             config.accent = accent[1]
-            utils.update_config(config)
+            Config().update_config(config)
 
             # Update accent palette and button highlight stylesheet
-            QApplication.setPalette(style.get_palette())
+            QApplication.setPalette(Palette().get_palette())
             QApplication.setStyleSheet(
-                QApplication.instance(), style.button_highlight(style_sheet=True)
+                QApplication.instance(), Styling().button_highlight(style_sheet=True)
             )
 
         except FileNotFoundError as error:
@@ -169,9 +175,9 @@ class SettingCore:
     def save_style(self, updated_style):
         """Write style preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
             config.style = "" if updated_style == "Default" else updated_style
-            utils.update_config(config)
+            Config().update_config(config)
 
             # Update style
             QApplication.setStyle(updated_style)
@@ -182,12 +188,12 @@ class SettingCore:
     def save_mica_effect(self, new_mica, parent):
         """Write style preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
             prev_mica = config.mica_effect
 
             # Update config
             config.mica_effect = new_mica.lower()
-            utils.update_config(config)
+            Config().update_config(config)
 
             if prev_mica == "disable" or new_mica.lower() == "disable":
                 messagebox = QMessageBox(parent)
@@ -195,8 +201,8 @@ class SettingCore:
                 messagebox.setWindowTitle("Success")
                 messagebox.setText(
                     f"Mica effect changed to {new_mica}. "
-                    f"Please restart {utils.program_name} to apply change.\n\n"
-                    f"Would you like to restart {utils.program_name}?",
+                    f"Please restart {self.utility.program_name} to apply change.\n\n"
+                    f"Would you like to restart {self.utility.program_name}?",
                 )
                 messagebox.setStandardButtons(
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -206,10 +212,11 @@ class SettingCore:
                 if response == QMessageBox.StandardButton.Yes:
                     self.restart_app()
             else:
+                styling = Styling()
                 # Apply mica on setting window
-                style.apply_mica(parent)
+                styling.apply_mica(parent)
                 # Apply mica on main window
-                style.apply_mica(parent.window().parentWidget())
+                styling.apply_mica(parent.window().parentWidget())
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent, "Error", f"Failed to change style\n{error}")
@@ -217,20 +224,26 @@ class SettingCore:
     def save_auto_complete(self, new_auto_complete):
         """Write auto complete preferences preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
 
             # Update config
             config.auto_complete = new_auto_complete
-            utils.update_config(config)
+            Config().update_config(config)
 
         except FileNotFoundError as error:
             print(f"Error: {error}")
 
     def ahk_action(self, ahk_installed):
         """Uninstall AutoHotkey."""
+        ahk_uninstall_path = os.path.join(
+            self.utility.get_ahk_install_dir() or r"C:\Program Files\AutoHotkey",
+            "UX",
+            "ui-uninstall.ahk",
+        )
+
         if ahk_installed:
             try:
-                subprocess.run(utils.ahk_uninstall_path, shell=True, check=True)
+                subprocess.run(ahk_uninstall_path, shell=True, check=True)
 
             except FileNotFoundError:
                 QMessageBox.critical(

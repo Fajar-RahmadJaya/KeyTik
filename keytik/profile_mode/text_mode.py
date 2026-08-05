@@ -32,7 +32,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.profile_mode.shared_row import SharedRow
 from keytik.profile_mode.shortcut_row import ShortcutRow
-from keytik.utility import style
+from keytik.utility.style import Palette
 
 
 class TextMode:
@@ -65,7 +65,7 @@ class TextMode:
 
     def text_block(self, lines=None):
         """Text mode frame."""
-        palette = style.get_palette()
+        palette = Palette().get_palette()
 
         default_style = pyqcodeeditor_utils.get_resource_file("default_style.json")
         try:
@@ -116,7 +116,7 @@ class TextMode:
         text_document = code_editor.document()
         line = text_document.firstBlock()
 
-        palette = style.get_palette()
+        palette = Palette().get_palette()
         accent = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Accent)
         accent.setAlpha(20)
 

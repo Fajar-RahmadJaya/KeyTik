@@ -22,7 +22,8 @@ from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.write_script import WriteScript
-from keytik.utility import diff, utils
+from keytik.utility import diff
+from keytik.utility.utils import Config, Data, Utility
 
 
 class Thread(QThread):  # pylint: disable=R0903
@@ -42,8 +43,8 @@ class Thread(QThread):  # pylint: disable=R0903
         write_script.initialize_exit_keys()
 
         # Check for update
-        data = utils.get_data()
-        config = utils.get_config()
+        data = Data().get_data()
+        config = Config().get_config()
         latest_version = data.latest_version
         changelog_md = data.changelog
 
@@ -57,17 +58,18 @@ class Thread(QThread):  # pylint: disable=R0903
             data.latest_update_check = current_date
             data.latest_version = latest_version
             data.changelog = changelog_md
-            utils.update_data(data)
+            Data().update_data(data)
 
-        if latest_version not in (utils.current_version, config.skip_update):
+        utility = Utility()
+        if latest_version not in (utility.current_version, config.skip_update):
             self.update_found.emit(latest_version, changelog_md)
 
         # Check whether AutoHotkey is installed
-        if not os.path.exists(utils.ahkv2_dir):
+        if not os.path.exists(utility.ahkv2_dir):
             self.ahk_not_installed.emit()
 
         # Whether to show announcement or not
-        if utils.get_config().show_announcement:
+        if Config().get_config().show_announcement:
             self.show_announcement.emit()
 
         # Check AHI necessary file

@@ -31,7 +31,9 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QVBoxLayout,
 )
 
-from keytik.utility import constant, style, utils
+from keytik.utility import constant
+from keytik.utility.style import Styling
+from keytik.utility.utils import Utility
 
 
 class SelectDevice:
@@ -51,17 +53,19 @@ class SelectDevice:
             return
 
         # Run device finder first
-        os.startfile(utils.device_finder_path)
-        time.sleep(1)
+        device_list_path = os.path.join(
+            Utility().active_dir, "Autohotkey Interception", "shared_device_info.txt"
+        )
+        devices = self.refresh_device_list(device_list_path)
 
         device_selection_window = QDialog(parent)
         device_selection_window.setWindowTitle("Select Device")
         device_selection_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = style.get_geometry(parent, 620, 300)
+        geometry = Styling().get_geometry(parent, 620, 300)
         device_selection_window.setGeometry(geometry)
         device_selection_window.setModal(True)
         device_selection_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        style.apply_mica(device_selection_window)
+        Styling().apply_mica(device_selection_window)
 
         main_layout = QVBoxLayout(device_selection_window)
 
@@ -84,13 +88,10 @@ class SelectDevice:
 
         refresh_button = QPushButton("Refresh", device_selection_window)
         refresh_button.clicked.connect(
-            lambda: self.update_treeview(
-                self.refresh_device_list(utils.device_list_path), device_tree
-            )
+            lambda: self.update_treeview(self.refresh_device_list(device_list_path), device_tree)
         )
         button_layout.addWidget(refresh_button)
 
-        devices = self.refresh_device_list(utils.device_list_path)
         self.update_treeview(devices, device_tree)
 
         device_selection_window.exec()
@@ -123,10 +124,12 @@ class SelectDevice:
 
     def refresh_device_list(self, file_path):
         """Rerun find_device.ahk to refresh device."""
-        os.startfile(utils.device_finder_path)
+        device_finder_path = os.path.join(
+            Utility().active_dir, "Autohotkey Interception", "find_device.ahk"
+        )
+        os.startfile(device_finder_path)
         time.sleep(1)
-        devices = self.parse_device_info(file_path)
-        return devices
+        return self.parse_device_info(file_path)
 
     def parse_device_info(self, file_path):
         """Parse device VID/PID or handle for device binding."""

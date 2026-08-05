@@ -23,27 +23,30 @@ from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.dashboard.dashboard_ui import DashboardUI
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_ui import SettingAbout
-from keytik.utility import style, thread, utils
+from keytik.utility import thread
+from keytik.utility.style import Palette, Styling
+from keytik.utility.utils import Config
 
 
 def main():
     """Main function."""
     # Set Appearance
-    config = utils.get_config()
+    config = Config().get_config()
     style_config = config.style
     theme = config.theme
 
     # Set normal dark and light theme
-    if theme == "light" or style.IS_BASE_LIGHT:
+    palette_comp = Palette()
+    if theme == "light" or palette_comp.isbase_light:
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=1"
-    elif theme == "dark" or not style.IS_BASE_LIGHT:
+    elif theme == "dark" or not palette_comp.isbase_light:
         os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=2"
 
     app = QApplication(sys.argv)
     app.setStyle(style_config)
-    app.setPalette(style.PALETTE)
+    app.setPalette(palette_comp.get_palette())
     # Set accent button highlight stylesheet
-    app.setStyleSheet(style.get_global_stylesheet())
+    app.setStyleSheet(Styling().get_global_stylesheet())
 
     main_window = DashboardUI()
     main_window.show()

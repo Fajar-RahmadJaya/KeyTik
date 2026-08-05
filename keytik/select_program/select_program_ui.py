@@ -27,7 +27,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.select_program.select_program_core import SelectProgramCore
-from keytik.utility import constant, style
+from keytik.utility import constant
+from keytik.utility.style import Styling
 
 
 class SelectProgramUI:
@@ -45,18 +46,18 @@ class SelectProgramUI:
         select_program_window = QDialog(parent)
         select_program_window.setWindowTitle("Select Programs")
         select_program_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = style.get_geometry(parent, 620, 300)
+        geometry = Styling().get_geometry(parent, 620, 300)
         select_program_window.setGeometry(geometry)
         select_program_window.setModal(True)
         select_program_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        style.apply_mica(select_program_window)
+        Styling().apply_mica(select_program_window)
 
         main_layout = QVBoxLayout(select_program_window)
 
         self.program_tree = QTreeWidget(select_program_window)
         self.program_tree.setHeaderLabels(["Window Title", "Class", "Process"])
         self.program_tree.setSortingEnabled(True)
-        self.program_tree.setStyleSheet(style.TREEVIEW)
+        self.program_tree.setStyleSheet(Styling.TREEVIEW)
         self.program_tree.setIndentation(20)
         main_layout.addWidget(self.program_tree)
 

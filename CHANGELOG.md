@@ -16,3 +16,5 @@
 - Fix multi scan code parsing "~"
 - Fix text format sending incorrect string
 - Fix normal click is written on double click
+- Fix change profile directory error
+- Fix can't add profile to startup error

@@ -208,21 +208,16 @@ class Data:
 class Utility:
     """Program utility."""
 
+    active_dir = os.path.join(Config().get_config().profile_path, "Active")
+    store_dir = os.path.join(Config().get_config().profile_path, "Store")
+    if not os.path.exists(active_dir):
+        os.makedirs(active_dir)
+
+    if not os.path.exists(store_dir):
+        os.makedirs(store_dir)
+
     def __init__(self):
         self.program_name, self.current_version = self.get_metadata()
-
-        self.active_dir = os.path.join(Config().get_config().profile_path, "Active")
-        self.store_dir = os.path.join(Config().get_config().profile_path, "Store")
-
-        if not os.path.exists(self.active_dir):
-            os.makedirs(self.active_dir)
-
-        if not os.path.exists(self.store_dir):
-            os.makedirs(self.store_dir)
-
-        if not os.path.exists(constant.appdata_dir):
-            os.makedirs(constant.appdata_dir)
-
         self.ahkv2_dir = os.path.join(
             self.get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2"
         )

@@ -400,7 +400,6 @@ class DashboardCore(QObject):
 
         del shell
 
-        self.update_script_signal.emit()
         return shortcut_path
 
     def remove_ahk_from_startup(self, script_name):
@@ -411,8 +410,6 @@ class DashboardCore(QObject):
 
         try:
             os.remove(shortcut_path)
-
-            self.update_script_signal.emit()
 
         except NotADirectoryError as e:
             print(f"Error removing {shortcut_path}: {e}")

@@ -419,9 +419,9 @@ class DashboardUI(QMainWindow):
         else:
             startup_button.setChecked(False)
 
-        def build_button():
+        def build_button(checked: bool):
             """Buid button configuration bassed on check state."""
-            if self.is_startup(script):
+            if checked:
                 font = startup_button.font()
                 font.setPointSize(8)
                 startup_button.setFont(font)
@@ -441,14 +441,16 @@ class DashboardUI(QMainWindow):
 
         def button_event():
             """Call appropriate function based on check state."""
-            if startup_button.isChecked():
-                self.dashboard_core.remove_ahk_from_startup(script)
-                build_button()
-            else:
-                self.dashboard_core.add_ahk_to_startup(script)
-                build_button()
+            ischecked = startup_button.isChecked()
 
-        build_button()
+            if ischecked:
+                self.dashboard_core.add_ahk_to_startup(script)
+            else:
+                self.dashboard_core.remove_ahk_from_startup(script)
+
+            build_button(ischecked)
+
+        build_button(self.is_startup(script))
         startup_button.clicked.connect(button_event)
 
         return startup_button

@@ -214,12 +214,12 @@ def get_metadata():
         with open(constant.meta_path, encoding="utf-8") as data_file:
             value = json.load(data_file)
             name = value.get("name", "KeyTik")
-            version = value.get("version") or "Unkown"
+            version = value.get("version") or "Unknown"
         return name, version
 
     except (json.JSONDecodeError, FileNotFoundError) as error:
         print(f"Error: {error}")
-    return "KeyTik", "Unkown"
+    return "KeyTik", "Unknown"
 
 
 program_name, current_version = get_metadata()
@@ -236,10 +236,6 @@ if not os.path.exists(store_dir):
 if not os.path.exists(constant.appdata_dir):
     os.makedirs(constant.appdata_dir)
 
-device_list_path = os.path.join(active_dir, "Autohotkey Interception", "shared_device_info.txt")
-device_finder_path = os.path.join(active_dir, "Autohotkey Interception", "find_device.ahk")
-coordinate_path = os.path.join(active_dir, "Autohotkey Interception", "Coordinate.ahk")
-
 
 def get_ahk_install_dir():
     """Get AutoHotkey installation directory in case not installed via other method."""
@@ -254,9 +250,4 @@ def get_ahk_install_dir():
     return None
 
 
-ahk_uninstall_path = os.path.join(
-    get_ahk_install_dir() or r"C:\Program Files\AutoHotkey",
-    "UX",
-    "ui-uninstall.ahk",
-)
 ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")

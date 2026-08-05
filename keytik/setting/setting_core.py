@@ -228,9 +228,15 @@ class SettingCore:
 
     def ahk_action(self, ahk_installed):
         """Uninstall AutoHotkey."""
+        ahk_uninstall_path = os.path.join(
+            utils.get_ahk_install_dir() or r"C:\Program Files\AutoHotkey",
+            "UX",
+            "ui-uninstall.ahk",
+        )
+
         if ahk_installed:
             try:
-                subprocess.run(utils.ahk_uninstall_path, shell=True, check=True)
+                subprocess.run(ahk_uninstall_path, shell=True, check=True)
 
             except FileNotFoundError:
                 QMessageBox.critical(

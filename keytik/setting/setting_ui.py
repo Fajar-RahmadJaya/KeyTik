@@ -46,7 +46,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_core import SettingCore
-from keytik.utility import constant, diff, style
+from keytik.utility import constant, diff
+from keytik.utility.style import Mica, Palette, Styling
 from keytik.utility.utils import Config, Data, Utility
 
 
@@ -66,7 +67,7 @@ class SettingTemplate:
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
         card_frame.setObjectName("setting")
-        card_frame.setStyleSheet(style.card("setting"))
+        card_frame.setStyleSheet(Styling().card("setting"))
 
         card_layout = QHBoxLayout(card_frame)
         card_layout.setContentsMargins(16, 16, 16, 16)
@@ -74,7 +75,7 @@ class SettingTemplate:
         if heading and subheading:
             theme_label = QLabel(
                 f"<div style='font-size:13px; margin-bottom:2px'> {heading} </div>"
-                f""" <div style='font-size:11px; color: {style.palette_role.subtext};'>
+                f""" <div style='font-size:11px; color: {Palette().get_palette_role().subtext};'>
                 {subheading} </div>"""
             )
 
@@ -125,10 +126,10 @@ class SettingUI:
         """Setting window."""
         settings_window = QDialog(parent)
         settings_window.setWindowTitle("Settings")
-        geometry = style.get_geometry(parent, 600, 400)
+        geometry = Styling().get_geometry(parent, 600, 400)
         settings_window.setGeometry(geometry)
         settings_window.setWindowIcon(QIcon(constant.icon_path))
-        style.apply_mica(settings_window)
+        Mica().apply_mica(settings_window)
 
         setting_layout = QVBoxLayout(settings_window)
         setting_layout.setContentsMargins(12, 12, 12, 12)
@@ -185,7 +186,7 @@ class SettingUI:
         pro_upgrade_button.clicked.connect(
             lambda: webbrowser.open("https://fajarrahmadjaya.gumroad.com/l/keytik-pro")
         )
-        pro_upgrade_button.setObjectName(style.button_highlight())
+        pro_upgrade_button.setObjectName(Styling().button_highlight())
 
         pro_upgrade_layout, pro_upgrade_frame = self.setting_template.setting_card(
             heading="KeyTik Pro", subheading="Pro version available at $20"
@@ -227,7 +228,7 @@ class SettingAppearance:
         appearance_layout.addWidget(self.accent(settings_window))
 
         # Mica Effect
-        if style.mica_supported:
+        if Mica.MICA_SUPPORTED:
             appearance_layout.addWidget(self.mica_effect(settings_window))
 
         return appearance_widget
@@ -639,9 +640,9 @@ class SettingAbout:
             window.setWindowTitle(f"New version of {utility.program_name} is available")
         else:
             window.setWindowTitle("Changelog")
-        window.setGeometry(style.get_geometry(parent, 520, 360))
+        window.setGeometry(Styling().get_geometry(parent, 520, 360))
         window.setWindowIcon(QIcon(constant.icon_path))
-        style.apply_mica(window)
+        Mica().apply_mica(window)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(16, 16, 16, 16)
@@ -678,9 +679,9 @@ class SettingAbout:
         text_edit.document().setDocumentMargin(8)
         text_edit.document().setIndentWidth(20)
 
-        if Config().get_config().mica_effect != "disable" and style.mica_supported:
+        if Config().get_config().mica_effect != "disable" and Mica.MICA_SUPPORTED:
             text_edit.setStyleSheet(
-                f"#ChangelogText {{background-color: {style.palette_role.base_rgba}}}"
+                f"#ChangelogText {{background-color: {Palette().get_palette_role().base_rgba}}}"
             )
 
         version_indicator = "Latest" if not unreleased else "Upcoming"
@@ -696,7 +697,7 @@ class SettingAbout:
     def update_button(self, window: QDialog):
         """Retrun update button opening update link."""
         button = QPushButton()
-        button.setObjectName(style.button_highlight())
+        button.setObjectName(Styling().button_highlight())
         button.setText("Update now")
         button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         button.setFocusPolicy(Qt.FocusPolicy.NoFocus)

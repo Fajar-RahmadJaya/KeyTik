@@ -33,7 +33,8 @@ from keytik.profile_manager.parse_script import ParseScript
 from keytik.profile_mode.key_listening import KeyListening
 from keytik.profile_mode.shared_row import SharedRow
 from keytik.select_key.select_key_ui import SelectKeyUI
-from keytik.utility import icons, style
+from keytik.utility import icons
+from keytik.utility.style import Palette, Styling
 
 
 class RemapObject:  # pylint: disable=R0903
@@ -58,6 +59,7 @@ class DefaultMode:
         # Composition
         self.select_key_ui = SelectKeyUI()
         self.shared_row = SharedRow()
+        self.styling = Styling()
 
         # Variables
         self.remap_frame = None
@@ -141,12 +143,12 @@ class DefaultMode:
 
         default_key_label = QLabel("Default Key")
         default_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        default_key_label.setStyleSheet(style.PROFILE_ROW_LABEL)
+        default_key_label.setStyleSheet(self.styling.PROFILE_ROW_LABEL)
         remap_label_layout.addWidget(default_key_label, 0, 0, 1, 2)
 
         remap_key_label = QLabel("Remap Key")
         remap_key_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        remap_key_label.setStyleSheet(style.PROFILE_ROW_LABEL)
+        remap_key_label.setStyleSheet(self.styling.PROFILE_ROW_LABEL)
         remap_label_layout.addWidget(remap_key_label, 0, 2, 1, 2)
 
         return remap_label_widget
@@ -157,7 +159,7 @@ class DefaultMode:
         self.remap_frame = QFrame()
         self.remap_frame.setObjectName("RemapRowWidget")
         self.remap_frame.setFrameShape(QFrame.NoFrame)
-        self.remap_frame.setStyleSheet(style.card())
+        self.remap_frame.setStyleSheet(self.styling.card())
         self.remap_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
 
         card_layout = QGridLayout(self.remap_frame)
@@ -277,7 +279,7 @@ class DefaultMode:
         content_widget.setObjectName("OptionContent")
         content_widget.setStyleSheet(f"""
         QWidget#OptionContent {{
-            background-color: {style.palette_role.surface};
+            background-color: {Palette().get_palette_role().surface};
         }}
         """)
         content_layout = QHBoxLayout()
@@ -312,43 +314,45 @@ class DefaultMode:
 
         default_header, default_header_icon = self.option_header_button("Default Key Option")
         default_header_icon.setPixmap(keyboard_arrow_down)
-        default_header.setStyleSheet(style.option_header_style())
+        default_header.setStyleSheet(self.styling.option_header_style())
         layout.addWidget(default_header)
 
         vertical_separator = QWidget()
-        vertical_separator.setStyleSheet(f"background-color: {style.palette_role.surface}")
+        vertical_separator.setStyleSheet(
+            f"background-color: {Palette().get_palette_role().surface}"
+        )
         vertical_separator.setFixedWidth(3)
         vertical_separator.setFixedHeight(20)
         layout.addWidget(vertical_separator)
 
         remap_header, remap_header_icon = self.option_header_button("Remap Key Option")
         remap_header_icon.setPixmap(keyboard_arrow_down)
-        remap_header.setStyleSheet(style.option_header_style())
+        remap_header.setStyleSheet(self.styling.option_header_style())
         layout.addWidget(remap_header)
 
         def default_click_event(ischecked: bool):
             """Change default option button stylesheet and show default content."""
             if ischecked:
                 default_header_icon.setPixmap(keyboard_arrow_up)
-                default_header.setStyleSheet(style.option_header_style(isclicked=True))
+                default_header.setStyleSheet(self.styling.option_header_style(isclicked=True))
                 default_option_content.setHidden(False)
                 remap_click_event(False)
             else:
                 default_header_icon.setPixmap(keyboard_arrow_down)
                 default_header.setChecked(False)
-                default_header.setStyleSheet(style.option_header_style())
+                default_header.setStyleSheet(self.styling.option_header_style())
                 default_option_content.setHidden(True)
 
         def remap_click_event(ischecked: bool):
             if ischecked:
                 remap_header_icon.setPixmap(keyboard_arrow_up)
-                remap_header.setStyleSheet(style.option_header_style(isclicked=True))
+                remap_header.setStyleSheet(self.styling.option_header_style(isclicked=True))
                 remap_option_content.setHidden(False)
                 default_click_event(False)
             else:
                 remap_header_icon.setPixmap(keyboard_arrow_down)
                 remap_header.setChecked(False)
-                remap_header.setStyleSheet(style.option_header_style())
+                remap_header.setStyleSheet(self.styling.option_header_style())
                 remap_option_content.setHidden(True)
 
         default_header.clicked.connect(lambda: default_click_event(default_header.isChecked()))

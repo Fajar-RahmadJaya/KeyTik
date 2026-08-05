@@ -31,7 +31,8 @@ from keytik.profile_manager.parse_script import ParseScript
 from keytik.profile_mode.key_listening import KeyListening
 from keytik.profile_mode.shared_row import SharedRow
 from keytik.select_key.select_key_ui import SelectKeyUI
-from keytik.utility import icons, style
+from keytik.utility import icons
+from keytik.utility.style import Palette, Styling
 
 
 class ShortcutRow:
@@ -104,7 +105,7 @@ class ShortcutRow:
         layout.setSpacing(0)
         widget.setLayout(layout)
 
-        palette = style.get_palette()
+        palette = Palette().get_palette()
         hover_palette = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Midlight)
 
         header_button = QPushButton()
@@ -112,7 +113,7 @@ class ShortcutRow:
         header_button.setStyleSheet(f"""
         QPushButton{{
             border: none;
-            {style.PROFILE_ROW_LABEL}
+            {Styling.PROFILE_ROW_LABEL}
         }}
 
         QPushButton:hover {{
@@ -159,7 +160,7 @@ class ShortcutRow:
         """Shortcuts row tittle label."""
         shortcut_label = QLabel("Shortcut")
         shortcut_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        shortcut_label.setStyleSheet(style.PROFILE_ROW_LABEL)
+        shortcut_label.setStyleSheet(Styling.PROFILE_ROW_LABEL)
         return shortcut_label
 
     def shortcut_card(self, parent_window, parsed_shortcut=None):
@@ -167,7 +168,7 @@ class ShortcutRow:
         # Card frame
         shortcut_card_frame = QFrame()
         shortcut_card_frame.setFrameShape(QFrame.NoFrame)
-        shortcut_card_frame.setStyleSheet(style.card())
+        shortcut_card_frame.setStyleSheet(Styling().card())
 
         card_layout = QVBoxLayout(shortcut_card_frame)
         card_layout.setContentsMargins(8, 8, 8, 8)

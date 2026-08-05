@@ -30,7 +30,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
-from keytik.utility import constant, style
+from keytik.utility import constant
+from keytik.utility.style import Mica, Palette, Styling
 from keytik.utility.utils import Config, Utility
 
 
@@ -120,8 +121,9 @@ class SettingCore:
             Config().update_config(config)
 
             # Apply palette directly when theme is in the same default color
-            palette = style.get_palette()
-            base_light = style.is_light(palette.color(QPalette.Base))
+            palette_comp = Palette()
+            palette = palette_comp.get_palette()
+            base_light = palette_comp.is_light(palette.color(QPalette.Base))
             default_theme_light = os.environ.get("QT_QPA_PLATFORM") == "windows:darkmode=1"
 
             # Palette with different default theme need restart
@@ -148,7 +150,7 @@ class SettingCore:
                 # Set palette
                 QApplication.setPalette(palette)
                 QApplication.setStyleSheet(
-                    QApplication.instance(), style.button_highlight(style_sheet=True)
+                    QApplication.instance(), Styling().button_highlight(style_sheet=True)
                 )
 
         except FileNotFoundError as error:
@@ -162,9 +164,9 @@ class SettingCore:
             Config().update_config(config)
 
             # Update accent palette and button highlight stylesheet
-            QApplication.setPalette(style.get_palette())
+            QApplication.setPalette(Palette().get_palette())
             QApplication.setStyleSheet(
-                QApplication.instance(), style.button_highlight(style_sheet=True)
+                QApplication.instance(), Styling().button_highlight(style_sheet=True)
             )
 
         except FileNotFoundError as error:
@@ -210,10 +212,11 @@ class SettingCore:
                 if response == QMessageBox.StandardButton.Yes:
                     self.restart_app()
             else:
+                mica = Mica()
                 # Apply mica on setting window
-                style.apply_mica(parent)
+                mica.apply_mica(parent)
                 # Apply mica on main window
-                style.apply_mica(parent.window().parentWidget())
+                mica.apply_mica(parent.window().parentWidget())
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent, "Error", f"Failed to change style\n{error}")

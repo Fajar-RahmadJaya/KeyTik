@@ -37,7 +37,8 @@ from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.profile_ui import ProfileUI
 from keytik.profile_mode.text_mode import TextMode
 from keytik.setting.setting_ui import SettingUI
-from keytik.utility import constant, icons, style
+from keytik.utility import constant, icons
+from keytik.utility.style import Mica, Palette, Styling
 from keytik.utility.utils import Utility
 
 
@@ -87,7 +88,7 @@ class DashboardUI(QMainWindow):
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        style.apply_mica(self)
+        Mica().apply_mica(self)
 
         # Startup
         self.create_ui()
@@ -180,7 +181,7 @@ class DashboardUI(QMainWindow):
         button_layout.addWidget(dummy_left, 0, 3)
 
         create_button = QPushButton(" Create New Profile")
-        create_button.setObjectName(style.button_highlight())
+        create_button.setObjectName(Styling().button_highlight())
         create_button.setIcon(icons.get_icon(icons.plus, highlighted=True))
         create_button.setFixedWidth(152)
         create_button.setFixedHeight(36)
@@ -226,7 +227,7 @@ class DashboardUI(QMainWindow):
         card_widget.setLayout(layout)
 
         group_box = QGroupBox(os.path.splitext(script)[0])
-        group_box.setStyleSheet(style.GROUP_BOX)
+        group_box.setStyleSheet(Styling().group_box)
         layout.addWidget(group_box, 0, 0, 1, 3)
 
         group_layout = QGridLayout(group_box)
@@ -290,7 +291,7 @@ class DashboardUI(QMainWindow):
         button.setStyleSheet(f"""
         QToolButton#PeekButton {{
                 border-radius: {button.size().height() / 2};
-                background-color: {style.palette_role.surface};
+                background-color: {Palette().get_palette_role().surface};
         }}
         """)
 

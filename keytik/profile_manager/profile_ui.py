@@ -44,7 +44,8 @@ from keytik.profile_mode.shortcut_row import ShortcutRow
 from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
 from keytik.select_program.select_program_ui import SelectProgramUI
-from keytik.utility import constant, diff, style
+from keytik.utility import constant, diff
+from keytik.utility.style import Mica, Styling
 
 
 class ProfileUI:
@@ -88,9 +89,9 @@ class ProfileUI:
         first_line = lines[0].strip()
 
         self.edit_window.setWindowIcon(QIcon(constant.icon_path))
-        geometry = style.get_geometry(parent, 640, 480)
+        geometry = Styling().get_geometry(parent, 640, 480)
         self.edit_window.setGeometry(geometry)
-        style.apply_mica(self.edit_window)
+        Mica().apply_mica(self.edit_window)
 
         edit_layout = QGridLayout(self.edit_window)
         edit_layout.setContentsMargins(30, 10, 30, 10)

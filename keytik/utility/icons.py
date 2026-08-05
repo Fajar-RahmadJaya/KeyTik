@@ -27,7 +27,8 @@ from PySide6.QtGui import (  # pylint: disable=E0611
 from PySide6.QtSvg import QSvgRenderer  # pylint: disable=E0611
 from PySide6.QtWidgets import QApplication  # pylint: disable=E0611
 
-from keytik.utility import constant, style
+from keytik.utility import constant
+from keytik.utility.style import Palette
 
 icon_cache = {}
 
@@ -37,7 +38,7 @@ def get_icon(path, highlighted=False) -> QIcon:
     # Get palette
     palette = QApplication.palette()
     text_palette = palette.color(QPalette.Text)
-    invert_text_palette = style.invert_color(text_palette)
+    invert_text_palette = Palette().invert_color(text_palette)
     color = invert_text_palette.name() if highlighted else text_palette.name()
 
     # Apply color

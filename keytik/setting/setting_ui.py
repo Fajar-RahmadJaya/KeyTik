@@ -388,7 +388,7 @@ class SettingGeneral:
         general_layout.addWidget(general_label)
 
         # Profile Location
-        general_layout.addWidget(self.profile_location(settings_window=()))
+        general_layout.addWidget(self.profile_location(settings_window))
 
         # Announcement
         general_layout.addWidget(self.announcement(settings_window))

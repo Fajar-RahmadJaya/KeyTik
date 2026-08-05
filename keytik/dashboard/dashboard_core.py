@@ -32,8 +32,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 from win32com.client import Dispatch
 
-from keytik.utility import constant, icons, utils
-from keytik.utility.utils import Config
+from keytik.utility import constant, icons
+from keytik.utility.utils import Config, Utility
 
 
 class DashboardCore(QObject):
@@ -43,8 +43,10 @@ class DashboardCore(QObject):
 
     def __init__(self):
         super().__init__()
+        self.utility = Utility()
+
         # UI initialization
-        self.script_dir = utils.active_dir
+        self.script_dir = self.utility.active_dir
 
         # Variable
         self.current_page = 0
@@ -242,10 +244,10 @@ class DashboardCore(QObject):
 
     def activate_script(self, script_name):
         """Run profile."""
-        if os.path.isfile(os.path.join(utils.active_dir, script_name)):
-            script_path = os.path.join(utils.active_dir, script_name)
+        if os.path.isfile(os.path.join(self.utility.active_dir, script_name)):
+            script_path = os.path.join(self.utility.active_dir, script_name)
         else:
-            script_path = os.path.join(utils.store_dir, script_name)
+            script_path = os.path.join(self.utility.store_dir, script_name)
 
         if os.path.isfile(script_path):
             os.startfile(script_path)
@@ -256,10 +258,10 @@ class DashboardCore(QObject):
 
     def exit_script(self, script_name):
         """Exit profile."""
-        if os.path.isfile(os.path.join(utils.active_dir, script_name)):
-            script_path = os.path.join(utils.active_dir, script_name)
+        if os.path.isfile(os.path.join(self.utility.active_dir, script_name)):
+            script_path = os.path.join(self.utility.active_dir, script_name)
         else:
-            script_path = os.path.join(utils.store_dir, script_name)
+            script_path = os.path.join(self.utility.store_dir, script_name)
 
         if os.path.isfile(script_path):
             exit_keys = Config().get_config().exit_key
@@ -292,7 +294,11 @@ class DashboardCore(QObject):
     def store_script(self, script_name):
         """Move profile to store directory."""
         script_path = os.path.join(self.script_dir, script_name)
-        target_dir = utils.store_dir if self.script_dir == utils.active_dir else utils.active_dir
+        target_dir = (
+            self.utility.store_dir
+            if self.script_dir == self.utility.active_dir
+            else self.utility.active_dir
+        )
 
         target_path = os.path.join(target_dir, script_name)
 
@@ -311,12 +317,12 @@ class DashboardCore(QObject):
 
     def toggle_script_dir(self, show_stored):
         """Change current directory based on store/active profile."""
-        if self.script_dir == utils.active_dir:
-            self.script_dir = utils.store_dir
+        if self.script_dir == self.utility.active_dir:
+            self.script_dir = self.utility.store_dir
             show_stored.setToolTip("Show Active Profile")
             show_stored.setIcon(icons.get_icon(icons.show_stored_fill))
         else:
-            self.script_dir = utils.active_dir
+            self.script_dir = self.utility.active_dir
             show_stored.setToolTip("Show Stored Profile")
             show_stored.setIcon(icons.get_icon(icons.show_stored))
 
@@ -413,7 +419,7 @@ class DashboardCore(QObject):
 
     def check_ahi_dir(self):
         """Make sure AutoHotkey Interception folder is in active profile folder."""
-        target_folder = os.path.join(utils.active_dir, "AutoHotkey Interception")
+        target_folder = os.path.join(self.utility.active_dir, "AutoHotkey Interception")
 
         def get_all_relative_paths(base_dir):
             rel_paths = set()

@@ -46,8 +46,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_core import SettingCore
-from keytik.utility import constant, diff, style, utils
-from keytik.utility.utils import Config, Data
+from keytik.utility import constant, diff, style
+from keytik.utility.utils import Config, Data, Utility
 
 
 class SettingCombobox(QComboBox):  # pylint: disable=R0903
@@ -118,6 +118,7 @@ class SettingUI:
         # Composition
         self.setting_core = SettingCore()
         self.setting_template = SettingTemplate()
+        self.utility = Utility()
 
     # ------------------------------ Window ------------------------------
     def setting_window(self, parent):
@@ -148,7 +149,7 @@ class SettingUI:
         content_layout.setContentsMargins(8, 8, 8, 8)
 
         # Pro Version
-        if utils.program_name != "KeyTik Pro":
+        if Utility().program_name != "KeyTik Pro":
             content_layout.addWidget(self.pro_version())
 
         # Appearance
@@ -491,7 +492,7 @@ class SettingInstallation:
 
     def ahk_installation(self):
         """AutoHotkey Installation Widget."""
-        ahk_installed = os.path.exists(utils.ahkv2_dir)
+        ahk_installed = os.path.exists(Utility().ahkv2_dir)
 
         ahk_button = self.setting_template.setting_button()
         ahk_button.setText("Uninstall AutoHotkey" if ahk_installed else "Install AutoHotkey")
@@ -563,7 +564,7 @@ class SettingAbout:
     def version(self):
         """Check for Update Widget."""
         layout, frame = self.setting_template.setting_card(
-            heading="Version", subheading=utils.current_version
+            heading="Version", subheading=Utility().current_version
         )
 
         button = self.setting_template.setting_button()
@@ -574,7 +575,7 @@ class SettingAbout:
             data = Data().get_data()
             latest_version = data.latest_version
 
-            if latest_version != utils.current_version:
+            if latest_version != Utility().current_version:
                 self.update_changelog()
             else:
                 QMessageBox.information(
@@ -631,10 +632,11 @@ class SettingAbout:
             changelog_md = data.changelog
 
         window = QDialog(parent)
+        utility = Utility()
         if unreleased:
             window.setWindowTitle("Upcoming Changelog")
-        elif new_version != utils.current_version:
-            window.setWindowTitle(f"New version of {utils.program_name} is available")
+        elif new_version != utility.current_version:
+            window.setWindowTitle(f"New version of {utility.program_name} is available")
         else:
             window.setWindowTitle("Changelog")
         window.setGeometry(style.get_geometry(parent, 520, 360))
@@ -684,7 +686,7 @@ class SettingAbout:
         version_indicator = "Latest" if not unreleased else "Upcoming"
         text_edit.setMarkdown(
             "## What's Changed\n\n"
-            f"`{version_indicator}: {new_version} - Current: {utils.current_version}`\n"
+            f"`{version_indicator}: {new_version} - Current: {Utility().current_version}`\n"
             "\n---\n\n"
             f"{changelog_md.replace('## Changelog', '')}"
         )

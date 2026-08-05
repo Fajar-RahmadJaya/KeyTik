@@ -31,7 +31,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QVBoxLayout,
 )
 
-from keytik.utility import constant, style, utils
+from keytik.utility import constant, style
+from keytik.utility.utils import Utility
 
 
 class SelectDevice:
@@ -52,7 +53,7 @@ class SelectDevice:
 
         # Run device finder first
         device_list_path = os.path.join(
-            utils.active_dir, "Autohotkey Interception", "shared_device_info.txt"
+            Utility().active_dir, "Autohotkey Interception", "shared_device_info.txt"
         )
         devices = self.refresh_device_list(device_list_path)
 
@@ -123,7 +124,7 @@ class SelectDevice:
     def refresh_device_list(self, file_path):
         """Rerun find_device.ahk to refresh device."""
         device_finder_path = os.path.join(
-            utils.active_dir, "Autohotkey Interception", "find_device.ahk"
+            Utility().active_dir, "Autohotkey Interception", "find_device.ahk"
         )
         os.startfile(device_finder_path)
         time.sleep(1)

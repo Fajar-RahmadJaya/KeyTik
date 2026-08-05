@@ -37,7 +37,8 @@ from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.profile_ui import ProfileUI
 from keytik.profile_mode.text_mode import TextMode
 from keytik.setting.setting_ui import SettingUI
-from keytik.utility import constant, icons, style, utils
+from keytik.utility import constant, icons, style
+from keytik.utility.utils import Utility
 
 
 class PeekButton(QToolButton):
@@ -81,7 +82,7 @@ class DashboardUI(QMainWindow):
         self.dashboard_core.update_script_signal.connect(self.update_script_list)
 
         # UI initialization
-        self.setWindowTitle(utils.program_name)
+        self.setWindowTitle(Utility().program_name)
         self.setFixedSize(660, 500)
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()
@@ -473,12 +474,14 @@ class DashboardUI(QMainWindow):
 
     def store_button(self, script):
         """Profile card store button."""
+        utility = Utility()
+
         store_button = QPushButton(
-            " Store" if self.dashboard_core.script_dir == utils.active_dir else " Restore"
+            " Store" if self.dashboard_core.script_dir == utility.active_dir else " Restore"
         )
         store_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         store_button.setIcon(icons.get_icon(icons.store))
-        if self.dashboard_core.script_dir == utils.active_dir:
+        if self.dashboard_core.script_dir == utility.active_dir:
             store_button.setToolTip(f'Hide "{os.path.splitext(script)[0]}"')
         else:
             store_button.setToolTip(f'Unhide "{os.path.splitext(script)[0]}"')

@@ -205,47 +205,49 @@ class Data:
             print(f"Error: {error}")
 
 
-# ------------------------------ Metadata ------------------------------
-def get_metadata():
-    """Get program metadata.."""
-    try:
-        with open(constant.meta_path, encoding="utf-8") as data_file:
-            value = json.load(data_file)
-            name = value.get("name", "KeyTik")
-            version = value.get("version") or "Unknown"
-        return name, version
+class Utility:
+    """Program utility."""
 
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return "KeyTik", "Unknown"
+    def __init__(self):
+        self.program_name, self.current_version = self.get_metadata()
 
+        self.active_dir = os.path.join(Config().get_config().profile_path, "Active")
+        self.store_dir = os.path.join(Config().get_config().profile_path, "Store")
 
-program_name, current_version = get_metadata()
+        if not os.path.exists(self.active_dir):
+            os.makedirs(self.active_dir)
 
-active_dir = os.path.join(Config().get_config().profile_path, "Active")
-store_dir = os.path.join(Config().get_config().profile_path, "Store")
+        if not os.path.exists(self.store_dir):
+            os.makedirs(self.store_dir)
 
-if not os.path.exists(active_dir):
-    os.makedirs(active_dir)
+        if not os.path.exists(constant.appdata_dir):
+            os.makedirs(constant.appdata_dir)
 
-if not os.path.exists(store_dir):
-    os.makedirs(store_dir)
+        self.ahkv2_dir = os.path.join(
+            self.get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2"
+        )
 
-if not os.path.exists(constant.appdata_dir):
-    os.makedirs(constant.appdata_dir)
-
-
-def get_ahk_install_dir():
-    """Get AutoHotkey installation directory in case not installed via other method."""
-    reg_paths = [r"SOFTWARE\AutoHotkey", r"SOFTWARE\WOW6432Node\AutoHotkey"]
-    for reg_path in reg_paths:
+    def get_metadata(self):
+        """Get program metadata.."""
         try:
-            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
-                install_dir, _ = winreg.QueryValueEx(key, "InstallDir")
-                return install_dir
-        except FileNotFoundError:
-            continue
-    return None
+            with open(constant.meta_path, encoding="utf-8") as data_file:
+                value = json.load(data_file)
+                name = value.get("name", "KeyTik")
+                version = value.get("version") or "Unknown"
+            return name, version
 
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+        return "KeyTik", "Unknown"
 
-ahkv2_dir = os.path.join(get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2")
+    def get_ahk_install_dir(self):
+        """Get AutoHotkey installation directory in case not installed via other method."""
+        reg_paths = [r"SOFTWARE\AutoHotkey", r"SOFTWARE\WOW6432Node\AutoHotkey"]
+        for reg_path in reg_paths:
+            try:
+                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
+                    install_dir, _ = winreg.QueryValueEx(key, "InstallDir")
+                    return install_dir
+            except FileNotFoundError:
+                continue
+        return None

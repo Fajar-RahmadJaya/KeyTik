@@ -35,8 +35,8 @@ from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_mode.default_mode import RemapObject
 from keytik.profile_mode.profile_mode_core import ProfileModeCore
 from keytik.select_key.select_key_core import SelectKeyCore
-from keytik.utility import constant, utils
-from keytik.utility.utils import Config
+from keytik.utility import constant
+from keytik.utility.utils import Config, Utility
 
 
 @dataclass
@@ -269,7 +269,8 @@ cm1 := AHI.CreateContextManager(id1)\n
         """Make sure each script have different exit keys."""
         # Collect all ahk script from active and store dit
         ahk_files = set()
-        for ahk_path in [utils.active_dir, utils.store_dir]:
+        utility = Utility()
+        for ahk_path in [utility.active_dir, utility.store_dir]:
             if os.path.exists(ahk_path):
                 ahk_files.update(f for f in os.listdir(ahk_path) if f.endswith(".ahk"))
 
@@ -296,7 +297,8 @@ cm1 := AHI.CreateContextManager(id1)\n
     def is_valid_exit_key(self, script_name, exit_keys):
         """Check whether exit key is valid."""
         exit_combo = exit_keys[script_name]
-        for dir_path in [utils.active_dir, utils.store_dir]:
+        utility = Utility()
+        for dir_path in [utility.active_dir, utility.store_dir]:
             script_path = os.path.join(dir_path, script_name)
             if os.path.exists(script_path):
                 try:

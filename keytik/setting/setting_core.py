@@ -30,12 +30,15 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.dashboard.dashboard_core import DashboardCore
-from keytik.utility import constant, style, utils
-from keytik.utility.utils import Config
+from keytik.utility import constant, style
+from keytik.utility.utils import Config, Utility
 
 
 class SettingCore:
     """Setting logic."""
+
+    def __init__(self):
+        self.utility = Utility()
 
     def restart_app(self):
         """Run new instance and remove the old one."""
@@ -70,17 +73,17 @@ class SettingCore:
             new_active_dir = os.path.join(new_path, "Active")
             new_store_dir = os.path.join(new_path, "Store")
 
-            if os.path.exists(utils.active_dir):
-                shutil.move(utils.active_dir, new_path)
+            if os.path.exists(self.utility.active_dir):
+                shutil.move(self.utility.active_dir, new_path)
                 print(f"Moved Active folder to {new_path}")
             else:
-                print(f"Active folder does not exist at {utils.active_dir}")
+                print(f"Active folder does not exist at {self.utility.active_dir}")
 
-            if os.path.exists(utils.store_dir):
-                shutil.move(utils.store_dir, new_path)
+            if os.path.exists(self.utility.store_dir):
+                shutil.move(self.utility.store_dir, new_path)
                 print(f"Moved Store folder to {new_path}")
             else:
-                print(f"Store folder does not exist at {utils.store_dir}")
+                print(f"Store folder does not exist at {self.utility.store_dir}")
 
             # Save profile path to config
             config = Config().get_config()
@@ -89,10 +92,10 @@ class SettingCore:
 
             print(f"Updated condition.json with the new path: {new_path}")
 
-            utils.active_dir = new_active_dir
-            utils.store_dir = new_store_dir
-            print(f"Global active_dir updated to: {utils.active_dir}")
-            print(f"Global store_dir updated to: {utils.store_dir}")
+            self.utility.active_dir = new_active_dir
+            self.utility.store_dir = new_store_dir
+            print(f"Global active_dir updated to: {self.utility.active_dir}")
+            print(f"Global store_dir updated to: {self.utility.store_dir}")
 
             # Reactive script after move profile successfully
             for script in running_scripts:
@@ -131,8 +134,8 @@ class SettingCore:
                 messagebox.setWindowTitle("Success")
                 messagebox.setText(
                     f"Theme changed to {config.theme}. "
-                    f"Please restart {utils.program_name} to apply change.\n\n"
-                    f"Would you like to restart {utils.program_name}?",
+                    f"Please restart {self.utility.program_name} to apply change.\n\n"
+                    f"Would you like to restart {self.utility.program_name}?",
                 )
                 messagebox.setStandardButtons(
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -196,8 +199,8 @@ class SettingCore:
                 messagebox.setWindowTitle("Success")
                 messagebox.setText(
                     f"Mica effect changed to {new_mica}. "
-                    f"Please restart {utils.program_name} to apply change.\n\n"
-                    f"Would you like to restart {utils.program_name}?",
+                    f"Please restart {self.utility.program_name} to apply change.\n\n"
+                    f"Would you like to restart {self.utility.program_name}?",
                 )
                 messagebox.setStandardButtons(
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -230,7 +233,7 @@ class SettingCore:
     def ahk_action(self, ahk_installed):
         """Uninstall AutoHotkey."""
         ahk_uninstall_path = os.path.join(
-            utils.get_ahk_install_dir() or r"C:\Program Files\AutoHotkey",
+            self.utility.get_ahk_install_dir() or r"C:\Program Files\AutoHotkey",
             "UX",
             "ui-uninstall.ahk",
         )

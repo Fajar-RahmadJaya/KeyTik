@@ -25,7 +25,8 @@ import win32mica
 from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
 from PySide6.QtGui import QColor, QPalette  # pylint: disable=E0611
 
-from keytik.utility import constant, utils
+from keytik.utility import constant
+from keytik.utility.utils import Config
 
 
 # ---------------------------- Palatte ------------------------------
@@ -80,7 +81,7 @@ mica_supported = bool(sys.getwindowsversion().build >= WINDOWS_BUILD_NUMBER)
 
 def apply_mica(target_window):
     """Apply mica style on target window using win32mica."""
-    config = utils.get_config()
+    config = Config().get_config()
     mica_effect = config.mica_effect
     palette = get_palette()
     is_base_light = is_light(palette.color(QPalette.ColorRole.Base))
@@ -97,7 +98,7 @@ def apply_mica(target_window):
 
 def set_custom_palette(palette: QPalette):
     """Apply custom theme to QPalette."""
-    config = utils.get_config()
+    config = Config().get_config()
     theme_file = os.path.join(constant.theme_dir, config.theme + ".json")
 
     try:
@@ -129,7 +130,7 @@ def set_custom_palette(palette: QPalette):
 
 def set_accent(palette: QPalette):
     """Apply accent to QPalette."""
-    accent = utils.get_config().accent
+    accent = Config().get_config().accent
 
     if accent != "default":
         palette.setColor(QPalette.ColorRole.Accent, QColor(accent))
@@ -138,7 +139,7 @@ def set_accent(palette: QPalette):
 def get_palette() -> QPalette:
     """Set global appearance based on user config using palette and style."""
     # Variables
-    config = utils.get_config()
+    config = Config().get_config()
     theme_type = config.theme_type
     theme = config.theme
 
@@ -176,7 +177,7 @@ class _PaletteRole:
 
 def get_palette_role():
     """Get color palette on various theme."""
-    config = utils.get_config()
+    config = Config().get_config()
     theme = config.theme
     if theme == "light" or IS_BASE_LIGHT:
         surface = "rgba(255, 255, 255, 0.7)"
@@ -241,7 +242,7 @@ def get_geometry(parent_window, width, height):
 def get_global_stylesheet():
     """Get widget global stylesheet."""
     stylesheet = []
-    config = utils.get_config()
+    config = Config().get_config()
 
     global_treeview = f"""
     QTreeWidget {{

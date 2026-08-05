@@ -23,13 +23,14 @@ from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.dashboard.dashboard_ui import DashboardUI
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_ui import SettingAbout
-from keytik.utility import style, thread, utils
+from keytik.utility import style, thread
+from keytik.utility.utils import Config
 
 
 def main():
     """Main function."""
     # Set Appearance
-    config = utils.get_config()
+    config = Config().get_config()
     style_config = config.style
     theme = config.theme
 

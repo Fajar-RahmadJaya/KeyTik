@@ -31,7 +31,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.profile_mode.profile_mode_core import ProfileModeCore
-from keytik.utility import icons, style, utils
+from keytik.utility import icons, style
+from keytik.utility.utils import Config
 
 
 class SharedRow:  # pylint: disable=R0903
@@ -85,7 +86,7 @@ class SharedRow:  # pylint: disable=R0903
     def remap_entry_template(self) -> QLineEdit:
         """Entry template used across remap row."""
         auto_complete_model = list(ProfileModeCore().load_key_list().values())
-        auto_complete_config = utils.get_config().auto_complete
+        auto_complete_config = Config().get_config().auto_complete
 
         completer = QCompleter(auto_complete_model)
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)

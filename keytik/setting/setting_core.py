@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.utility import constant, style, utils
+from keytik.utility.utils import Config
 
 
 class SettingCore:
@@ -82,9 +83,9 @@ class SettingCore:
                 print(f"Store folder does not exist at {utils.store_dir}")
 
             # Save profile path to config
-            config = utils.get_config()
+            config = Config().get_config()
             config.profile_path = new_path
-            utils.update_config(config)
+            Config().update_config(config)
 
             print(f"Updated condition.json with the new path: {new_path}")
 
@@ -109,11 +110,11 @@ class SettingCore:
     def save_theme(self, theme: dict, parent):
         """Write theme preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
 
             config.theme_type = theme.get("type")
             config.theme = theme.get("value")
-            utils.update_config(config)
+            Config().update_config(config)
 
             # Apply palette directly when theme is in the same default color
             palette = style.get_palette()
@@ -153,9 +154,9 @@ class SettingCore:
     def save_accent(self, accent: list, parent):
         """Write accent preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
             config.accent = accent[1]
-            utils.update_config(config)
+            Config().update_config(config)
 
             # Update accent palette and button highlight stylesheet
             QApplication.setPalette(style.get_palette())
@@ -169,9 +170,9 @@ class SettingCore:
     def save_style(self, updated_style):
         """Write style preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
             config.style = "" if updated_style == "Default" else updated_style
-            utils.update_config(config)
+            Config().update_config(config)
 
             # Update style
             QApplication.setStyle(updated_style)
@@ -182,12 +183,12 @@ class SettingCore:
     def save_mica_effect(self, new_mica, parent):
         """Write style preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
             prev_mica = config.mica_effect
 
             # Update config
             config.mica_effect = new_mica.lower()
-            utils.update_config(config)
+            Config().update_config(config)
 
             if prev_mica == "disable" or new_mica.lower() == "disable":
                 messagebox = QMessageBox(parent)
@@ -217,11 +218,11 @@ class SettingCore:
     def save_auto_complete(self, new_auto_complete):
         """Write auto complete preferences preference to config file."""
         try:
-            config = utils.get_config()
+            config = Config().get_config()
 
             # Update config
             config.auto_complete = new_auto_complete
-            utils.update_config(config)
+            Config().update_config(config)
 
         except FileNotFoundError as error:
             print(f"Error: {error}")

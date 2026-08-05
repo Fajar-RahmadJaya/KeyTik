@@ -23,6 +23,7 @@ from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.write_script import WriteScript
 from keytik.utility import diff, utils
+from keytik.utility.utils import Config
 
 
 class Thread(QThread):  # pylint: disable=R0903
@@ -43,7 +44,7 @@ class Thread(QThread):  # pylint: disable=R0903
 
         # Check for update
         data = utils.get_data()
-        config = utils.get_config()
+        config = Config().get_config()
         latest_version = data.latest_version
         changelog_md = data.changelog
 
@@ -67,7 +68,7 @@ class Thread(QThread):  # pylint: disable=R0903
             self.ahk_not_installed.emit()
 
         # Whether to show announcement or not
-        if utils.get_config().show_announcement:
+        if Config().get_config().show_announcement:
             self.show_announcement.emit()
 
         # Check AHI necessary file

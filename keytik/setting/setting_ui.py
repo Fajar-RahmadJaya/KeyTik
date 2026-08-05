@@ -47,6 +47,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_core import SettingCore
 from keytik.utility import constant, diff, style, utils
+from keytik.utility.utils import Config
 
 
 class SettingCombobox(QComboBox):  # pylint: disable=R0903
@@ -235,7 +236,7 @@ class SettingAppearance:
         style_combobox = self.setting_template.setting_combobox()
         style_combobox.addItem("Default")
         style_combobox.addItems(QStyleFactory.keys())
-        current_style = utils.get_config().style
+        current_style = Config().get_config().style
         style_combobox.setCurrentText(current_style if current_style else "Default")
         style_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_style(updated_style=style_combobox.currentText())
@@ -275,7 +276,7 @@ class SettingAppearance:
                     {"type": "qt-themes", "value": qt_theme},
                 )
 
-        theme_combobox.setCurrentText(utils.get_config().theme.replace("_", " ").title())
+        theme_combobox.setCurrentText(Config().get_config().theme.replace("_", " ").title())
         theme_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_theme(
                 theme=theme_combobox.currentData(), parent=settings_window
@@ -291,7 +292,7 @@ class SettingAppearance:
 
     def accent(self, settings_window):
         """Theme Widget."""
-        config = utils.get_config()
+        config = Config().get_config()
         accent_combobox = self.setting_template.setting_combobox()
         accent_combobox.view().setFixedWidth(200)
 
@@ -314,7 +315,7 @@ class SettingAppearance:
                     accent_name = f"Catppuccin {flavor.name} {color.name}".title()
                     accent_combobox.setCurrentText(accent_name)
 
-        accent_combobox.setCurrentText(utils.get_config().accent.title())
+        accent_combobox.setCurrentText(Config().get_config().accent.title())
         accent_combobox.setToolTip(accent_combobox.currentText())
         accent_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_accent(
@@ -351,7 +352,7 @@ class SettingAppearance:
         """Mica Effect Widget."""
         mica_combobox = self.setting_template.setting_combobox()
         mica_combobox.addItems(["Default", "Alt", "Disable"])
-        mica_combobox.setCurrentText(utils.get_config().mica_effect.capitalize())
+        mica_combobox.setCurrentText(Config().get_config().mica_effect.capitalize())
         mica_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_mica_effect(
                 new_mica=mica_combobox.currentText(), parent=settings_window
@@ -405,7 +406,7 @@ class SettingGeneral:
 
         profile_location_layout, profile_location_frame = self.setting_template.setting_card()
 
-        profile_dir = utils.get_config().profile_path
+        profile_dir = Config().get_config().profile_path
         theme_label = QLabel(
             "<div style='font-size:13px; margin-bottom:2px'>Profile Location</div>"
             "<div style='font-size:11px;'>"
@@ -448,7 +449,7 @@ class SettingGeneral:
         auto_complete_combobox.addItem("Pop Up", "popup")
         auto_complete_combobox.addItem("Unfiltered Pop UP", "unfiltered_popup")
 
-        current_text = auto_complete_combobox.findData(utils.get_config().auto_complete)
+        current_text = auto_complete_combobox.findData(Config().get_config().auto_complete)
         auto_complete_combobox.setCurrentIndex(current_text)
         auto_complete_combobox.currentTextChanged.connect(
             lambda: self.setting_core.save_auto_complete(auto_complete_combobox.currentData())
@@ -675,7 +676,7 @@ class SettingAbout:
         text_edit.document().setDocumentMargin(8)
         text_edit.document().setIndentWidth(20)
 
-        if utils.get_config().mica_effect != "disable" and style.mica_supported:
+        if Config().get_config().mica_effect != "disable" and style.mica_supported:
             text_edit.setStyleSheet(
                 f"#ChangelogText {{background-color: {style.palette_role.base_rgba}}}"
             )
@@ -717,11 +718,11 @@ class SettingAbout:
         def button_event():
             """Save current version to skip version config."""
             try:
-                config = utils.get_config()
+                config = Config().get_config()
 
                 # Update config
                 config.skip_update = new_version
-                utils.update_config(config)
+                Config().update_config(config)
 
                 window.reject()
 

@@ -36,6 +36,7 @@ from keytik.profile_mode.default_mode import RemapObject
 from keytik.profile_mode.profile_mode_core import ProfileModeCore
 from keytik.select_key.select_key_core import SelectKeyCore
 from keytik.utility import constant, utils
+from keytik.utility.utils import Config
 
 
 @dataclass
@@ -257,9 +258,9 @@ cm1 := AHI.CreateContextManager(id1)\n
             self.validate_exit_keys(exit_keys)
 
             # Save the new exit keys back to save file
-            config = utils.get_config()
+            config = Config().get_config()
             config.exit_key = exit_keys
-            utils.update_config(config)
+            Config().update_config(config)
 
         except FileNotFoundError as e:
             print(f"Error in initialize_exit_keys: {e}")
@@ -315,7 +316,7 @@ cm1 := AHI.CreateContextManager(id1)\n
         """Resolve and get exit keys from file."""
         # Load the exit keys from save file
         exit_keys = {}
-        exit_keys = utils.get_config().exit_key
+        exit_keys = Config().get_config().exit_key
 
         # Create dictionary containing script and the exit key
         combo_to_scripts = {}

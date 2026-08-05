@@ -29,7 +29,8 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget,
 )
 
-from keytik.utility import constant, diff, style, utils
+from keytik.utility import constant, diff, style
+from keytik.utility.utils import Config
 
 
 class AnnouncmentThread(QThread):  # pylint: disable=R0903
@@ -192,7 +193,7 @@ class Announcement:
         button_layout.addWidget(next_button)
 
         dont_show_checkbox = QCheckBox("Don't show again")
-        dont_show_checkbox.setChecked(not utils.get_config().show_announcement)
+        dont_show_checkbox.setChecked(not Config().get_config().show_announcement)
         dont_show_checkbox.stateChanged.connect(
             lambda: self.save_announcement_condition(dont_show_checkbox)
         )
@@ -214,6 +215,6 @@ class Announcement:
         """Save user preference on file when don't show announcement checkbox is checked."""
         announcement_condition = not dont_show_checkbox.isChecked()
 
-        config = utils.get_config()
+        config = Config().get_config()
         config.show_announcement = announcement_condition
-        utils.update_config(config)
+        Config().update_config(config)

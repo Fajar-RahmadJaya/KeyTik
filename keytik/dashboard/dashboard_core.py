@@ -33,6 +33,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from win32com.client import Dispatch
 
 from keytik.utility import constant, icons, utils
+from keytik.utility.utils import Config
 
 
 class DashboardCore(QObject):
@@ -47,7 +48,7 @@ class DashboardCore(QObject):
 
         # Variable
         self.current_page = 0
-        self.pinned_profiles = utils.get_config().pinned_profile
+        self.pinned_profiles = Config().get_config().pinned_profile
 
     def import_button_clicked(self, parent):
         """Select AHK script and add necessary line."""
@@ -127,14 +128,14 @@ class DashboardCore(QObject):
                 file.write("\n".join(result_lines) + "\n")
         except FileNotFoundError as e:
             print(f"Error modifying script: {e}")
-            exit_keys = utils.get_config().exit_key
+            exit_keys = Config().get_config().exit_key
 
             if file_name in exit_keys:
                 del exit_keys[file_name]
 
-            config = utils.get_config()
+            config = Config().get_config()
             config.exit_key = exit_keys
-            utils.update_config(config)
+            Config().update_config(config)
 
     def generate_exit_key(self, script_name, file=None):
         """Generate key for profile exit."""
@@ -167,7 +168,7 @@ class DashboardCore(QObject):
             "z",
         ]
 
-        exit_keys = utils.get_config().exit_key
+        exit_keys = Config().get_config().exit_key
 
         used_keys = set(key[-1] for key in exit_keys.values())
         available_keys = [k for k in possible_keys if k not in used_keys]
@@ -180,9 +181,9 @@ class DashboardCore(QObject):
         exit_keys[script_name] = exit_combo
 
         try:
-            config = utils.get_config()
+            config = Config().get_config()
             config.exit_key = exit_keys
-            utils.update_config(config)
+            Config().update_config(config)
 
             if file:
                 file.write(f"{exit_combo}::ExitApp\n\n")
@@ -261,7 +262,7 @@ class DashboardCore(QObject):
             script_path = os.path.join(utils.store_dir, script_name)
 
         if os.path.isfile(script_path):
-            exit_keys = utils.get_config().exit_key
+            exit_keys = Config().get_config().exit_key
             exit_combo = exit_keys.get(script_name)
             if not exit_combo:
                 QMessageBox.critical(
@@ -345,9 +346,9 @@ class DashboardCore(QObject):
             self.pinned_profiles.insert(0, script)
 
         # Update config
-        config = utils.get_config()
+        config = Config().get_config()
         config.pinned_profile = self.pinned_profiles
-        utils.update_config(config)
+        Config().update_config(config)
 
         self.update_script_signal.emit()
 

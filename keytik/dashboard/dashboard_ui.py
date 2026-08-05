@@ -38,7 +38,7 @@ from keytik.profile_manager.profile_ui import ProfileUI
 from keytik.profile_mode.text_mode import TextMode
 from keytik.setting.setting_ui import SettingUI
 from keytik.utility import constant, icons
-from keytik.utility.style import Mica, Palette, Styling
+from keytik.utility.style import Palette, Styling
 from keytik.utility.utils import Utility
 
 
@@ -88,7 +88,7 @@ class DashboardUI(QMainWindow):
         self.setWindowIcon(QIcon(constant.icon_path))
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        Mica().apply_mica(self)
+        Styling().apply_mica(self)
 
         # Startup
         self.create_ui()

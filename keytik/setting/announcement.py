@@ -30,7 +30,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.utility import constant, diff
-from keytik.utility.style import Mica, Styling
+from keytik.utility.style import Styling
 from keytik.utility.utils import Config
 
 
@@ -87,7 +87,7 @@ class Announcement:
 
             announcement_dialog = QDialog(parent)
             announcement_dialog.setWindowTitle("Announcement")
-            Mica().apply_mica(announcement_dialog)
+            Styling().apply_mica(announcement_dialog)
 
             geometry = Styling().get_geometry(parent, 525, 290)
             announcement_dialog.setGeometry(geometry)

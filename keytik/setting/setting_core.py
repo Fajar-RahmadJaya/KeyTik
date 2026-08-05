@@ -31,7 +31,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.utility import constant
-from keytik.utility.style import Mica, Palette, Styling
+from keytik.utility.style import Palette, Styling
 from keytik.utility.utils import Config, Utility
 
 
@@ -212,11 +212,11 @@ class SettingCore:
                 if response == QMessageBox.StandardButton.Yes:
                     self.restart_app()
             else:
-                mica = Mica()
+                styling = Styling()
                 # Apply mica on setting window
-                mica.apply_mica(parent)
+                styling.apply_mica(parent)
                 # Apply mica on main window
-                mica.apply_mica(parent.window().parentWidget())
+                styling.apply_mica(parent.window().parentWidget())
 
         except FileNotFoundError as error:
             QMessageBox.critical(parent, "Error", f"Failed to change style\n{error}")

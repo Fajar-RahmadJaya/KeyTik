@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.select_program.select_program_core import SelectProgramCore
 from keytik.utility import constant
-from keytik.utility.style import Mica, Styling
+from keytik.utility.style import Styling
 
 
 class SelectProgramUI:
@@ -50,7 +50,7 @@ class SelectProgramUI:
         select_program_window.setGeometry(geometry)
         select_program_window.setModal(True)
         select_program_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        Mica().apply_mica(select_program_window)
+        Styling().apply_mica(select_program_window)
 
         main_layout = QVBoxLayout(select_program_window)
 

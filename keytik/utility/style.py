@@ -178,30 +178,11 @@ class Palette:
         return role
 
 
-class Mica:
-    """Mica effect."""
-
-    _WINDOWS_BUILD_NUMBER = 22000
-    MICA_SUPPORTED = bool(sys.getwindowsversion().build >= _WINDOWS_BUILD_NUMBER)
-
-    def apply_mica(self, target_window):
-        """Apply mica style on target window using win32mica."""
-        config = Config().get_config()
-        mica_effect = config.mica_effect
-        theme = "LIGHT" if Palette().isbase_light else "DARK"
-
-        if mica_effect != "disable" and Mica().MICA_SUPPORTED:
-            target_window.setAttribute(Qt.WA_TranslucentBackground)
-            win32mica.ApplyMica(
-                HWND=int(target_window.winId()),
-                Theme=getattr(win32mica.MicaTheme, theme),
-                Style=getattr(win32mica.MicaStyle, mica_effect.upper()),
-            )
-
-
 class Styling:
     """Shared widget styling."""
 
+    _WINDOWS_BUILD_NUMBER = 22000
+    MICA_SUPPORTED = bool(sys.getwindowsversion().build >= _WINDOWS_BUILD_NUMBER)
     PROFILE_ROW_LABEL = "font-size: 13px; font-weight: bold;"
     TREEVIEW = """
     QHeaderView::down-arrow, QHeaderView::up-arrow {
@@ -229,6 +210,20 @@ class Styling:
             subcontrol-position: top left;
             left: 26px;
         }}"""
+
+    def apply_mica(self, target_window):
+        """Apply mica style on target window using win32mica."""
+        config = Config().get_config()
+        mica_effect = config.mica_effect
+        theme = "LIGHT" if Palette().isbase_light else "DARK"
+
+        if mica_effect != "disable" and self.MICA_SUPPORTED:
+            target_window.setAttribute(Qt.WA_TranslucentBackground)
+            win32mica.ApplyMica(
+                HWND=int(target_window.winId()),
+                Theme=getattr(win32mica.MicaTheme, theme),
+                Style=getattr(win32mica.MicaStyle, mica_effect.upper()),
+            )
 
     def get_geometry(self, parent_window, width, height):
         """Get x and y centered relative to parent window."""
@@ -275,7 +270,7 @@ class Styling:
         stylesheet.append(self.button_highlight(style_sheet=True))
 
         # Only set global tree view on dark mica
-        if config.mica_effect != "disable" and Mica.MICA_SUPPORTED and config.theme == "dark":
+        if config.mica_effect != "disable" and self.MICA_SUPPORTED and config.theme == "dark":
             stylesheet.append(global_treeview)
 
         return "\n".join(stylesheet)

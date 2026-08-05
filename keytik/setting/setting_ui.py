@@ -47,7 +47,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_core import SettingCore
 from keytik.utility import constant, diff
-from keytik.utility.style import Mica, Palette, Styling
+from keytik.utility.style import Palette, Styling
 from keytik.utility.utils import Config, Data, Utility
 
 
@@ -129,7 +129,7 @@ class SettingUI:
         geometry = Styling().get_geometry(parent, 600, 400)
         settings_window.setGeometry(geometry)
         settings_window.setWindowIcon(QIcon(constant.icon_path))
-        Mica().apply_mica(settings_window)
+        Styling().apply_mica(settings_window)
 
         setting_layout = QVBoxLayout(settings_window)
         setting_layout.setContentsMargins(12, 12, 12, 12)
@@ -228,7 +228,7 @@ class SettingAppearance:
         appearance_layout.addWidget(self.accent(settings_window))
 
         # Mica Effect
-        if Mica.MICA_SUPPORTED:
+        if Styling().MICA_SUPPORTED:
             appearance_layout.addWidget(self.mica_effect(settings_window))
 
         return appearance_widget
@@ -642,7 +642,7 @@ class SettingAbout:
             window.setWindowTitle("Changelog")
         window.setGeometry(Styling().get_geometry(parent, 520, 360))
         window.setWindowIcon(QIcon(constant.icon_path))
-        Mica().apply_mica(window)
+        Styling().apply_mica(window)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(16, 16, 16, 16)
@@ -679,7 +679,7 @@ class SettingAbout:
         text_edit.document().setDocumentMargin(8)
         text_edit.document().setIndentWidth(20)
 
-        if Config().get_config().mica_effect != "disable" and Mica.MICA_SUPPORTED:
+        if Config().get_config().mica_effect != "disable" and Styling().MICA_SUPPORTED:
             text_edit.setStyleSheet(
                 f"#ChangelogText {{background-color: {Palette().get_palette_role().base_rgba}}}"
             )

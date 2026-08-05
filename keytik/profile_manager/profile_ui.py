@@ -45,7 +45,7 @@ from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
 from keytik.select_program.select_program_ui import SelectProgramUI
 from keytik.utility import constant, diff
-from keytik.utility.style import Mica, Styling
+from keytik.utility.style import Styling
 
 
 class ProfileUI:
@@ -91,7 +91,7 @@ class ProfileUI:
         self.edit_window.setWindowIcon(QIcon(constant.icon_path))
         geometry = Styling().get_geometry(parent, 640, 480)
         self.edit_window.setGeometry(geometry)
-        Mica().apply_mica(self.edit_window)
+        Styling().apply_mica(self.edit_window)
 
         edit_layout = QGridLayout(self.edit_window)
         edit_layout.setContentsMargins(30, 10, 30, 10)

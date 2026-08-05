@@ -32,7 +32,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 )
 
 from keytik.utility import constant
-from keytik.utility.style import Mica, Styling
+from keytik.utility.style import Styling
 from keytik.utility.utils import Utility
 
 
@@ -65,7 +65,7 @@ class SelectDevice:
         device_selection_window.setGeometry(geometry)
         device_selection_window.setModal(True)
         device_selection_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        Mica().apply_mica(device_selection_window)
+        Styling().apply_mica(device_selection_window)
 
         main_layout = QVBoxLayout(device_selection_window)
 

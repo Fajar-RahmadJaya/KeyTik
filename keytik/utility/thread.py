@@ -23,7 +23,7 @@ from PySide6.QtCore import QThread, Signal  # pylint: disable=E0611
 from keytik.dashboard.dashboard_core import DashboardCore
 from keytik.profile_manager.write_script import WriteScript
 from keytik.utility import diff, utils
-from keytik.utility.utils import Config
+from keytik.utility.utils import Config, Data
 
 
 class Thread(QThread):  # pylint: disable=R0903
@@ -43,7 +43,7 @@ class Thread(QThread):  # pylint: disable=R0903
         write_script.initialize_exit_keys()
 
         # Check for update
-        data = utils.get_data()
+        data = Data().get_data()
         config = Config().get_config()
         latest_version = data.latest_version
         changelog_md = data.changelog
@@ -58,7 +58,7 @@ class Thread(QThread):  # pylint: disable=R0903
             data.latest_update_check = current_date
             data.latest_version = latest_version
             data.changelog = changelog_md
-            utils.update_data(data)
+            Data().update_data(data)
 
         if latest_version not in (utils.current_version, config.skip_update):
             self.update_found.emit(latest_version, changelog_md)

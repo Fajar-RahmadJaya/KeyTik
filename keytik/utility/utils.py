@@ -164,7 +164,7 @@ class Config:
 
 # ------------------------------ Data ------------------------------
 @dataclass
-class Data:  # pylint: disable=R0902
+class Datas:  # pylint: disable=R0902
     """Dataclass to make data usage easier."""
 
     latest_update_check: str
@@ -172,35 +172,37 @@ class Data:  # pylint: disable=R0902
     changelog: str
 
 
-def get_data():
-    """Get config from json file."""
-    data_path = constant.data_path
-    if not os.path.exists(data_path):
-        with open(data_path, "w", encoding="utf-8") as f:
-            json.dump({}, f)
+class Data:
+    """Program data."""
 
-    try:
-        with open(data_path, encoding="utf-8") as data_file:
-            value = json.load(data_file)
-            data = Data(
-                latest_update_check=value.get("latest_update_check", True),
-                latest_version=value.get("latest_version") or None,
-                changelog=value.get("changelog") or None,
-            )
-        return data
+    def get_data(self):
+        """Get config from json file."""
+        data_path = constant.data_path
+        if not os.path.exists(data_path):
+            with open(data_path, "w", encoding="utf-8") as f:
+                json.dump({}, f)
 
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
-    return None
+        try:
+            with open(data_path, encoding="utf-8") as data_file:
+                value = json.load(data_file)
+                data = Datas(
+                    latest_update_check=value.get("latest_update_check", True),
+                    latest_version=value.get("latest_version") or None,
+                    changelog=value.get("changelog") or None,
+                )
+            return data
 
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
+        return None
 
-def update_data(data: Data):
-    """Save data into json file."""
-    try:
-        with open(constant.data_path, "w", encoding="utf-8") as f:
-            json.dump(data.__dict__, f, indent=4, sort_keys=True)
-    except (json.JSONDecodeError, FileNotFoundError) as error:
-        print(f"Error: {error}")
+    def update_data(self, data: Datas):
+        """Save data into json file."""
+        try:
+            with open(constant.data_path, "w", encoding="utf-8") as f:
+                json.dump(data.__dict__, f, indent=4, sort_keys=True)
+        except (json.JSONDecodeError, FileNotFoundError) as error:
+            print(f"Error: {error}")
 
 
 # ------------------------------ Metadata ------------------------------

@@ -47,7 +47,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_core import SettingCore
 from keytik.utility import constant, diff, style, utils
-from keytik.utility.utils import Config
+from keytik.utility.utils import Config, Data
 
 
 class SettingCombobox(QComboBox):  # pylint: disable=R0903
@@ -571,7 +571,7 @@ class SettingAbout:
 
         def button_event():
             """Check for update."""
-            data = utils.get_data()
+            data = Data().get_data()
             latest_version = data.latest_version
 
             if latest_version != utils.current_version:
@@ -626,7 +626,7 @@ class SettingAbout:
         """Show update changelog window."""
         parent = QApplication.activeWindow()
         if not new_version and not changelog_md:
-            data = utils.get_data()
+            data = Data().get_data()
             new_version = data.latest_version
             changelog_md = data.changelog
 

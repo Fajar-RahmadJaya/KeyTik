@@ -9,6 +9,7 @@
 - *(remap-options)* Allow option to be collapsed
 - *(remap-option)* Improve remap option ui
 - *(key-listening)* Handle mouse listening better
+- *(peek-script)* Allow enable from setting
 
 ### Fixes
 

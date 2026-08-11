@@ -192,6 +192,7 @@ dependencies = [
     { name = "catppuccin" },
     { name = "keyboard" },
     { name = "markdown" },
+    { name = "plwidgets" },
     { name = "psutil" },
     { name = "pynput" },
     { name = "pyqcodeeditor" },
@@ -218,6 +219,7 @@ requires-dist = [
     { name = "catppuccin", specifier = ">=2.5.0" },
     { name = "keyboard", specifier = ">=0.13.5,<0.14.0" },
     { name = "markdown", specifier = ">=3.10.3,<4.0.0" },
+    { name = "plwidgets", specifier = ">=0.1.1" },
     { name = "psutil", specifier = ">=7.2.2,<8.0.0" },
     { name = "pynput", specifier = ">=1.8.2,<2.0.0" },
     { name = "pyqcodeeditor", specifier = ">=0.3.7" },
@@ -280,6 +282,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/19/56/8d4c30c8a1d07013911a8fdbd8f89440ef9f08d07a1b50ab8ca8be5a20f9/platformdirs-4.9.4.tar.gz", hash = "sha256:1ec356301b7dc906d83f371c8f487070e99d3ccf9e501686456394622a01a934", size = 28737, upload-time = "2026-03-05T18:34:13.271Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/63/d7/97f7e3a6abb67d8080dd406fd4df842c2be0efaf712d1c899c32a075027c/platformdirs-4.9.4-py3-none-any.whl", hash = "sha256:68a9a4619a666ea6439f2ff250c12a853cd1cbd5158d258bd824a7df6be2f868", size = 21216, upload-time = "2026-03-05T18:34:12.172Z" },
+]
+
+[[package]]
+name = "plwidgets"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyside6" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9f/9c/f1ff5a20cc08c79d58bac1d6fc55e93d89256588c0a6a231207c8ca8bee8/plwidgets-0.1.1.tar.gz", hash = "sha256:a057b0bb82beceeef05333734fdc799fe84b979453e0ba24cd211fd22aca5a32", size = 19750, upload-time = "2025-07-11T15:32:04.665Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ae/f4/e99152c86923e3f537f087fcd21fa08750780921de4aed4511e6ae66a1c5/plwidgets-0.1.1-py3-none-any.whl", hash = "sha256:54be284ccebe91a725ed81384e67d111be8f5af08b40304ce68c0dc9b0881fab", size = 29566, upload-time = "2025-07-11T15:32:03.718Z" },
 ]
 
 [[package]]

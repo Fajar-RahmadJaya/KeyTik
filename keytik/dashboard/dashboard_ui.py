@@ -39,7 +39,7 @@ from keytik.profile_mode.text_mode import TextMode
 from keytik.setting.setting_ui import SettingUI
 from keytik.utility import constant, icons
 from keytik.utility.style import Palette, Styling
-from keytik.utility.utils import Utility
+from keytik.utility.utils import Config, Utility
 
 
 class PeekButton(QToolButton):
@@ -227,7 +227,7 @@ class DashboardUI(QMainWindow):
         card_widget.setLayout(layout)
 
         group_box = QGroupBox(os.path.splitext(script)[0])
-        group_box.setStyleSheet(Styling().group_box)
+        group_box.setStyleSheet(Styling().group_box())
         layout.addWidget(group_box, 0, 0, 1, 3)
 
         group_layout = QGridLayout(group_box)
@@ -247,7 +247,8 @@ class DashboardUI(QMainWindow):
         layout.addWidget(self.pin_icon(script), 0, 2, 1, 1, Qt.AlignTop | Qt.AlignRight)
 
         # Peek icon
-        layout.addWidget(self.peek_icon(script), 0, 0, 1, 1, Qt.AlignTop | Qt.AlignLeft)
+        if Config().get_config().enable_peek:
+            layout.addWidget(self.peek_icon(script), 0, 0, 1, 1, Qt.AlignTop | Qt.AlignLeft)
 
         return card_widget
 

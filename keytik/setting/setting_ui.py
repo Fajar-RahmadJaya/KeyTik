@@ -19,12 +19,14 @@ import webbrowser
 
 import qt_themes
 from catppuccin import PALETTE as catppuccin_palette
+from plwidgets.pl_checkbox import PlCheckBox
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import (  # pylint: disable=E0611
     QColor,
     QFont,
     QIcon,
     QPainter,
+    QPalette,
     QPixmap,
 )
 from PySide6.QtWidgets import (  # pylint: disable=E0611
@@ -111,6 +113,43 @@ class SettingTemplate:
 
         return setting_header_label
 
+    def setting_switch(self):
+        """Toggle switch template for setting."""
+        palett_comp = Palette()
+        palette = palett_comp.get_palette()
+        accent = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Accent)
+        text = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Text)
+        inverted_text = palett_comp.invert_color(text)
+        window = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Window)
+
+        widget = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(8)
+        widget.setLayout(layout)
+
+        label = QLabel()
+        layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignRight)
+
+        switch = PlCheckBox()
+        switch._checkedBackgroundColor = accent
+        switch._checkedHandleColor = inverted_text
+        switch.backgroundColor = window
+        switch.update()
+        layout.addWidget(switch)
+
+        def switch_event():
+            """Change switch label based on check state."""
+            if switch.isChecked():
+                label.setText("On")
+            else:
+                label.setText("Off")
+
+        switch.toggled.connect(switch_event)
+        switch_event()
+
+        return widget, switch
+
 
 class SettingUI:
     """Setting UI."""
@@ -157,7 +196,7 @@ class SettingUI:
         content_layout.addWidget(SettingAppearance().appearance(settings_window))
 
         # General
-        content_layout.addWidget(SettingGeneral().general(settings_window))
+        content_layout.addWidget(SettingGeneral(settings_window).general(settings_window))
 
         # Advanced
         content_layout.addWidget(SettingInstallation().installation())
@@ -372,9 +411,10 @@ class SettingAppearance:
 class SettingGeneral:
     """General section on setting."""
 
-    def __init__(self):
+    def __init__(self, settings_window: QDialog):
         self.setting_template = SettingTemplate()
         self.setting_core = SettingCore()
+        self.settings_window = settings_window
 
     def general(self, settings_window):
         """General setting."""
@@ -395,6 +435,9 @@ class SettingGeneral:
 
         # Auto Complete
         general_layout.addWidget(self.auto_complete())
+
+        # Peek script
+        general_layout.addWidget(self.enable_peek())
 
         return general_widget
 
@@ -463,6 +506,23 @@ class SettingGeneral:
         auto_complete_layout.addWidget(auto_complete_combobox)
 
         return auto_complete_frame
+
+    def enable_peek(self):
+        """Enable script peek widget."""
+        is_enabled = Config().get_config().enable_peek
+
+        widget, switch = self.setting_template.setting_switch()
+        switch.setChecked(is_enabled)
+        switch.toggled.connect(
+            lambda: self.setting_core.save_enable_peek(switch.isChecked(), self.settings_window)
+        )
+
+        layout, frame = self.setting_template.setting_card(
+            heading="Enable script peek", subheading="Enable button to see profile script."
+        )
+        layout.addWidget(widget)
+
+        return frame
 
 
 class SettingInstallation:

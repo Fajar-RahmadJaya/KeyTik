@@ -132,8 +132,8 @@ class SettingTemplate:
         layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignRight)
 
         switch = PlCheckBox()
-        switch._checkedBackgroundColor = accent
-        switch._checkedHandleColor = inverted_text
+        switch._checkedBackgroundColor = accent  # pylint: disable=W0212
+        switch._checkedHandleColor = inverted_text  # pylint: disable=W0212
         switch.backgroundColor = window
         switch.update()
         layout.addWidget(switch)

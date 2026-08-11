@@ -233,6 +233,35 @@ class SettingCore:
         except FileNotFoundError as error:
             print(f"Error: {error}")
 
+    def save_enable_peek(self, is_enabled: bool, parent):
+        """Write peek script preferences to config file."""
+        try:
+            config_comp = Config()
+            config = config_comp.get_config()
+
+            # Update config
+            config.enable_peek = is_enabled
+            config_comp.update_config(config)
+
+            messagebox = QMessageBox(parent)
+            messagebox.setIcon(QMessageBox.Icon.Information)
+            messagebox.setWindowTitle("Success")
+            messagebox.setText(
+                f"Peek script {'enabled' if is_enabled else 'disabled'}. "
+                f"Please restart {self.utility.program_name} to apply change.\n\n"
+                f"Would you like to restart {self.utility.program_name}?",
+            )
+            messagebox.setStandardButtons(
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+
+            response = messagebox.exec()
+            if response == QMessageBox.StandardButton.Yes:
+                self.restart_app()
+
+        except FileNotFoundError as error:
+            print(f"Error: {error}")
+
     def ahk_action(self, ahk_installed):
         """Uninstall AutoHotkey."""
         ahk_uninstall_path = os.path.join(

@@ -196,7 +196,11 @@ class Styling:
     def __init__(self):
         self.palette_comp = Palette()
 
-        self.group_box = f"""
+    def group_box(self):
+        """Dashboard group box styling."""
+        title_padding = 26 if Config().get_config().enable_peek else 8
+
+        group_box = f"""
         QGroupBox {{
             background-color: {self.palette_comp.get_palette_role().surface};
             border: 1px solid {self.palette_comp.get_palette_role().mantle};
@@ -208,8 +212,10 @@ class Styling:
         QGroupBox:title {{
             subcontrol-origin: margin;
             subcontrol-position: top left;
-            left: 26px;
+            left: {title_padding}px;
         }}"""
+
+        return group_box
 
     def apply_mica(self, target_window):
         """Apply mica style on target window using win32mica."""

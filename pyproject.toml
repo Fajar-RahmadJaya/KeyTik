@@ -22,6 +22,7 @@ dependencies = [
     "winaccent>=2.1.0",
     "catppuccin>=2.5.0",
     "pyqcodeeditor>=0.3.7",
+    "plwidgets>=0.1.1",
 ]
 
 [dependency-groups]

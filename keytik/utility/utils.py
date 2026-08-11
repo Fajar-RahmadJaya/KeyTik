@@ -17,7 +17,7 @@
 import json
 import os
 import winreg
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from keytik.utility import constant
 
@@ -27,17 +27,18 @@ from keytik.utility import constant
 class ConfigData:  # pylint: disable=R0902
     """Dataclass to make config usage easier."""
 
-    show_announcement: bool
-    style: str
-    theme_type: str
-    theme: dict
-    accent: str
-    mica_effect: str
-    profile_path: str
-    pinned_profile: list
-    exit_key: dict
-    auto_complete: str
-    skip_update: str
+    show_announcement: bool = True
+    style: str = ""
+    theme_type: str = "default"
+    theme: str = "system"
+    accent: str = "default"
+    mica_effect: str = "default"
+    profile_path: str = constant.appdata_dir
+    pinned_profile: list[str] = field(default_factory=list)
+    exit_key: dict[str, str] = field(default_factory=dict)
+    auto_complete: str = "inline"
+    skip_update: str = ""
+    enable_peek: bool = False
 
 
 class Config:
@@ -53,7 +54,7 @@ class Config:
                 value = json.load(config_file)
                 config = ConfigData(
                     show_announcement=value.get("show_announcement", True),
-                    style=value.get("style") or None,
+                    style=value.get("style") or "",
                     theme_type=value.get("theme_type") or "default",
                     theme=value.get("theme") or "system",
                     accent=value.get("accent") or "default",
@@ -62,13 +63,14 @@ class Config:
                     pinned_profile=value.get("pinned_profile", []),
                     exit_key=value.get("exit_key", {}),
                     auto_complete=value.get("auto_complete") or "inline",
-                    skip_update=value.get("skip_update") or None,
+                    skip_update=value.get("skip_update") or "",
+                    enable_peek=value.get("enable_peek", False),
                 )
             return config
 
         except (json.JSONDecodeError, FileNotFoundError) as error:
             print(f"Error: {error}")
-        return None
+        return ConfigData
 
     def update_config(self, config):
         """Save config into json file."""

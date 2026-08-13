@@ -17,12 +17,14 @@
 import os
 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
-from PySide6.QtGui import QIcon  # pylint: disable=E0611
+from PySide6.QtGui import QFont, QIcon, QPalette  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
     QComboBox,
     QDialog,
+    QFrame,
     QGridLayout,
+    QHBoxLayout,
     QLabel,
     QLineEdit,
     QMessageBox,
@@ -45,7 +47,7 @@ from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
 from keytik.select_program.select_program_ui import SelectProgramUI
 from keytik.utility import constant, diff
-from keytik.utility.style import Styling
+from keytik.utility.style import Palette, Styling
 
 
 class ProfileUI:
@@ -67,7 +69,7 @@ class ProfileUI:
         self.edit_frame_layout = QVBoxLayout(self.edit_frame)
         self.middle_stack = None
 
-    def edit_script(self, script_name, parent):
+    def edit_script(self, script_name: str, parent):
         """Create/edit profile window."""
         self.edit_window = QDialog(parent)
         # Handle Create New Profile
@@ -84,7 +86,7 @@ class ProfileUI:
             if not lines:
                 return
 
-            self.edit_window.setWindowTitle("Edit Profile")
+            self.edit_window.setWindowTitle(f"Edit {script_name.replace('.ahk', '').title()}")
 
         first_line = lines[0].strip()
 
@@ -93,24 +95,162 @@ class ProfileUI:
         self.edit_window.setGeometry(geometry)
         Styling().apply_mica(self.edit_window)
 
-        edit_layout = QGridLayout(self.edit_window)
-        edit_layout.setContentsMargins(30, 10, 30, 10)
+        edit_layout = QVBoxLayout(self.edit_window)
+        edit_layout.setObjectName("editLayout")
+        edit_layout.setContentsMargins(0, 0, 0, 0)
 
         # Top part of profile manager
-        top_widget = self.edit_top(script_name, lines)
-        top_widget.setObjectName("TopWidget")
-        edit_layout.addWidget(top_widget, 0, 0, 1, 4)
+        # top_widget = self.edit_top(script_name, lines)
+        # top_widget.setObjectName("TopWidget")
+        # edit_layout.addWidget(top_widget, 0, 0, 1, 4)
 
         # Middle part of profile manager
-        self.edit_middle(lines, edit_layout)
+        self.middle_stack = QStackedWidget()
+
+        self.middle_stack.addWidget(self.scroll_area())
+
+        text_block = TextMode().text_mode_widget(self.edit_window, self.edit_frame, lines)
+        self.middle_stack.addWidget(text_block)
+
+        self.middle_stack.addWidget(self.edit_top(script_name, lines))
+        edit_layout.addWidget(self.middle_stack)
+
+        # Add profile mode widget
+        index = diff.mode_map.get(lines[0].strip().lower())
+        self.build_profile(index, lines=lines)
 
         # Bottom part of profile manager
-        bottom_widget = self.edit_bottom(first_line, top_widget)
-        bottom_widget.setObjectName("BottomWidget")
-        edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
+        # bottom_widget = self.edit_bottom(first_line, top_widget)
+        # bottom_widget.setObjectName("BottomWidget")
+        # edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
+
+        edit_layout.addWidget(self.command_bar(first_line))
 
         self.edit_window.setLayout(edit_layout)
         self.edit_window.exec()
+
+    def command_bar(self, first_line: str):
+        """Command bar inspired by WinUI3."""
+        widget = QWidget()
+        widget.setObjectName("commandBar")
+        widget.setStyleSheet("#commandBar { background-color: rgba(0, 0, 0, 0.08); }")  # 1C1C1C
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(32, 0, 32, 0)
+        layout.setSpacing(4)
+        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        widget.setLayout(layout)
+
+        # Content
+        content_widget = self.content(first_line)
+        layout.addWidget(content_widget)
+
+        # Primary command
+        layout.addWidget(self.primary_command(content_widget.findChild(QComboBox)))
+
+        return widget
+
+    def content(self, first_line):
+        """Command bar content."""
+        widget = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 8, 0, 8)
+        layout.setSpacing(0)
+        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        widget.setLayout(layout)
+
+        combobox = QComboBox(self.edit_window)
+        combobox.addItems(diff.mode_item)
+        combobox.setEditable(True)
+        combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignLeft)
+        combobox.lineEdit().setReadOnly(True)
+        combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        default_index = diff.mode_map.get(first_line.lower(), 0)
+        combobox.setCurrentIndex(default_index)
+        combobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        combobox.setMinimumHeight(32)
+        combobox.setMinimumWidth(180)
+        combobox.currentIndexChanged.connect(self.build_profile)
+        combobox.setStyleSheet(f"""
+            QComboBox {{
+                background-color: transparent;
+            }}
+
+            QComboBox QAbstractItemView {{
+                background-color: {
+            Palette()
+            .get_palette()
+            .color(QPalette.ColorGroup.Active, QPalette.ColorRole.Window)
+            .name()
+        };
+            }}
+        """)
+        layout.addWidget(combobox)
+
+        return widget
+
+    def primary_command(self, combobox):
+        """Command bar primary command."""
+        widget = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        widget.setLayout(layout)
+
+        setting_button = self.app_bar_icon(code_glyph="\ue713", button_text="Profile Setting")
+        setting_button.setCheckable(True)
+
+        prev_stack_index = 0
+
+        def setting_event():
+            """Profile setting click event."""
+            nonlocal prev_stack_index
+            if setting_button.isChecked():
+                prev_stack_index = self.middle_stack.currentIndex()
+                self.middle_stack.setCurrentIndex(2)
+            else:
+                self.middle_stack.setCurrentIndex(prev_stack_index)
+
+        setting_button.clicked.connect(setting_event)
+        layout.addWidget(setting_button)
+
+        save_button = self.app_bar_icon(code_glyph="\ue74e", button_text="Save Profile")
+
+        save_button.clicked.connect(
+            lambda: self.save_changes(
+                combobox.currentText().strip().lower(), self.middle_stack.widget(2)
+            )
+        )
+        layout.addWidget(save_button)
+
+        return widget
+
+    def app_bar_icon(self, code_glyph: str, button_text: str):
+        """Button  inspired by WinUI3."""
+        button = QPushButton()
+        button.setFlat(True)
+        button.setStyleSheet("background-color: transparent;")
+
+        layout = QHBoxLayout(button)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(8)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        fluent_font = QFont("Segoe Fluent Icons", 12)
+
+        icon = QLabel()
+        icon.setFont(fluent_font)
+        icon.setText(code_glyph)
+        layout.addWidget(icon)
+
+        text = QLabel()
+        text.setText(button_text)
+        layout.addWidget(text)
+
+        button.setMinimumSize(layout.sizeHint())
+
+        return button
 
     def edit_top(self, script_name, lines):
         """Top part of profile manager."""
@@ -182,18 +322,6 @@ class ProfileUI:
         keyboard_select_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         top_layout.addWidget(keyboard_select_button, 2, 3, 1, 1)
 
-    def edit_middle(self, lines, edit_layout: QGridLayout):
-        """Middle part of profile manager."""
-        self.middle_stack = QStackedWidget()
-        self.middle_stack.addWidget(self.scroll_area())
-        text_block = TextMode().text_mode_widget(self.edit_window, self.edit_frame, lines)
-        self.middle_stack.addWidget(text_block)
-        edit_layout.addWidget(self.middle_stack, 1, 0, 1, 4)
-
-        # Add profile mode widget
-        index = diff.mode_map.get(lines[0].strip().lower())
-        self.build_profile(index, lines=lines)
-
     def scroll_area(self):
         """Scroll area with expand button."""
         widget = QWidget()
@@ -205,6 +333,7 @@ class ProfileUI:
         edit_scroll = QScrollArea(self.edit_window)
         layout.addWidget(edit_scroll, 0, 0, 1, 2)
         edit_scroll.setWidgetResizable(True)
+        edit_scroll.setFrameShape(QFrame.NoFrame)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         edit_scroll.setObjectName("editScroll")
         edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
@@ -260,38 +389,6 @@ class ProfileUI:
             self.middle_stack.setCurrentIndex(1)
         else:
             diff.pro_mode(index, lines, self)
-
-    def edit_bottom(self, first_line, top_widget):
-        """Bottom part of profile manager."""
-        bottom_widget = QWidget(self.edit_window)
-        bottom_layout = QGridLayout(bottom_widget)
-        bottom_layout.setContentsMargins(0, 5, 0, 0)
-        bottom_layout.setHorizontalSpacing(225)
-
-        save_button = QPushButton("Save Changes", self.edit_window)
-        save_button.clicked.connect(
-            lambda: self.save_changes(mode_combobox.currentText().strip().lower(), top_widget)
-        )
-        save_button.setFixedHeight(28)
-        save_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        bottom_layout.addWidget(save_button, 0, 0, 1, 1)
-
-        mode_combobox = QComboBox(self.edit_window)
-        mode_combobox.addItems(diff.mode_item)
-        mode_combobox.setEditable(True)
-        mode_combobox.lineEdit().setAlignment(Qt.AlignmentFlag.AlignCenter)
-        mode_combobox.lineEdit().setReadOnly(True)
-        mode_combobox.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        default_index = diff.mode_map.get(first_line.lower(), 0)
-        mode_combobox.setCurrentIndex(default_index)
-        mode_combobox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-        mode_combobox.currentIndexChanged.connect(self.build_profile)
-
-        mode_combobox.setFixedHeight(28)
-        bottom_layout.addWidget(mode_combobox, 0, 3, 1, 1)
-
-        return bottom_widget
 
     def save_changes(self, mode, top_widget: QWidget):
         """Write script."""

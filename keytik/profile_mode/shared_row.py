@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QSizePolicy,
     QStackedWidget,
     QToolButton,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -123,7 +124,7 @@ class SharedRow:  # pylint: disable=R0903
         }
         """)
 
-        edit_layout = parent_window.findChild(QGridLayout)
+        edit_layout = parent_window.findChild(QVBoxLayout, "editLayout")
         prev_layout_margin = edit_layout.contentsMargins()
         button.clicked.connect(
             lambda: self.expand_text_block(button, prev_layout_margin, parent_window)

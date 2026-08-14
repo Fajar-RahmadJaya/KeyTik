@@ -64,7 +64,7 @@ class SettingCombobox(QComboBox):  # pylint: disable=R0903
 class SettingTemplate:
     """Widget template to use across setting UI."""
 
-    def setting_card(self, icon_code: str | None, heading=None, subheading=None):
+    def setting_card(self, icon_code=None, heading=None, subheading=None):
         """Setting card template."""
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -79,7 +79,7 @@ class SettingTemplate:
 
             fluent_font = QFont("Segoe Fluent Icons", 16)
 
-            icon = QLabel()
+            icon = QLabel()  # pylint: disable=R0801
             icon.setFont(fluent_font)
             icon.setText(icon_code)
             icon.setStyleSheet("background-color: transparent;")

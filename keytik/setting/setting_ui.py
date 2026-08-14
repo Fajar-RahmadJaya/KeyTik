@@ -64,7 +64,7 @@ class SettingCombobox(QComboBox):  # pylint: disable=R0903
 class SettingTemplate:
     """Widget template to use across setting UI."""
 
-    def setting_card(self, heading=None, subheading=None):
+    def setting_card(self, icon_code: str | None, heading=None, subheading=None):
         """Setting card template."""
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -72,7 +72,21 @@ class SettingTemplate:
         card_frame.setStyleSheet(Styling().card("setting"))
 
         card_layout = QHBoxLayout(card_frame)
-        card_layout.setContentsMargins(16, 16, 16, 16)
+
+        if icon_code:
+            card_layout.setContentsMargins(20, 16, 16, 16)
+            card_layout.setSpacing(20)
+
+            fluent_font = QFont("Segoe Fluent Icons", 16)
+
+            icon = QLabel()
+            icon.setFont(fluent_font)
+            icon.setText(icon_code)
+            icon.setStyleSheet("background-color: transparent;")
+            icon.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            card_layout.addWidget(icon)
+        else:
+            card_layout.setContentsMargins(16, 16, 16, 16)
 
         if heading and subheading:
             theme_label = QLabel(

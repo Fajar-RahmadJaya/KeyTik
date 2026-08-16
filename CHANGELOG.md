@@ -3,6 +3,7 @@
 ### New Features
 
 - Add ability to peek source script
+- Improve profile ui appearance
 
 ### Improvements
 
@@ -10,6 +11,8 @@
 - *(remap-option)* Improve remap option ui
 - *(key-listening)* Handle mouse listening better
 - *(peek-script)* Allow enable from setting
+- *(create-profile)* Add command bar
+- *(profile-manager)* Add fluent icons fallback
 
 ### Fixes
 

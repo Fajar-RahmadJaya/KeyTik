@@ -18,7 +18,6 @@ import os
 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QFont, QIcon, QPalette  # pylint: disable=E0611
-from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
     QComboBox,
@@ -50,7 +49,6 @@ from keytik.select_program.select_program_ui import SelectProgramUI
 from keytik.setting.setting_ui import SettingTemplate
 from keytik.utility import constant, diff, icons
 from keytik.utility.style import Palette, Styling
-from keytik.utility.utils import Utility
 
 
 class ProfileUI:
@@ -242,26 +240,7 @@ class ProfileUI:
         layout.setSpacing(8)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        winver = Utility().get_windows_version()
-
-        fluent_support = 11
-        mdl2_support = 10
-
-        font = None
-        if winver == fluent_support:
-            font = QFont("Segoe Fluent Icons", 12)
-        elif winver == mdl2_support:
-            font = QFont("Segoe MDL2 Assets", 12)
-
-        if winver in (fluent_support, mdl2_support):
-            icon = QLabel()
-            icon.setFont(font)
-            icon.setText(fluent_icon.get("code_glyph"))
-        else:
-            icon = QSvgWidget()
-            icon.load(fluent_icon.get("material_path"))
-            icon.setMaximumSize(20, 20)
-        layout.addWidget(icon)
+        layout.addWidget(SettingTemplate().adaptive_icon(fluent_icon, 12))
 
         text = QLabel()
         text.setText(button_text)
@@ -334,27 +313,7 @@ class ProfileUI:
         frame.setLayout(layout)
 
         if icon_code:
-            winver = Utility().get_windows_version()
-            fluent_support = 11
-            mdl2_support = 10
-            font = None
-
-            if winver == fluent_support:
-                font = QFont("Segoe Fluent Icons", 12)
-            elif winver == mdl2_support:
-                font = QFont("Segoe MDL2 Assets", 12)
-
-            if winver in (fluent_support, mdl2_support):
-                icon = QLabel()
-                icon.setFont(font)
-                icon.setText(icon_code.get("code_glyph"))
-                icon.setStyleSheet("background-color: transparent;")
-            else:
-                icon = QSvgWidget()
-                icon.load(icon_code.get("material_path"))
-                icon.setMaximumSize(20, 20)
-
-            layout.addWidget(icon)
+            layout.addWidget(SettingTemplate().adaptive_icon(icon_code, 16))
 
         content_widget = QWidget()
         layout.addWidget(content_widget)
@@ -446,7 +405,7 @@ class ProfileUI:
         layout, widget = setting_template.setting_card(
             heading="No Tray Icon",
             subheading="Hide profile from system tray hidden icons.",
-            icon_code="\ued1a",
+            icon_code=icons.fluent_hide,
         )
         switch_widget, switch = setting_template.setting_switch()
         switch.setChecked(False)

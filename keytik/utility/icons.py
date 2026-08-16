@@ -127,3 +127,7 @@ fluent_apps = {
     "code_glyph": "\ued35",
     "material_path": os.path.join(_material_symbols_dir, "apps.svg"),
 }
+fluent_hide = {
+    "code_glyph": "\ued1a",
+    "material_path": os.path.join(_material_symbols_dir, "visibility_off.svg"),
+}

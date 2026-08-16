@@ -104,8 +104,26 @@ eye_closed = os.path.join(_lucide_icons_dir, "eye-closed.svg")
 eye = os.path.join(_lucide_icons_dir, "eye.svg")
 
 # Fluent icons
-fluent_setting = "\ue713"
-fluent_save = "\ue74e"
-fluent_label = "\ue932"
-fluent_input = "\ue961"
-fluent_apps = "\ued35"
+fluent_setting = {
+    "code_glyph": "\ue713",
+    "material_path": os.path.join(_material_symbols_dir, "settings.svg"),
+}
+
+fluent_save = {
+    "code_glyph": "\ue74e",
+    "material_path": os.path.join(_material_symbols_dir, "save.svg"),
+}
+
+fluent_label = {
+    "code_glyph": "\ue932",
+    "material_path": os.path.join(_material_symbols_dir, "label.svg"),
+}
+
+fluent_input = {
+    "code_glyph": "\ue961",
+    "material_path": os.path.join(_material_symbols_dir, "touchpad.svg"),
+}
+fluent_apps = {
+    "code_glyph": "\ued35",
+    "material_path": os.path.join(_material_symbols_dir, "apps.svg"),
+}

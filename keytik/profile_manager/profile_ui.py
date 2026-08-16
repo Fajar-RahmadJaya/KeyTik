@@ -18,6 +18,7 @@ import os
 
 from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QFont, QIcon, QPalette  # pylint: disable=E0611
+from PySide6.QtSvgWidgets import QSvgWidget  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
     QComboBox,
@@ -49,6 +50,7 @@ from keytik.select_program.select_program_ui import SelectProgramUI
 from keytik.setting.setting_ui import SettingTemplate
 from keytik.utility import constant, diff, icons
 from keytik.utility.style import Palette, Styling
+from keytik.utility.utils import Utility
 
 
 class ProfileUI:
@@ -200,7 +202,7 @@ class ProfileUI:
         widget.setLayout(layout)
 
         setting_button = self.app_bar_icon(
-            code_glyph=icons.fluent_setting, button_text="Profile Setting"
+            fluent_icon=icons.fluent_setting, button_text="Profile Setting"
         )
         setting_button.setCheckable(True)
 
@@ -218,7 +220,7 @@ class ProfileUI:
         setting_button.clicked.connect(setting_event)
         layout.addWidget(setting_button)
 
-        save_button = self.app_bar_icon(code_glyph=icons.fluent_save, button_text="Save Profile")
+        save_button = self.app_bar_icon(fluent_icon=icons.fluent_save, button_text="Save Profile")
 
         save_button.clicked.connect(
             lambda: self.save_changes(
@@ -229,7 +231,7 @@ class ProfileUI:
 
         return widget
 
-    def app_bar_icon(self, code_glyph: str, button_text: str):
+    def app_bar_icon(self, fluent_icon: dict[str, str], button_text: str):
         """Button  inspired by WinUI3."""
         button = QPushButton()
         button.setFlat(True)
@@ -240,11 +242,25 @@ class ProfileUI:
         layout.setSpacing(8)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        fluent_font = QFont("Segoe Fluent Icons", 12)
+        winver = Utility().get_windows_version()
 
-        icon = QLabel()
-        icon.setFont(fluent_font)
-        icon.setText(code_glyph)
+        fluent_support = 11
+        mdl2_support = 10
+
+        font = None
+        if winver == fluent_support:
+            font = QFont("Segoe Fluent Icons", 12)
+        elif winver == mdl2_support:
+            font = QFont("Segoe MDL2 Assets", 12)
+
+        if winver in (fluent_support, mdl2_support):
+            icon = QLabel()
+            icon.setFont(font)
+            icon.setText(fluent_icon.get("code_glyph"))
+        else:
+            icon = QSvgWidget()
+            icon.load(fluent_icon.get("material_path"))
+            icon.setMaximumSize(20, 20)
         layout.addWidget(icon)
 
         text = QLabel()
@@ -304,7 +320,7 @@ class ProfileUI:
 
         return widget
 
-    def profile_setting_card(self, header_text: str, icon_code: str | None):
+    def profile_setting_card(self, header_text: str, icon_code: dict[str, str]):
         """Profile setting profile name."""
         frame = QFrame()
         frame.setFrameShape(QFrame.NoFrame)
@@ -318,12 +334,26 @@ class ProfileUI:
         frame.setLayout(layout)
 
         if icon_code:
-            fluent_font = QFont("Segoe Fluent Icons", 16)
+            winver = Utility().get_windows_version()
+            fluent_support = 11
+            mdl2_support = 10
+            font = None
 
-            icon = QLabel()
-            icon.setFont(fluent_font)
-            icon.setText(icon_code)
-            icon.setStyleSheet("background-color: transparent;")
+            if winver == fluent_support:
+                font = QFont("Segoe Fluent Icons", 12)
+            elif winver == mdl2_support:
+                font = QFont("Segoe MDL2 Assets", 12)
+
+            if winver in (fluent_support, mdl2_support):
+                icon = QLabel()
+                icon.setFont(font)
+                icon.setText(icon_code.get("code_glyph"))
+                icon.setStyleSheet("background-color: transparent;")
+            else:
+                icon = QSvgWidget()
+                icon.load(icon_code.get("material_path"))
+                icon.setMaximumSize(20, 20)
+
             layout.addWidget(icon)
 
         content_widget = QWidget()

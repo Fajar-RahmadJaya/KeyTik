@@ -227,7 +227,8 @@ class Utility:
 
     def get_windows_version(self) -> int:
         """Return Windows version ranging from 7 - 11."""
-        # Windows build number. source: https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions
+        # Windows build number
+        # source: https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions
         win7 = 7601
         win8 = 9200
         win10 = 10240
@@ -237,14 +238,16 @@ class Utility:
 
         if winver <= win7:
             return 0
-        elif winver <= win8:
+        if winver <= win8:
             return 7
-        elif winver <= win10:
+        if winver <= win10:
             return 8
-        elif winver <= win11:
+        if winver <= win11:
             return 10
-        elif winver >= win11:
+        if winver >= win11:
             return 11
+
+        return None
 
     def get_metadata(self):
         """Get program metadata.."""

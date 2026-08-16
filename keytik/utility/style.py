@@ -26,7 +26,7 @@ from PySide6.QtCore import QRect, Qt  # pylint: disable=E0611
 from PySide6.QtGui import QColor, QPalette  # pylint: disable=E0611
 
 from keytik.utility import constant
-from keytik.utility.utils import Config
+from keytik.utility.utils import Config, Utility
 
 
 @dataclass
@@ -181,8 +181,8 @@ class Palette:
 class Styling:
     """Shared widget styling."""
 
-    _WINDOWS_BUILD_NUMBER = 22000
-    MICA_SUPPORTED = bool(sys.getwindowsversion().build >= _WINDOWS_BUILD_NUMBER)
+    _MICA_SUPPORT_WINVER = 11
+    MICA_SUPPORTED = bool(Utility().get_windows_version() == _MICA_SUPPORT_WINVER)
     PROFILE_ROW_LABEL = "font-size: 13px; font-weight: bold;"
     TREEVIEW = """
     QHeaderView::down-arrow, QHeaderView::up-arrow {

@@ -99,6 +99,7 @@ class TextMode:
         code_editor.setFontFamily("Consolas")
         code_editor.setFontWeight(400)
         code_editor.setFontPointSize(10)
+        code_editor.setObjectName("codeEditor")
 
         text_content = self.extract_and_filter_content(lines).strip() if lines else None
         code_editor.setPlainText(text_content)

@@ -20,6 +20,7 @@ import re
 from dataclasses import dataclass
 
 from plwidgets.pl_checkbox import PlCheckBox
+from pyqcodeeditor.QCodeEditor import QCodeEditor
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
@@ -146,7 +147,8 @@ class WriteScript:
             file.write(condition_string.device_string)
             file.write(condition_string.hotif_string)
 
-        text_content = middle_stack.widget(1).toPlainText()
+        text_mode_widget = middle_stack.widget(1)
+        text_content = text_mode_widget.findChild(QCodeEditor, "codeEditor").toPlainText()
         if text_content:
             file.write("; Text mode start\n")
             file.write(text_content + "\n")

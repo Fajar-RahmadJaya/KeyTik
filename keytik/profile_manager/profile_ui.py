@@ -100,11 +100,6 @@ class ProfileUI:
         edit_layout.setObjectName("editLayout")
         edit_layout.setContentsMargins(0, 0, 0, 0)
 
-        # Top part of profile manager
-        # top_widget = self.edit_top(script_name, lines)
-        # top_widget.setObjectName("TopWidget")
-        # edit_layout.addWidget(top_widget, 0, 0, 1, 4)
-
         # Middle part of profile manager
         self.middle_stack = QStackedWidget()
 
@@ -119,11 +114,6 @@ class ProfileUI:
         # Add profile mode widget
         index = diff.mode_map.get(lines[0].strip().lower())
         self.build_profile(index, lines=lines)
-
-        # Bottom part of profile manager
-        # bottom_widget = self.edit_bottom(first_line, top_widget)
-        # bottom_widget.setObjectName("BottomWidget")
-        # edit_layout.addWidget(bottom_widget, 2, 0, 1, 4)
 
         edit_layout.addWidget(self.command_bar(first_line))
 
@@ -516,7 +506,7 @@ class ProfileUI:
                     if not default_mode:
                         return
                 # Check if pro version mode
-                elif diff.pro_write(file, mode, condition_string):
+                elif diff.pro_write(file, mode, condition_string, self.middle_stack):
                     pass
                 else:
                     write_script.handle_text_mode(file, self.middle_stack, condition_string)

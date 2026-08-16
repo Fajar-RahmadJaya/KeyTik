@@ -190,6 +190,6 @@ def pro_mode(index, lines, profile_ui: "ProfileUI"):  # pylint: disable=W0613
         text_block.setPlainText(SCREEN_COORDINATE_FINDER)
 
 
-def pro_write(file, mode, condition_string):  # pylint: disable=W0613
+def pro_write(file, mode, condition_string, middle_stack):  # pylint: disable=W0613
     """Dummy write on normal version."""
     return None

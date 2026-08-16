@@ -20,7 +20,7 @@ import webbrowser
 import qt_themes
 from catppuccin import PALETTE as catppuccin_palette
 from plwidgets.pl_checkbox import PlCheckBox
-from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtCore import QSize, Qt  # pylint: disable=E0611
 from PySide6.QtGui import (  # pylint: disable=E0611
     QColor,
     QFont,
@@ -48,7 +48,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_core import SettingCore
-from keytik.utility import constant, diff
+from keytik.utility import constant, diff, icons
 from keytik.utility.style import Palette, Styling
 from keytik.utility.utils import Config, Data, Utility
 
@@ -64,7 +64,7 @@ class SettingCombobox(QComboBox):  # pylint: disable=R0903
 class SettingTemplate:
     """Widget template to use across setting UI."""
 
-    def setting_card(self, heading=None, subheading=None):
+    def setting_card(self, icon_code=None, heading=None, subheading=None):
         """Setting card template."""
         card_frame = QFrame()
         card_frame.setFrameShape(QFrame.NoFrame)
@@ -72,7 +72,16 @@ class SettingTemplate:
         card_frame.setStyleSheet(Styling().card("setting"))
 
         card_layout = QHBoxLayout(card_frame)
-        card_layout.setContentsMargins(16, 16, 16, 16)
+
+        if icon_code:
+            card_layout.setContentsMargins(20, 16, 16, 16)
+            card_layout.setSpacing(20)
+
+            icon = self.adaptive_icon(icon_code, 16)
+            icon.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            card_layout.addWidget(icon)
+        else:
+            card_layout.setContentsMargins(16, 16, 16, 16)
 
         if heading and subheading:
             theme_label = QLabel(
@@ -84,6 +93,31 @@ class SettingTemplate:
             card_layout.addWidget(theme_label)
 
         return card_layout, card_frame
+
+    def adaptive_icon(self, icon_code: dict[str, str], size: int) -> QLabel:
+        """Adaptive icon supporting fluent and material icons."""
+        winver = Utility().get_windows_version()
+        fluent_support = 11
+        mdl2_support = 10
+        font = None
+
+        if winver == fluent_support:
+            font = QFont("Segoe Fluent Icons", size)
+        elif winver == mdl2_support:
+            font = QFont("Segoe MDL2 Assets", size)
+
+        icon = QLabel()
+        if winver in (fluent_support, mdl2_support):
+            icon.setFont(font)
+            icon.setText(icon_code.get("code_glyph"))
+            icon.setStyleSheet("background-color: transparent;")
+        else:
+            material_size = size + 8
+            qicon = icons.get_icon(icon_code.get("material_path"))
+            icon.setPixmap(qicon.pixmap(QSize(material_size, material_size)))
+            icon.setStyleSheet("background-color: transparent;")
+
+        return icon
 
     def setting_combobox(self):
         """Setting combobox template."""

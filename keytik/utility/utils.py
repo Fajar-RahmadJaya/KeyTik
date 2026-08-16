@@ -16,6 +16,7 @@
 
 import json
 import os
+import sys
 import winreg
 from dataclasses import dataclass, field
 
@@ -223,6 +224,30 @@ class Utility:
         self.ahkv2_dir = os.path.join(
             self.get_ahk_install_dir() or r"C:\Program Files\AutoHotkey", "v2"
         )
+
+    def get_windows_version(self) -> int:
+        """Return Windows version ranging from 7 - 11."""
+        # Windows build number
+        # source: https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions
+        win7 = 7601
+        win8 = 9200
+        win10 = 10240
+        win11 = 22000
+
+        winver = sys.getwindowsversion().build
+
+        if winver <= win7:
+            return 0
+        if winver <= win8:
+            return 7
+        if winver <= win10:
+            return 8
+        if winver <= win11:
+            return 10
+        if winver >= win11:
+            return 11
+
+        return None
 
     def get_metadata(self):
         """Get program metadata.."""

@@ -102,3 +102,32 @@ keyboard_arrow_down = os.path.join(_material_symbols_dir, "keyboard_arrow_down.s
 _lucide_icons_dir = os.path.join(icon_dir, "lucide")
 eye_closed = os.path.join(_lucide_icons_dir, "eye-closed.svg")
 eye = os.path.join(_lucide_icons_dir, "eye.svg")
+
+# Fluent icons
+fluent_setting = {
+    "code_glyph": "\ue713",
+    "material_path": os.path.join(_material_symbols_dir, "settings.svg"),
+}
+
+fluent_save = {
+    "code_glyph": "\ue74e",
+    "material_path": os.path.join(_material_symbols_dir, "save.svg"),
+}
+
+fluent_label = {
+    "code_glyph": "\ue932",
+    "material_path": os.path.join(_material_symbols_dir, "label.svg"),
+}
+
+fluent_input = {
+    "code_glyph": "\ue961",
+    "material_path": os.path.join(_material_symbols_dir, "touchpad.svg"),
+}
+fluent_apps = {
+    "code_glyph": "\ued35",
+    "material_path": os.path.join(_material_symbols_dir, "apps.svg"),
+}
+fluent_hide = {
+    "code_glyph": "\ued1a",
+    "material_path": os.path.join(_material_symbols_dir, "visibility_off.svg"),
+}

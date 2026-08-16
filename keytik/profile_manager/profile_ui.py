@@ -250,7 +250,7 @@ class ProfileUI:
 
         return button
 
-    def profile_setting(self, script_name: str, lines: str):
+    def profile_setting(self, script_name: str, lines: list[str]):
         """Profile setting."""
         setting_template = SettingTemplate()
         parse_script = ParseScript()
@@ -295,7 +295,7 @@ class ProfileUI:
 
         scroll_layout.addWidget(self.profile_program(setting_template, lines, parse_script))
 
-        scroll_layout.addWidget(self.profile_no_tray(setting_template))
+        scroll_layout.addWidget(self.profile_no_tray(setting_template, lines))
 
         return widget
 
@@ -354,7 +354,7 @@ class ProfileUI:
         return widget
 
     def profile_device(
-        self, setting_template: SettingTemplate, lines: str, parse_script: ParseScript
+        self, setting_template: SettingTemplate, lines: list[str], parse_script: ParseScript
     ):
         """Bind to device setting widget."""
         widget = self.profile_setting_card(
@@ -380,7 +380,7 @@ class ProfileUI:
         return widget
 
     def profile_program(
-        self, setting_template: SettingTemplate, lines: str, parse_script: ParseScript
+        self, setting_template: SettingTemplate, lines: list[str], parse_script: ParseScript
     ):
         """Bind to program setting widget."""
         widget = self.profile_setting_card("Bind Profile to Programs", icons.fluent_apps)
@@ -400,7 +400,7 @@ class ProfileUI:
 
         return widget
 
-    def profile_no_tray(self, setting_template: SettingTemplate):
+    def profile_no_tray(self, setting_template: SettingTemplate, lines: list[str]):
         """Profile no tray setting."""
         layout, widget = setting_template.setting_card(
             heading="No Tray Icon",
@@ -408,7 +408,13 @@ class ProfileUI:
             icon_code=icons.fluent_hide,
         )
         switch_widget, switch = setting_template.setting_switch()
-        switch.setChecked(False)
+        switch.setObjectName("noTrayCheckbox")
+
+        for line in lines:
+            if line.startswith("#NoTrayIcon"):
+                switch.setChecked(True)
+                break
+
         layout.addWidget(switch_widget)
 
         return widget
@@ -504,17 +510,16 @@ class ProfileUI:
 
                 if mode == "default mode":
                     write_default = WriteDefault(write_script)
-                    default_mode = write_default.handle_default_mode(file, condition_string)
+                    default_mode = write_default.handle_default_mode(
+                        file, condition_string, self.middle_stack
+                    )
                     if not default_mode:
                         return
                 # Check if pro version mode
                 elif diff.pro_write(file, mode, condition_string):
                     pass
                 else:
-                    text_mode = self.middle_stack.widget(1)
-                    write_script.handle_text_mode(
-                        file, text_mode.findChild(QTextEdit), condition_string
-                    )
+                    write_script.handle_text_mode(file, self.middle_stack, condition_string)
 
         except FileNotFoundError as error:
             print(f"Error: {error}")

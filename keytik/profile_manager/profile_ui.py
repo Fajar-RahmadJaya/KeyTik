@@ -47,7 +47,7 @@ from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
 from keytik.select_program.select_program_ui import SelectProgramUI
 from keytik.setting.setting_ui import SettingTemplate
-from keytik.utility import constant, diff
+from keytik.utility import constant, diff, icons
 from keytik.utility.style import Palette, Styling
 
 
@@ -199,7 +199,9 @@ class ProfileUI:
         layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         widget.setLayout(layout)
 
-        setting_button = self.app_bar_icon(code_glyph="\ue713", button_text="Profile Setting")
+        setting_button = self.app_bar_icon(
+            code_glyph=icons.fluent_setting, button_text="Profile Setting"
+        )
         setting_button.setCheckable(True)
 
         prev_stack_index = 0
@@ -216,7 +218,7 @@ class ProfileUI:
         setting_button.clicked.connect(setting_event)
         layout.addWidget(setting_button)
 
-        save_button = self.app_bar_icon(code_glyph="\ue74e", button_text="Save Profile")
+        save_button = self.app_bar_icon(code_glyph=icons.fluent_save, button_text="Save Profile")
 
         save_button.clicked.connect(
             lambda: self.save_changes(
@@ -350,7 +352,7 @@ class ProfileUI:
 
     def profile_name(self, script_name: str):
         """Profile name on profile setting."""
-        widget = self.profile_setting_card("Profile Name", "\ue932")
+        widget = self.profile_setting_card("Profile Name", icons.fluent_label)
         entry = widget.findChild(QLineEdit)
         if script_name:
             entry.setText(script_name.replace(".ahk", ""))
@@ -366,7 +368,9 @@ class ProfileUI:
         self, setting_template: SettingTemplate, lines: str, parse_script: ParseScript
     ):
         """Bind to device setting widget."""
-        widget = self.profile_setting_card("Bind Profile to Keyboards or Mouses", "\ue961")
+        widget = self.profile_setting_card(
+            "Bind Profile to Keyboards or Mouses", icons.fluent_input
+        )
 
         entry = widget.findChild(QLineEdit)
         entry.setObjectName("KeyboardEntry")
@@ -390,7 +394,7 @@ class ProfileUI:
         self, setting_template: SettingTemplate, lines: str, parse_script: ParseScript
     ):
         """Bind to program setting widget."""
-        widget = self.profile_setting_card("Bind Profile to Programs", "\ued35")
+        widget = self.profile_setting_card("Bind Profile to Programs", icons.fluent_apps)
 
         entry = widget.findChild(QLineEdit)
         entry.setObjectName("ProgramEntry")

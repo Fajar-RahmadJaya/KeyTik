@@ -102,3 +102,10 @@ keyboard_arrow_down = os.path.join(_material_symbols_dir, "keyboard_arrow_down.s
 _lucide_icons_dir = os.path.join(icon_dir, "lucide")
 eye_closed = os.path.join(_lucide_icons_dir, "eye-closed.svg")
 eye = os.path.join(_lucide_icons_dir, "eye.svg")
+
+# Fluent icons
+fluent_setting = "\ue713"
+fluent_save = "\ue74e"
+fluent_label = "\ue932"
+fluent_input = "\ue961"
+fluent_apps = "\ued35"

@@ -397,6 +397,11 @@ cm1 := AHI.CreateContextManager(id1)\n
 
             return None
 
+        # Remove duplicate key on default double click
+        double_click_length = 2
+        if len(keys) == double_click_length and keys[0] == keys[1] and is_default_key:
+            keys = keys[0]
+
         for single_key in keys:
             if is_multi_modifier and single_key.title() in modifier_keys:
                 modifier = "".join(modifier_keys.get(single_key.title()))
@@ -419,7 +424,7 @@ cm1 := AHI.CreateContextManager(id1)\n
 
 
 @dataclass
-class RemapWidget:
+class RemapWidget:  # pylint: disable=R0902
     """Dataclass containing key rows tuple."""
 
     default_key_entry: QLineEdit = None
@@ -429,6 +434,8 @@ class RemapWidget:
     hold_interval_entry: QLineEdit = None
     first_key_checkbox: QCheckBox = None
     sc_checkbox: QCheckBox = None
+    hold_remap_checkbox: QCheckBox = None
+    hold_remap_entry: QLineEdit = None
 
 
 class WriteDefault:
@@ -469,6 +476,10 @@ class WriteDefault:
                 ),
                 first_key_checkbox=row_widget.findChild(QCheckBox, RemapObject.first_key_checkbox),
                 sc_checkbox=row_widget.findChild(QCheckBox, RemapObject.scan_code_checkbox),
+                hold_remap_checkbox=row_widget.findChild(
+                    QCheckBox, RemapObject.hold_remap_checkbox
+                ),
+                hold_remap_entry=row_widget.findChild(QLineEdit, RemapObject.hold_remap_entry),
             )
 
             default_key = self.remap_widget.default_key_entry.text()
@@ -486,54 +497,79 @@ class WriteDefault:
                 return False
 
             if remap_key and default_key:
-                self.process_key_remaps(file)
+                default_key_string = self.get_default_string()
+                remap_key_string = self.get_remap_string()
+                if not remap_key_string or not default_key_string:
+                    return False
+
+                file.write(default_key_string + remap_key_string + "\n")
 
         if condition_string:
             file.write("#HotIf\n")
 
         return True
 
-    def process_key_remaps(self, file):
-        """Handle key remap write."""
+    def get_default_string(self) -> str | None:
+        """Get default key string."""
         default_key = self.remap_widget.default_key_entry.text().strip()
-        remap_key = self.remap_widget.remap_key_entry.text().strip()
+        translated_key = self.write_script.translate_key(default_key, is_default_key=True)
 
+        # Double click
         keys = [k.strip() for k in default_key.split("+")]
         double_click_length = 2
         if len(keys) == double_click_length and keys[0] == keys[1]:
-            self.write_double_click(file, keys[0], remap_key)
-            return True
+            return (
+                f"*{translated_key}:: "
+                f'(A_PriorHotkey = "*{translated_key}" and A_TimeSincePriorHotkey < 400) && '
+            )
 
-        translated_key = self.write_script.translate_key(default_key, is_default_key=True)
-        if not translated_key:
-            return False
+        # Remap hold
+        if self.remap_widget.hold_remap_checkbox.isChecked():
+            if len(keys) != 1:
+                return None
 
+            hold_interval = self.remap_widget.hold_remap_entry.text().strip()
+            return (
+                f"*{translated_key}:: "
+                f'KeyWait("{translated_key}", "T{hold_interval if hold_interval else "0.5"}") ? '
+                f'Send("{translated_key}") : '
+            )
+
+        # Disable first key
         if not self.remap_widget.first_key_checkbox.isChecked() and "+" in default_key:
-            key = "~" + translated_key
-        else:
-            key = translated_key
+            return f"~{translated_key}::"
 
-        self.handle_remap_type(file, key, remap_key)
+        # Hold format default need '*' prefix
+        if self.remap_widget.hold_format_checkbox.isChecked() and "&" not in translated_key:
+            return f"*{translated_key}::"
 
-        return True
+        return f"{translated_key}::"  # Normal default key
 
-    def handle_remap_type(self, file, default_translated, remap_key):
-        """Handle text, hold, single, multiple key mode."""
+    def get_remap_string(self) -> str | None:
+        """Get remap key string."""
+        remap_key = self.remap_widget.remap_key_entry.text().strip()
+
+        # Text format
         if self.remap_widget.text_format_checkbox.isChecked():
-            self.write_text_format(file, default_translated, remap_key)
-        elif self.remap_widget.hold_format_checkbox.isChecked():
-            self.write_hold_format(file, default_translated, remap_key)
-        elif "+" in remap_key:
-            self.write_multiple_key_remap(file, default_translated, remap_key)
-        else:
-            self.write_single_key_remap(file, default_translated, remap_key)
+            return f'(A_Clipboard := "{remap_key}", Send("^v"))'
 
-    def write_text_format(self, file, default_translated, remap_key):
-        """Write text format (Send literal string)."""
-        file.write(f'{default_translated}::A_Clipboard := "{remap_key}", Send("^v")\n')
+        # Hold format
+        if self.remap_widget.hold_format_checkbox.isChecked():
+            return self.get_hold_format_string(remap_key)
 
-    def write_hold_format(self, file, default_translated, remap_key):
-        """Write hold format."""
+        # Multi remap key
+        if "+" in remap_key:
+            return self.get_multiple_key_remap(remap_key)
+
+        # Unicode key
+        if self.write_script.is_unicode_key(remap_key):
+            return f"SendInput(Chr({ord(remap_key)}))"
+
+        # Single/normal key
+        return f'Send("{self.write_script.translate_key(remap_key)}")'
+
+    def get_hold_format_string(self, remap_key):
+        """Get hold format syntax."""
         hold_interval_ms = "10000"
         if (
             self.remap_widget.hold_format_checkbox.isChecked()
@@ -563,19 +599,13 @@ class WriteDefault:
         down_sequence = "".join(down_parts)
         up_sequence = "".join(up_parts)
 
-        if "&" in default_translated:
-            file.write(
-                f'{default_translated}::(SendInput("{down_sequence}"), '
-                f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
-            )
-        else:
-            file.write(
-                f'*{default_translated}::(SendInput("{down_sequence}"), '
-                f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
-            )
+        return (
+            f'(SendInput("{down_sequence}"), '
+            f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))'
+        )
 
-    def write_multiple_key_remap(self, file, default_translated, remap_key):
-        """Write multiple key case on remap key."""
+    def get_multiple_key_remap(self, remap_key):
+        """Get multi key script syntax."""
         keys = [key.strip() for key in remap_key.split("+")]
         send_parts_down = []
         send_parts_up = []
@@ -590,52 +620,8 @@ class WriteDefault:
                 send_parts_up.insert(0, f"{{{tr_key} up}}")
 
         send_sequence = "".join(send_parts_down + send_parts_up)
-        file.write(f'{default_translated}::SendInput("{send_sequence}")\n')
 
-    def write_single_key_remap(self, file, default_translated, remap_key):
-        """Write single key case on remap key."""
-        if self.write_script.is_unicode_key(remap_key):
-            file.write(f"{default_translated}::SendInput Chr({ord(remap_key)})\n")
-        else:
-            remap_key_tr = self.write_script.translate_key(remap_key)
-            file.write(f"{default_translated}::{remap_key_tr}\n")
-
-    def write_double_click(self, file, single_key, remap_key):
-        """Write double click (same key twice) on default key."""
-        translated_key = self.write_script.translate_key(single_key)
-
-        file.write(f"*{translated_key}::{{\n")
-        file.write(
-            f'    if (A_PriorHotkey = "*{translated_key}") and (A_TimeSincePriorHotkey < 400)\n'
-        )
-
-        if self.remap_widget.text_format_checkbox.isChecked():
-            file.write(f'        A_Clipboard := "{remap_key}", Send("^v")\n')
-        elif self.remap_widget.hold_format_checkbox.isChecked():
-            self.hold_format_double_click(remap_key, file)
-        elif "+" in remap_key:
-            keys = [key.strip() for key in remap_key.split("+")]
-            send_parts_down = []
-            send_parts_up = []
-
-            for key in keys:
-                if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(key):
-                    send_parts_down.append(f'{{" Chr({ord(key)}) " down}}')
-                    send_parts_up.insert(0, f'{{" Chr({ord(key)}) " up}}')
-                else:
-                    tr_key = self.write_script.translate_key(key)
-                    send_parts_down.append(f"{{{tr_key} down}}")
-                    send_parts_up.insert(0, f"{{{tr_key} up}}")
-
-            send_sequence = "".join(send_parts_down + send_parts_up)
-            file.write(f'        SendInput("{send_sequence}")\n')
-        elif hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(remap_key):
-            file.write(f"        Send Chr({ord(remap_key)})\n")
-        else:
-            remap_key_tr = self.write_script.translate_key(remap_key)
-            file.write(f'        SendInput("{remap_key_tr}")\n')
-
-        file.write("    }\n")
+        return f'(SendInput("{send_sequence}"))'
 
     def hold_format_double_click(self, remap_key, file):
         """Write double click on hold format."""

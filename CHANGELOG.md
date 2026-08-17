@@ -4,6 +4,7 @@
 
 - Add ability to peek source script
 - Improve profile ui appearance
+- Add no tray icon profile option
 
 ### Improvements
 
@@ -22,3 +23,4 @@
 - Fix normal click is written on double click
 - Fix change profile directory error
 - Fix can't add profile to startup error
+- Fix text mode save error

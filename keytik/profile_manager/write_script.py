@@ -19,6 +19,8 @@ import random
 import re
 from dataclasses import dataclass
 
+from plwidgets.pl_checkbox import PlCheckBox
+from pyqcodeeditor.QCodeEditor import QCodeEditor
 from PySide6.QtGui import QIcon  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
@@ -27,7 +29,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QLineEdit,
     QMessageBox,
     QScrollArea,
-    QTextEdit,
+    QStackedWidget,
     QWidget,
 )
 
@@ -122,19 +124,31 @@ class WriteScript:
             return False
         return True
 
-    def handle_text_mode(self, file, text_block: QTextEdit, condition_string: ConditionString):
-        """Write text mode."""
-        file.write("; text\n")
-        self.dashboard_core.generate_exit_key(os.path.basename(file.name), file)
+    def write_script_header(self, file, mode: str, is_notray: bool):
+        """Write script header."""
+        dashboard_core = DashboardCore()  # Composition
+
+        file.write(f"; {mode}\n")
+        dashboard_core.generate_exit_key(os.path.basename(file.name), file)
         file.write("#SingleInstance force\n")
         file.write("#Requires AutoHotkey v2.0\n")
+        if is_notray:
+            file.write("#NoTrayIcon\n")
+
+    def handle_text_mode(
+        self, file, middle_stack: QStackedWidget, condition_string: ConditionString
+    ):
+        """Write text mode."""
+        is_notray = middle_stack.widget(2).findChild(PlCheckBox, "noTrayCheckbox").isChecked()
+        self.write_script_header(file, "text", is_notray)
 
         if condition_string:
             file.write(condition_string.shortcut_string)
             file.write(condition_string.device_string)
             file.write(condition_string.hotif_string)
 
-        text_content = text_block.toPlainText()
+        text_mode_widget = middle_stack.widget(1)
+        text_content = text_mode_widget.findChild(QCodeEditor, "codeEditor").toPlainText()
         if text_content:
             file.write("; Text mode start\n")
             file.write(text_content + "\n")
@@ -426,15 +440,12 @@ class WriteDefault:
 
         self.remap_widget = RemapWidget
 
-    def handle_default_mode(self, file, condition_string: ConditionString):
+    def handle_default_mode(
+        self, file, condition_string: ConditionString, middle_stack: QStackedWidget
+    ):
         """Write default mode."""
-        dashboard_core = DashboardCore()  # Composition
-
-        file.write("; default\n")
-        dashboard_core.generate_exit_key(os.path.basename(file.name), file)
-        file.write("#SingleInstance force\n")
-        file.write("#Requires AutoHotkey v2.0\n")
-
+        is_notray = middle_stack.widget(2).findChild(PlCheckBox, "noTrayCheckbox").isChecked()
+        self.write_script.write_script_header(file, "default", is_notray)
         if condition_string:
             file.write(condition_string.shortcut_string)
             file.write(condition_string.device_string)

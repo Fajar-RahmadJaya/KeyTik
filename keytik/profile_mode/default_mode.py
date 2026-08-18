@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget,
 )
 
-from keytik.profile_manager.parse_script import ParseScript
+from keytik.profile_manager.parse_script import ParsedRemap, ParseScript
 from keytik.profile_mode.key_listening import KeyListening
 from keytik.profile_mode.shared_row import SharedRow
 from keytik.select_key.select_key_ui import SelectKeyUI
@@ -49,6 +49,8 @@ class RemapObject:  # pylint: disable=R0903
     text_format_checkbox = "TextFormatCheckbox"
     hold_format_checkbox = "HoldFormatCheckbox"
     hold_interval_entry = "HoldIntervalEntry"
+    hold_remap_checkbox = "HoldRemapCheckbox"
+    hold_remap_entry = "HoldRemapEntry"
 
 
 class DefaultMode:
@@ -153,7 +155,7 @@ class DefaultMode:
 
         return remap_label_widget
 
-    def remap_card(self, parent_window=None, parsed_remap=None):
+    def remap_card(self, parent_window=None, parsed_remap: ParsedRemap = None):
         """Remap row."""
         # Remap row card
         self.remap_frame = QFrame()
@@ -183,7 +185,7 @@ class DefaultMode:
 
         return self.remap_frame
 
-    def default_key_widget(self, parsed_remap, parent_window):
+    def default_key_widget(self, parsed_remap: ParsedRemap, parent_window):
         """Default key widget on remap row."""
         default_key_container = QWidget()
         default_key_container.setContentsMargins(32, 0, 8, 0)
@@ -227,7 +229,7 @@ class DefaultMode:
 
         return default_key_container
 
-    def remap_key_widget(self, parsed_remap, parent_window):
+    def remap_key_widget(self, parsed_remap: ParsedRemap, parent_window):
         """Remap key widget on remap row."""
         remap_key_container = QWidget()
         remap_key_container.setContentsMargins(8, 0, 32, 0)
@@ -267,7 +269,7 @@ class DefaultMode:
 
         return remap_key_container
 
-    def option_widget(self, parsed_remap):
+    def option_widget(self, parsed_remap: ParsedRemap):
         """Remap option collapsible widget."""
         widget = QWidget()
         layout = QVBoxLayout()
@@ -383,7 +385,7 @@ class DefaultMode:
 
         return button, icon
 
-    def default_option_content(self, parsed_remap):
+    def default_option_content(self, parsed_remap: ParsedRemap):
         """Get default key option widget."""
         widget = QWidget()
         layout = QHBoxLayout()
@@ -410,11 +412,50 @@ class DefaultMode:
         )
         if parsed_remap:
             sc_checkbox.setChecked(parsed_remap.is_sc)
-        layout.addWidget(sc_checkbox, alignment=Qt.AlignCenter)
+        layout.addWidget(sc_checkbox, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        hold_remap = QWidget()
+        hold_remap_layout = QHBoxLayout()
+        hold_remap_layout.setContentsMargins(0, 0, 0, 0)
+        hold_remap.setLayout(hold_remap_layout)
+        layout.addWidget(hold_remap, alignment=Qt.AlignCenter)
+
+        hold_remap_checkbox = QCheckBox("Remap Key Hold")
+        hold_remap_checkbox.setObjectName(RemapObject.hold_remap_checkbox)
+        hold_remap_checkbox.setToolTip("Default Key Only: Remap key hold action")
+        if parsed_remap:
+            hold_remap_checkbox.setChecked(parsed_remap.is_remap_hold)
+        hold_remap_layout.addWidget(hold_remap_checkbox)
+
+        hold_remap_entry = QLineEdit()
+        hold_remap_entry.setObjectName(RemapObject.hold_remap_entry)
+        hold_remap_entry.setPlaceholderText("0.5")
+        hold_remap_entry.setFixedWidth(40)
+        hold_remap_entry.setFixedHeight(hold_remap_checkbox.sizeHint().height())
+        hold_remap_entry.setToolTip(
+            "Default Key Only: Enter the hold interval in seconds (Default is 0.5 second)"
+        )
+        hold_remap_entry.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        hold_remap_layout.addWidget(hold_remap_entry)
+
+        def hold_entry_status():
+            """Set hold interval entry to be disabled or not."""
+            if hold_remap_checkbox.isChecked():
+                hold_remap_entry.setDisabled(False)
+            else:
+                hold_remap_entry.setDisabled(True)
+
+        hold_entry_status()
+        hold_remap_checkbox.toggled.connect(hold_entry_status)
+
+        if parsed_remap:
+            hold_remap_entry.setText(str(parsed_remap.remap_hold_interval))
+
+        layout.addWidget(hold_remap, alignment=Qt.AlignmentFlag.AlignCenter)
 
         return widget
 
-    def remap_option_content(self, parsed_remap):
+    def remap_option_content(self, parsed_remap: ParsedRemap):
         """Get remap key option widget."""
         widget = QWidget()
         layout = QHBoxLayout()
@@ -449,7 +490,7 @@ class DefaultMode:
 
         hold_interval_entry = QLineEdit()
         hold_interval_entry.setObjectName(RemapObject.hold_interval_entry)
-        hold_interval_entry.setPlaceholderText("Int")
+        hold_interval_entry.setPlaceholderText("10")
         hold_interval_entry.setFixedWidth(40)
         hold_interval_entry.setFixedHeight(hold_format_checkbox.sizeHint().height())
         hold_interval_entry.setToolTip(

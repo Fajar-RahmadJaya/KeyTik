@@ -22,7 +22,7 @@ from keytik.utility import constant
 
 
 @dataclass
-class ParsedRemap:
+class ParsedRemap:  # pylint: disable=R0902
     """Data class containing parsed remap."""
 
     default_key: str = ""
@@ -32,6 +32,8 @@ class ParsedRemap:
     is_first_key: bool = False
     is_sc: bool = False
     is_text_format: bool = False
+    remap_hold_interval: float = 0.5
+    is_remap_hold: bool = False
 
 
 class ParseScript:
@@ -113,12 +115,9 @@ class ParseScript:
 
         return shortcuts_key
 
-    def parse_default_mode(self, lines):
+    def parse_default_mode(self, lines: list[str]):
         """Parse default mode."""
         remaps = []
-        in_block = False
-        current_block = []
-        default_key = ""
 
         for string in lines[3:]:
             line = string.strip()
@@ -126,23 +125,6 @@ class ParseScript:
                 continue
 
             if line.startswith("#HotIf"):
-                continue
-
-            if in_block:
-                if line == "}":
-                    in_block = False
-                    block_text = " ".join(current_block)
-                    remaps.append(self.parse_double_click(default_key, block_text))
-                    current_block = []
-                    continue
-
-                current_block.append(line)
-                continue
-
-            if line.startswith("*") and "::{" in line:
-                default_key = line[1 : line.index("::{")]
-                in_block = True
-                current_block = []
                 continue
 
             if "::" in line and "::{" not in line and ":: ; Shortcuts" not in line:
@@ -177,59 +159,67 @@ class ParseScript:
 
     def parse_remap_key(self, line: str):
         """Parse remap key line."""
-        parts = line.split("::")
-        default = parts[0].strip()
-        remap = parts[1].strip() if len(parts) > 1 else ""
         parsed_remap = ParsedRemap()
 
-        default_key = self.parse_default_key(default)
-        parsed_remap.default_key = default_key
+        if "A_PriorHotkey" in line:  # Double click
+            parts = line.split("&&")
+            default_string = parts[0].strip()
+            default_split = default_string.split("::")
 
+            default = default_split[0].strip()
+            default_option = default_split[1].strip()
+            remap = parts[1].strip()
+        elif "KeyWait" in line:  # Remap hold
+            parts = line.split(" : ")
+            default_string = parts[0].strip()
+            default_split = default_string.split("::")
+
+            default = default_split[0].strip()
+            default_option = default_split[1].strip()
+            remap = parts[1].strip()
+        else:  # Normal
+            parts = line.split("::")
+            default = parts[0].strip()
+            default_option = ""
+            remap = parts[1].strip()
+
+        # Scan code, normal default, double click
+        default_key = self.parse_default_key(default)
+        parsed_remap.default_key = (
+            default_key
+            if "A_PriorHotkey" not in default_option
+            else f"{default_key} + {default_key}"
+        )
+
+        # Disable first key
         if not default.startswith("~") and "&" in default:
             parsed_remap.is_first_key = True
 
-        if default.startswith(("SC", "~SC")):
-            parsed_remap.is_sc = True
-            parsed_remap.default_key = default.replace("&", "+").replace("~", "")
+        # Remap key hold action, option
+        if "KeyWait" in default_option:
+            remap_hold = re.search(r'KeyWait\("[^"]+",\s*"T(\d+(?:\.\d+)?)"\)', default_option)
+            parsed_remap.remap_hold_interval = remap_hold.group(1)
+            parsed_remap.is_remap_hold = True
 
+        # Text format
         if "A_Clipboard :=" in remap and ', Send("^v")' in remap:
             key = self.parse_text_format(remap)
             parsed_remap.is_text_format = True
+
+        # Hold format
         elif "SetTimer" in remap:
             key = self.parse_hold_format(remap, parsed_remap)
             parsed_remap.is_hold_format = True
-        elif remap.startswith("Send") or remap.startswith("SendInput"):
+
+        # Multi remap key, Unicode
+        elif "Send" in remap:
             key = self.parse_send_remap(remap)
+
+        # Single remap key
         else:
             key = remap
 
         parsed_remap.remap_key = self.key_map.get(key, key)
-
-        return parsed_remap
-
-    def parse_double_click(self, default_key: str, block_text):
-        """Parse double click mode from default key."""
-        parsed_remap = ParsedRemap()
-        parsed_remap.default_key = f"{default_key} + {default_key}"
-
-        if not default_key.startswith("~") and "&" in default_key:
-            parsed_remap.is_first_key = True
-
-        if default_key.startswith("SC") or default_key.startswith("~SC"):
-            parsed_remap.is_sc = True
-
-        if "A_PriorHotkey" in block_text and "A_TimeSincePriorHotkey < 400" in block_text:
-            if "A_Clipboard :=" in block_text and ', Send("^v")' in block_text:
-                parsed_remap.remap_key = self.parse_text_format(block_text)
-                parsed_remap.is_text_format = True
-            elif "SetTimer" in block_text:
-                parsed_remap.remap_key = self.parse_hold_format(block_text, parsed_remap)
-                parsed_remap.is_hold_format = True
-            else:
-                send_match = re.search(r'Send(?:Input)?\("(.+?)"\)', block_text)
-                parsed_remap.remap_key = (
-                    self.parse_send_remap(send_match.group(0)) if send_match else ""
-                )
 
         return parsed_remap
 
@@ -263,14 +253,15 @@ class ParseScript:
 
         return remap_key
 
-    def parse_send_remap(self, remap_or_action):
+    def parse_send_remap(self, remap: str):
         """Parse SendInput line."""
-        if remap_or_action.startswith("SendInput("):
-            key_sequence = remap_or_action[len("SendInput(") : -1]
-        elif remap_or_action.startswith("Send("):
-            key_sequence = remap_or_action[len("Send(") : -1]
+        if "SendInput" in remap:
+            key_sequence = remap[len("SendInput(") : -1]
+        elif "Send" in remap:
+            key_sequence = remap[len("Send(") : -1]
         else:
-            key_sequence = remap_or_action.split(" ", 1)[1]
+            key_sequence = remap.split(" ", 1)[1]
+
         key_sequence = self.get_unicode(key_sequence)
         keys = []
         remap_key = ""

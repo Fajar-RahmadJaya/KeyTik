@@ -5,6 +5,7 @@
 - Add ability to peek source script
 - Improve profile ui appearance
 - Add no tray icon profile option
+- Allow remapping key hold into some action
 
 ### Improvements
 

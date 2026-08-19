@@ -15,6 +15,7 @@
 - *(peek-script)* Allow enable from setting
 - *(create-profile)* Add command bar
 - *(profile-manager)* Add fluent icons fallback
+- *(profile-manager)* Improve ux
 
 ### Fixes
 

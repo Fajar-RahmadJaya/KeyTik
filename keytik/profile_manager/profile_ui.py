@@ -51,6 +51,22 @@ from keytik.utility import constant, diff, icons
 from keytik.utility.style import Palette, Styling
 
 
+class ProfileObject:
+    """Profile widget object name."""
+
+    editLayout = "editLayout"
+    commandBar = "commandBar"
+    profileSettingScroll = "profileSettingScroll"
+    profileScrollContent = "profileScrollContent"
+    profileCard = "profileCard"
+    scriptNameEntry = "scriptNameEntry"
+    keyboardEntry = "keyboardEntry"
+    programEntry = "programEntry"
+    noTrayCheckbox = "noTrayCheckbox"
+    editScroll = "editScroll"
+    editFrame = "editFrame"
+
+
 class ProfileUI:
     """Create/edit profile UI."""
 
@@ -97,7 +113,7 @@ class ProfileUI:
         Styling().apply_mica(self.edit_window)
 
         edit_layout = QVBoxLayout(self.edit_window)
-        edit_layout.setObjectName("editLayout")
+        edit_layout.setObjectName(ProfileObject.editLayout)
         edit_layout.setContentsMargins(0, 0, 0, 0)
 
         # Middle part of profile manager
@@ -123,7 +139,7 @@ class ProfileUI:
     def command_bar(self, first_line: str):
         """Command bar inspired by WinUI3."""
         widget = QWidget()
-        widget.setObjectName("commandBar")
+        widget.setObjectName(ProfileObject.commandBar)
         widget.setStyleSheet("#commandBar { background-color: rgba(0, 0, 0, 0.08); }")  # 1C1C1C
 
         layout = QHBoxLayout()
@@ -263,14 +279,14 @@ class ProfileUI:
         layout.addWidget(title)
 
         scroll_area = QScrollArea()
-        scroll_area.setObjectName("profileSettingScroll")
+        scroll_area.setObjectName(ProfileObject.profileSettingScroll)
         scroll_area.setStyleSheet("#profileSettingScroll {background-color: transparent;}")
         scroll_area.setFrameShape(QFrame.NoFrame)
         scroll_area.setWidgetResizable(True)
         layout.addWidget(scroll_area)
 
         scroll_widget = QWidget()
-        scroll_widget.setObjectName("profileScrollContent")
+        scroll_widget.setObjectName(ProfileObject.profileScrollContent)
         scroll_widget.setStyleSheet("#profileScrollContent {background-color: transparent;}")
         scroll_area.setWidget(scroll_widget)
 
@@ -281,9 +297,9 @@ class ProfileUI:
 
         scroll_layout.addWidget(self.profile_name(script_name))
 
-        scroll_layout.addWidget(self.profile_device(setting_template, lines, parse_script))
-
         scroll_layout.addWidget(self.profile_program(setting_template, lines, parse_script))
+
+        scroll_layout.addWidget(self.profile_device(setting_template, lines, parse_script))
 
         scroll_layout.addWidget(self.profile_no_tray(setting_template, lines))
 
@@ -293,7 +309,7 @@ class ProfileUI:
         """Profile setting profile name."""
         frame = QFrame()
         frame.setFrameShape(QFrame.NoFrame)
-        frame.setObjectName("profileCard")
+        frame.setObjectName(ProfileObject.profileCard)
         frame.setStyleSheet(Styling().card("profileCard"))
         frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
@@ -339,7 +355,7 @@ class ProfileUI:
         else:
             entry.setText("")
             entry.setReadOnly(False)
-        entry.setObjectName("ScriptNameEntry")
+        entry.setObjectName(ProfileObject.scriptNameEntry)
 
         return widget
 
@@ -352,7 +368,7 @@ class ProfileUI:
         )
 
         entry = widget.findChild(QLineEdit)
-        entry.setObjectName("KeyboardEntry")
+        entry.setObjectName(ProfileObject.keyboardEntry)
         device_line = parse_script.parse_device(lines) if lines else None
         entry.setText(device_line)
 
@@ -376,7 +392,7 @@ class ProfileUI:
         widget = self.profile_setting_card("Bind Profile to Programs", icons.fluent_apps)
 
         entry = widget.findChild(QLineEdit)
-        entry.setObjectName("ProgramEntry")
+        entry.setObjectName(ProfileObject.programEntry)
         program_line = parse_script.parse_program(lines) if lines else None
         entry.setText(program_line)
 
@@ -398,7 +414,7 @@ class ProfileUI:
             icon_code=icons.fluent_hide,
         )
         switch_widget, switch = setting_template.setting_switch()
-        switch.setObjectName("noTrayCheckbox")
+        switch.setObjectName(ProfileObject.noTrayCheckbox)
 
         for line in lines:
             if line.startswith("#NoTrayIcon"):
@@ -422,11 +438,11 @@ class ProfileUI:
         edit_scroll.setWidgetResizable(True)
         edit_scroll.setFrameShape(QFrame.NoFrame)
         edit_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        edit_scroll.setObjectName("editScroll")
+        edit_scroll.setObjectName(ProfileObject.editScroll)
         edit_scroll.setStyleSheet("#editScroll {background-color: transparent;}")
 
         self.edit_frame = QWidget()
-        self.edit_frame.setObjectName("editFrame")
+        self.edit_frame.setObjectName(ProfileObject.editFrame)
         self.edit_frame.setStyleSheet(
             """QWidget#editFrame {
             background: transparent;
@@ -479,8 +495,8 @@ class ProfileUI:
 
     def save_changes(self, mode, top_widget: QWidget):
         """Write script."""
-        script_name_entry = top_widget.findChild(QLineEdit, "ScriptNameEntry")
-        script_name = script_name_entry.text().strip() + ".ahk"
+        script_name_entry = top_widget.findChild(QLineEdit, ProfileObject.scriptNameEntry)
+        script_name = script_name_entry.text()
 
         if not script_name_entry.text():
             QMessageBox.warning(

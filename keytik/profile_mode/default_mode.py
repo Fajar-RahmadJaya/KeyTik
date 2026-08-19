@@ -319,13 +319,7 @@ class DefaultMode:
         default_header.setStyleSheet(self.styling.option_header_style())
         layout.addWidget(default_header)
 
-        vertical_separator = QWidget()
-        vertical_separator.setStyleSheet(
-            f"background-color: {Palette().get_palette_role().surface}"
-        )
-        vertical_separator.setFixedWidth(3)
-        vertical_separator.setFixedHeight(20)
-        layout.addWidget(vertical_separator)
+        layout.addWidget(self.option_separator())
 
         remap_header, remap_header_icon = self.option_header_button("Remap Key Option")
         remap_header_icon.setPixmap(keyboard_arrow_down)
@@ -360,7 +354,29 @@ class DefaultMode:
         default_header.clicked.connect(lambda: default_click_event(default_header.isChecked()))
         remap_header.clicked.connect(lambda: remap_click_event(remap_header.isChecked()))
 
+        # Expand header if any checkbox in content is checked
+        remap_checkbox_list = remap_option_content.findChildren(QCheckBox)
+        for remap_checkbox in remap_checkbox_list:
+            if remap_checkbox.isChecked():
+                remap_click_event(True)
+
+        default_checkbox_list = default_option_content.findChildren(QCheckBox)
+        for default_checkbox in default_checkbox_list:
+            if default_checkbox.isChecked():
+                default_click_event(True)
+
         return widget
+
+    def option_separator(self):
+        """Option header separator."""
+        vertical_separator = QWidget()
+        vertical_separator.setStyleSheet(
+            f"background-color: {Palette().get_palette_role().surface}"
+        )
+        vertical_separator.setFixedWidth(3)
+        vertical_separator.setFixedHeight(20)
+
+        return vertical_separator
 
     def option_header_button(self, title_string: str):
         """Get remap option header widget."""

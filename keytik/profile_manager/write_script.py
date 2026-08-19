@@ -165,11 +165,11 @@ class WriteScript:
         shortcut_string = self.shortcuts_condition(hotif_conditions)
 
         # Device condition
-        keyboard_entry = top_widget.findChild(QLineEdit, "KeyboardEntry")
+        keyboard_entry = top_widget.findChild(QLineEdit, "keyboardEntry")
         device_string = self.device_condition(hotif_conditions, keyboard_entry)
 
         # Program condition
-        program_entry = top_widget.findChild(QLineEdit, "ProgramEntry")
+        program_entry = top_widget.findChild(QLineEdit, "programEntry")
         self.get_program_condition(hotif_conditions, program_entry)
 
         if hotif_conditions:

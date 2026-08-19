@@ -16,6 +16,7 @@
 - *(create-profile)* Add command bar
 - *(profile-manager)* Add fluent icons fallback
 - *(profile-manager)* Improve ux
+- *(default-mode)* Allow option to auto expand
 
 ### Fixes
 
@@ -26,3 +27,4 @@
 - Fix change profile directory error
 - Fix can't add profile to startup error
 - Fix text mode save error
+- Fix scan code not detected

@@ -51,7 +51,7 @@ from keytik.utility import constant, diff, icons
 from keytik.utility.style import Palette, Styling
 
 
-class ProfileObject:
+class ProfileObject:  # pylint:disable=R0903
     """Profile widget object name."""
 
     editLayout = "editLayout"
@@ -499,6 +499,8 @@ class ProfileUI:
         script_name = script_name_entry.text()
 
         if not script_name_entry.text():
+            self.middle_stack.setCurrentIndex(2)
+            script_name_entry.setFocus()
             QMessageBox.warning(
                 QApplication.activeWindow(), "Input Error", "Please enter a Profile name."
             )

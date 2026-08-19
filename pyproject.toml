@@ -110,3 +110,10 @@ commit_parsers = [
     { message = "^docs", skip = true },
 ]
 skip_tags = "beta"
+
+# --- License ---
+[tool.pip-licenses]
+from = "mixed"
+format = "json"
+with-license-file = true
+output-file = "keytik/_internal/Data/open-source-licenses.json"

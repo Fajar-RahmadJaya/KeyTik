@@ -496,7 +496,6 @@ class ProfileUI:
     def save_changes(self, mode, top_widget: QWidget):
         """Write script."""
         script_name_entry = top_widget.findChild(QLineEdit, ProfileObject.scriptNameEntry)
-        script_name = script_name_entry.text()
 
         if not script_name_entry.text():
             self.middle_stack.setCurrentIndex(2)
@@ -510,6 +509,8 @@ class ProfileUI:
         write_script = WriteScript(self.middle_stack.widget(0), self.shortcut_row_comp)
         if not write_script.check_shortcut_integrity():
             return
+
+        script_name = script_name_entry.text().strip() + ".ahk"
 
         try:
             output_path = os.path.join(self.main_core.script_dir, script_name)

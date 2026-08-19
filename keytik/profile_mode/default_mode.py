@@ -355,6 +355,16 @@ class DefaultMode:
         remap_header.clicked.connect(lambda: remap_click_event(remap_header.isChecked()))
 
         # Expand header if any checkbox in content is checked
+        self.option_expand(
+            remap_option_content, remap_click_event, default_option_content, default_click_event
+        )
+
+        return widget
+
+    def option_expand(
+        self, remap_option_content, remap_click_event, default_option_content, default_click_event
+    ):
+        """Whether or not option should exapand."""
         remap_checkbox_list = remap_option_content.findChildren(QCheckBox)
         for remap_checkbox in remap_checkbox_list:
             if remap_checkbox.isChecked():
@@ -364,8 +374,6 @@ class DefaultMode:
         for default_checkbox in default_checkbox_list:
             if default_checkbox.isChecked():
                 default_click_event(True)
-
-        return widget
 
     def option_separator(self):
         """Option header separator."""

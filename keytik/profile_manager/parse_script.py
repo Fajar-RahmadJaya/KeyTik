@@ -183,13 +183,17 @@ class ParseScript:
             default_option = ""
             remap = parts[1].strip()
 
-        # Scan code, normal default, double click
+        # Normal default, double click
         default_key = self.parse_default_key(default)
         parsed_remap.default_key = (
             default_key
             if "A_PriorHotkey" not in default_option
             else f"{default_key} + {default_key}"
         )
+
+        # Scan code
+        if "SC" in default_key:
+            parsed_remap.is_sc = True
 
         # Disable first key
         if not default.startswith("~") and "&" in default:

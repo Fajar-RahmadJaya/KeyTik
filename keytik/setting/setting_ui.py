@@ -188,6 +188,89 @@ class SettingTemplate:
 
         return widget, switch
 
+    def bread_crumb_bar(self, stack_widget: QStackedWidget):
+        """Bread crumb inspired by WinUi3."""
+        widget = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        widget.setLayout(layout)
+
+        index_list = []
+
+        def stack_change_event(is_start: bool = False):
+            """Change breadcrumb based on index."""
+            nonlocal index_list
+
+            stack_index = stack_widget.currentIndex()
+            object_name = stack_widget.currentWidget().objectName()
+            title_name = object_name.replace("-", " ").replace("_", " ").title()
+
+            new_title = self.bread_crumb_title(title_name, is_start)
+            new_title.mousePressEvent = lambda _: stack_widget.setCurrentIndex(stack_index)
+
+            if stack_index not in index_list:
+                index_list.append(stack_index)
+                layout.addWidget(new_title)
+                title_list = widget.findChildren(QLabel, "breadCrumbTitle")
+            else:
+                deleted_widget_count = len(index_list[index_list.index(stack_index) + 1 :])
+                del index_list[-deleted_widget_count:]
+
+                for _ in range(deleted_widget_count):
+                    item = layout.takeAt(layout.count() - 1).widget()
+                    item.deleteLater()
+
+                title_list = widget.findChildren(QLabel, "breadCrumbTitle")
+                del title_list[-deleted_widget_count:]
+                title_list[-1].setDisabled(True)
+
+            for title in title_list[:-1]:
+                title.setEnabled(True)
+
+        # Start index
+        stack_change_event(is_start=True)
+
+        stack_widget.currentChanged.connect(lambda: stack_change_event(is_start=False))
+
+        return widget
+
+    def bread_crumb_title(self, title_name: str, is_start: bool = False):
+        """Bread crumb title widget."""
+        widget = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        widget.setLayout(layout)
+
+        if not is_start:
+            chevron = SettingTemplate().adaptive_icon(icons.fluent_chevron_right, 8)
+            layout.addWidget(chevron, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        palette = Palette().get_palette()
+        text_active = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Text)
+        text_disabled = palette.color(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Text)
+
+        font = QFont()
+        font.setBold(True)
+        font.setPixelSize(20)
+
+        title = QLabel()
+        title.setObjectName("breadCrumbTitle")
+        title.setFont(font)
+        title.setText(title_name)
+        title.setContentsMargins(8, 8, 8, 8)
+        title.setStyleSheet(
+            f"QLabel {{ color: {text_disabled.name()}; }}"
+            f"QLabel:disabled {{ color: {text_active.name()} }}"
+        )
+        title.setDisabled(True)
+        title.setCursor(Qt.CursorShape.PointingHandCursor)
+        layout.addWidget(title)
+
+        return widget
+
 
 class SettingUI:
     """Setting UI."""
@@ -209,18 +292,22 @@ class SettingUI:
         Styling().apply_mica(settings_window)
 
         setting_layout = QVBoxLayout(settings_window)
-        setting_layout.setContentsMargins(12, 12, 12, 12)
+        setting_layout.setSpacing(0)
+        setting_layout.setContentsMargins(12, 0, 12, 12)
 
         setting_stack = QStackedWidget()
         setting_stack.setContentsMargins(0, 0, 0, 0)
-        setting_layout.addWidget(setting_stack)
 
         scroll_area = QScrollArea()
-        scroll_area.setObjectName("settingScroll")
-        scroll_area.setStyleSheet("#settingScroll {background-color: transparent;}")
+        scroll_area.setObjectName("settings")
+        scroll_area.setStyleSheet("#settings {background-color: transparent;}")
         scroll_area.setFrameShape(QFrame.NoFrame)
         scroll_area.setWidgetResizable(True)
         setting_stack.addWidget(scroll_area)
+
+        # Add widget to stack widget first before calling bread crumb
+        setting_layout.addWidget(self.setting_template.bread_crumb_bar(setting_stack))
+        setting_layout.addWidget(setting_stack)
 
         content_widget = QWidget()
         content_widget.setObjectName("contentWidget")
@@ -862,15 +949,23 @@ class SettingAbout:
         right_chevron.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         card_layout.addWidget(right_chevron)
 
+        license_index = None
+
         def button_event():
             """Add widget to stack widget and move the index there."""
-            license_widget = self.licenses_widget()
-            self.setting_stack.addWidget(license_widget)
-            self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_widget))
+            nonlocal license_index
 
-            license_text = QTextEdit()
-            license_text.setReadOnly(True)
-            self.setting_stack.addWidget(license_text)
+            if not license_index:
+                license_widget = self.licenses_widget()
+                self.setting_stack.addWidget(license_widget)
+                self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_widget))
+                license_index = self.setting_stack.indexOf(license_widget)
+
+                license_text = QTextEdit()
+                license_text.setReadOnly(True)
+                self.setting_stack.addWidget(license_text)
+            else:
+                self.setting_stack.setCurrentIndex(license_index)
 
         button.setFixedHeight(card_frame.sizeHint().height())
         button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -881,8 +976,8 @@ class SettingAbout:
     def licenses_widget(self):
         """Display open-source licenses used."""
         scroll_area = QScrollArea()
-        scroll_area.setObjectName("licenseScroll")
-        scroll_area.setStyleSheet("#licenseScroll {background-color: transparent;}")
+        scroll_area.setObjectName("open-source-licenses")
+        scroll_area.setStyleSheet("#open-source-license {background-color: transparent;}")
         scroll_area.setFrameShape(QFrame.NoFrame)
         scroll_area.setWidgetResizable(True)
 
@@ -954,6 +1049,7 @@ class SettingAbout:
             license_text_widget: QTextEdit = self.setting_stack.widget(
                 self.setting_stack.currentIndex() + 1
             )
+            license_text_widget.setObjectName(lib.get("Name"))
             license_text_widget.setText(lib.get("LicenseText"))
             self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_text_widget))
 

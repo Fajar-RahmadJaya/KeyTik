@@ -14,6 +14,7 @@
 
 """Setting UI code."""
 
+import json
 import os
 import webbrowser
 
@@ -34,12 +35,14 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QComboBox,
     QDialog,
     QFrame,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QMessageBox,
     QPushButton,
     QScrollArea,
     QSizePolicy,
+    QStackedWidget,
     QStyleFactory,
     QTextEdit,
     QVBoxLayout,
@@ -71,7 +74,8 @@ class SettingTemplate:
         card_frame.setObjectName("setting")
         card_frame.setStyleSheet(Styling().card("setting"))
 
-        card_layout = QHBoxLayout(card_frame)
+        card_layout = QHBoxLayout()
+        card_frame.setLayout(card_layout)
 
         if icon_code:
             card_layout.setContentsMargins(20, 16, 16, 16)
@@ -207,11 +211,16 @@ class SettingUI:
         setting_layout = QVBoxLayout(settings_window)
         setting_layout.setContentsMargins(12, 12, 12, 12)
 
+        setting_stack = QStackedWidget()
+        setting_stack.setContentsMargins(0, 0, 0, 0)
+        setting_layout.addWidget(setting_stack)
+
         scroll_area = QScrollArea()
         scroll_area.setObjectName("settingScroll")
         scroll_area.setStyleSheet("#settingScroll {background-color: transparent;}")
         scroll_area.setFrameShape(QFrame.NoFrame)
         scroll_area.setWidgetResizable(True)
+        setting_stack.addWidget(scroll_area)
 
         content_widget = QWidget()
         content_widget.setObjectName("contentWidget")
@@ -236,9 +245,8 @@ class SettingUI:
         content_layout.addWidget(SettingInstallation().installation())
 
         # About
-        content_layout.addWidget(SettingAbout().about())
+        content_layout.addWidget(SettingAbout(setting_stack).about())
 
-        setting_layout.addWidget(scroll_area)
         settings_window.exec()
 
     # ------------------------------ Pro Version ------------------------------
@@ -631,8 +639,10 @@ class SettingInstallation:
 class SettingAbout:
     """About section on setting."""
 
-    def __init__(self):
+    def __init__(self, setting_stack: QStackedWidget = None):
         self.setting_template = SettingTemplate()
+
+        self.setting_stack = setting_stack
 
     def about(self):
         """About section."""
@@ -653,6 +663,9 @@ class SettingAbout:
 
         # Unreleased Changelog
         about_layout.addWidget(self.unreleased_changelog())
+
+        # Third party open-source licenses
+        about_layout.addWidget(self.open_source_licenses())
 
         return about_widget
 
@@ -830,3 +843,204 @@ class SettingAbout:
         button.clicked.connect(button_event)
 
         return button
+
+    def open_source_licenses(self):
+        """Third party open-source licenses widget."""
+        button = QPushButton()
+        button.setFlat(True)
+        button.setStyleSheet("background-color: transparent;")
+        layout = QVBoxLayout(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        card_layout, card_frame = self.setting_template.setting_card(
+            heading="Open-Source licenses", subheading="See third party licenses."
+        )
+        layout.addWidget(card_frame)
+
+        right_chevron = SettingTemplate().adaptive_icon(icons.fluent_chevron_right, 10)
+        right_chevron.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        card_layout.addWidget(right_chevron)
+
+        def button_event():
+            """Add widget to stack widget and move the index there."""
+            license_widget = self.licenses_widget()
+            self.setting_stack.addWidget(license_widget)
+            self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_widget))
+
+            license_text = QTextEdit()
+            license_text.setReadOnly(True)
+            self.setting_stack.addWidget(license_text)
+
+        button.setFixedHeight(card_frame.sizeHint().height())
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        button.clicked.connect(button_event)
+
+        return button
+
+    def licenses_widget(self):
+        """Display open-source licenses used."""
+        scroll_area = QScrollArea()
+        scroll_area.setObjectName("licenseScroll")
+        scroll_area.setStyleSheet("#licenseScroll {background-color: transparent;}")
+        scroll_area.setFrameShape(QFrame.NoFrame)
+        scroll_area.setWidgetResizable(True)
+
+        widget = QWidget()
+        widget.setObjectName("licensesWidget")
+        widget.setStyleSheet("#licensesWidget {background-color: transparent;}")
+        scroll_area.setWidget(widget)
+
+        layout = QVBoxLayout()
+        layout.setSpacing(24)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        widget.setLayout(layout)
+
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(content_widget)
+
+        header = self.setting_template.setting_header_label()
+        header.setText("Open-Source Licenses")
+        content_layout.addWidget(header)
+
+        try:
+            with open(constant.open_source_license_path, encoding="utf8") as file:
+                content: list[dict] = json.load(file)
+        except (FileNotFoundError, ValueError) as error:
+            print(f"Error while opening {constant.open_source_license_path}: {error}")
+            content = {}
+
+        for lib in content:
+            content_layout.addWidget(self.license_card(lib))
+
+        return scroll_area
+
+    def license_card(self, lib: dict[str, str]):
+        """Setting card with pill."""
+        button = QPushButton()
+        button.setFlat(True)
+        button.setStyleSheet("background-color: transparent;")
+
+        layout = QVBoxLayout(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        frame = QFrame()
+        frame.setFrameShape(QFrame.Shape.NoFrame)
+        frame.setObjectName("setting")
+        frame.setStyleSheet(Styling().card("setting"))
+        layout.addWidget(frame)
+
+        card_layout = QGridLayout()
+        card_layout.setContentsMargins(16, 8, 16, 8)
+        card_layout.setVerticalSpacing(8)
+        card_layout.setHorizontalSpacing(0)
+        frame.setLayout(card_layout)
+
+        card_layout.addWidget(
+            self.license_label(lib.get("Name"), lib.get("Author"), lib.get("Version")), 0, 0
+        )
+
+        card_layout.addWidget(self.license_pill(lib.get("License")), 1, 0)
+
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        button.setFixedHeight(frame.sizeHint().height())
+
+        def button_event():
+            """Show license text."""
+            license_text_widget: QTextEdit = self.setting_stack.widget(
+                self.setting_stack.currentIndex() + 1
+            )
+            license_text_widget.setText(lib.get("LicenseText"))
+            self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_text_widget))
+
+        button.clicked.connect(button_event)
+
+        return button
+
+    def license_label(self, package: str, author: str, version: str):
+        """Third party open-source license QLable."""
+        label_widget = QWidget()
+        label_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        label_layout = QGridLayout()
+        label_layout.setVerticalSpacing(2)
+        label_layout.setHorizontalSpacing(0)
+        label_layout.setContentsMargins(0, 0, 0, 0)
+        label_widget.setLayout(label_layout)
+
+        heading_font = QFont()
+        heading_font.setPixelSize(13)
+
+        package_name = QLabel()
+        package_name.setFont(heading_font)
+        package_name.setStyleSheet("background-color: transparent;")
+        package_name.setText(package)
+        label_layout.addWidget(package_name, 0, 0, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        version_number = QLabel()
+        version_number.setFont(heading_font)
+        version_number.setStyleSheet("background-color: transparent;")
+        version_number.setText(version)
+        label_layout.addWidget(version_number, 0, 1, alignment=Qt.AlignmentFlag.AlignRight)
+
+        subheading_font = QFont()
+        subheading_font.setPixelSize(11)
+
+        author_name = QLabel()
+        author_name.setFont(subheading_font)
+        author_name.setStyleSheet(
+            f"background-color: transparent;color: {Palette().get_palette_role().subtext}"
+        )
+        author_name.setText(author)
+        label_layout.addWidget(author_name, 1, 0, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        # theme_label = QLabel(
+        #     f"<div style='font-size:13px; margin-bottom:2px'> {package} </div>"
+        #     f""" <div style='font-size:11px; color: {Palette().get_palette_role().subtext};'>
+        #     {author} </div>"""
+        # )
+
+        # card_layout.addWidget(theme_label, 0, 0)
+
+        # right_chevron = SettingTemplate().adaptive_icon(icons.fluent_chevron_right, 10)
+        # right_chevron.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        # card_layout.addWidget(right_chevron, 0, 1, 2, 1)
+
+        return label_widget
+
+    def license_pill(self, license_name: str):
+        """Third party open-source license pill."""
+        palette_comp = Palette()
+        palette = palette_comp.get_palette()
+        alternate_base = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.AlternateBase)
+        text = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Text)
+        invert_text = palette_comp.invert_color(text)
+
+        pill = QFrame()
+        pill.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+
+        pill_layout = QHBoxLayout()
+        pill_layout.setContentsMargins(4, 2, 4, 2)
+        pill_layout.setSpacing(0)
+        pill_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        pill.setLayout(pill_layout)
+
+        license_font = QFont()
+        license_font.setPixelSize(10)
+
+        license_label = QLabel()
+        license_label.setFont(license_font)
+        license_label.setText(license_name)
+        license_label.setStyleSheet(f"color: {invert_text.name()}")
+
+        pill_layout.addWidget(license_label)
+
+        pill.setStyleSheet(
+            f"background-color: {alternate_base.name()};"
+            f"border-radius: {pill.sizeHint().height() / 2}px;"
+        )
+
+        return pill

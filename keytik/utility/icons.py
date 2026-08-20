@@ -131,3 +131,8 @@ fluent_hide = {
     "code_glyph": "\ued1a",
     "material_path": os.path.join(_material_symbols_dir, "visibility_off.svg"),
 }
+
+fluent_chevron_right = {
+    "code_glyph": "\ue76c",
+    "material_path": os.path.join(_material_symbols_dir, "chevron_right.svg"),
+}

@@ -37,6 +37,7 @@ icon_path = os.path.join(data_dir, "icon.ico")
 keylist_path = os.path.join(data_dir, "key_list.json")
 interception_install_path = os.path.join(data_dir, "inter_install.bat")
 interception_uninstall_path = os.path.join(data_dir, "inter_uninstall.bat")
+open_source_license_path = os.path.join(data_dir, "open-source-licenses.json")
 DRIVER_PATH = r"C:\Windows\System32\drivers\keyboard.sys"
 
 # Cache

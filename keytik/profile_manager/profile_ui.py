@@ -46,7 +46,7 @@ from keytik.profile_mode.shortcut_row import ShortcutRow
 from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
 from keytik.select_program.select_program_ui import SelectProgramUI
-from keytik.setting.setting_ui import SettingTemplate
+from keytik.setting.setting_template import SettingTemplate
 from keytik.utility import constant, diff, icons
 from keytik.utility.style import Palette, Styling
 

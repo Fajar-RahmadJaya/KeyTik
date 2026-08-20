@@ -14,13 +14,13 @@
 
 """Setting UI code."""
 
+import json
 import os
 import webbrowser
 
 import qt_themes
 from catppuccin import PALETTE as catppuccin_palette
-from plwidgets.pl_checkbox import PlCheckBox
-from PySide6.QtCore import QSize, Qt  # pylint: disable=E0611
+from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import (  # pylint: disable=E0611
     QColor,
     QFont,
@@ -31,15 +31,16 @@ from PySide6.QtGui import (  # pylint: disable=E0611
 )
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QApplication,
-    QComboBox,
     QDialog,
     QFrame,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QMessageBox,
     QPushButton,
     QScrollArea,
     QSizePolicy,
+    QStackedWidget,
     QStyleFactory,
     QTextEdit,
     QVBoxLayout,
@@ -48,141 +49,10 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 
 from keytik.setting.announcement import Announcement
 from keytik.setting.setting_core import SettingCore
+from keytik.setting.setting_template import SettingTemplate
 from keytik.utility import constant, diff, icons
 from keytik.utility.style import Palette, Styling
 from keytik.utility.utils import Config, Data, Utility
-
-
-class SettingCombobox(QComboBox):  # pylint: disable=R0903
-    """Ignore Wheel Event."""
-
-    def wheelEvent(self, event):  # pylint: disable=C0103
-        """Override wheelEvent."""
-        event.ignore()
-
-
-class SettingTemplate:
-    """Widget template to use across setting UI."""
-
-    def setting_card(self, icon_code=None, heading=None, subheading=None):
-        """Setting card template."""
-        card_frame = QFrame()
-        card_frame.setFrameShape(QFrame.NoFrame)
-        card_frame.setObjectName("setting")
-        card_frame.setStyleSheet(Styling().card("setting"))
-
-        card_layout = QHBoxLayout(card_frame)
-
-        if icon_code:
-            card_layout.setContentsMargins(20, 16, 16, 16)
-            card_layout.setSpacing(20)
-
-            icon = self.adaptive_icon(icon_code, 16)
-            icon.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            card_layout.addWidget(icon)
-        else:
-            card_layout.setContentsMargins(16, 16, 16, 16)
-
-        if heading and subheading:
-            theme_label = QLabel(
-                f"<div style='font-size:13px; margin-bottom:2px'> {heading} </div>"
-                f""" <div style='font-size:11px; color: {Palette().get_palette_role().subtext};'>
-                {subheading} </div>"""
-            )
-
-            card_layout.addWidget(theme_label)
-
-        return card_layout, card_frame
-
-    def adaptive_icon(self, icon_code: dict[str, str], size: int) -> QLabel:
-        """Adaptive icon supporting fluent and material icons."""
-        winver = Utility().get_windows_version()
-        fluent_support = 11
-        mdl2_support = 10
-        font = None
-
-        if winver == fluent_support:
-            font = QFont("Segoe Fluent Icons", size)
-        elif winver == mdl2_support:
-            font = QFont("Segoe MDL2 Assets", size)
-
-        icon = QLabel()
-        if winver in (fluent_support, mdl2_support):
-            icon.setFont(font)
-            icon.setText(icon_code.get("code_glyph"))
-            icon.setStyleSheet("background-color: transparent;")
-        else:
-            material_size = size + 8
-            qicon = icons.get_icon(icon_code.get("material_path"))
-            icon.setPixmap(qicon.pixmap(QSize(material_size, material_size)))
-            icon.setStyleSheet("background-color: transparent;")
-
-        return icon
-
-    def setting_combobox(self):
-        """Setting combobox template."""
-        setting_combobox = SettingCombobox()
-        setting_combobox.setFixedWidth(164)
-        setting_combobox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-
-        return setting_combobox
-
-    def setting_button(self):
-        """Setting button template."""
-        setting_button = QPushButton()
-        setting_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        setting_button.setFixedWidth(164)
-
-        return setting_button
-
-    def setting_header_label(self):
-        """Setting header label template."""
-        setting_header_font = QFont()
-        setting_header_font.setBold(True)
-        setting_header_font.setPixelSize(13)
-
-        setting_header_label = QLabel()
-        setting_header_label.setFont(setting_header_font)
-        setting_header_label.setContentsMargins(0, 0, 0, 4)
-
-        return setting_header_label
-
-    def setting_switch(self):
-        """Toggle switch template for setting."""
-        palett_comp = Palette()
-        palette = palett_comp.get_palette()
-        accent = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Accent)
-        text = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Text)
-        inverted_text = palett_comp.invert_color(text)
-        window = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Window)
-
-        widget = QWidget()
-        layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
-        widget.setLayout(layout)
-
-        label = QLabel()
-        layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignRight)
-
-        switch = PlCheckBox()
-        switch._checkedBackgroundColor = accent  # pylint: disable=W0212
-        switch._checkedHandleColor = inverted_text  # pylint: disable=W0212
-        switch.backgroundColor = window
-        switch.update()
-        layout.addWidget(switch)
-
-        def switch_event():
-            """Change switch label based on check state."""
-            if switch.isChecked():
-                label.setText("On")
-            else:
-                label.setText("Off")
-
-        switch.toggled.connect(switch_event)
-        switch_event()
-
-        return widget, switch
 
 
 class SettingUI:
@@ -205,13 +75,22 @@ class SettingUI:
         Styling().apply_mica(settings_window)
 
         setting_layout = QVBoxLayout(settings_window)
-        setting_layout.setContentsMargins(12, 12, 12, 12)
+        setting_layout.setSpacing(0)
+        setting_layout.setContentsMargins(12, 0, 12, 12)
+
+        setting_stack = QStackedWidget()
+        setting_stack.setContentsMargins(0, 0, 0, 0)
 
         scroll_area = QScrollArea()
-        scroll_area.setObjectName("settingScroll")
-        scroll_area.setStyleSheet("#settingScroll {background-color: transparent;}")
+        scroll_area.setObjectName("settings")
+        scroll_area.setStyleSheet("#settings {background-color: transparent;}")
         scroll_area.setFrameShape(QFrame.NoFrame)
         scroll_area.setWidgetResizable(True)
+        setting_stack.addWidget(scroll_area)
+
+        # Add widget to stack widget first before calling bread crumb
+        setting_layout.addWidget(self.setting_template.bread_crumb_bar(setting_stack))
+        setting_layout.addWidget(setting_stack)
 
         content_widget = QWidget()
         content_widget.setObjectName("contentWidget")
@@ -236,9 +115,8 @@ class SettingUI:
         content_layout.addWidget(SettingInstallation().installation())
 
         # About
-        content_layout.addWidget(SettingAbout().about())
+        content_layout.addWidget(SettingAbout(setting_stack).about())
 
-        setting_layout.addWidget(scroll_area)
         settings_window.exec()
 
     # ------------------------------ Pro Version ------------------------------
@@ -631,8 +509,10 @@ class SettingInstallation:
 class SettingAbout:
     """About section on setting."""
 
-    def __init__(self):
+    def __init__(self, setting_stack: QStackedWidget = None):
         self.setting_template = SettingTemplate()
+
+        self.setting_stack = setting_stack
 
     def about(self):
         """About section."""
@@ -653,6 +533,9 @@ class SettingAbout:
 
         # Unreleased Changelog
         about_layout.addWidget(self.unreleased_changelog())
+
+        # Third party open-source licenses
+        about_layout.addWidget(self.open_source_licenses())
 
         return about_widget
 
@@ -830,3 +713,213 @@ class SettingAbout:
         button.clicked.connect(button_event)
 
         return button
+
+    def open_source_licenses(self):
+        """Third party open-source licenses widget."""
+        button = QPushButton()
+        button.setFlat(True)
+        button.setStyleSheet("background-color: transparent;")
+        layout = QVBoxLayout(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        card_layout, card_frame = self.setting_template.setting_card(
+            heading="Open-Source licenses", subheading="See third party licenses."
+        )
+        layout.addWidget(card_frame)
+
+        right_chevron = SettingTemplate().adaptive_icon(icons.fluent_chevron_right, 10)
+        right_chevron.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        card_layout.addWidget(right_chevron)
+
+        license_index = None
+
+        def button_event():
+            """Add widget to stack widget and move the index there."""
+            nonlocal license_index
+
+            if not license_index:
+                license_widget = self.licenses_widget()
+                self.setting_stack.addWidget(license_widget)
+                self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_widget))
+                license_index = self.setting_stack.indexOf(license_widget)
+
+                license_text = QTextEdit()
+                license_text.setReadOnly(True)
+                self.setting_stack.addWidget(license_text)
+            else:
+                self.setting_stack.setCurrentIndex(license_index)
+
+        button.setFixedHeight(card_frame.sizeHint().height())
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        button.clicked.connect(button_event)
+
+        return button
+
+    def licenses_widget(self):
+        """Display open-source licenses used."""
+        scroll_area = QScrollArea()
+        scroll_area.setObjectName("open-source-licenses")
+        scroll_area.setStyleSheet("#open-source-license {background-color: transparent;}")
+        scroll_area.setFrameShape(QFrame.NoFrame)
+        scroll_area.setWidgetResizable(True)
+
+        widget = QWidget()
+        widget.setObjectName("licensesWidget")
+        widget.setStyleSheet("#licensesWidget {background-color: transparent;}")
+        scroll_area.setWidget(widget)
+
+        layout = QVBoxLayout()
+        layout.setSpacing(24)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        widget.setLayout(layout)
+
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(content_widget)
+
+        header = self.setting_template.setting_header_label()
+        header.setText("Open-Source Licenses")
+        content_layout.addWidget(header)
+
+        try:
+            with open(constant.open_source_license_path, encoding="utf8") as file:
+                content: list[dict] = json.load(file)
+        except (FileNotFoundError, ValueError) as error:
+            print(f"Error while opening {constant.open_source_license_path}: {error}")
+            content = {}
+
+        for lib in content:
+            content_layout.addWidget(self.license_card(lib))
+
+        return scroll_area
+
+    def license_card(self, lib: dict[str, str]):
+        """Setting card with pill."""
+        button = QPushButton()
+        button.setFlat(True)
+        button.setStyleSheet("background-color: transparent;")
+
+        layout = QVBoxLayout(button)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        frame = QFrame()
+        frame.setFrameShape(QFrame.Shape.NoFrame)
+        frame.setObjectName("setting")
+        frame.setStyleSheet(Styling().card("setting"))
+        layout.addWidget(frame)
+
+        card_layout = QGridLayout()
+        card_layout.setContentsMargins(16, 8, 16, 8)
+        card_layout.setVerticalSpacing(8)
+        card_layout.setHorizontalSpacing(0)
+        frame.setLayout(card_layout)
+
+        card_layout.addWidget(
+            self.license_label(lib.get("Name"), lib.get("Author"), lib.get("Version")), 0, 0
+        )
+
+        card_layout.addWidget(self.license_pill(lib.get("License")), 1, 0)
+
+        button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        button.setFixedHeight(frame.sizeHint().height())
+
+        def button_event():
+            """Show license text."""
+            license_text_widget: QTextEdit = self.setting_stack.widget(
+                self.setting_stack.currentIndex() + 1
+            )
+            license_text_widget.setObjectName(lib.get("Name"))
+            license_text_widget.setText(lib.get("LicenseText"))
+            self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_text_widget))
+
+        button.clicked.connect(button_event)
+
+        return button
+
+    def license_label(self, package: str, author: str, version: str):
+        """Third party open-source license QLable."""
+        label_widget = QWidget()
+        label_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        label_layout = QGridLayout()
+        label_layout.setVerticalSpacing(2)
+        label_layout.setHorizontalSpacing(0)
+        label_layout.setContentsMargins(0, 0, 0, 0)
+        label_widget.setLayout(label_layout)
+
+        heading_font = QFont()
+        heading_font.setPixelSize(13)
+
+        package_name = QLabel()
+        package_name.setFont(heading_font)
+        package_name.setStyleSheet("background-color: transparent;")
+        package_name.setText(package)
+        label_layout.addWidget(package_name, 0, 0, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        version_number = QLabel()
+        version_number.setFont(heading_font)
+        version_number.setStyleSheet("background-color: transparent;")
+        version_number.setText(version)
+        label_layout.addWidget(version_number, 0, 1, alignment=Qt.AlignmentFlag.AlignRight)
+
+        subheading_font = QFont()
+        subheading_font.setPixelSize(11)
+
+        author_name = QLabel()
+        author_name.setFont(subheading_font)
+        author_name.setStyleSheet(
+            f"background-color: transparent;color: {Palette().get_palette_role().subtext}"
+        )
+        author_name.setText(author)
+        label_layout.addWidget(author_name, 1, 0, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        # theme_label = QLabel(
+        #     f"<div style='font-size:13px; margin-bottom:2px'> {package} </div>"
+        #     f""" <div style='font-size:11px; color: {Palette().get_palette_role().subtext};'>
+        #     {author} </div>"""
+        # )
+
+        # card_layout.addWidget(theme_label, 0, 0)
+
+        # right_chevron = SettingTemplate().adaptive_icon(icons.fluent_chevron_right, 10)
+        # right_chevron.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        # card_layout.addWidget(right_chevron, 0, 1, 2, 1)
+
+        return label_widget
+
+    def license_pill(self, license_name: str):
+        """Third party open-source license pill."""
+        palette_comp = Palette()
+        palette = palette_comp.get_palette()
+        alternate_base = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.AlternateBase)
+        text = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Text)
+        invert_text = palette_comp.invert_color(text)
+
+        pill = QFrame()
+        pill.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+
+        pill_layout = QHBoxLayout()
+        pill_layout.setContentsMargins(4, 2, 4, 2)
+        pill_layout.setSpacing(0)
+        pill_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        pill.setLayout(pill_layout)
+
+        license_font = QFont()
+        license_font.setPixelSize(10)
+
+        license_label = QLabel()
+        license_label.setFont(license_font)
+        license_label.setText(license_name)
+        license_label.setStyleSheet(f"color: {invert_text.name()}")
+
+        pill_layout.addWidget(license_label)
+
+        pill.setStyleSheet(
+            f"background-color: {alternate_base.name()};"
+            f"border-radius: {pill.sizeHint().height() / 2}px;"
+        )
+
+        return pill

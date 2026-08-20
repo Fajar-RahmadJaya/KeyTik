@@ -15,7 +15,7 @@ import tomllib
 class Build:
     """Build executable and installer."""
 
-    def main(self):
+    def main(self):  # noqa pylint: disable=R0911
         """Entry point."""
         # Argument
         parser = argparse.ArgumentParser(description="Build KeyTik Pro executable and installer")
@@ -49,6 +49,10 @@ class Build:
             return
 
         if not isdevelopment:
+            # Generate open-source licenses
+            if not self.generate_license():
+                return
+
             # Build zip from executable
             if not self.build_zip(work_path, version):
                 return
@@ -148,6 +152,59 @@ class Build:
 
         except (FileNotFoundError, PermissionError, ValueError) as error:
             print(f"Failed to build executable\n{error}")
+            return False
+
+    def generate_license(self) -> bool:
+        """Get open source licenses using pip-licenses."""
+        try:
+            # Sync first to exclude dev dependencies
+            print("Syncing dependencies . . .")
+
+            sync_command = [
+                "uv",
+                "sync",
+            ]
+
+            sync_deps = subprocess.Popen(  # pylint: disable=R1732
+                args=sync_command,
+                stdout=subprocess.PIPE,
+                text=True,
+            )
+
+            for result in sync_deps.stdout:
+                print(result, end="")
+
+            if sync_deps.wait() != 0:
+                return False
+
+            print("Generating open-source licenses . . .")
+
+            command = [
+                # pip-licenses on UV
+                "uv",
+                "run",
+                "--refresh-package",
+                "pip-licenses",
+                "--with",
+                "pip-licenses",
+                # pip0licenses command
+                "--",
+                "pip-licenses",
+            ]
+
+            generate_license = subprocess.Popen(  # pylint: disable=R1732
+                args=command,
+                stdout=subprocess.PIPE,
+                text=True,
+            )
+
+            for result in generate_license.stdout:
+                print(result, end="")
+
+            return generate_license.wait() == 0
+
+        except (FileNotFoundError, PermissionError, ValueError) as error:
+            print(f"Failed to generate open-source licenses\n{error}")
             return False
 
     def build_zip(self, work_path: str, version: str) -> bool:

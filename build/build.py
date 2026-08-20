@@ -15,7 +15,7 @@ import tomllib
 class Build:
     """Build executable and installer."""
 
-    def main(self):  # noqa
+    def main(self):  # noqa pylint: disable=R0911
         """Entry point."""
         # Argument
         parser = argparse.ArgumentParser(description="Build KeyTik Pro executable and installer")

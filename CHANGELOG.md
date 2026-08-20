@@ -17,6 +17,8 @@
 - *(profile-manager)* Add fluent icons fallback
 - *(profile-manager)* Improve ux
 - *(default-mode)* Allow option to auto expand
+- *(setting-about)* Add open-source licenses
+- *(setting)* Add bread crumb bar
 
 ### Fixes
 

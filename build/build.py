@@ -157,6 +157,26 @@ class Build:
     def generate_license(self) -> bool:
         """Get open source licenses using pip-licenses."""
         try:
+            # Sync first to exclude dev dependencies
+            print("Syncing dependencies . . .")
+
+            sync_command = [
+                "uv",
+                "sync",
+            ]
+
+            sync_deps = subprocess.Popen(  # pylint: disable=R1732
+                args=sync_command,
+                stdout=subprocess.PIPE,
+                text=True,
+            )
+
+            for result in sync_deps.stdout:
+                print(result, end="")
+
+            if sync_deps.wait() != 0:
+                return False
+
             print("Generating open-source licenses . . .")
 
             command = [

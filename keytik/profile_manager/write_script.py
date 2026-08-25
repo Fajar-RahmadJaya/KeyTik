@@ -622,39 +622,3 @@ class WriteDefault:
         send_sequence = "".join(send_parts_down + send_parts_up)
 
         return f'(SendInput("{send_sequence}"))'
-
-    def hold_format_double_click(self, remap_key, file):
-        """Write double click on hold format."""
-        hold_interval_ms = "10000"
-        if (
-            self.remap_widget.hold_format_checkbox.isChecked()
-            and self.remap_widget.hold_interval_entry is not None
-        ):
-            hold_interval = "10"
-            if (
-                self.remap_widget.hold_interval_entry.text().strip()
-                and self.remap_widget.hold_interval_entry.text().strip() != "Hold Interval"
-            ):
-                hold_interval = self.remap_widget.hold_interval_entry.text().strip()
-            hold_interval_ms = str(int(float(hold_interval) * 1000))
-
-        keys = [key.strip() for key in remap_key.split("+")]
-        down_parts = []
-        up_parts = []
-
-        for key in keys:
-            if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(key):
-                down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
-                up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
-            else:
-                tr_key = self.write_script.translate_key(key)
-                down_parts.append(f"{{{tr_key} Down}}")
-                up_parts.insert(0, f"{{{tr_key} Up}}")
-
-        down_sequence = "".join(down_parts)
-        up_sequence = "".join(up_parts)
-
-        file.write(
-            f'        (SendInput("{down_sequence}"), '
-            f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
-        )

@@ -513,12 +513,16 @@ class WriteDefault:
         """Get default key string."""
         default_key = self.remap_widget.default_key_entry.text().strip()
         translated_key = self.write_script.translate_key(default_key, is_default_key=True)
+        if translated_key is None:
+            return None
+
+        default_string = f"{translated_key}::"  # Normal default key
 
         # Double click
         keys = [k.strip() for k in default_key.split("+")]
         double_click_length = 2
         if len(keys) == double_click_length and keys[0] == keys[1]:
-            return (
+            default_string = (
                 f"*{translated_key}:: "
                 f'(A_PriorHotkey = "*{translated_key}" and A_TimeSincePriorHotkey < 400) && '
             )
@@ -529,7 +533,7 @@ class WriteDefault:
                 return None
 
             hold_interval = self.remap_widget.hold_remap_entry.text().strip()
-            return (
+            default_string = (
                 f"*{translated_key}:: "
                 f'KeyWait("{translated_key}", "T{hold_interval if hold_interval else "0.5"}") ? '
                 f'Send("{translated_key}") : '
@@ -537,13 +541,13 @@ class WriteDefault:
 
         # Disable first key
         if not self.remap_widget.first_key_checkbox.isChecked() and "+" in default_key:
-            return f"~{translated_key}::"
+            default_string = f"~{translated_key}::"
 
         # Hold format default need '*' prefix
         if self.remap_widget.hold_format_checkbox.isChecked() and "&" not in translated_key:
-            return f"*{translated_key}::"
+            default_string = f"*{translated_key}::"
 
-        return f"{translated_key}::"  # Normal default key
+        return default_string
 
     def get_remap_string(self) -> str | None:
         """Get remap key string."""

@@ -746,6 +746,10 @@ class SettingAbout:
 
                 license_text = QTextEdit()
                 license_text.setReadOnly(True)
+                license_text.setObjectName("LicenseText")
+                if Config().get_config().mica_effect != "disable" and Styling().MICA_SUPPORTED:
+                    base_rgba = Palette().get_palette_role().base_rgba
+                    license_text.setStyleSheet(f"#LicenseText {{background-color: {base_rgba}}}")
                 self.setting_stack.addWidget(license_text)
             else:
                 self.setting_stack.setCurrentIndex(license_index)

@@ -760,7 +760,7 @@ class SettingAbout:
         """Display open-source licenses used."""
         scroll_area = QScrollArea()
         scroll_area.setObjectName("open-source-licenses")
-        scroll_area.setStyleSheet("#open-source-license {background-color: transparent;}")
+        scroll_area.setStyleSheet("#open-source-licenses {background-color: transparent;}")
         scroll_area.setFrameShape(QFrame.NoFrame)
         scroll_area.setWidgetResizable(True)
 
@@ -779,10 +779,6 @@ class SettingAbout:
         content_layout = QVBoxLayout(content_widget)
         content_layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(content_widget)
-
-        header = self.setting_template.setting_header_label()
-        header.setText("Open-Source Licenses")
-        content_layout.addWidget(header)
 
         try:
             with open(constant.open_source_license_path, encoding="utf8") as file:

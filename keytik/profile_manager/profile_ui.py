@@ -41,7 +41,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from keytik.profile_manager.parse_script import ParseScript
 from keytik.profile_manager.write_script import WriteDefault, WriteScript
 from keytik.profile_mode.default_mode import DefaultMode
-from keytik.profile_mode.shared_row import SharedRow
 from keytik.profile_mode.shortcut_row import ShortcutRow
 from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
@@ -515,9 +514,9 @@ class ProfileUI:
         self.edit_frame.setLayout(self.edit_frame_layout)
         edit_scroll.setWidget(self.edit_frame)
 
-        layout.addWidget(
-            SharedRow().expand_button(self.edit_window), 0, 1, Qt.AlignTop | Qt.AlignRight
-        )
+        # layout.addWidget(
+        #     SharedRow().expand_button(self.edit_window), 0, 1, Qt.AlignTop | Qt.AlignRight
+        # )
 
         return widget
 

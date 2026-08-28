@@ -57,6 +57,15 @@ def get_icon(path, highlighted=False) -> QIcon:
     return icon_cache[cache_key]
 
 
+def adaptive_icon(fluent_icon: dict[str, str]):
+    """Get fluent icon, fallback to material icon."""
+    code_glyph = fluent_icon.get("code_glyph")
+    if QIcon().hasThemeIcon(code_glyph):
+        return QIcon().fromTheme(code_glyph)
+
+    return get_icon(fluent_icon.get("material_path"))
+
+
 icon_dir = os.path.join(constant.data_dir, "icon")
 
 # Profile Icon
@@ -135,4 +144,9 @@ fluent_hide = {
 fluent_chevron_right = {
     "code_glyph": "\ue76c",
     "material_path": os.path.join(_material_symbols_dir, "chevron_right.svg"),
+}
+
+fluent_globe = {
+    "code_glyph": "\ue774",
+    "material_path": os.path.join(_material_symbols_dir, "globe.svg"),
 }

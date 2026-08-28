@@ -41,7 +41,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
 from keytik.profile_manager.parse_script import ParseScript
 from keytik.profile_manager.write_script import WriteDefault, WriteScript
 from keytik.profile_mode.default_mode import DefaultMode
-from keytik.profile_mode.shared_row import SharedRow
 from keytik.profile_mode.shortcut_row import ShortcutRow
 from keytik.profile_mode.text_mode import TextMode
 from keytik.select_device.select_device import SelectDevice
@@ -200,15 +199,14 @@ class ProfileUI:
         """Command bar primary command."""
         widget = QWidget()
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setContentsMargins(0, 8, 0, 8)
+        layout.setSpacing(4)
         layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         widget.setLayout(layout)
 
         setting_button = self.app_bar_icon(
-            fluent_icon=icons.fluent_setting, button_text="Profile Setting"
+            fluent_icon=icons.fluent_setting, button_text="Profile Setting", is_toggleable=True
         )
-        setting_button.setCheckable(True)
 
         prev_stack_index = 0
 
@@ -226,33 +224,96 @@ class ProfileUI:
 
         save_button = self.app_bar_icon(fluent_icon=icons.fluent_save, button_text="Save Profile")
 
-        save_button.clicked.connect(
-            lambda: self.save_changes(
-                combobox.currentText().strip().lower(), self.middle_stack.widget(2)
+        def save_event():
+            """Make sure script name is not empty before saving profile."""
+            script_name_entry = self.middle_stack.widget(2).findChild(
+                QLineEdit, ProfileObject.scriptNameEntry
             )
-        )
+            if not script_name_entry.text():
+                if not setting_button.isChecked():
+                    setting_button.click()  # Trigger setting button event
+
+                script_name_entry.setFocus()
+                QMessageBox.warning(
+                    QApplication.activeWindow(), "Input Error", "Please enter a Profile name."
+                )
+                return
+
+            self.save_changes(
+                combobox.currentText().strip().lower(), script_name_entry.text().strip() + ".ahk"
+            )
+
+        save_button.clicked.connect(save_event)
         layout.addWidget(save_button)
 
         return widget
 
-    def app_bar_icon(self, fluent_icon: dict[str, str], button_text: str):
+    def app_bar_icon(
+        self, fluent_icon: dict[str, str], button_text: str, is_toggleable: bool = False
+    ) -> QPushButton:
         """Button  inspired by WinUI3."""
         button = QPushButton()
-        button.setFlat(True)
-        button.setStyleSheet("background-color: transparent;")
+
+        palette_comp = Palette()
+        palette = palette_comp.get_palette()
+        app_bar_palette = (
+            "QPushButton {"
+            "background-color: transparent;"
+            "border: none;"
+            "border-radius: 4px;"
+            "}"
+            "QPushButton::hover {"
+            f"background-color: {palette_comp.get_palette_role().overlay};"
+            "border: none;"
+            "border-radius: 4px;"
+            "}"
+        )
+        button.setStyleSheet(app_bar_palette)
 
         layout = QHBoxLayout(button)
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(8)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        layout.addWidget(SettingTemplate().adaptive_icon(fluent_icon, 12))
+        icon = SettingTemplate().adaptive_icon(fluent_icon, 12)
+        layout.addWidget(icon)
 
         text = QLabel()
         text.setText(button_text)
         layout.addWidget(text)
 
         button.setMinimumSize(layout.sizeHint())
+
+        if is_toggleable:
+            button.setCheckable(True)
+
+            accent = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.Accent)
+            text_palette = palette.color(QPalette.ColorGroup.Active, QPalette.ColorRole.ButtonText)
+            text_invert = palette_comp.invert_color(text_palette)
+
+            def button_event():
+                """Change button styling based on check state."""
+                if button.isChecked():
+                    button.setStyleSheet(
+                        "QPushButton {"
+                        f"background-color: {accent.name()};"
+                        "border: none;"
+                        "border-radius: 4px;"
+                        "}"
+                        "QPushButton::hover {"
+                        f"background-color: {palette_comp.color_rgba(accent, 0.85)};"
+                        "border: none;"
+                        "border-radius: 4px;"
+                        "}"
+                    )
+                    text.setStyleSheet(f"color: {text_invert.name()}")
+                    icon.setStyleSheet(f"color: {text_invert.name()}")
+                else:
+                    button.setStyleSheet(app_bar_palette)
+                    text.setStyleSheet(f"color: {text_palette.name()}")
+                    icon.setStyleSheet(f"color: {text_palette.name()}")
+
+            button.clicked.connect(button_event)
 
         return button
 
@@ -453,9 +514,9 @@ class ProfileUI:
         self.edit_frame.setLayout(self.edit_frame_layout)
         edit_scroll.setWidget(self.edit_frame)
 
-        layout.addWidget(
-            SharedRow().expand_button(self.edit_window), 0, 1, Qt.AlignTop | Qt.AlignRight
-        )
+        # layout.addWidget(
+        #     SharedRow().expand_button(self.edit_window), 0, 1, Qt.AlignTop | Qt.AlignRight
+        # )
 
         return widget
 
@@ -493,24 +554,12 @@ class ProfileUI:
         else:
             diff.pro_mode(index, lines, self)
 
-    def save_changes(self, mode, top_widget: QWidget):
+    def save_changes(self, mode, script_name: str):
         """Write script."""
-        script_name_entry = top_widget.findChild(QLineEdit, ProfileObject.scriptNameEntry)
-
-        if not script_name_entry.text():
-            self.middle_stack.setCurrentIndex(2)
-            script_name_entry.setFocus()
-            QMessageBox.warning(
-                QApplication.activeWindow(), "Input Error", "Please enter a Profile name."
-            )
-            return
-
         # Make sure shortcut valid
         write_script = WriteScript(self.middle_stack.widget(0), self.shortcut_row_comp)
         if not write_script.check_shortcut_integrity():
             return
-
-        script_name = script_name_entry.text().strip() + ".ahk"
 
         try:
             output_path = os.path.join(self.main_core.script_dir, script_name)

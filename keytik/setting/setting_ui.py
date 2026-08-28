@@ -20,7 +20,7 @@ import webbrowser
 
 import qt_themes
 from catppuccin import PALETTE as catppuccin_palette
-from PySide6.QtCore import Qt  # pylint: disable=E0611
+from PySide6.QtCore import QMetaMethod, QSize, Qt  # pylint: disable=E0611
 from PySide6.QtGui import (  # pylint: disable=E0611
     QColor,
     QFont,
@@ -43,6 +43,7 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QStackedWidget,
     QStyleFactory,
     QTextEdit,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
@@ -744,9 +745,7 @@ class SettingAbout:
                 self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_widget))
                 license_index = self.setting_stack.indexOf(license_widget)
 
-                license_text = QTextEdit()
-                license_text.setReadOnly(True)
-                self.setting_stack.addWidget(license_text)
+                self.setting_stack.addWidget(self.license_text())
             else:
                 self.setting_stack.setCurrentIndex(license_index)
 
@@ -756,11 +755,45 @@ class SettingAbout:
 
         return button
 
+    def license_text(self):
+        """License full text widget."""
+        license_widget = QWidget()
+        layout = QGridLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        license_widget.setLayout(layout)
+
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setObjectName("LicenseText")
+        if Config().get_config().mica_effect != "disable" and Styling().MICA_SUPPORTED:
+            base_rgba = Palette().get_palette_role().base_rgba
+            text_edit.setStyleSheet(f"#LicenseText {{background-color: {base_rgba}}}")
+        layout.addWidget(text_edit, 0, 0, 1, 2)
+
+        button_widget = QWidget()
+        button_layout = QVBoxLayout()
+        button_layout.setContentsMargins(0, 8, 16, 0)
+        button_layout.setSpacing(0)
+        button_widget.setLayout(button_layout)
+
+        button = QToolButton()
+        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        button.setIcon(icons.adaptive_icon(icons.fluent_globe))
+        button.setIconSize(QSize(20, 20))
+        button.setToolTip("Maximize")
+        button.setFixedSize(32, 32)
+        button_layout.addWidget(button)
+
+        layout.addWidget(button_widget, 0, 1, Qt.AlignTop | Qt.AlignRight)
+
+        return license_widget
+
     def licenses_widget(self):
         """Display open-source licenses used."""
         scroll_area = QScrollArea()
         scroll_area.setObjectName("open-source-licenses")
-        scroll_area.setStyleSheet("#open-source-license {background-color: transparent;}")
+        scroll_area.setStyleSheet("#open-source-licenses {background-color: transparent;}")
         scroll_area.setFrameShape(QFrame.NoFrame)
         scroll_area.setWidgetResizable(True)
 
@@ -779,10 +812,6 @@ class SettingAbout:
         content_layout = QVBoxLayout(content_widget)
         content_layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(content_widget)
-
-        header = self.setting_template.setting_header_label()
-        header.setText("Open-Source Licenses")
-        content_layout.addWidget(header)
 
         try:
             with open(constant.open_source_license_path, encoding="utf8") as file:
@@ -829,12 +858,22 @@ class SettingAbout:
 
         def button_event():
             """Show license text."""
-            license_text_widget: QTextEdit = self.setting_stack.widget(
+            license_widget: QTextEdit = self.setting_stack.widget(
                 self.setting_stack.currentIndex() + 1
             )
-            license_text_widget.setObjectName(lib.get("Name"))
-            license_text_widget.setText(lib.get("LicenseText"))
-            self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_text_widget))
+            license_widget.setObjectName(lib.get("Name"))
+
+            license_text = license_widget.findChild(QTextEdit)
+            license_text.setText(lib.get("LicenseText"))
+
+            button_link = license_widget.findChild(QToolButton)
+
+            module_url = lib.get("URL")
+            if module_url != "UNKNOWN":
+                if button_link.isSignalConnected(QMetaMethod.fromSignal(button_link.clicked)):
+                    button_link.clicked.disconnect()
+                button_link.clicked.connect(lambda: webbrowser.open_new_tab(module_url))
+            self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_widget))
 
         button.clicked.connect(button_event)
 

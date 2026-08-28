@@ -513,37 +513,43 @@ class WriteDefault:
         """Get default key string."""
         default_key = self.remap_widget.default_key_entry.text().strip()
         translated_key = self.write_script.translate_key(default_key, is_default_key=True)
+        if translated_key is None:
+            return None
 
         # Double click
         keys = [k.strip() for k in default_key.split("+")]
         double_click_length = 2
         if len(keys) == double_click_length and keys[0] == keys[1]:
-            return (
+            default_string = (
                 f"*{translated_key}:: "
                 f'(A_PriorHotkey = "*{translated_key}" and A_TimeSincePriorHotkey < 400) && '
             )
 
         # Remap hold
-        if self.remap_widget.hold_remap_checkbox.isChecked():
+        elif self.remap_widget.hold_remap_checkbox.isChecked():
             if len(keys) != 1:
                 return None
 
             hold_interval = self.remap_widget.hold_remap_entry.text().strip()
-            return (
+            default_string = (
                 f"*{translated_key}:: "
                 f'KeyWait("{translated_key}", "T{hold_interval if hold_interval else "0.5"}") ? '
                 f'Send("{translated_key}") : '
             )
 
         # Disable first key
-        if not self.remap_widget.first_key_checkbox.isChecked() and "+" in default_key:
-            return f"~{translated_key}::"
+        elif not self.remap_widget.first_key_checkbox.isChecked() and "+" in default_key:
+            default_string = f"~{translated_key}::"
 
         # Hold format default need '*' prefix
-        if self.remap_widget.hold_format_checkbox.isChecked() and "&" not in translated_key:
-            return f"*{translated_key}::"
+        elif self.remap_widget.hold_format_checkbox.isChecked() and "&" not in translated_key:
+            default_string = f"*{translated_key}::"
 
-        return f"{translated_key}::"  # Normal default key
+        # Normal default key
+        else:
+            default_string = f"{translated_key}::"
+
+        return default_string
 
     def get_remap_string(self) -> str | None:
         """Get remap key string."""
@@ -622,39 +628,3 @@ class WriteDefault:
         send_sequence = "".join(send_parts_down + send_parts_up)
 
         return f'(SendInput("{send_sequence}"))'
-
-    def hold_format_double_click(self, remap_key, file):
-        """Write double click on hold format."""
-        hold_interval_ms = "10000"
-        if (
-            self.remap_widget.hold_format_checkbox.isChecked()
-            and self.remap_widget.hold_interval_entry is not None
-        ):
-            hold_interval = "10"
-            if (
-                self.remap_widget.hold_interval_entry.text().strip()
-                and self.remap_widget.hold_interval_entry.text().strip() != "Hold Interval"
-            ):
-                hold_interval = self.remap_widget.hold_interval_entry.text().strip()
-            hold_interval_ms = str(int(float(hold_interval) * 1000))
-
-        keys = [key.strip() for key in remap_key.split("+")]
-        down_parts = []
-        up_parts = []
-
-        for key in keys:
-            if hasattr(self, "is_unicode_key") and self.write_script.is_unicode_key(key):
-                down_parts.append(f'{{" Chr({ord(key)}) " Down}}')
-                up_parts.insert(0, f'{{" Chr({ord(key)}) " Up}}')
-            else:
-                tr_key = self.write_script.translate_key(key)
-                down_parts.append(f"{{{tr_key} Down}}")
-                up_parts.insert(0, f"{{{tr_key} Up}}")
-
-        down_sequence = "".join(down_parts)
-        up_sequence = "".join(up_parts)
-
-        file.write(
-            f'        (SendInput("{down_sequence}"), '
-            f'SetTimer(() => SendInput("{up_sequence}"), -{hold_interval_ms}))\n'
-        )

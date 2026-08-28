@@ -19,7 +19,6 @@ import json
 from pyqcodeeditor import utils as pyqcodeeditor_utils
 from pyqcodeeditor.QCodeEditor import QCodeEditor
 from pyqcodeeditor.QSyntaxStyle import QSyntaxStyle
-from PySide6.QtCore import Qt  # pylint: disable=E0611
 from PySide6.QtGui import QPalette, QTextCharFormat, QTextCursor  # pylint: disable=E0611
 from PySide6.QtWidgets import (  # pylint: disable=E0611
     QDialog,
@@ -30,7 +29,6 @@ from PySide6.QtWidgets import (  # pylint: disable=E0611
     QWidget,
 )
 
-from keytik.profile_mode.shared_row import SharedRow
 from keytik.profile_mode.shortcut_row import ShortcutRow
 from keytik.utility.style import Palette
 
@@ -57,9 +55,9 @@ class TextMode:
         text_block = self.text_block(lines)
         text_block_layout.addWidget(text_block, 0, 0, 1, 2)
 
-        text_block_layout.addWidget(
-            SharedRow().expand_button(parent_window), 0, 1, Qt.AlignTop | Qt.AlignRight
-        )
+        # text_block_layout.addWidget(
+        #     SharedRow().expand_button(parent_window), 0, 1, Qt.AlignTop | Qt.AlignRight
+        # )
 
         return widget
 

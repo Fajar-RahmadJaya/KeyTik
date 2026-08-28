@@ -13,7 +13,7 @@
     "LicenseText": "Licensees holding valid commercial Qt licenses may use this software in\naccordance with the the terms contained in a written agreement between\nyou and The Qt Company. Alternatively, the terms and conditions that were\naccepted by the licensee when buying and/or downloading the\nsoftware do apply.\n\nFor the latest licensing terms and conditions, see https://www.qt.io/terms-conditions.\nFor further information use the contact form at https://www.qt.io/contact-us.\n",
     "Name": "PySide6",
     "URL": "https://pyside.org",
-    "Version": "6.11.1"
+    "Version": "6.11.2"
   },
   {
     "Author": "Qt for Python Team <pyside@qt-project.org>",
@@ -21,7 +21,7 @@
     "LicenseText": "Licensees holding valid commercial Qt licenses may use this software in\naccordance with the the terms contained in a written agreement between\nyou and The Qt Company. Alternatively, the terms and conditions that were\naccepted by the licensee when buying and/or downloading the\nsoftware do apply.\n\nFor the latest licensing terms and conditions, see https://www.qt.io/terms-conditions.\nFor further information use the contact form at https://www.qt.io/contact-us.\n",
     "Name": "PySide6_Addons",
     "URL": "https://pyside.org",
-    "Version": "6.11.1"
+    "Version": "6.11.2"
   },
   {
     "Author": "Qt for Python Team <pyside@qt-project.org>",
@@ -29,7 +29,7 @@
     "LicenseText": "Licensees holding valid commercial Qt licenses may use this software in\naccordance with the the terms contained in a written agreement between\nyou and The Qt Company. Alternatively, the terms and conditions that were\naccepted by the licensee when buying and/or downloading the\nsoftware do apply.\n\nFor the latest licensing terms and conditions, see https://www.qt.io/terms-conditions.\nFor further information use the contact form at https://www.qt.io/contact-us.\n",
     "Name": "PySide6_Essentials",
     "URL": "https://pyside.org",
-    "Version": "6.11.1"
+    "Version": "6.11.2"
   },
   {
     "Author": "Colin Duquesnoy and the Spyder Development Team",
@@ -149,7 +149,7 @@
     "LicenseText": "Licensees holding valid commercial Qt licenses may use this software in\naccordance with the the terms contained in a written agreement between\nyou and The Qt Company. Alternatively, the terms and conditions that were\naccepted by the licensee when buying and/or downloading the\nsoftware do apply.\n\nFor the latest licensing terms and conditions, see https://www.qt.io/terms-conditions.\nFor further information use the contact form at https://www.qt.io/contact-us.\n",
     "Name": "shiboken6",
     "URL": "https://pyside.org",
-    "Version": "6.11.1"
+    "Version": "6.11.2"
   },
   {
     "Author": "Benjamin Peterson",

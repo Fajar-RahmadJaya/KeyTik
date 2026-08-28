@@ -757,11 +757,11 @@ class SettingAbout:
 
     def license_text(self):
         """License full text widget."""
-        widget = QWidget()
+        license_widget = QWidget()
         layout = QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        widget.setLayout(layout)
+        license_widget.setLayout(layout)
 
         text_edit = QTextEdit()
         text_edit.setReadOnly(True)
@@ -787,7 +787,7 @@ class SettingAbout:
 
         layout.addWidget(button_widget, 0, 1, Qt.AlignTop | Qt.AlignRight)
 
-        return widget
+        return license_widget
 
     def licenses_widget(self):
         """Display open-source licenses used."""

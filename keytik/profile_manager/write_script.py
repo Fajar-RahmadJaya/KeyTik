@@ -516,8 +516,6 @@ class WriteDefault:
         if translated_key is None:
             return None
 
-        default_string = f"{translated_key}::"  # Normal default key
-
         # Double click
         keys = [k.strip() for k in default_key.split("+")]
         double_click_length = 2
@@ -528,7 +526,7 @@ class WriteDefault:
             )
 
         # Remap hold
-        if self.remap_widget.hold_remap_checkbox.isChecked():
+        elif self.remap_widget.hold_remap_checkbox.isChecked():
             if len(keys) != 1:
                 return None
 
@@ -540,12 +538,16 @@ class WriteDefault:
             )
 
         # Disable first key
-        if not self.remap_widget.first_key_checkbox.isChecked() and "+" in default_key:
+        elif not self.remap_widget.first_key_checkbox.isChecked() and "+" in default_key:
             default_string = f"~{translated_key}::"
 
         # Hold format default need '*' prefix
-        if self.remap_widget.hold_format_checkbox.isChecked() and "&" not in translated_key:
+        elif self.remap_widget.hold_format_checkbox.isChecked() and "&" not in translated_key:
             default_string = f"*{translated_key}::"
+
+        # Normal default key
+        else:
+            default_string = f"{translated_key}::"
 
         return default_string
 

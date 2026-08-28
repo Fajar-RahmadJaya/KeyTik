@@ -62,8 +62,8 @@ def adaptive_icon(fluent_icon: dict[str, str]):
     code_glyph = fluent_icon.get("code_glyph")
     if QIcon().hasThemeIcon(code_glyph):
         return QIcon().fromTheme(code_glyph)
-    else:
-        return get_icon(fluent_icon.get("material_path"))
+
+    return get_icon(fluent_icon.get("material_path"))
 
 
 icon_dir = os.path.join(constant.data_dir, "icon")

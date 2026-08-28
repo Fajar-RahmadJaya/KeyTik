@@ -19,6 +19,10 @@
 - *(default-mode)* Allow option to auto expand
 - *(setting-about)* Add open-source licenses
 - *(setting)* Add bread crumb bar
+- *(profile-ui)* Set setting button toggleable
+- *(open-source-licenses)* Add mica support
+- *(open-source-license)* Add module link
+- *(open-source-licenses)* Improve open url
 
 ### Fixes
 
@@ -30,3 +34,6 @@
 - Fix can't add profile to startup error
 - Fix text mode save error
 - Fix scan code not detected
+- Fix invalid save still saving profile
+- Fix open source licenses not following mica
+- Fix default key double click format not working

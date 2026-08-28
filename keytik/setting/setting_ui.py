@@ -867,9 +867,12 @@ class SettingAbout:
             license_text.setText(lib.get("LicenseText"))
 
             button_link = license_widget.findChild(QToolButton)
-            if button_link.isSignalConnected(QMetaMethod.fromSignal(button_link.clicked)):
-                button_link.clicked.disconnect()
-            button_link.clicked.connect(lambda: webbrowser.open_new_tab(lib.get("URL")))
+
+            module_url = lib.get("URL")
+            if module_url != "UNKNOWN":
+                if button_link.isSignalConnected(QMetaMethod.fromSignal(button_link.clicked)):
+                    button_link.clicked.disconnect()
+                button_link.clicked.connect(lambda: webbrowser.open_new_tab(module_url))
             self.setting_stack.setCurrentIndex(self.setting_stack.indexOf(license_widget))
 
         button.clicked.connect(button_event)

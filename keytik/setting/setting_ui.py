@@ -779,7 +779,7 @@ class SettingAbout:
 
         button = QToolButton()
         button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        button.setIcon(QIcon().fromTheme("\ue774"))
+        button.setIcon(icons.adaptive_icon(icons.fluent_globe))
         button.setIconSize(QSize(20, 20))
         button.setToolTip("Maximize")
         button.setFixedSize(32, 32)

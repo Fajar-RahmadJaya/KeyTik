@@ -572,7 +572,7 @@ class WriteDefault:
             return f"SendInput(Chr({ord(remap_key)}))"
 
         # Single/normal key
-        return f'Send("{self.write_script.translate_key(remap_key)}")'
+        return f'Send("{{{self.write_script.translate_key(remap_key)}}}")'
 
     def get_hold_format_string(self, remap_key):
         """Get hold format syntax."""

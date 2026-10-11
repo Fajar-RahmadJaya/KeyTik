@@ -3019,11 +3019,11 @@ wheels = [
 
 [[package]]
 name = "qt-themes"
-version = "0.4.0"
+version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ad/ec/8b966d8021e908a80dea7fe8a89641b2b950efdc02fd5d506f26fd71e8d4/qt_themes-0.4.0.tar.gz", hash = "sha256:81f5fad08338d54654cd914eec6cc42e8701cbcd1595900b98ae32d48f615237", size = 8569, upload-time = "2025-12-06T21:32:45.713Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dd/15/9a373063de1472808b02d7a4551418b478c8d824ec833bc9092e99125e3f/qt_themes-0.4.1.tar.gz", hash = "sha256:74351059d1b5bf26a5bf71131e70a3e5ac66908c37d190b865d178215575579c", size = 9587, upload-time = "2026-09-27T21:58:02.81Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ac/b4/8d2276d1ff41e7178cb8bfd374977614ed90eb2b1da3ac7a4d872932c73f/qt_themes-0.4.0-py3-none-any.whl", hash = "sha256:ff754bd5ecd0bd54caf49260939c9d1454d2967240bd6973420bd3fb9ef32c1e", size = 11331, upload-time = "2025-12-06T21:32:44.435Z" },
+    { url = "https://files.pythonhosted.org/packages/d9/d8/c33ab285a4fe74441a29ad246fb7cac00da2b6c4d7d0308bb4df66a7d3bb/qt_themes-0.4.1-py3-none-any.whl", hash = "sha256:5e77c8c3e7d04f9fd77b39e7434f14e72f378ec8fa1580b3021f9dcbb54e2979", size = 11436, upload-time = "2026-09-27T21:58:01.561Z" },
 ]
 
 [[package]]

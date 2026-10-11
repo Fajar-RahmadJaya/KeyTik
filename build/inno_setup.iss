@@ -68,9 +68,32 @@ begin
   Result := FileExists(ExpandConstant('C:\Windows\System32\drivers\keyboard.sys'))
 end;
 
+// Check AutoHotkey installation based on registry
 function IsAHKInstalled: Boolean;
+var
+  InstallDir: String;
 begin
-  Result := DirExists('C:\Program Files\AutoHotkey\v2');
+  Result := False;
+
+  // User installation
+  if RegQueryStringValue(HKCU, 'SOFTWARE\AutoHotkey', 'InstallDir', InstallDir) then
+  begin
+    if DirExists(InstallDir + '\v2') then
+    begin
+      Result := True;
+      Exit;
+    end;
+  end;
+
+  // Global installation
+  if RegQueryStringValue(HKLM, 'SOFTWARE\AutoHotkey', 'InstallDir', InstallDir) then
+  begin
+    if DirExists(InstallDir + '\v2') then
+    begin
+      Result := True;
+      Exit;
+    end;
+  end;
 end;
 
 procedure InitializeWizard;

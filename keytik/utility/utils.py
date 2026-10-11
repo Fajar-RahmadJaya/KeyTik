@@ -264,10 +264,17 @@ class Utility:
 
     def get_ahk_install_dir(self):
         """Get AutoHotkey installation directory in case not installed via other method."""
-        reg_paths = [r"SOFTWARE\AutoHotkey", r"SOFTWARE\WOW6432Node\AutoHotkey"]
-        for reg_path in reg_paths:
+        reg_paths = [
+            # User installation
+            (winreg.HKEY_CURRENT_USER, r"SOFTWARE\AutoHotkey"),
+            (winreg.HKEY_CURRENT_USER, r"SOFTWARE\WOW6432Node\AutoHotkey"),
+            # Global installation
+            (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\AutoHotkey"),
+            (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\AutoHotkey"),
+        ]
+        for hive, reg_path in reg_paths:
             try:
-                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
+                with winreg.OpenKey(hive, reg_path) as key:
                     install_dir, _ = winreg.QueryValueEx(key, "InstallDir")
                     return install_dir
             except FileNotFoundError:
